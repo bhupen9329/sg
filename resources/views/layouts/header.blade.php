@@ -382,6 +382,17 @@
                         </li>
  
 
+                        
+
+                        <li>
+                        
+                                <a href="{{ route('lifo_report') }}">
+                                    <i class="bi bi-circle"></i><span>LIFO </span>
+                                </a>
+                          
+                        </li>
+ 
+
                         {{-- <li>
                              @can('Stock-Transaction-Report')
                                 <a href="{{ route('stock_transaction_report') }}">

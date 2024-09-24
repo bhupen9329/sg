@@ -290,6 +290,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ageing-report', [ReportController::class, 'ageing_report'])->name('ageing_report');
     Route::post('/ageing-report-get', [ReportController::class, 'get_ageing_report'])->name('ageing_report_get');
 
+    
+
+    Route::get('/lifo-report', [ReportController::class, 'lifo_report'])->name('lifo_report');
+
 
     // .........................................Transactions.............................................
     Route::get('/stock_transaction', [TransactionController::class, 'index'])->name('stock_transaction.index');

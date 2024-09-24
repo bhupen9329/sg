@@ -776,4 +776,10 @@ class ReportController extends Controller
 
         return response()->json($data);
     }
+
+    public function lifo_report()
+    {
+        // dd(1);
+        return view('reports.lifo_report');
+    }
 }
