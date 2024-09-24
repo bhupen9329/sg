@@ -293,6 +293,7 @@ Route::group(['middleware' => ['auth']], function () {
     
 
     Route::get('/lifo-report', [ReportController::class, 'lifo_report'])->name('lifo_report');
+    Route::get('/inventory/lifo', [ReportController::class, 'calculateLIFO'])->name('inventory.lifo');
 
 
     // .........................................Transactions.............................................

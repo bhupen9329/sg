@@ -16,6 +16,7 @@ use App\Models\StockItem;
 use App\Models\SubCategory;
 use App\Models\Transaction;
 use App\Models\WareHouseModel;
+use App\Models\InventoryTransaction;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use DateTime;
@@ -782,4 +783,107 @@ class ReportController extends Controller
         // dd(1);
         return view('reports.lifo_report');
     }
+
+    public function calculateLifoReport()
+{
+    // Fetch all purchases
+    $purchases = InventoryTransaction::where('transaction_type', 'purchase')
+        ->orderBy('transaction_date', 'desc')
+        ->get();
+
+    // Fetch all issues
+    $issues = InventoryTransaction::where('transaction_type', 'issue')
+        ->orderBy('transaction_date')
+        ->get();
+
+    $inventoryStack = []; // LIFO stack to store remaining purchases
+    $costOfGoodsSold = 0;
+
+    // Push all purchases to the LIFO stack
+    foreach ($purchases as $purchase) {
+        $inventoryStack[] = [
+            'quantity' => $purchase->quantity,
+            'unit_price' => $purchase->unit_price,
+        ];
+    }
+
+    // Process issues
+    foreach ($issues as $issue) {
+        $issueQuantity = $issue->quantity * -1; // Convert issue to positive number
+        
+        while ($issueQuantity > 0) {
+            if (empty($inventoryStack)) {
+                throw new \Exception('Not enough inventory to fulfill the issue.');
+            }
+
+            $lastPurchase = array_pop($inventoryStack);
+
+            if ($lastPurchase['quantity'] > $issueQuantity) {
+                // Partial issue
+                $costOfGoodsSold += $issueQuantity * $lastPurchase['unit_price'];
+                $lastPurchase['quantity'] -= $issueQuantity;
+                array_push($inventoryStack, $lastPurchase); // Push back remaining stock
+                $issueQuantity = 0;
+            } else {
+                // Full issue, remove entire purchase
+                $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+                $issueQuantity -= $lastPurchase['quantity'];
+            }
+        }
+    }
+
+    return $costOfGoodsSold;
+}
+
+public function calculateLIFO()
+{
+    // Fetch all purchases first (sorted by date in descending order for LIFO)
+    $purchases = InventoryTransaction::where('transaction_type', 'purchase')
+        ->orderBy('transaction_date', 'desc')
+        ->get();
+
+    // Fetch all issues (sorted by date in ascending order)
+    $issues = InventoryTransaction::where('transaction_type', 'issue')
+        ->orderBy('transaction_date', 'asc')
+        ->get();
+
+    $remainingInventory = [];
+    $totalValue = 0;
+    $totalQuantity = 0;
+
+    foreach ($issues as $issue) {
+        $issueQty = abs($issue->quantity); // Convert issue quantity to positive for easier comparison
+
+        foreach ($purchases as $purchase) {
+            if ($purchase->quantity > 0) {
+                if ($purchase->quantity >= $issueQty) {
+                    $remainingInventory[] = [
+                        'quantity' => $issueQty,
+                        'unit_price' => $purchase->unit_price
+                    ];
+                    $totalValue += $issueQty * $purchase->unit_price;
+                    $totalQuantity += $issueQty;
+                    $purchase->quantity -= $issueQty;
+                    break;
+                } else {
+                    $remainingInventory[] = [
+                        'quantity' => $purchase->quantity,
+                        'unit_price' => $purchase->unit_price
+                    ];
+                    $totalValue += $purchase->quantity * $purchase->unit_price;
+                    $totalQuantity += $purchase->quantity;
+                    $issueQty -= $purchase->quantity;
+                    $purchase->quantity = 0;
+                }
+            }
+        }
+    }
+
+    return response()->json([
+        'remaining_inventory' => $remainingInventory,
+        'total_quantity' => $totalQuantity,
+        'total_value' => $totalValue
+    ]);
+}
+
 }
