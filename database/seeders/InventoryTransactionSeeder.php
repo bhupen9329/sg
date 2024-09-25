@@ -16,51 +16,65 @@ class InventoryTransactionSeeder extends Seeder
     {
         $transactions = [
             [
-                'transaction_date' => Carbon::create(2023, 3, 1),
+                'transaction_date' => '2024-09-01', // Date in the correct format
                 'transaction_type' => 'purchase',
-                'quantity' => 600,
-                'unit_price' => 5.00,
+                'item_name' => 'WRD5.5',
+                'quantity' => 2.99,
+                'unit_price' => 48000
             ],
             [
-                'transaction_date' => Carbon::create(2023, 3, 5),
+                'transaction_date' => '2024-09-05',
                 'transaction_type' => 'purchase',
-                'quantity' => 200,
-                'unit_price' => 5.10,
+                'item_name' => 'WRD5.5',
+                'quantity' => 18.05,
+                'unit_price' => 48100
             ],
             [
-                'transaction_date' => Carbon::create(2023, 3, 9),
-                'transaction_type' => 'issue',
-                'quantity' => -500,
-                'unit_price' => null, // Not required for issues
+                'transaction_date' => '2024-09-06',
+                'transaction_type' => 'sell',
+                'item_name' => 'WRD5.5',
+                'quantity' => 15, // Use positive values for sell transactions (handled by logic)
+                'unit_price' => 47995
             ],
             [
-                'transaction_date' => Carbon::create(2023, 3, 11),
+                'transaction_date' => '2024-09-08',
                 'transaction_type' => 'purchase',
-                'quantity' => 100,
-                'unit_price' => 4.50,
+                'item_name' => 'WRD5.5',
+                'quantity' => 4.05,
+                'unit_price' => 47500
             ],
             [
-                'transaction_date' => Carbon::create(2023, 3, 16),
+                'transaction_date' => '2024-09-09',
+                'transaction_type' => 'sell',
+                'item_name' => 'WRD5.5',
+                'quantity' => 10, // Use positive values for sell transactions (handled by logic)
+                'unit_price' => 48000
+            ],
+            [
+                'transaction_date' => '2024-09-15',
                 'transaction_type' => 'purchase',
-                'quantity' => 300,
-                'unit_price' => 5.50,
+                'item_name' => 'WRD5.5',
+                'quantity' => 4.06,
+                'unit_price' => 48200
             ],
             [
-                'transaction_date' => Carbon::create(2023, 3, 20),
-                'transaction_type' => 'issue',
-                'quantity' => -250,
-                'unit_price' => null, // Not required for issues
+                'transaction_date' => '2024-09-18',
+                'transaction_type' => 'purchase',
+                'item_name' => 'WRD5.5',
+                'quantity' => 4.59,
+                'unit_price' => 48250
             ],
             [
-                'transaction_date' => Carbon::create(2023, 3, 29),
-                'transaction_type' => 'issue',
-                'quantity' => -300,
-                'unit_price' => null, // Not required for issues
+                'transaction_date' => '2024-09-19',
+                'transaction_type' => 'sell',
+                'item_name' => 'WRD5.5',
+                'quantity' => 50,
+                'unit_price' => 48000
             ],
         ];
 
         foreach ($transactions as $transaction) {
-            InventoryTransaction::create($transaction);
+            InventoryTransaction::create($transaction); // Create the transaction in the database
         }
     }
 }
