@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('inventory_transactions', function (Blueprint $table) {
             $table->id();
             $table->date('transaction_date');
-            $table->enum('transaction_type', ['purchase', 'issue']);
-            $table->integer('quantity');
-            $table->decimal('unit_price', 10, 2)->nullable(); // Only applicable for purchases
+            $table->enum('transaction_type', ['purchase', 'sell']);
+            $table->decimal('unit_price', 10, 2)->nullable(); 
+            $table->decimal('quantity', 8, 2); 
+
+      
+            $table->string('item_name');
             $table->timestamps();
         });
     }
