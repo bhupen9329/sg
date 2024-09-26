@@ -294,6 +294,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/lifo-report', [ReportController::class, 'lifo_report'])->name('lifo_report');
     Route::get('/calculate_lifo', [ReportController::class, 'calculateLIFO'])->name('inventory.lifo');
+    Route::get('/show_lifo', [ReportController::class, 'showLIFOReport'])->name('show.lifo');
     Route::get('/calculate_fifo', [ReportController::class, 'calculateFIFO'])->name('inventory.fifo');
     Route::get('/calculate_average', [ReportController::class, 'calculateAverageCost'])->name('inventory.average');
 

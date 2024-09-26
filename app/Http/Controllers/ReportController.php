@@ -953,7 +953,6 @@ class ReportController extends Controller
 
 public function calculateLIFO()
 {
-  
     $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
     $inventoryStack = []; 
@@ -964,56 +963,54 @@ public function calculateLIFO()
 
     foreach ($transactions as $transaction) {
         if ($transaction->transaction_type === 'purchase') {
-           
+            // Add the purchased items to the inventory stack
             $inventoryStack[] = [
                 'quantity' => $transaction->quantity,
                 'unit_price' => $transaction->unit_price,
                 'transaction_date' => $transaction->transaction_date,
             ];
 
-         
+            // Update totals
             $totalQuantity += $transaction->quantity;
             $totalValue += $transaction->quantity * $transaction->unit_price;
 
-      
+            // Log the transaction
             $transactionLogs[] = [
                 'transaction_type' => 'Purchase',
                 'quantity' => $transaction->quantity,
                 'unit_price' => $transaction->unit_price,
                 'transaction_date' => $transaction->transaction_date,
                 'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue
+                'balance_value' => $totalValue,
+                'cost_of_goods_sold' => 0,
+                'profit_loss' => 0,
             ];
 
         } elseif ($transaction->transaction_type === 'sell') {
-
-            $sellQty = abs($transaction->quantity); 
-            $sellingPrice = $transaction->unit_price; 
+            $sellQty = abs($transaction->quantity); // Quantity sold is negative in the transaction
             $logEntry = [
-                'transaction_type' => 'sell',
+                'transaction_type' => 'Sell',
                 'quantity' => $sellQty,
                 'transaction_date' => $transaction->transaction_date,
-                'selling_price' => $sellingPrice,
+                'selling_price' => $transaction->unit_price,
                 'details' => []
             ];
 
             $costOfGoodsSold = 0; 
 
-           
             while ($sellQty > 0 && !empty($inventoryStack)) {
-                $lastPurchase = array_pop($inventoryStack); 
+                // Get the last purchase from the stack
+                $lastPurchase = array_pop($inventoryStack);
 
+                // Determine how much can be sold from the last purchase
                 if ($lastPurchase['quantity'] >= $sellQty) {
-                   
-                    $remainingQty = $lastPurchase['quantity'] - $sellQty;
-
-                 
+                    // If the last purchase can cover the entire sell quantity
                     $costOfGoodsSold += $sellQty * $lastPurchase['unit_price'];
-                    $totalValue -= $sellQty * $lastPurchase['unit_price']; 
-                    $totalQuantity -= $sellQty; 
+                    $totalQuantity -= $sellQty; // Reduce the quantity in stock
+                    $remainingQty = $lastPurchase['quantity'] - $sellQty; // Calculate remaining quantity
 
+                    // If there's remaining quantity, push it back to the inventory stack
                     if ($remainingQty > 0) {
-                      
                         $inventoryStack[] = [
                             'quantity' => $remainingQty,
                             'unit_price' => $lastPurchase['unit_price'],
@@ -1021,7 +1018,7 @@ public function calculateLIFO()
                         ];
                     }
 
-                  
+                    // Log the details for this transaction
                     $logEntry['details'][] = [
                         'used_qty' => $sellQty,
                         'unit_price' => $lastPurchase['unit_price'],
@@ -1029,36 +1026,33 @@ public function calculateLIFO()
                         'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
                     ];
 
-                    $sellQty = 0; 
+                    $sellQty = 0; // Sale is completed
                 } else {
-                 
-                    $usedQty = $lastPurchase['quantity'];
-                    $costOfGoodsSold += $usedQty * $lastPurchase['unit_price'];
-                    $totalValue -= $usedQty * $lastPurchase['unit_price'];
-                    $totalQuantity -= $usedQty;
+                    // If the last purchase can't cover the sell quantity completely
+                    $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+                    $sellQty -= $lastPurchase['quantity']; // Reduce the sell quantity
+                    $totalQuantity -= $lastPurchase['quantity']; // Update the total quantity
 
+                    // Log the details
                     $logEntry['details'][] = [
-                        'used_qty' => $usedQty,
+                        'used_qty' => $lastPurchase['quantity'],
                         'unit_price' => $lastPurchase['unit_price'],
                         'remaining_qty' => 0,
                         'remaining_value' => 0,
                     ];
-
-                    $sellQty -= $usedQty; 
                 }
             }
 
-           
-            $totalSaleValue = $transaction->quantity * $sellingPrice;
+            // Calculate profit/loss
+            $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price; // Note: Selling price is null, so adjust as needed
             $profitLoss = $totalSaleValue - $costOfGoodsSold;
             $totalProfitLoss += $profitLoss;
 
-          
+            // Log the sell transaction
             $transactionLogs[] = [
-                'transaction_type' => 'sell',
+                'transaction_type' => 'Sell',
                 'quantity' => $logEntry['quantity'],
                 'transaction_date' => $logEntry['transaction_date'],
-                'selling_price' => $logEntry['selling_price'],
                 'balance_qty' => $totalQuantity,
                 'balance_value' => $totalValue,
                 'cost_of_goods_sold' => $costOfGoodsSold,
@@ -1069,14 +1063,20 @@ public function calculateLIFO()
         }
     }
 
-   
-    return response()->json([
+    // return response()->json([
+    //     'transaction_logs' => $transactionLogs,
+    //     'final_balance_qty' => $totalQuantity,
+    //     'final_balance_value' => $totalValue,
+    //     'final_profit_loss' => $totalProfitLoss
+    // ]);
+    return view('reports.lifo_report', [
         'transaction_logs' => $transactionLogs,
         'final_balance_qty' => $totalQuantity,
         'final_balance_value' => $totalValue,
         'final_profit_loss' => $totalProfitLoss
     ]);
 }
+
 
 
 

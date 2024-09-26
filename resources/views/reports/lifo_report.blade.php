@@ -1,4 +1,58 @@
 @extends('layouts.main')
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Logs</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            text-align: left;
+        }
+    
+        table, th, td {
+            border: 1px solid #dddddd;
+        }
+    
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+    
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    
+        .purchase {
+            background-color: #d1ecf1;
+        }
+    
+        .sell {
+            background-color: #f8d7da;
+        }
+    
+        .balance {
+            background-color: #fff3cd;
+        }
+    
+        .highlight {
+            font-weight: bold;
+            color: #343a40;
+        }
+    
+        .aggregate {
+            font-weight: bold;
+            color: #FF5733;
+        }
+    </style>
+</head>
 @section('title','Sales Order reports - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
@@ -128,46 +182,50 @@
             </div>
         </div>
 
-        <section class="section">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row ">
-                                <div class="col-md-6 col-sm-12">
-                                    <div class="pd-20">
-                                        <h4 class="text-blue h4">LIFO Report</h4>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
-                                </div>
-                            </div>
-                            <!-- Table with stripped rows -->
-                            <div class="table-responsive">
-                                <table class="table " id="Category_table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Date(MM/DD/YY)​</th>
-                                            <th>SO No.</th>
-                                            <th>Buyer Name.​</th>
-                                            <th>Total Quantity</th>
-                                            <th>Rest PCs</th>
-                                            <th>Virtual Store</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+      
+<section class="section">
+ 
+    <div class="container">
+        <h1>Inventory Transactions</h1>
+        
+        <h2>Transaction Log</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Transaction Type</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Transaction Date</th>
+                    <th>Cost of Goods Sold</th>
+                    <th>Profit/Loss</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($transactionLogs as $log)
+                    <tr>
+                        <td>{{ $log['transaction_type'] }}</td>
+                        <td>{{ $log['quantity'] }}</td>
+                        <td>{{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }}</td>
+                        <td>{{ $log['transaction_date'] }}</td>
+                        <td>{{ number_format($log['cost_of_goods_sold'], 2) }}</td>
+                        <td>{{ number_format($log['profit_loss'], 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    
+        <h3>Final Summary</h3>
+        <ul>
+            <li><strong>Final Balance Quantity:</strong> {{ $finalBalanceQty }}</li>
+            <li><strong>Final Balance Value:</strong> {{ number_format($finalBalanceValue, 2) }}</li>
+            <li><strong>Total Profit/Loss:</strong> {{ number_format($finalProfitLoss, 2) }}</li>
+        </ul>
+    </div>
 
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!-- End Table with stripped rows -->
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    
+</section>
+        
+        
     </main><!-- End #main -->
 
 

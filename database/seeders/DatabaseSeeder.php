@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             WareHouseSeeder::class,
             SubCategorySeeder::class,
             InventoryTransactionSeeder::class,
+            
    
         ]);
     }
