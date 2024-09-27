@@ -955,15 +955,15 @@ public function calculateLIFO()
 {
     $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
-    $inventoryStack = []; 
-    $transactionLogs = []; 
+    $inventoryStack = [];  // LIFO Stack to hold inventory
+    $transactionLogs = []; // To log each transaction for the report
     $totalQuantity = 0;
     $totalValue = 0;
     $totalProfitLoss = 0;
 
     foreach ($transactions as $transaction) {
-        if ($transaction->transaction_type === 'purchase') {
-            // Add the purchased items to the inventory stack
+        if (strtolower($transaction->transaction_type) === 'purchase') {
+            // Add purchase to the inventory stack
             $inventoryStack[] = [
                 'quantity' => $transaction->quantity,
                 'unit_price' => $transaction->unit_price,
@@ -974,20 +974,21 @@ public function calculateLIFO()
             $totalQuantity += $transaction->quantity;
             $totalValue += $transaction->quantity * $transaction->unit_price;
 
-            // Log the transaction
+            // Log the purchase transaction
             $transactionLogs[] = [
                 'transaction_type' => 'Purchase',
                 'quantity' => $transaction->quantity,
                 'unit_price' => $transaction->unit_price,
                 'transaction_date' => $transaction->transaction_date,
                 'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue,
+                'balance_value' => $totalValue, // This should now correctly reflect after every purchase
                 'cost_of_goods_sold' => 0,
                 'profit_loss' => 0,
             ];
 
-        } elseif ($transaction->transaction_type === 'sell') {
-            $sellQty = abs($transaction->quantity); // Quantity sold is negative in the transaction
+        } elseif (strtolower($transaction->transaction_type) === 'sell') {
+            $sellQty = abs($transaction->quantity); // Quantity sold is positive
+            $costOfGoodsSold = 0; // Track cost for the sale
             $logEntry = [
                 'transaction_type' => 'Sell',
                 'quantity' => $sellQty,
@@ -996,20 +997,21 @@ public function calculateLIFO()
                 'details' => []
             ];
 
-            $costOfGoodsSold = 0; 
-
+            // LIFO logic - Sell the most recent purchase first
             while ($sellQty > 0 && !empty($inventoryStack)) {
-                // Get the last purchase from the stack
-                $lastPurchase = array_pop($inventoryStack);
+                $lastPurchase = array_pop($inventoryStack); // Get the last batch
 
-                // Determine how much can be sold from the last purchase
                 if ($lastPurchase['quantity'] >= $sellQty) {
-                    // If the last purchase can cover the entire sell quantity
+                    // If the last purchase batch can fulfill the sell quantity
                     $costOfGoodsSold += $sellQty * $lastPurchase['unit_price'];
-                    $totalQuantity -= $sellQty; // Reduce the quantity in stock
-                    $remainingQty = $lastPurchase['quantity'] - $sellQty; // Calculate remaining quantity
+                    $totalQuantity -= $sellQty;
+                    $totalValue -= $sellQty * $lastPurchase['unit_price'];
 
-                    // If there's remaining quantity, push it back to the inventory stack
+                    // Calculate remaining quantity and value for this batch
+                    $remainingQty = $lastPurchase['quantity'] - $sellQty;
+                    $remainingValue = $remainingQty * $lastPurchase['unit_price'];
+
+                    // Push remaining stock back into the stack if there is any left
                     if ($remainingQty > 0) {
                         $inventoryStack[] = [
                             'quantity' => $remainingQty,
@@ -1018,22 +1020,22 @@ public function calculateLIFO()
                         ];
                     }
 
-                    // Log the details for this transaction
                     $logEntry['details'][] = [
                         'used_qty' => $sellQty,
                         'unit_price' => $lastPurchase['unit_price'],
                         'remaining_qty' => $remainingQty,
-                        'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
+                        'remaining_value' => $remainingValue,
                     ];
+                    $sellQty = 0; // Sale fully fulfilled
 
-                    $sellQty = 0; // Sale is completed
                 } else {
-                    // If the last purchase can't cover the sell quantity completely
+                    // If the last purchase batch can't fulfill the sell quantity
                     $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-                    $sellQty -= $lastPurchase['quantity']; // Reduce the sell quantity
-                    $totalQuantity -= $lastPurchase['quantity']; // Update the total quantity
+                    $sellQty -= $lastPurchase['quantity'];
+                    $totalQuantity -= $lastPurchase['quantity'];
+                    $totalValue -= $lastPurchase['quantity'] * $lastPurchase['unit_price'];
 
-                    // Log the details
+                    // No remaining quantity from this batch
                     $logEntry['details'][] = [
                         'used_qty' => $lastPurchase['quantity'],
                         'unit_price' => $lastPurchase['unit_price'],
@@ -1044,38 +1046,36 @@ public function calculateLIFO()
             }
 
             // Calculate profit/loss
-            $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price; // Note: Selling price is null, so adjust as needed
+            $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
             $profitLoss = $totalSaleValue - $costOfGoodsSold;
             $totalProfitLoss += $profitLoss;
 
             // Log the sell transaction
             $transactionLogs[] = [
                 'transaction_type' => 'Sell',
-                'quantity' => $logEntry['quantity'],
-                'transaction_date' => $logEntry['transaction_date'],
+                'quantity' => abs($transaction->quantity),
+                'selling_price' => $transaction->unit_price,
+                'transaction_date' => $transaction->transaction_date,
                 'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue,
+                'balance_value' => $totalValue, // Corrected balance value after sale
                 'cost_of_goods_sold' => $costOfGoodsSold,
                 'profit_loss' => $profitLoss,
                 'total_profit_loss' => $totalProfitLoss,
-                'details' => $logEntry['details']
+                'details' => $logEntry['details'],
             ];
         }
     }
 
-    // return response()->json([
-    //     'transaction_logs' => $transactionLogs,
-    //     'final_balance_qty' => $totalQuantity,
-    //     'final_balance_value' => $totalValue,
-    //     'final_profit_loss' => $totalProfitLoss
-    // ]);
     return view('reports.lifo_report', [
         'transaction_logs' => $transactionLogs,
         'final_balance_qty' => $totalQuantity,
-        'final_balance_value' => $totalValue,
-        'final_profit_loss' => $totalProfitLoss
+        'final_balance_value' => $totalValue, // Final corrected balance value
+        'final_profit_loss' => $totalProfitLoss,
     ]);
 }
+
+
+
 
 
 

@@ -182,48 +182,83 @@
             </div>
         </div>
 
-      
-<section class="section">
- 
-    <div class="container">
-        <h1>Inventory Transactions</h1>
+        <section class="section">
+            <div class="container">
+                <h1>LIFO Inventory Report</h1>
+                
+                <h2>Final Summary</h2>
+                <p><strong>Final Balance Quantity:</strong> {{ $final_balance_qty }}</p>
+                <p><strong>Final Balance Value:</strong> {{ number_format($final_balance_value, 2) }}</p>
+                <p><strong>Total Profit/Loss:</strong> {{ number_format($final_profit_loss, 2) }}</p>
+                
+                <h2>Transaction Logs</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Transaction Type</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Balance Qty</th>
+                            <th>Balance Value</th>
+                            <th>Cost of Goods Sold</th>
+                            <th>Profit/Loss</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($transaction_logs as $log)
+                            <tr>
+                                <td>{{ $log['transaction_date'] }}</td>
+                                <td>{{ $log['transaction_type'] }}</td>
+                                <td>{{ $log['quantity'] }}</td>
+                                <td>{{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }}</td>
+                                <td>{{ $log['balance_qty'] }}</td>
+                                <td>{{ number_format($log['balance_value'], 2) }}</td>
+                                <td>{{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}</td>
+                                <td>{{ number_format($log['profit_loss'] ?? 0, 2) }}</td>
+                            </tr>
         
-        <h2>Transaction Log</h2>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Transaction Type</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Transaction Date</th>
-                    <th>Cost of Goods Sold</th>
-                    <th>Profit/Loss</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($transactionLogs as $log)
-                    <tr>
-                        <td>{{ $log['transaction_type'] }}</td>
-                        <td>{{ $log['quantity'] }}</td>
-                        <td>{{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }}</td>
-                        <td>{{ $log['transaction_date'] }}</td>
-                        <td>{{ number_format($log['cost_of_goods_sold'], 2) }}</td>
-                        <td>{{ number_format($log['profit_loss'], 2) }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    
-        <h3>Final Summary</h3>
-        <ul>
-            <li><strong>Final Balance Quantity:</strong> {{ $finalBalanceQty }}</li>
-            <li><strong>Final Balance Value:</strong> {{ number_format($finalBalanceValue, 2) }}</li>
-            <li><strong>Total Profit/Loss:</strong> {{ number_format($finalProfitLoss, 2) }}</li>
-        </ul>
-    </div>
-
-    
-</section>
+                            {{-- If it's a sell transaction, display the used and remaining quantities from purchases --}}
+                            @if (!empty($log['details']))
+                                <tr>
+                                    <td colspan="8">
+                                        <h4>Details for Sell Transaction:</h4>
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Used Qty</th>
+                                                    <th>Unit Price</th>
+                                                    <th>Used Value</th>
+                                                    <th>Remaining Qty from Batch</th>
+                                                    <th>Remaining Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($log['details'] as $detail)
+                                                    <tr>
+                                                        <td>{{ $detail['used_qty'] }}</td>
+                                                        <td>{{ number_format($detail['unit_price'], 2) }}</td>
+                                                        <td>{{ number_format($detail['used_qty'] * $detail['unit_price'], 2) }}</td>
+                                                        <td>{{ $detail['remaining_qty'] }}</td>
+                                                        <td>{{ isset($detail['remaining_value']) ? number_format($detail['remaining_value'], 2) : 'N/A' }}</td> <!-- Added conditional check -->
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        
+        
+        
+        
+        
         
         
     </main><!-- End #main -->
