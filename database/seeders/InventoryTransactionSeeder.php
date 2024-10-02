@@ -36,7 +36,7 @@ class InventoryTransactionSeeder extends Seeder
                 'transaction_type' => 'Sell',
                 'item_name' => 'WRD5.5',
                 'quantity' => 15,
-                'unit_price' => 0,
+                'unit_price' => 48200,
             ],
             [
                 'transaction_date' => '2024-09-08',
@@ -50,7 +50,7 @@ class InventoryTransactionSeeder extends Seeder
                 'transaction_type' => 'Sell',
                 'item_name' => 'WRD5.5',
                 'quantity' => 10,
-                'unit_price' => 0,
+                'unit_price' => 47000,
             ],
             [
                 'transaction_date' => '2024-09-15',
@@ -71,7 +71,7 @@ class InventoryTransactionSeeder extends Seeder
                 'transaction_type' => 'Sell',
                 'item_name' => 'WRD5.5',
                 'quantity' => 50,
-                'unit_price' => 0,
+                'unit_price' => 48300,
             ],
         ];
 
