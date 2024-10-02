@@ -122,107 +122,170 @@
                 </ol>
             </nav>
         </div><!-- End Page Title -->
-        <div class="dashboard-header pagetitle">
-            <div class="breadcrum">
-                <section class="section">
-                    <div class="container">
-                        <h1>LIFO Inventory Report</h1>
 
-                        <!-- Transaction Logs -->
-                        <h2>Transaction Logs</h2>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Transaction Type</th>
-                                    <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Balance Qty</th>
-                                    <th>Balance Value</th>
-                                    <th>Cost of Goods Sold</th>
-                                    <th>Profit/Loss</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{-- @dd($transaction_logs); --}}
-                                @foreach ($transaction_logs as $log)
-                                    <tr>
-                                        <td>{{ $log['transaction_date'] }}</td>
-                                 
-                                        <td class="transaction-type"
-                                            @if (isset($log['details'])) data-details="{{ json_encode($log['details']) }}" @endif>
-                                            <a href="javascript:void(0);"
-                                                onclick="showModal(this);">{{ $log['transaction_type'] }}</a>
-                                        </td>
+<div class="dashboard-header pagetitle">
+    <div class="breadcrum">
+        <section class="section">
+            <div class="container">
+                <h1>LIFO Inventory Report</h1>
 
-                                        <td>{{ $log['quantity'] }}</td>
-                                        <td>{{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }}
-                                        </td>
-                                        <td>{{ $log['balance_qty'] }}</td>
-                                        <td>{{ number_format($log['balance_value'], 2) }}</td>
-                                        <td>{{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}</td>
-                                        <td>{{ number_format($log['profit_loss'] ?? 0, 2) }}</td>
-                                      
-                                        <td><button type="button" class="btn btn-info" data-toggle="modal"
-                                                data-target="#transactionModal"
-                                                data-details='@json($log)'>View Transaction</button></td>
+                <!-- Transaction Logs -->
+                <h2>Transaction Logs</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Transaction Date</th>
+                            <th>Transaction Type</th>
+                            <th colspan="3" class="text-center">Purchase</th>
+                            <th colspan="3" class="text-center">Sell</th>
+                           
+                            <th colspan="3" class="text-center">Stock Balance</th>
+                            <th colspan="3" class="text-center">Cost of Goods Sold(COGS)</th>
+                           
+                            <!-- <th>Quantity</th>
+                            <th>Unit Price</th> -->
+                            <!-- <th>Balance Qty</th>
+                            <th>Balance Value</th> -->
+                            <th>Cost of Goods Sold</th>
+                            <th>Profit/Loss</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                        
+                            <th></th> 
+                            <th></th> 
+                            <!-- Purchase   -->
+                            <th class="text-center">Qty MT </th>
+                            <th class="text-center">Rate</th>
+                            <th class="text-center">Amount</th>
+                            <!-- Sell -->
+                            <th class="text-center">Qty MT </th>
+                            <th class="text-center">Rate</th>
+                            <th class="text-center">Amount</th>
+                            
 
-                                    </tr>
-         
+                            <!-- Stock balance -->
+                            <th class="text-center">Bal Qty </th>
+                            <th class="text-center">Bal Value</th>
+                            <th class="text-center">Position</th>
 
+                             <!-- COGS -->
+                             <th class="text-center">Qty </th>
+                            <th class="text-center">Unit COGS Price</th>
+                            <th class="text-center">COGS</th>
+                        </tr>
 
-                                @endforeach
+                    </thead>
+                    <tbody>
+                        @foreach ($transaction_logs as $log)
+                        <tr>
+                        <td>{{ $log['transaction_date'] }}</td>
+                        <td class="transaction-type"
+                                @if (isset($log['details'])) data-details="{{ json_encode($log['details']) }}" @endif>
+                                <a href="javascript:void(0);" onclick="showModal(this);">{{ $log['transaction_type'] }}</a>
+                            </td>
+                            <!-- Purchase -->
+                            <td>
+                            @if ($log['transaction_type'] == 'Purchase')
+                            +{{ $log['quantity'] }} 
+                            @endif
+                            </td>
+                            <td>
+                            @if ($log['transaction_type'] == 'Purchase')
+                                    {{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }}                                 
+                                @endif
+                             </td>
+                             <td>
+                                @if ($log['transaction_type'] == 'Purchase' && isset($log['unit_price']))
+                                    {{ number_format($log['quantity'] * $log['unit_price'], 2) }} <!-- Calculate Total Value -->
+                                @else
+                                    N/A
+                                @endif
+                            </td>
 
-                                {{-- @foreach ($transaction_logs as $log)
-                                    <tr>
-                                        <td>{{ $log['transaction_type'] }}</td>
-                                        <td>{{ $log['quantity'] }}</td>
-                                        <td>{{ $log['transaction_date'] }}</td>
-                                        <td>{{ $log['balance_qty'] }}</td>
-                                        <td>{{ $log['balance_value'] }}</td>
-                                        <td>{{ $log['cost_of_goods_sold'] }}</td>
-                                        <td>{{ $log['profit_loss'] }}</td>
-                                        
-                                        <!-- Check if the 'break_even_price' key exists -->
-                                        <td>{{ isset($log['break_even_price']) ? $log['break_even_price'] : 'N/A' }}</td>
-                                    </tr>
-                                @endforeach --}}
+                            
+                           
+                            <!-- Sell -->
+                            <td>
+                            @if ($log['transaction_type'] == 'Sell')
+                            -{{ $log['quantity'] }} 
+                            @endif
+                            </td>
+                            
+                            <td>
+                                @if ($log['transaction_type'] == 'Sell')
+                                    {{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }} 
+                                @else
+                                   
+                                @endif
+                            </td>
 
+                            <td>
+                                @if ($log['transaction_type'] == 'Sell' && isset($log['unit_price']))
+                                    {{ number_format($log['quantity'] * $log['unit_price'], 2) }} <!-- Calculate Total Value -->
+                                @else
+                                   
+                                @endif
+                            </td>
+                          
 
-                            </tbody>
+                           <!-- Stock balance -->
+                           <td>{{ $log['balance_qty'] }}</td>
+                           <td>{{ number_format($log['balance_value'], 2) }}</td> 
+                           <td>{{ $log['status'] }}</td>   
+                           
+                            <!-- COGS details -->
+                            <td></td>                        
+                           <td></td>
+                           <td></td>
 
-                        </table>
+                           
+                            <!-- <td>{{ $log['quantity'] }}</td> -->
+                           
 
+                            <!-- <td>{{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }}</td> -->
+                            <!-- <td>{{ $log['balance_qty'] }}</td>
+                            <td>{{ number_format($log['balance_value'], 2) }}</td> -->
+                            <td>{{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}</td>
+                            <td>{{ number_format($log['profit_loss'] ?? 0, 2) }}</td>
+                            <td><button type="button" class="btn btn-info" data-toggle="modal"
+                                    data-target="#transactionModal" data-details='@json($log)'>View Transaction</button></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
-                    </div>
-
-
-
-                </section>
-
-
-
-
-                <div>
-
-                    <div class="dashboard-header pagetitle">
-                        <div class="breadcrum">
-
-
-                            <!-- Final Summary -->
-                            <h2>Final Summary</h2>
-                            <p><strong>Final Balance Quantity:</strong> {{ $final_balance_qty }}</p>
-                            <p><strong>Final Balance Value:</strong> {{ number_format($final_balance_value, 2) }}</p>
-                            <p><strong>Total Profit/Loss:</strong> {{ number_format($final_profit_loss, 2) }}</p>
-
-
-
-
-
-
-                            <div>
+                <!-- Modal for Transaction Details -->
+                <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="transactionModalLabel">Transaction Details</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
+                            <div class="modal-body">
+                                <!-- Content will be populated via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Summary -->
+                <h2>Final Summary</h2>
+                <p><strong>Final Balance Quantity:</strong> {{ $final_balance_qty }}</p>
+                <p><strong>Final Balance Value:</strong> {{ number_format($final_balance_value, 2) }}</p>
+                <p><strong>Total Profit/Loss:</strong> {{ number_format($final_profit_loss, 2) }}</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+
+
 
 
 
@@ -236,44 +299,25 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-   function showModal(button) {
-    // Retrieve the transaction log data and id from the button's data attributes
-    var log = $(button).data('log');
-    var transactionId = $(button).data('id');  // Retrieve the ID from the button
+    function showModal(element) {
+        const details = JSON.parse(element.getAttribute('data-details'));
+        let modalBody = '';
 
-    // Clear existing modal content
-    $('#modalDetailsBody').empty();
-
-    // Filter and show the specific transaction details based on the transaction ID
-    if (log.details && log.details.length > 0) {
-        var foundDetail = log.details.find(function(detail) {
-            return detail.id == transactionId;  // Compare the id with the transaction detail's id
+        details.forEach((detail) => {
+            modalBody += `
+                <p><strong>Used Quantity:</strong> ${detail.used_qty}</p>
+                <p><strong>Unit Price:</strong> ${detail.unit_price}</p>
+                <p><strong>Remaining Quantity:</strong> ${detail.remaining_qty}</p>
+                <p><strong>Remaining Value:</strong> ${detail.remaining_value}</p>
+                <hr/>
+            `;
         });
 
-        if (foundDetail) {
-            // Add the row for the found transaction
-            var row = `<tr>
-                <td>${foundDetail.used_qty}</td>
-                <td>${parseFloat(foundDetail.unit_price).toFixed(2)}</td>
-                <td>${(foundDetail.used_qty * foundDetail.unit_price).toFixed(2)}</td>
-                <td>${foundDetail.remaining_qty}</td>
-                <td>${parseFloat(foundDetail.remaining_value).toFixed(2)}</td>
-            </tr>`;
-            $('#modalDetailsBody').append(row);
-        } else {
-            $('#modalDetailsBody').append('<tr><td colspan="5">No details available for this transaction.</td></tr>');
-        }
-    } else {
-        $('#modalDetailsBody').append('<tr><td colspan="5">No details available for this transaction.</td></tr>');
+        document.querySelector('#transactionModal .modal-body').innerHTML = modalBody;
+        $('#transactionModal').modal('show');
     }
-
-    // Show the modal
-    $('#transactionModal').modal('show');
-}
-
-    </script>
+</script>
 
 
 <!-- Modal HTML -->
