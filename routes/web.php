@@ -22,6 +22,7 @@ use App\Http\Controllers\WareHouseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ValuationController;
 use App\Models\CompanySetting;
 use App\Models\SubCategory;
 use App\Models\Transaction;
@@ -293,7 +294,7 @@ Route::group(['middleware' => ['auth']], function () {
     
 
     Route::get('/lifo-report', [ReportController::class, 'lifo_report'])->name('lifo_report');
-    Route::get('/calculate_lifo', [ReportController::class, 'calculateLIFO'])->name('inventory.lifo');
+    
     Route::get('/show_lifo', [ReportController::class, 'showLIFOReport'])->name('show.lifo');
     Route::get('/calculate_fifo', [ReportController::class, 'calculateFIFO'])->name('inventory.fifo');
     Route::get('/calculate_average', [ReportController::class, 'calculateAverageCost'])->name('inventory.average');
@@ -306,6 +307,13 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('subcategory-export', [SubCategoryController::class, 'export'])->name('subcategory_export');
     Route::post('/subcategory-import', [SubCategoryController::class, 'import'])->name('subcategory_import');
+
+
+        //...............................................Inventory Valuation............................................................................
+
+        Route::get('/inventory_valuation', [ValuationController::class, 'index'])->name('inventory_valuation.index');
+        Route::get('/calculate_lifo', [ValuationController::class, 'calculateLIFO'])->name('inventory.lifo');
+        Route::post('/store_inventory', [ValuationController::class, 'store_inventory'])->name('store_inventory');
 
 });
 

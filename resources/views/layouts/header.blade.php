@@ -323,6 +323,13 @@
                 </li>
             @endcan
 
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('inventory_valuation.index')}}">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    <span>Inventory Valuation</span>
+                </a>
+            </li>
+
 
             @if (
                 (auth()->check() && auth()->user()->can('PO-Report')) ||
