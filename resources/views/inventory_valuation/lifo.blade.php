@@ -196,7 +196,7 @@
                                             <!-- Purchase -->
                                             <td>
                                                 @if ($log['transaction_type'] == 'Purchase')
-                                                    +{{ number_format($log['quantity']) }}
+                                                    +{{ number_format($log['quantity'], 2) }}
                                                 @endif
                                             </td>
                                             <td>
