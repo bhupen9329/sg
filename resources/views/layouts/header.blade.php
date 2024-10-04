@@ -324,6 +324,13 @@
             @endcan
 
             <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('manual.matching')}}">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    <span>Manual Matching</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('inventory_valuation.index')}}">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
                     <span>Inventory Valuation</span>

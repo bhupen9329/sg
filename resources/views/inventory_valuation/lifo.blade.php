@@ -517,6 +517,43 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </section>
+
+                {{-- <section>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Transaction Date</th>
+                                <th>Transaction Type</th>
+                                <th>Used Qty</th>
+                                <th>Unit Price</th>
+                                <th>Total Value</th>
+                                <th>Current Balance Qty</th>
+                                <th>Current Balance Value</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($calculatedLogs as $log)
+                                <tr>
+                                    <td>{{ $log['transaction_date'] }}</td>
+                                    <td>{{ $log['transaction_type'] }}</td>
+                                    <td>{{ number_format($log['used_qty'] ?? 0, 2) }}</td>
+                                    <td>{{ number_format($log['unit_price'] ?? 0, 2) }}</td>
+                                    <td>{{ number_format($log['total_value'] ?? 0, 2) }}</td>
+                                    <td>{{ number_format($log['current_balance_qty'] ?? 0, 2) }}</td>
+                                    <td>{{ number_format($log['current_balance_value'] ?? 0, 2) }}</td>
+                                    <td>{{ $log['status'] ?? 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                                      
+        
+        
+                </section> --}}
 
 
               <!-- Modal HTML -->
