@@ -9,6 +9,6 @@ class InventoryTransaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = [  'transaction_date', 'transaction_type', 'item_name', 'quantity', 'unit_price'];
+    protected $fillable = [  'company_name','transaction_date', 'transaction_type', 'item_name', 'quantity', 'unit_price'];
     
 }

@@ -23,6 +23,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ValuationController;
+use App\Http\Controllers\ManualMatching;
 use App\Models\CompanySetting;
 use App\Models\SubCategory;
 use App\Models\Transaction;
@@ -314,7 +315,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/inventory_valuation', [ValuationController::class, 'index'])->name('inventory_valuation.index');
         Route::get('/calculate_lifo', [ValuationController::class, 'calculateLIFO'])->name('inventory.lifo');
         Route::post('/store_inventory', [ValuationController::class, 'store_inventory'])->name('store_inventory');
+        Route::get('/inventory/filter', [ValuationController::class, 'filter'])->name('inventory.filter');
+        // Route::get('/valuation', [ValuationController::class, 'valuation'])->name('inventory.valuation');
+        Route::post('/inventory_valuation/get_inventory_list', [ValuationController::class, 'get_inventory_list'])->name('get_inventory_list');
+        Route::post('/inventory/valuation-data', [ValuationController::class, 'getValuationData'])->name('inventory.getValuationData');
+        Route::get('/transaction-details', [ValuationController::class, 'getTransactionDetails'])->name('inventory_valuation.valuation');
+        Route::get('/position-report', [ValuationController::class, 'getPositionReport'])->name('position.report');
 
+        // .................................................................................................................................................
+        Route::get('/manual_matching', [ManualMatching::class, 'index'])->name('manual.matching');
 });
 
 

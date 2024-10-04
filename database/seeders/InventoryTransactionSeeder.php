@@ -18,6 +18,7 @@ class InventoryTransactionSeeder extends Seeder
         // Define the transactions as per the specified data
         $transactions = [
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-01',
                 'transaction_type' => 'Purchase',
                 'item_name' => 'WRD5.5',
@@ -25,6 +26,7 @@ class InventoryTransactionSeeder extends Seeder
                 'unit_price' => 48000,
             ],
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-05',
                 'transaction_type' => 'Purchase',
                 'item_name' => 'WRD5.5',
@@ -32,6 +34,7 @@ class InventoryTransactionSeeder extends Seeder
                 'unit_price' => 48100,
             ],
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-06',
                 'transaction_type' => 'Sell',
                 'item_name' => 'WRD5.5',
@@ -39,6 +42,7 @@ class InventoryTransactionSeeder extends Seeder
                 'unit_price' => 48200,
             ],
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-08',
                 'transaction_type' => 'Purchase',
                 'item_name' => 'WRD5.5',
@@ -46,6 +50,7 @@ class InventoryTransactionSeeder extends Seeder
                 'unit_price' => 47500,
             ],
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-09',
                 'transaction_type' => 'Sell',
                 'item_name' => 'WRD5.5',
@@ -53,6 +58,7 @@ class InventoryTransactionSeeder extends Seeder
                 'unit_price' => 47000,
             ],
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-15',
                 'transaction_type' => 'Purchase',
                 'item_name' => 'WRD5.5',
@@ -60,6 +66,7 @@ class InventoryTransactionSeeder extends Seeder
                 'unit_price' => 48200,
             ],
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-18',
                 'transaction_type' => 'Purchase',
                 'item_name' => 'WRD5.5',
@@ -67,6 +74,7 @@ class InventoryTransactionSeeder extends Seeder
                 'unit_price' => 48250,
             ],
             [
+                'company_name' => 'Aditya Engineering Raipur',
                 'transaction_date' => '2024-09-19',
                 'transaction_type' => 'Sell',
                 'item_name' => 'WRD5.5',

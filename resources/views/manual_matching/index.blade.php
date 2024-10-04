@@ -87,7 +87,7 @@
                     <div class="card">
                         <div class="card-body">
                             <!-- Add Filter Section -->
-                            <div class="row mb-4">
+                            {{-- <div class="row mb-4">
 
                                 <div class="col-md-4 col-sm-6">
                                     <label for="date_filter" class="form-label">Select Filter</label>
@@ -126,13 +126,13 @@
                                 
                                 </div>
 
-                            </div>
+                            </div> --}}
 
                             <!-- Existing Table Section -->
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Inventory Details</h4>
+                                        <h4 class="text-blue h4">Purchase -Sell  Details</h4>
                                     </div>
                                 </div>
 
@@ -143,7 +143,7 @@
                                                 data-bs-target="#PurchaseinwardModal">Add Inventory</a>
                                         @endcan
                                     </div>
-                                    <div class="btn-group ps-3">
+                                    {{-- <div class="btn-group ps-3">
                                         @can('Inward-create')
                                             <a href="{{ route('inventory.lifo') }}" class="btn btn-primary mb-4 mr-3">LIFO</a>
                                         @endcan
@@ -159,7 +159,7 @@
                                         @can('Inward-create')
                                             <a href="{{ route('position.report') }}" class="btn btn-primary mb-4 mr-3">Position Report</a>
                                         @endcan
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
 
@@ -169,27 +169,29 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Transaction Date​</th>
-                                        <th>Party Name​</th>
                                         <th>Item Name​</th>
-                                    
-                                        <th>Type</th>
+                                        <th>Purchase Qty​</th>
+                                        <th>Sell Qty</th>
+                                        <th>Rem Pur</th>
+                                        <th>Rem Sell</th>
+                                        <th>Position<th>
+                                        {{-- <th>Type</th>
                                         <th>Unit Price</th>
-                                        <th>Quantity (Q)</th>
+                                        <th>Quantity (Q)</th> --}}
                                     </tr>
                                 </thead>
-                                <tbody>
+                                {{-- <tbody>
                                     @foreach ($inventory as $data)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->transaction_date)) }}</td>
-                                            <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->item_name }}</td>
                                             <td>{{ $data->transaction_type }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->quantity }}</td>
                                         </tr>
                                     @endforeach
-                                </tbody>
+                                </tbody> --}}
                             </table>
                             <!-- End Table with stripped rows -->
                         </div>
@@ -269,7 +271,6 @@
                                 @endforeach
                             </select>
                         </div>
-                        
                         
                         <div class="form-group">
                             <label for="item_name">Item Name:</label>
