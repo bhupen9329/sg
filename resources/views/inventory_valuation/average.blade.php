@@ -127,64 +127,76 @@
             <div class="dashboard-header pagetitle">
                 <div class="breadcrum">
                     <section class="section">
-                        <div>
-                           
-            
-                            <!-- Transaction Logs -->
-                            <h2>Transaction Logs</h2>
-            
-                            <div style="overflow-x: auto">
-                                <table class="table table-bordered text-center" id="Category_table" style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="background-color: #f2f2f2; text-align: center;">
-                                            <!-- Table Headers with proper alignment -->
-                                            <th style="padding: 8px;">Report Date</th>
-                                            <th style="padding: 8px;">Item Name</th>
-                                            <th style="padding: 8px;">Position (MT)</th>
-                                            <th style="padding: 8px;">LIFO Valuation</th>
-                                            <th style="padding: 8px;">FIFO Valuation</th>
-                                            <th style="padding: 8px;">Manual Match</th>
-                                            <th style="padding: 8px;">Monthly Average</th>
-                                            <th style="padding: 8px;">Netwise</th>
+                        <div class="container">
+                            <h1>Average Cost Inventory</h1>
+                            <h2>Item: {{ $item_name }}</h2>
+                        
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Transaction Type</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Transaction Date</th>
+                                        <th>Balance Quantity</th>
+                                        <th>Balance Value</th>
+                                        <th>Average Cost</th>
+                                        <th>Cost of Goods Sold</th>
+                                        <th>Profit/Loss</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($transaction_logs as $log)
+                                        <tr>
+                                            <td>{{ $log['transaction_type'] }}</td>
+                                            <td>{{ $log['quantity'] }}</td>
+                                            <td>
+                                                @if(isset($log['selling_price']))
+                                                    {{ number_format($log['selling_price'], 2) }}
+                                                @else
+                                                    {{ number_format($log['unit_price'], 2) }}
+                                                @endif
+                                            </td>
+                                            <td>{{ \Carbon\Carbon::parse($log['transaction_date'])->format('Y-m-d') }}</td>
+                                            <td>{{ $log['balance_qty'] }}</td>
+                                            <td>{{ number_format($log['balance_value'], 2) }}</td>
+                                            <td>{{ number_format($log['average_cost'], 2) }}</td>
+                                            <td>{{ isset($log['cost_of_goods_sold']) ? number_format($log['cost_of_goods_sold'], 2) : 'N/A' }}</td>
+                                            <td>{{ number_format($log['profit_loss'], 2) }}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{-- @dd($avgData); --}}
-                                        @if(!empty($lifoData))
-                                            <!-- Table row with data -->
+                                        @if(isset($log['details']) && count($log['details']) > 0)
                                             <tr>
-                                                <td style="padding: 8px;">{{ $lifoData['last_transaction_date'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">{{ $lifoData['item_name'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">{{ $lifoData['final_balance_qty'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">
-                                                    <a href="{{ route('show.lifo') }}" >
-                                                        {{ $lifoData['final_balance_value'] ?? 'N/A' }}
-                                                    </a>
+                                                <td colspan="9">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Used Quantity</th>
+                                                                <th>Unit Price</th>
+                                                                <th>Remaining Quantity</th>
+                                                                <th>Remaining Value</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($log['details'] as $detail)
+                                                                <tr>
+                                                                    <td>{{ $detail['used_qty'] }}</td>
+                                                                    <td>{{ number_format($detail['unit_price'], 2) }}</td>
+                                                                    <td>{{ $detail['remaining_qty'] }}</td>
+                                                                    <td>{{ number_format($detail['remaining_value'], 2) }}</td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
                                                 </td>
-                                                <td style="padding: 8px;">
-                                                    <a href="{{ route('show.fifo') }}" >
-                                                        {{ $fifoData['final_balance_value'] ?? 'N/A' }}
-                                                    </a>  
-                                                </td>
-                                                <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">
-                                                    <a href="{{ route('show.average') }}" >
-                                                        {{ $avgData['final_balance_value'] ?? 'N/A' }}
-                                                    </a>
-                                                </td>
-                                             
-                                                <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
-                                            </tr>
-                                        @else
-                                            <!-- No data row -->
-                                            <tr>
-                                                <td colspan="7" style="padding: 8px; text-align: center;">No data available</td>
                                             </tr>
                                         @endif
-                                    </tbody>
-                                </table>
-                            </div>
-                            
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        
+                            <p>Total Quantity: {{ $final_balance_qty }}</p>
+                            <p>Total Value: {{ number_format($final_balance_value, 2) }}</p>
+                            <p>Total Profit/Loss: {{ number_format($final_profit_loss, 2) }}</p>
                         </div>
                     </section>
                 </div>

@@ -143,17 +143,28 @@
                                                 data-bs-target="#PurchaseinwardModal">Add Inventory</a>
                                         @endcan
                                     </div>
+                                    {{-- <div class="btn-group ps-3">
+                                        @can('Inward-create')
+                                            <a href="{{ route('show.lifo') }}" class="btn btn-primary mb-4 mr-3">LIFO</a>
+                                        @endcan
+                                    </div>
                                     <div class="btn-group ps-3">
                                         @can('Inward-create')
-                                            <a href="{{ route('inventory.lifo') }}" class="btn btn-primary mb-4 mr-3">LIFO</a>
+                                            <a href="{{ route('show.fifo') }}" class="btn btn-primary mb-4 mr-3">FIFO</a>
                                         @endcan
                                     </div>
 
                                     <div class="btn-group ps-3">
                                         @can('Inward-create')
+                                            <a href="{{ route('show.average') }}" class="btn btn-primary mb-4 mr-3">Average</a>
+                                        @endcan
+                                    </div> --}}
+
+                                    {{-- <div class="btn-group ps-3">
+                                        @can('Inward-create')
                                             <a href="{{ route('inventory_valuation.valuation') }}" class="btn btn-primary mb-4 mr-3">Valuation</a>
                                         @endcan
-                                    </div>
+                                    </div> --}}
 
                                     <div class="btn-group ps-3">
                                         @can('Inward-create')
@@ -283,7 +294,7 @@
 
                         <div class="form-group">
                             <label for="price">Unit Price:</label>
-                            <input type="number" step="0.01" name="price" class="form-control" required>
+                            <input type="number" step="any" name="price" class="form-control" required>
                         </div>
 
                         <!-- Additional fields can be added here -->
