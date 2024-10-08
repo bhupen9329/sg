@@ -143,6 +143,17 @@
                                                 data-bs-target="#PurchaseinwardModal">Add Inventory</a>
                                         @endcan
                                     </div>
+                                    <div class="btn-group ps-3">
+                                        @can('Inward-create')
+                                            <a href="{{ route('show.purchases')}}"  class="btn btn-primary mb-4 mr-3"   data-bs-toggle="modal"  data-bs-target="#selectcompanymodal">Purchases </a>
+                                        @endcan
+                                    </div>
+
+                                    <div class="btn-group ps-3">
+                                        @can('Inward-create')
+                                            <a href="#"  class="btn btn-primary mb-4 mr-3"   data-bs-toggle="modal"  data-bs-target="#selectbuyerorsupplier">Match Inventory </a>
+                                        @endcan
+                                    </div>
                                     {{-- <div class="btn-group ps-3">
                                         @can('Inward-create')
                                             <a href="{{ route('inventory.lifo') }}" class="btn btn-primary mb-4 mr-3">LIFO</a>
@@ -170,28 +181,32 @@
                                         <th>#</th>
                                         <th>Transaction Date​</th>
                                         <th>Item Name​</th>
-                                        <th>Purchase Qty​</th>
+                                       
+                                        <th>Transaction Type</th>
+
+                                        <th>Purchase ​</th>
                                         <th>Sell Qty</th>
                                         <th>Rem Pur</th>
                                         <th>Rem Sell</th>
                                         <th>Position<th>
-                                        {{-- <th>Type</th>
-                                        <th>Unit Price</th>
-                                        <th>Quantity (Q)</th> --}}
-                                    </tr>
+                                        </tr>
+                                   
                                 </thead>
-                                {{-- <tbody>
-                                    @foreach ($inventory as $data)
+                                <tbody>
+                                    {{-- @foreach ($transactions as $data)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->transaction_date)) }}</td>
                                             <td>{{ $data->item_name }}</td>
                                             <td>{{ $data->transaction_type }}</td>
-                                            <td>{{ $data->unit_price }}</td>
+                                            
+                                            
                                             <td>{{ $data->quantity }}</td>
+                                            <td>{{ $data->unit_price }}</td>
+                                            <td>Open</td>
                                         </tr>
-                                    @endforeach
-                                </tbody> --}}
+                                    @endforeach --}}
+                                </tbody>
                             </table>
                             <!-- End Table with stripped rows -->
                         </div>
@@ -203,40 +218,116 @@
 
     </main><!-- End #main -->
 
-
-    {{-- .................................. Modal for Credit Note.............................  --}}
-    <div class="modal fade" id="ModalforCredit_Note" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal3Label">Update Credit Note Status</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"style="width:50px"></button>
-                </div>
-                <form action="{{ route('change_credit_note.status') }}" method="POST">
-                    @csrf
+    
+      <!-- Modal -->
+      <div class="modal fade" id="selectbuyerorsupplier" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form action="{{ route('match.inventory') }}" method="post">
+            @csrf
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="width:50px"></button>
+                    </div>
                     <div class="modal-body">
-                        <!-- Content goes here -->
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <select name="credit_note_status" id="item_id${lastItemId}" style="height: 34px; "
-                                    class="form-control item-select-${lastItemId}" required>
-                                    <option value="" disabled selected>Select Status</option>
-                                    <option value="Credit Note Generated">Credit Note Generated</option>
-                                    <option value="Credit Note Pending">Credit Note Pending</option>
+                        <div class="row mb-3">
+                            <label class="mb-2">Select Buyer or Supplier <span class="required-classes">*</span></label>
+                            <div class="col-lg-12">
+                                <input type="radio" name="type" value="buyer" id="buyerOption" checked> Buyer
+                                <input type="radio" name="type" value="supplier" id="supplierOption"> Supplier
+                            </div>
+                        </div>
+    
+                        <div class="row">
+                            <label for="company_id" class="mb-2">Select Company <span class="required-classes">*</span></label>
+                            <div class="col-lg-12">
+                                <select name="company_id" id="companySelect" class="form-select" required>
+                                    <option value="">Select a Company</option>
+                                    @foreach($buyers as $buyer)
+                                        <option value="{{ $buyer->id }}" class="buyer-option">{{ $buyer->company_name }}</option>
+                                    @endforeach
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}" class="supplier-option" style="display: none;">{{ $supplier->company_name }}</option>
+                                    @endforeach
                                 </select>
-
-                                <input type="hidden" name="inward_id" id="set_po_id">
+                                @error('company_id') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
+        </form>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buyerOption = document.getElementById('buyerOption');
+            const supplierOption = document.getElementById('supplierOption');
+            const companySelect = document.getElementById('companySelect');
+            
+            // Function to toggle company list based on selected type
+            function toggleCompanyList() {
+                const isBuyerSelected = buyerOption.checked;
+    
+                // Show buyer companies
+                document.querySelectorAll('.buyer-option').forEach(option => {
+                    option.style.display = isBuyerSelected ? '' : 'none';
+                });
+    
+                // Show supplier companies
+                document.querySelectorAll('.supplier-option').forEach(option => {
+                    option.style.display = isBuyerSelected ? 'none' : '';
+                });
+    
+                // Reset the selected value to default
+                companySelect.value = '';
+            }
+    
+            // Event listeners for radio buttons
+            buyerOption.addEventListener('change', toggleCompanyList);
+            supplierOption.addEventListener('change', toggleCompanyList);
+    
+            // Initial load (in case Buyer is the default)
+            toggleCompanyList();
+        });
+    </script>
+    
+      <!-- Modal -->
+      <div class="modal fade" id="selectcompanymodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form action="{{ route('show.purchases') }}" method="post">
+            @csrf
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"style="width:50px"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <label for="" class="mb-2">Select Company <span
+                                    class="required-classes">*</span></label>
+
+                            <div class="col-lg-12">
+                                <select name="company_id" class="form-select" required>
+                                    <option value="">Select a Supplier</option>
+                                    @foreach($suppliers as $company)
+                                        <option value="{{ $company->id }}">{{ $company->company_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('company_id') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="modal fade" id="PurchaseinwardModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -279,7 +370,7 @@
 
                         <div class="form-group">
                             <label for="quantity">Quantity:</label>
-                            <input type="number" name="quantity" class="form-control" required>
+                            <input type="number" step="any" name="quantity" class="form-control" required>
                         </div>
 
                         <div class="form-group">
@@ -300,62 +391,7 @@
     </div>
 
 
-    <!-- Modal -->
-    {{-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <form action="{{ route('inward.create') }}" method="post">
-            @csrf
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <label for="" class="mb-2">Select Company <span
-                                    class="required-classes">*</span></label>
-                            <div class="col-lg-12">
-                                @livewire('purchase')
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div> --}}
-
-
-
-
-    {{-- 
-    <script>
-        function get_po_id(po_id) {
-            po_id = po_id;
-            // console.log(po_id);
-            $('#set_po_id').val(po_id);
-
-        }
-        document.getElementById("typeSelect").addEventListener("change", function() {
-            var type = this.value;
-
-            // $('#get_selected_type').val(type);
-            // $('#selected_type_purchase').val(type);
-
-            // // console.log(type);
-            // if (type == 'Sales Return') {
-            //     $('#warehouseModal').modal('show');
-            // } else {
-            //     $('#PurchaseinwardModal').modal('show');
-            // }
-        });
-    </script> --}}
-
-
-
-
+  
 
 
     <script>

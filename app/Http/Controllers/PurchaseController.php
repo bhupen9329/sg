@@ -126,6 +126,7 @@ class PurchaseController extends Controller
             'no_of_due_date' => $request->no_of_due_date,
             'due_date' => $request->due_date,
             'status' => 'Open',
+            'match_position' =>'open',
         ];
 
         // dd($po_data);

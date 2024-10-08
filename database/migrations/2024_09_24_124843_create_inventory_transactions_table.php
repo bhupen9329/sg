@@ -14,13 +14,15 @@ return new class extends Migration
         Schema::create('inventory_transactions', function (Blueprint $table) {
             $table->id();
             $table->date('transaction_date');
+            $table->string('item_name');
             $table->string('company_name');
             $table->enum('transaction_type', ['purchase', 'sell']);
             $table->decimal('unit_price', 10, 2)->nullable(); 
             $table->decimal('quantity'); 
+            $table->string('position');
 
       
-            $table->string('item_name');
+          
             $table->timestamps();
         });
     }
