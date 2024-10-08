@@ -289,7 +289,7 @@
 
                         <div class="form-group">
                             <label for="quantity">Quantity:</label>
-                            <input type="number" name="quantity" class="form-control" required>
+                            <input type="number" step="any" name="quantity" class="form-control" required>
                         </div>
 
                         <div class="form-group">
@@ -380,6 +380,7 @@
             _token: "{{ csrf_token() }}"
         },
         success: function(response) {
+            // console.log(response);
             if (response && Array.isArray(response)) {
                 var table = $('#Category_table').DataTable();
                 table.clear().draw();
@@ -396,10 +397,12 @@
                     table.row.add([
                         index + 1,
                         data.transaction_date,
+                        data.company_name ?? 'N/A',
+                        data.item_name ?? 'N/A',
                         data.transaction_type ?? 'N/A',
                         data.unit_price ?? 'N/A',
                         data.quantity ?? 'N/A',
-                        data.item_name ?? 'N/A',
+                  
                        
                     ]).draw(false);
                 });

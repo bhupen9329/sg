@@ -28,6 +28,7 @@ class PurchaseOrder extends Model
         'status',
         'order_age',
         'close_date',
+        'match_position',
     ];
     public $timestamps = true;
 }

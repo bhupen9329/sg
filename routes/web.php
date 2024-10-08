@@ -324,9 +324,16 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/inventory/valuation-data', [ValuationController::class, 'getValuationData'])->name('inventory.getValuationData');
         Route::get('/transaction-details', [ValuationController::class, 'getTransactionDetails'])->name('inventory_valuation.valuation');
         Route::get('/position-report', [ValuationController::class, 'getPositionReport'])->name('position.report');
+        Route::post('/get_position_report_list', [ValuationController::class, 'get_position_report_list'])->name('get_position_report_list.report');
+
 
         // .................................................................................................................................................
         Route::get('/manual_matching', [ManualMatching::class, 'index'])->name('manual.matching');
+        Route::post('/show_purchases', [ManualMatching::class, 'showOpenPurchases'])->name('show.purchases');
+        Route::get('/get_buyer_list', [YourControllerName::class, 'get_buyer_list'])->name('get.buyer.list');
+        Route::post('/match_inventory', [ManualMatching::class, 'match_inventory'])->name('match.inventory');
+        Route::post('/purchasesellmatch', [ManualMatching::class, 'storePurSellMatch'])->name('purchasesellmatch.store');
+
 });
 
 

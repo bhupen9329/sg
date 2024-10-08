@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('broker', 200)->nullable();
             $table->string('remark', 400)->nullable();
             $table->string('status', 100)->nullable();
+            $table->string('match_position', 100)->default('open');
             $table->string('order_age', 400)->nullable();
             $table->string('close_date', 200)->nullable();
             $table->timestamps();

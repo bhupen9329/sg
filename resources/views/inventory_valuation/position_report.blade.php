@@ -128,7 +128,46 @@
                 <div class="breadcrum">
                     <section class="section">
                         <div>
-                           
+                            <div class="row mb-4">
+
+                                <div class="col-md-4 col-sm-6">
+                                    <label for="date_filter" class="form-label">Select Filter</label>
+                                    <select class="form-select" id="filterType" name="filterType">
+                                        <option value="">Select Filter Type</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-sm-6" style="margin-top: 7px">
+                                    <label for="filterTodate"><strong>From Date</strong></label>
+                                    <?php
+                                    $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
+                                    ?>
+                                    <input type="date" class="form-control" value="<?php echo $firstDayOfMonth; ?>" name="to_date"
+                                        id="filterTodate" required>
+                                </div>
+                                <div class="col-md-2 col-sm-6" style="margin-top: 7px">
+                                    <label for="filterFromdate"><strong>To Date</strong></label>
+                                    <?php
+                                    $lastDayOfMonth = (new DateTime('last day of this month'))->format('Y-m-d');
+                                    ?>
+                                    <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
+                                        id="filterFromdate" required>
+                                </div>
+                                <div class="col-md-4 col-sm-12 d-flex align-items-end">
+
+                                    <button class=" m-1 btn btn-primary" type="button"
+                                    onclick="filterButton(
+                                        $('#filterType').val(),  
+                                        $('#filterTodate').val(),
+                                        $('#filterFromdate').val(),
+                                    )">
+                                    Apply
+                                </button>
+                                
+                                </div>
+
+                            </div>
             
                             <!-- Transaction Logs -->
                             <h2>Transaction Logs</h2>
@@ -205,7 +244,7 @@
                 </button>
             </div>
 
-            <table class="table" id="Category_table">
+            <table class="table" id="">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -270,7 +309,53 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
-
+    <script>
+        function filterButton(filterType, filterTodate, filterFromdate) {
+       $.ajax({
+           type: 'POST',
+           url: 'get_position_report_list',
+           data: {
+               filterTodate: filterTodate,
+               filterFromdate: filterFromdate,
+               filterType: filterType,
+               _token: "{{ csrf_token() }}"
+           },
+           success: function(response) {
+               if (response && Array.isArray(response)) {
+                   var table = $('#Category_table').DataTable();
+                   table.clear().draw();
+                   response.forEach(function(data, index) {
+                       var indentQty = data.indent_qty ?? 0;
+                       var poQty = data.po_qty ?? 0; // Default to 0 if null or undefined
+                       var inwardQty = data.inward_qty ?? 0; // Default to 0 if null or undefined
+                       var allocateQty = data.allocation_qty ?? 0;
+                       
+                       // Calculate remainingQty and pendingIndent
+                       var remainingQty = poQty != 0 ? poQty - inwardQty : 0;
+                       var pendingIndent = indentQty - (poQty + allocateQty);
+   
+                       table.row.add([
+                           index + 1,
+                           data.last_transaction_date,
+                           data.item_name ?? 'N/A',
+                           data.final_balance_qty ?? 'N/A',
+                           data.quantity ?? 'N/A',
+                           data.item_name ?? 'N/A',
+                           data.item_name ?? 'N/A',
+                           data.item_name ?? 'N/A',
+                       ]).draw(false);
+                   });
+               } else {
+                   console.error("Invalid or empty response received.");
+               }
+           },
+           error: function(xhr, status, error) {
+               console.error("AJAX request failed:", status, error);
+           }
+       });
+   }
+   
+       </script>
 
 
 

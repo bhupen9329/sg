@@ -177,6 +177,47 @@ class ValuationController extends Controller
             'last_transaction_date' => $lastTransactionDate,       
         ];
     }
+
+//     public function calculateLIFO($filterFromdate = null, $filterTodate = null)
+// {
+//     // Retrieve transactions within the date range if provided
+//     $query = InventoryTransaction::orderBy('transaction_date', 'asc');
+
+//     if ($filterFromdate && $filterTodate) {
+//         $query->whereBetween('transaction_date', [$filterFromdate, $filterTodate]);
+//     }
+
+//     $transactions = $query->get();
+//     $lastTransaction = $transactions->last();
+//     $lastTransactionDate = $lastTransaction ? $lastTransaction->transaction_date : null;
+
+//     // Initialize variables
+//     $inventoryStack = [];
+//     $transactionLogs = [];
+//     $totalQuantity = 0;
+//     $totalValue = 0;
+//     $totalProfitLoss = 0;
+//     $lastTransactionStatus = 'Long';
+
+//     foreach ($transactions as $transaction) {
+//         // The logic remains the same
+//         // Handle purchases and sales as in your original code
+//     }
+
+//     $calculatedLogs = $this->calculateTransactionDetails($transactionLogs);
+
+//     // Return the calculated LIFO data as an array
+//     return [
+//         'transaction_logs' => $transactionLogs,
+//         'final_balance_qty' => $totalQuantity,
+//         'final_balance_value' => $totalValue,
+//         'final_profit_loss' => $totalProfitLoss,
+//         'last_transaction_status' => $lastTransactionStatus,
+//         'calculatedLogs' => $calculatedLogs,
+//         'last_transaction_date' => $lastTransactionDate,
+//     ];
+// }
+
     
 
     public function showLifoReport()
@@ -334,8 +375,8 @@ class ValuationController extends Controller
     {
         $lifoData = $this->calculateLIFO();
         $fifoData = $this->calculateFIFO();
+        // dd($lifoData,  $fifoData);
         $avgData = $this->calculateAverage();
-        // dd($avgData);
         
         return view('inventory_valuation.position_report', compact('lifoData','fifoData','avgData'));
     }
@@ -501,6 +542,7 @@ class ValuationController extends Controller
         ];
     }
 
+
     public function calculateAverage()
 {
     // Fetch all transactions ordered by transaction date
@@ -616,6 +658,8 @@ class ValuationController extends Controller
     ];
 }
 
+    
+
 public function showAverageReport()
 {
     
@@ -684,6 +728,8 @@ public function showAverageReport()
         $transaction->quantity = $request->input('quantity');
         $transaction->unit_price = $request->input('price');
         $transaction->transaction_date = Carbon::now();
+        $transaction->position = 'open';
+        
 // dd($transaction);
         $transaction->save();
 
@@ -700,25 +746,26 @@ public function showAverageReport()
     $filterType = $request->filterType;
 
   
-    $query = InventoryTransaction::select('inventory_transactions.*')->orderBy('inventory_transactions.id');
+    $query = InventoryTransaction::join('companies', 'inventory_transactions.company_name', '=', 'companies.company_name')->select('inventory_transactions.*', 'companies.company_name');
     
-  
     if ($filterFromdate && $filterTodate) {
-       
-        $query->whereBetween('inventory_transactions.transaction_date', [$filterFromdate, $filterTodate]);
+        
+        $query->whereBetween('inventory_transactions.transaction_date', [$filterTodate, $filterFromdate]);
     }
     
- 
+    
     $filteredDatas = $query->get();
 
     $data = [];
     foreach ($filteredDatas as $filteredData) {
         $tempData = [
             'transaction_date' => date('d-M-Y', strtotime($filteredData->transaction_date)),
-            'transaction_type' => $filteredData->so_number ?? '',
-            'unit_price' => $filteredData->so_location ?? '',
-            'quantity' => $filteredData->section_name ?? '',
+            'transaction_type' => $filteredData->transaction_type ?? '',
+            'unit_price' => $filteredData->unit_price ?? '',
+            'quantity' => $filteredData->quantity ?? '',
             'item_name' => $filteredData->item_name ?? '',
+            'company_name' => $filteredData->company_name ?? '',
+
             
         ];
         $data[] = $tempData;
@@ -896,6 +943,41 @@ public function getValuationData(Request $request)
         // Return the view with the calculated data
         return view('inventory_valuation.valuation', compact('calculatedLogs'));
     }
+
+
+    
+    public function get_position_report_list(Request $request)
+{
+   
+    $filterTodate = $request->filterTodate;
+    $filterFromdate = $request->filterFromdate;
+    $filterType = $request->filterType;
+
+    $lifoData = $this->calculateLIFO($filterFromdate, $filterTodate);
+    $fifoData = $this->calculateFIFO($filterFromdate, $filterTodate);
+    // dd($lifoData,  $fifoData);
+    $avgData = $this->calculateAverage($filterFromdate, $filterTodate);
+ 
+
+    $data = [];
+  
+        $tempData = [
+            'last_transaction_date' =>  $lifoData['last_transaction_date'] ?? 'N/A' ,
+            'item_name' => $lifoData['item_name'] ?? 'N/A' ,
+            'final_balance_qty' => $lifoData['final_balance_qty'] ?? 'N/A',
+            'quantity' => $lifoData['final_balance_value'] ?? 'N/A' ,
+            'item_name' => $fifoData['final_balance_value'] ?? 'N/A',
+            'company_name' => $fifoData['final_balance_value'] ?? 'N/A',
+            'company_name' => $lifoData['manual_match'] ?? 'N/A',
+            'company_name' => $lifoData['netwise'] ?? 'N/A',
+        ];
+        $data[] = $tempData;
+
+    
+    
+ 
+    return response()->json($data);
+}
 
 
 

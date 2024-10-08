@@ -24,6 +24,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 2.99,
                 'unit_price' => 48000,
+                'position' => 'open',
             ],
             [
                 'company_name' => 'Aditya Engineering Raipur',
@@ -32,6 +33,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 18.05,
                 'unit_price' => 48100,
+                'position' => 'open',
             ],
             [
                 'company_name' => 'Aditya Engineering Raipur',
@@ -40,6 +42,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 15,
                 'unit_price' => 48200,
+                'position' => 'open',
             ],
             [
                 'company_name' => 'Aditya Engineering Raipur',
@@ -48,6 +51,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 4.05,
                 'unit_price' => 47500,
+                'position' => 'open',
             ],
             [
                 'company_name' => 'Aditya Engineering Raipur',
@@ -56,6 +60,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 10,
                 'unit_price' => 47000,
+                'position' => 'open',
             ],
             [
                 'company_name' => 'Aditya Engineering Raipur',
@@ -64,6 +69,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 4.06,
                 'unit_price' => 48200,
+                'position' => 'open',
             ],
             [
                 'company_name' => 'Aditya Engineering Raipur',
@@ -72,6 +78,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 4.59,
                 'unit_price' => 48250,
+                'position' => 'open',
             ],
             [
                 'company_name' => 'Aditya Engineering Raipur',
@@ -80,6 +87,7 @@ class InventoryTransactionSeeder extends Seeder
                 'item_name' => 'WRD5.5',
                 'quantity' => 50,
                 'unit_price' => 48300,
+                'position' => 'open',
             ],
         ];
 

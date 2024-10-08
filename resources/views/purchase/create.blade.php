@@ -136,7 +136,7 @@
                                                             </td>
                                                             <td>
                                                                 <input type="number" name="quantity"
-                                                                    placeholder="Quantity (Q)" class="form-control"
+                                                                    placeholder="Quantity (Q)" step="any" class="form-control"
                                                                     id="inputDesignation" required>
                                                             </td>
                                                             <td>

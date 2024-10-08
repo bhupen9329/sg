@@ -90,6 +90,8 @@ class SalesController extends Controller
         $salesOrder->total_quantity = $request->total_quantity;
         $salesOrder->total_amount = $request->total_amount;
         $salesOrder->status = 'pending';
+        $salesOrder->match_position = 'open';
+
         $salesOrder->so_number = $request->so_number;
         // $salesOrder->document_file = $request->document_file;
         $salesOrder->document_file = 'uploads/documents/sales/' . $request->so_number . '/' . $request->so_number . '.pdf';
