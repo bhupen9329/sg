@@ -31,20 +31,6 @@
                 <div class="pg active"></div>
             </div>
         @endif
-        @if ($message = Session::get('error'))
-    <div class="tt active">
-        <div class="tt-content">
-            <i class="fas fa-solid fa-times-circle error-icon" ></i>
-            <div class="message">
-                <span class="text text-1">Error</span>
-                <span class="text text-2"> {{ $message }}</span>
-            </div>
-        </div>
-        <i class="fa-solid fa-xmark close"></i>
-        <div class="pg active"></div>
-    </div>
-@endif
-
         @if ($message = Session::get('update'))
             <div class="tt active">
                 <div class="tt-content">
@@ -101,7 +87,7 @@
                     <div class="card">
                         <div class="card-body">
                             <!-- Add Filter Section -->
-                            {{-- <div class="row mb-4">
+                            <div class="row mb-4">
 
                                 <div class="col-md-4 col-sm-6">
                                     <label for="date_filter" class="form-label">Select Filter</label>
@@ -140,127 +126,83 @@
                                 
                                 </div>
 
-                            </div> --}}
+                            </div>
 
                             <!-- Existing Table Section -->
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Purchase Details</h4>
+                                        <h4 class="text-blue h4">Inventory Details</h4>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end">
-                                  
-
-                                    <div class="btn-group ps-3">
+                                    <div class="btn-group">
                                         @can('Inward-create')
-                                            <a href="{{ route('view.all')}}"  class="btn btn-primary mb-4 mr-3">View All </a>
-                                        @endcan
-                                    </div>
-                                    <div class="btn-group ps-3">
-                                        @can('Inward-create')
-                                            <a href="#"  class="btn btn-primary mb-4 mr-3"   data-bs-toggle="modal"  data-bs-target="#selectbuyerorsupplier">Match Inventory </a>
-                                        @endcan
-                                    </div>
-
-                                     <div class="btn-group ps-3">
-                                        @can('Inward-create')
-                                            <a href="{{ route('position.report')}}"  class="btn btn-primary mb-4 mr-3"   >Position Report </a>
+                                            <a href="#" class="btn btn-primary mb-4 mr-3" data-bs-toggle="modal"
+                                                data-bs-target="#PurchaseinwardModal">Add Inventory</a>
                                         @endcan
                                     </div>
                                     {{-- <div class="btn-group ps-3">
                                         @can('Inward-create')
-                                            <a href="{{ route('inventory.lifo') }}" class="btn btn-primary mb-4 mr-3">LIFO</a>
+                                            <a href="{{ route('show.lifo') }}" class="btn btn-primary mb-4 mr-3">LIFO</a>
+                                        @endcan
+                                    </div>
+                                    <div class="btn-group ps-3">
+                                        @can('Inward-create')
+                                            <a href="{{ route('show.fifo') }}" class="btn btn-primary mb-4 mr-3">FIFO</a>
                                         @endcan
                                     </div>
 
                                     <div class="btn-group ps-3">
                                         @can('Inward-create')
+                                            <a href="{{ route('show.average') }}" class="btn btn-primary mb-4 mr-3">Average</a>
+                                        @endcan
+                                    </div> --}}
+
+                                    {{-- <div class="btn-group ps-3">
+                                        @can('Inward-create')
                                             <a href="{{ route('inventory_valuation.valuation') }}" class="btn btn-primary mb-4 mr-3">Valuation</a>
                                         @endcan
-                                    </div>
+                                    </div> --}}
 
                                     <div class="btn-group ps-3">
                                         @can('Inward-create')
                                             <a href="{{ route('position.report') }}" class="btn btn-primary mb-4 mr-3">Position Report</a>
                                         @endcan
-                                    </div> --}}
-                                </div>
-                            </div>
-                            <table class="table table-bordered table-hover table-striped">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Transaction Date</th>
-                                        <th>Purchase Order</th> 
-                                        <th>Company Name</th> 
-                                                                              
-                                        <th>PO Qty</th>                                       
-                                        <th>PO Rem Quantity</th>
-                                        <th>Purchase Position</th>
-                                      
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($purchases as $data)                                 
-                                
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
-                                        <td>{{ $data->document_number }}</td> 
-                                        <td>{{ $data->company_name }}</td>                                      
-                                        <td>{{ $data->quantity }}</td>
-                                        <td>{{ $data->rest_quantity }}</td>
-                                     
-                                        <td>{{ $data->match_position }} </td>
-                                     
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-<br>
-                            <div class="row">
-                                <div class="col-md-6 col-sm-12">
-                                    <div class="pd-20">
-                                        <h4 class="text-blue h4">Sell Details</h4>
                                     </div>
                                 </div>
-
-                               
                             </div>
-                            <table class="table table-bordered table-hover table-striped">
-                                <thead class="thead-dark">
+
+                            <!-- Table with stripped rows -->
+                            <table class="table" id="Category_table">
+                                <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Transaction Date</th>
-                                        <th>Sales Order</th>   
-                                        <th>Company Name</th>                                       
-
-                                        <th>SO Qty</th>                                       
-                                        <th>SO Rem Quantity</th>
-                                        <th>Sales Position</th>
-                                      
+                                        <th>Transaction Date​</th>
+                                        <th>Party Name​</th>
+                                        <th>Item Name​</th>
+                                    
+                                        <th>Type</th>
+                                        <th>Unit Price</th>
+                                        <th>Quantity (Q)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($sales_order as $data)                                 
-                                
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
-                                        <td>{{ $data->so_number }}</td>         
-                                        <td>{{ $data->company_name }}</td>                                      
-                                        <td>{{ $data->total_quantity }}</td>
-                                        <td>{{ $data->rest_quantity }}</td>
-                                     
-                                        <td>{{ $data->match_position }} </td>
-                                     
-                                    </tr>
-                                @endforeach
+                                    @foreach ($inventory as $data)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ date('d-m-Y', strtotime($data->transaction_date)) }}</td>
+                                            <td>{{ $data->company_name }}</td>
+                                            <td>{{ $data->item_name }}</td>
+                                            <td>{{ $data->transaction_type }}</td>
+                                            <td>{{ $data->unit_price }}</td>
+                                            <td>{{ $data->quantity }}</td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
-                          
+                            <!-- End Table with stripped rows -->
                         </div>
                     </div>
                 </div>
@@ -270,115 +212,40 @@
 
     </main><!-- End #main -->
 
-    
-    <div class="modal fade" id="selectbuyerorsupplier" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <form action="{{ route('match.inventory') }}" method="post">
-            @csrf
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="width:50px"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="mb-2">Select Buyer or Supplier <span class="text-danger">*</span></label>
-                            <div>
-                                <input type="radio" name="type" value="buyer" id="buyerOption" checked>
-                                <label for="buyerOption" class="me-3">Buyer</label>
-    
-                                <input type="radio" name="type" value="supplier" id="supplierOption">
-                                <label for="supplierOption">Supplier</label>
-                            </div>
-                        </div>
-    
-                        <div class="mb-3">
-                            <label for="company_id" class="mb-2">Select Company <span class="text-danger">*</span></label>
-                            <select name="company_id" id="companySelect" class="form-select" required>
-                                <option value="">Select a Company</option>
-                                @foreach($buyers as $buyer)
-                                    <option value="{{ $buyer->id }}" class="buyer-option">{{ $buyer->company_name }}</option>
-                                @endforeach
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}" class="supplier-option" style="display: none;">{{ $supplier->company_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('company_id') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const buyerOption = document.getElementById('buyerOption');
-            const supplierOption = document.getElementById('supplierOption');
-            const companySelect = document.getElementById('companySelect');
-            
-            // Function to toggle company list based on selected type
-            function toggleCompanyList() {
-                const isBuyerSelected = buyerOption.checked;
-    
-                // Show/hide company options based on selection
-                document.querySelectorAll('.buyer-option').forEach(option => {
-                    option.style.display = isBuyerSelected ? '' : 'none';
-                });
-    
-                document.querySelectorAll('.supplier-option').forEach(option => {
-                    option.style.display = isBuyerSelected ? 'none' : '';
-                });
-    
-                // Reset the selected value to default if no valid selection
-                companySelect.value = '';
-            }
-    
-            // Event listeners for radio buttons
-            buyerOption.addEventListener('change', toggleCompanyList);
-            supplierOption.addEventListener('change', toggleCompanyList);
-    
-            // Initial load (in case Buyer is the default)
-            toggleCompanyList();
-        });
-    </script>
-    
-      <!-- Modal -->
-      <div class="modal fade" id="selectcompanymodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <form action="{{ route('show.purchases') }}" method="post">
-            @csrf
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"style="width:50px"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <label for="" class="mb-2">Select Company <span
-                                    class="required-classes">*</span></label>
 
-                            <div class="col-lg-12">
-                                <select name="company_id" class="form-select" required>
-                                    <option value="">Select a Supplier</option>
-                                    @foreach($suppliers as $company)
-                                        <option value="{{ $company->id }}">{{ $company->company_name }}</option>
-                                    @endforeach
+    {{-- .................................. Modal for Credit Note.............................  --}}
+    <div class="modal fade" id="ModalforCredit_Note" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal3Label">Update Credit Note Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"style="width:50px"></button>
+                </div>
+                <form action="{{ route('change_credit_note.status') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Content goes here -->
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <select name="credit_note_status" id="item_id${lastItemId}" style="height: 34px; "
+                                    class="form-control item-select-${lastItemId}" required>
+                                    <option value="" disabled selected>Select Status</option>
+                                    <option value="Credit Note Generated">Credit Note Generated</option>
+                                    <option value="Credit Note Pending">Credit Note Pending</option>
                                 </select>
-                                @error('company_id') <span class="text-danger">{{ $message }}</span> @enderror
+
+                                <input type="hidden" name="inward_id" id="set_po_id">
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
-                </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 
     <div class="modal fade" id="PurchaseinwardModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -414,6 +281,7 @@
                             </select>
                         </div>
                         
+                        
                         <div class="form-group">
                             <label for="item_name">Item Name:</label>
                             <input type="text" name="item_name" class="form-control" required>
@@ -426,7 +294,7 @@
 
                         <div class="form-group">
                             <label for="price">Unit Price:</label>
-                            <input type="number" step="0.01" name="price" class="form-control" required>
+                            <input type="number" step="any" name="price" class="form-control" required>
                         </div>
 
                         <!-- Additional fields can be added here -->
@@ -442,7 +310,62 @@
     </div>
 
 
-  
+    <!-- Modal -->
+    {{-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form action="{{ route('inward.create') }}" method="post">
+            @csrf
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <label for="" class="mb-2">Select Company <span
+                                    class="required-classes">*</span></label>
+                            <div class="col-lg-12">
+                                @livewire('purchase')
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div> --}}
+
+
+
+
+    {{-- 
+    <script>
+        function get_po_id(po_id) {
+            po_id = po_id;
+            // console.log(po_id);
+            $('#set_po_id').val(po_id);
+
+        }
+        document.getElementById("typeSelect").addEventListener("change", function() {
+            var type = this.value;
+
+            // $('#get_selected_type').val(type);
+            // $('#selected_type_purchase').val(type);
+
+            // // console.log(type);
+            // if (type == 'Sales Return') {
+            //     $('#warehouseModal').modal('show');
+            // } else {
+            //     $('#PurchaseinwardModal').modal('show');
+            // }
+        });
+    </script> --}}
+
+
+
+
 
 
     <script>
@@ -457,6 +380,7 @@
             _token: "{{ csrf_token() }}"
         },
         success: function(response) {
+            // console.log(response);
             if (response && Array.isArray(response)) {
                 var table = $('#Category_table').DataTable();
                 table.clear().draw();
@@ -473,10 +397,12 @@
                     table.row.add([
                         index + 1,
                         data.transaction_date,
+                        data.company_name ?? 'N/A',
+                        data.item_name ?? 'N/A',
                         data.transaction_type ?? 'N/A',
                         data.unit_price ?? 'N/A',
                         data.quantity ?? 'N/A',
-                        data.item_name ?? 'N/A',
+                  
                        
                     ]).draw(false);
                 });

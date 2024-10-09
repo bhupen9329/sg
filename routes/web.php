@@ -329,10 +329,13 @@ Route::group(['middleware' => ['auth']], function () {
 
         // .................................................................................................................................................
         Route::get('/manual_matching', [ManualMatching::class, 'index'])->name('manual.matching');
+        Route::get('/view_all', [ManualMatching::class, 'view_all'])->name('view.all');
+
         Route::post('/show_purchases', [ManualMatching::class, 'showOpenPurchases'])->name('show.purchases');
         Route::get('/get_buyer_list', [YourControllerName::class, 'get_buyer_list'])->name('get.buyer.list');
         Route::post('/match_inventory', [ManualMatching::class, 'match_inventory'])->name('match.inventory');
         Route::post('/purchasesellmatch', [ManualMatching::class, 'storePurSellMatch'])->name('purchasesellmatch.store');
+        Route::post('/purchasesellmatchbuyer', [ManualMatching::class, 'storePurSellMatchBuyer'])->name('purchasesellmatch.store.buyer');
 
 });
 

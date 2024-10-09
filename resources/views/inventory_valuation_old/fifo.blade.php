@@ -178,9 +178,8 @@
                         <h4 class="mt-4">Final Summary</h4>
                         <ul>
                             <li><strong>Final Balance Quantity:</strong> {{ $final_balance_qty }}</li>
-                            <li><strong>Final Balance Value:</strong> {{ $final_balance_value}}</li>
-                            {{-- <li><strong>Final Balance Value:</strong> {{ number_format($final_balance_value, 2) }}</li> --}}
-                            {{-- <li><strong>Final Profit/Loss:</strong> {{ number_format($final_profit_loss, 2) }}</li> --}}
+                            <li><strong>Final Balance Value:</strong> {{ number_format($final_balance_value, 2) }}</li>
+                            <li><strong>Final Profit/Loss:</strong> {{ number_format($final_profit_loss, 2) }}</li>
                             <li><strong>Last Transaction Status:</strong> {{ $last_transaction_status }}</li>
                         </ul>
                     </div>

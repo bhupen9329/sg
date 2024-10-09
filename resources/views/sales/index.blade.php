@@ -93,7 +93,7 @@
                                         <th>Total Quantity(Q)</th>
                                         <th>Due Date(DD/MM/YY)​</th>
                                         <th>Amount</th>
-                                        {{-- <th>Status</th> --}}
+                                        <th>Position</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -107,7 +107,7 @@
                                             <td>  {{ $data->total_quantity }}  </td>
                                             <td>{{ date('d-m-Y', strtotime($data->due_date)) }}</td>
                                             <td>  {{ $data->total_amount }}  </td>
-                                            {{-- <td>  {{ $data->status }}  </td> --}}
+                                            <td>  {{ $data->match_position }}  </td>
 
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">
