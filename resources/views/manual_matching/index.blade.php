@@ -175,39 +175,37 @@
                             </div>
 
                             <!-- Table with stripped rows -->
-                            <table class="table" id="Category_table">
-                                <thead>
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-dark">
                                     <tr>
                                         <th>#</th>
-                                        <th>Transaction Date​</th>
-                                        <th>Item Name​</th>
-                                       
-                                        <th>Transaction Type</th>
-
-                                        <th>Purchase ​</th>
-                                        <th>Sell Qty</th>
-                                        <th>Rem Pur</th>
-                                        <th>Rem Sell</th>
-                                        <th>Position<th>
-                                        </tr>
-                                   
+                                        <th>Transaction Date</th>
+                                        <th>Purchase Order</th>                                       
+                                        <th>Sales Order</th>
+                                        <th>Matched Quantity</th>
+                                        <th>PO Remaining Quantity</th>
+                                        <th>SO Remaining Quantity</th>    
+                                        <th>Purchase Position</th>
+                                        <th>Sales Position</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- @foreach ($transactions as $data)
+                                    @foreach ($manual_match as $data)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->transaction_date)) }}</td>
-                                            <td>{{ $data->item_name }}</td>
-                                            <td>{{ $data->transaction_type }}</td>
-                                            
-                                            
-                                            <td>{{ $data->quantity }}</td>
-                                            <td>{{ $data->unit_price }}</td>
-                                            <td>Open</td>
+                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
+                                            <td>{{ $data->po_id }}</td>
+                                            <td>{{ $data->so_id }}</td>
+                                            <td>{{ $data->matched_quantity }}</td>
+                                            <td>{{ $data->po_rest_quantity }}</td>
+                                            <td>{{ $data->so_rest_quantity }}</td>
+                                            <td>{{ $data->po_match_position }}</td>
+                                            <td>{{ $data->so_match_position }}</td>
                                         </tr>
-                                    @endforeach --}}
+                                    @endforeach
                                 </tbody>
                             </table>
+                            
                             <!-- End Table with stripped rows -->
                         </div>
                     </div>

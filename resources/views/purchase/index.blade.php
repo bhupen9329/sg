@@ -136,6 +136,7 @@
                                         @can('price')
                                             <th>Rate</th>
                                         @endcan
+                                        <th>Position​</th>
                                         {{-- <th>Status</th> --}}
                                         <th>Action</th>
                                     </tr>
@@ -155,6 +156,7 @@
                                             @can('price')
                                                 <td>{{ $po->price }}</td>
                                             @endcan
+                                            <td>{{ $po->match_position }}</td>
                                             {{-- <td>{{ $po->status }}</td> --}}
                                             <td>
                                                 <div class="filter">

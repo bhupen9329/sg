@@ -192,7 +192,9 @@
                                         @if(!empty($lifoData))
                                             <!-- Table row with data -->
                                             <tr>
-                                                <td style="padding: 8px;">{{ $lifoData['last_transaction_date'] ?? 'N/A' }}</td>
+                                                {{-- <td style="padding: 8px;">{{ $lifoData['last_transaction_date'] ?? 'N/A' }}</td> --}}
+                                                <td style="padding: 8px;">{{ date('d-m-Y') }}</td>
+
                                                 <td style="padding: 8px;">{{ $lifoData['item_name'] ?? 'N/A' }}</td>
                                                 <td style="padding: 8px;">{{ $lifoData['final_balance_qty'] ?? 'N/A' }}</td>
                                                 <td style="padding: 8px;">

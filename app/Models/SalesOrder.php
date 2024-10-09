@@ -22,6 +22,7 @@ class SalesOrder extends Model
         'total_quantity',
         'total_amount',
         'match_position',
+        'rest_quantity',
         // 'remarks',
     ];
     

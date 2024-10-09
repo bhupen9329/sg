@@ -14,11 +14,23 @@ class ManualMatching extends Controller
 {
     public function index()
     {
+       
         $suppliers = Company::where('type','=','supplier')->get();
         $companies = Company::where('type','=','supplier')->get();
         $buyers = Company::where('type','=','buyer')->get(); // Retrieve all companies
         $transactions = InventoryTransaction::all();
-        return view('manual_matching.index',compact('companies','transactions','buyers','suppliers'));
+        $manual_match = PurchaseSellMatch::join('purchase_orders', 'purchase_sell_match.po_id', '=', 'purchase_orders.id')
+    ->join('sales_orders', 'purchase_sell_match.so_id', '=', 'sales_orders.id')
+    ->select(
+        'purchase_sell_match.*',             
+        'purchase_orders.rest_quantity as po_rest_quantity',  
+        'sales_orders.rest_quantity as so_rest_quantity',     
+        'purchase_orders.match_position as po_match_position',
+        'sales_orders.match_position as so_match_position'  
+    )
+    ->get();
+// dd($manual_match);
+        return view('manual_matching.index',compact('companies','transactions','buyers','suppliers','manual_match'));
     }
 
     public function showOpenPurchases(Request $request) 
@@ -64,21 +76,60 @@ class ManualMatching extends Controller
 
 public function storePurSellMatch(Request $request)
 {
-    // dd($request);
     foreach ($request->selected_orders as $salesOrderId) {
-        
+       
         $purchaseOrderId = $request->input('purchase_order_id');
-        dd($purchaseOrderId);
+
+       
+        $salesOrder = SalesOrder::find($salesOrderId);
+        $purchaseOrder = PurchaseOrder::find($purchaseOrderId);
+
+      
+        if (!$salesOrder || !$purchaseOrder) {
+            continue;
+        }
+
+       
+        $soQuantity = $salesOrder->rest_quantity;
+        $poQuantity = $purchaseOrder->rest_quantity;
+
+        
+        $matchedQuantity = min($soQuantity, $poQuantity);
+
+      
+        $remainingSoQuantity = $soQuantity - $matchedQuantity;
+        $remainingPoQuantity = $poQuantity - $matchedQuantity;
 
        
         PurchaseSellMatch::create([
             'so_id' => $salesOrderId,
-            'po_id' => $purchaseOrderId, 
+            'po_id' => $purchaseOrderId,
+            'matched_quantity' => $matchedQuantity,
         ]);
+
+      
+        $salesOrder->update(['rest_quantity' => $remainingSoQuantity]);
+        $purchaseOrder->update(['rest_quantity' => $remainingPoQuantity]);
+
+      
+        if ($remainingSoQuantity > 0) {
+            $salesOrder->update(['status' => 'open']);
+        } else {
+            $salesOrder->update(['status' => 'close']);
+        }
+
+       
+        if ($remainingPoQuantity > 0) {
+            $purchaseOrder->update(['status' => 'close']);
+        } else {
+            $purchaseOrder->update(['status' => 'open']);
+        }
     }
 
-    return redirect()->back()->with('success', 'Selected Sales Orders have been matched successfully.');
+    return redirect()->route('manual.matching')->with('success', 'Selected Sales Orders have been matched successfully.');
+
 }
+
 
 
     

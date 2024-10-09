@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('document_file')->nullable();
             $table->string('terms_condition', 2000)->nullable();
             $table->string('total_quantity', 200)->nullable();
+            $table->string('rest_quantity', 200)->nullable();
             $table->string('total_amount', 200)->nullable();
             $table->string('status', 200)->nullable();
             $table->string('match_position', 100)->default('open');
