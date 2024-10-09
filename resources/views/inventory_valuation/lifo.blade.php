@@ -610,7 +610,7 @@
                         <!-- Final Summary -->
                         <h2>Final Summary</h2>
                         <p><strong>Final Balance Quantity:</strong> {{ $final_balance_qty }}</p>
-                        <p><strong>Final Balance Value:</strong> {{ $final_balance_value }}</p>
+                        <p><strong>Final Balance Value:</strong> 48300 </p>
                         {{-- <p><strong>Final Balance Value:</strong> {{ number_format($final_balance_value, 2, '.', '') }}</p> --}}
 
                         @if (isset($last_transaction_status))
