@@ -145,7 +145,7 @@ public function storePurSellMatch(Request $request)
         $matchedQuantity = $request->input('matched_quantity.'.$salesOrderId, 0);
         // Ensure matched quantity is valid
         if ($matchedQuantity <= 0 || $matchedQuantity > $salesOrder->rest_quantity || $matchedQuantity > $purchaseOrder->rest_quantity) {
-            dd(1);
+            // dd(1);
             continue; // Skip this iteration if the quantity is invalid
         }
         
@@ -159,6 +159,11 @@ public function storePurSellMatch(Request $request)
             'so_id' => $salesOrderId,
             'po_id' => $purchaseOrderId,
             'matched_quantity' => $matchedQuantity,
+            'po_rest_quantity' =>  $remainingPoQuantity,
+            'so_rest_quantity' =>  $remainingSoQuantity,
+
+
+
         ]);
 
         // Update remaining quantities for both sales and purchase orders
@@ -222,6 +227,9 @@ public function storePurSellMatchBuyer(Request $request)
             'so_id' => $salesOrderId,
             'po_id' => $purchaseOrderId,
             'matched_quantity' => $matchedQuantity,
+            'po_rest_quantity' =>  $remainingPoQuantity,
+            'so_rest_quantity' =>  $remainingSoQuantity,
+
         ]);
 
         // Update remaining quantities for both sales and purchase orders
@@ -257,16 +265,17 @@ public function view_all()
     ->join('companies as po_companies', 'po_companies.id', '=', 'purchase_orders.supplier_id')
     ->select(
         'purchase_sell_match.id as match_id',
-        'purchase_sell_match.created_at',             
+        'purchase_sell_match.created_at',
+        'purchase_sell_match.*',             
         'purchase_orders.id as po_id',
         'purchase_orders.document_number as po_number',
         'po_companies.company_name as po_company_name',  // Aliased to po_companies
-        'purchase_orders.rest_quantity as po_rest_quantity',  
+        
         'purchase_orders.match_position as po_match_position',
         'sales_orders.id as so_id',
         'sales_orders.so_number as so_number',
         'so_companies.company_name as so_company_name',  // Aliased to so_companies
-        'sales_orders.rest_quantity as so_rest_quantity',     
+             
         'sales_orders.match_position as so_match_position',
         'purchase_sell_match.matched_quantity'
     )

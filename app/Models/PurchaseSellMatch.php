@@ -16,7 +16,10 @@ class PurchaseSellMatch extends Model
      protected $fillable = [
          'po_id', 
          'so_id', 
-         'matched_quantity'
+         'matched_quantity',
+         'po_rest_quantity',
+         'so_rest_quantity',
+        
      ];
  
      // Define relationship with PurchaseItem model

@@ -15,8 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('po_id');
             $table->unsignedBigInteger('so_id');
+
+        
           
             $table->decimal('matched_quantity', 10, 2)->nullable(); 
+            $table->decimal('po_rest_quantity', 10, 2)->nullable(); 
+            $table->decimal('so_rest_quantity', 10, 2)->nullable(); 
             $table->timestamps();
 
             // Foreign key for purchase_item_id
