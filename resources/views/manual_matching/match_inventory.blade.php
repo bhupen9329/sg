@@ -204,14 +204,20 @@
                                                                     </td>
                                                                     <td>Purchase</td>
 
-                                                                    <td>
+                                                                    {{-- <td>
                                                                         <a href="#" class="document-cell"
                                                                             data-document-number="{{ $data->company_name }}"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#documentModal">
                                                                             {{ $data->document_number }}
                                                                         </a>
-                                                                    </td>
+                                                                    </td> --}}
+                                                                    <td>
+                                                                    <a href="#" class="document-cell" data-id="{{ $data->id }}"  data-document-number="{{ $data->company_name }}" data-bs-toggle="modal" data-bs-target="#documentModal">
+                                                                        {{ $data->document_number }}
+                                                                    </a>
+                                                                </td>
+                                                                    
 
                                                                     <td>{{ $data->company_name }}</td>
                                                                     <td>{{ $data->category_name }} {{ $data->sub_category_name }}
@@ -244,10 +250,10 @@
     <form action="{{ route('purchasesellmatch.store') }}" method="POST">
         @csrf
         <!-- Hidden input to hold the purchase order ID -->
-        <input type="hidden" name="purchase_order_id" value="{{ $data->id }}"> <!-- Assuming $data contains the purchase order details -->
+        <input type="hidden" name="purchase_order_id" id="purchaseOrderId"> <!-- Dynamically set this ID -->
         
         <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg"> <!-- Larger modal for better visibility -->
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="documentModalLabel">Inventory Details</h5>
@@ -292,25 +298,40 @@
     
     
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const checkboxes = document.querySelectorAll('.sales-order-checkbox');
-            const saveButton = document.querySelector('button[type="submit"]');
-            
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    let selectedCount = Array.from(checkboxes).filter(chk => chk.checked).length;
-                    if (selectedCount > 0) {
-                        saveButton.disabled = false;
-                    } else {
-                        saveButton.disabled = true;
-                    }
-                });
-            });
     
-            // Disable Save button if no checkboxes are selected initially
-            saveButton.disabled = true;
+    <script>
+     document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('.sales-order-checkbox');
+    const saveButton = document.querySelector('button[type="submit"]');
+    const documentCells = document.querySelectorAll('.document-cell');
+    
+    // Handle Save Button Enable/Disable based on checkbox selection
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            let selectedCount = Array.from(checkboxes).filter(chk => chk.checked).length;
+            if (selectedCount > 0) {
+                saveButton.disabled = false;
+            } else {
+                saveButton.disabled = true;
+            }
         });
+    });
+
+    // Disable Save button if no checkboxes are selected initially
+    saveButton.disabled = true;
+
+    // When the modal opens, set the purchase order ID dynamically
+    documentCells.forEach(function (cell) {
+        cell.addEventListener('click', function () {
+            // Get the purchase order ID from the clicked cell
+            const purchaseOrderId = this.getAttribute('data-id');
+
+            // Set the hidden input with the purchase order ID
+            document.getElementById('purchaseOrderId').value = purchaseOrderId;
+        });
+    });
+});
+
     </script>
     
     

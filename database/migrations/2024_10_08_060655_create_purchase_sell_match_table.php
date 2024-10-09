@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('purchase_sell_match', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('purchase_item_id');
-            $table->unsignedBigInteger('sell_item_id');
-            $table->unsignedInteger('matched_quantity');
+            $table->unsignedBigInteger('po_id');
+            $table->unsignedBigInteger('so_id');
+          
+            $table->decimal('matched_quantity', 10, 2)->nullable(); 
             $table->timestamps();
 
             // Foreign key for purchase_item_id
-            $table->foreign('purchase_item_id')->references('id')->on('purchase_items')->onDelete('cascade');
+            $table->foreign('po_id')->references('id')->on('purchase_orders')->onDelete('cascade');
 
             // Foreign key for sell_item_id
-            $table->foreign('sell_item_id')->references('id')->on('sell_items')->onDelete('cascade');
+            $table->foreign('so_id')->references('id')->on('sales_orders')->onDelete('cascade');
         });
     }
 

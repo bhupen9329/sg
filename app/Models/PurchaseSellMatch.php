@@ -14,20 +14,20 @@ class PurchaseSellMatch extends Model
 
      // Specify the fillable attributes to allow mass assignment
      protected $fillable = [
-         'purchase_item_id', 
-         'sell_item_id', 
+         'po_id', 
+         'so_id', 
          'matched_quantity'
      ];
  
      // Define relationship with PurchaseItem model
      public function purchaseItem()
      {
-         return $this->belongsTo(PurchaseItem::class, 'purchase_item_id');
+         return $this->belongsTo(PurchaseOrder::class, 'po_id');
      }
  
      // Define relationship with SellItem model
      public function sellItem()
      {
-         return $this->belongsTo(SellItem::class, 'sell_item_id');
+         return $this->belongsTo(SalesOrder::class, 'so_id');
      }
 }

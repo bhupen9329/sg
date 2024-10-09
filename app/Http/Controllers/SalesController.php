@@ -89,6 +89,7 @@ class SalesController extends Controller
         $salesOrder->terms_condition = $request->terms_condition;
         $salesOrder->total_quantity = $request->total_quantity;
         $salesOrder->total_amount = $request->total_amount;
+        $salesOrder->rest_quantity = $request->total_quantity;
         $salesOrder->status = 'pending';
         $salesOrder->match_position = 'open';
 
