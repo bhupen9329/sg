@@ -182,6 +182,7 @@
                                             <td>{{ $data->so_rest_quantity }}</td>
                                             <td>{{ $data->po_match_position }} </td>
                                             <td>{{ $data->so_match_position }} </td>
+                                            
                                         </tr>
                                     @endforeach
                                 </tbody>
