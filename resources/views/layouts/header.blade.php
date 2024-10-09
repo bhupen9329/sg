@@ -325,17 +325,17 @@
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('manual.matching')}}">
-                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    <i class="fa-solid fas fa-pencil-alt"></i>
                     <span>Manual Matching</span>
                 </a>
             </li>
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('inventory_valuation.index')}}">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
                     <span>Inventory Valuation</span>
                 </a>
-            </li>
+            </li> --}}
 
 
             @if (

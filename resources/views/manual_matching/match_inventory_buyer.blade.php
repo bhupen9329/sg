@@ -175,7 +175,7 @@
 
 
 
-                                                <h2>Open Purchases</h2>
+                                                <h2>Open Sales</h2>
                                                 <div style="overflow-x: auto">
                                                     <table class="table table-bordered xl">
                                                         <thead>
@@ -183,12 +183,11 @@
                                                                 <th>#</th>
                                                                 <th>Transaction Date</th>
                                                                 <th>Transaction Type</th>
-                                                                <th>PO Number</th>
-                                                                <th>Supplier Name</th>
-                                                                <th>Item Name</th>
+                                                                <th>SO Number</th>
+                                                                <th>Buyer Name</th>
+                                                                {{-- <th>Item Name</th> --}}
                                                                 <th>Quantity</th>
                                                                 <th>Price</th>
-
                                                                 <th>Position</th>
 
 
@@ -196,36 +195,33 @@
 
                                                         </thead>
                                                         <tbody>
-
-                                                            @foreach ($purchases as $data)
+{{-- @dd($salesOrders); --}}
+                                                            @foreach ($salesOrders as $data)
                                                                 <tr>
                                                                     <td>{{ $loop->iteration }}</td>
                                                                     <td>{{ date('d-m-Y', strtotime($data->created_at)) }}
                                                                     </td>
-                                                                    <td>Purchase</td>
-
-                                                                    {{-- <td>
-                                                                        <a href="#" class="document-cell"
-                                                                            data-document-number="{{ $data->company_name }}"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#documentModal">
-                                                                            {{ $data->document_number }}
-                                                                        </a>
-                                                                    </td> --}}
+                                                                    <td>Sales</td>
+                                                                    {{-- @dd($data->id); --}}
                                                                     <td>
-                                                                    <a href="#" class="document-cell" data-id="{{ $data->id }}"  data-document-number="{{ $data->company_name }}" data-bs-toggle="modal" data-bs-target="#documentModal">
-                                                                        {{ $data->document_number }}
-                                                                    </a>
-                                                                </td>
-                                                                    
-
-                                                                    <td>{{ $data->company_name }}</td>
-                                                                    <td>{{ $data->category_name }} {{ $data->sub_category_name }}
+                                                                        <a href="#" class="document-cell" data-id="{{ $data->id }}" data-document-number="{{ $data->company_name }}" 
+                                                                           data-bs-toggle="modal" data-bs-target="#documentModal" 
+                                                                           onclick="setSalesOrderId('{{ $data->id }}')">
+                                                                            {{ $data->so_number }}
+                                                                        </a>
                                                                     </td>
-                                                                    <td>{{ $data->quantity }}</td>
-                                                                    <td>{{ $data->price }}</td>
+                                                                        
+                                                                    {{-- <td>{{ $data->so_number }}</td>             --}}
+                                                                    <td>{{ $data->company_name }}</td>                                                        
+                                                                   
 
-                                                                    <td>Open</td>
+                                                                  
+                                                                    {{-- <td>{{ $data->category_name }} {{ $data->sub_category_name }} --}}
+                                                                    </td>
+                                                                    <td>{{ $data->total_quantity }}</td>
+                                                                    <td>{{ $data->total_amount }}</td>
+                                                                    <td>{{ $data->match_position }}</td>
+
                                                                 </tr>
                                                             @endforeach
 
@@ -247,89 +243,111 @@
 
     </main><!-- End #main -->
 
-    <!-- Modal with Sales Orders and Matched Quantity -->
-<form action="{{ route('purchasesellmatch.store') }}" method="POST">
-    @csrf
-    <!-- Hidden input to hold the dynamically set purchase order ID -->
-    <input type="hidden" name="purchase_order_id" id="purchaseOrderId">
-
-    <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="documentModalLabel">Inventory Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Section to Show Sales Orders with Open Positions -->
-                    <div class="mt-4">
-                        <h5>Sales Orders (Open Positions)</h5>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Select</th>
-                                    <th>Sales Order</th>
-                                    <th>Open Quantity</th>
-                                    <th>Rem Quantity</th>
-                                    <th>Rate</th>
-                                    <th>Matched Quantity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($salesOrders as $order)
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="sales-order-checkbox" name="selected_orders[]" value="{{ $order->id }}">
-                                    </td>
-                                    <td>{{ $order->so_number }}</td>
-                                    <td>{{ $order->total_quantity }}</td>
-                                    <td>{{ $order->rest_quantity }}</td>
-                                    <td>{{ $order->total_amount }}</td>
-                                    <td>
-                                        <!-- Input for matched quantity, disabled by default -->
-                                        <input type="number" step="any" name="matched_quantity[{{ $order->id }}]" class="matched-quantity-input form-control" disabled min="0" max="{{ $order->total_quantity }}" placeholder="Enter quantity">
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+    <form action="{{ route('purchasesellmatch.store.buyer') }}" method="POST">
+        @csrf
+        <!-- Hidden input to hold the dynamically set sales order ID -->
+        <input type="hidden" name="sales_order_id" id="salesOrderId">
+    
+        <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="documentModalLabel">Inventory Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Details</button>
+                    <div class="modal-body">
+                        <div class="mt-4">
+                            <h5>Purchase Orders (Open Positions)</h5>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Purchase Order</th>
+                                        <th>Total Quantity</th>
+                                        <th>Remaining Quantity</th>
+                                        <th>Rate</th>
+                                        <th>Matched Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ($purchaseOrders->isEmpty())
+                                        <tr>
+                                            <td colspan="6" class="text-center">No open purchase orders available.</td>
+                                        </tr>
+                                    @else
+                                        @foreach($purchaseOrders as $order)
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="purchase-order-checkbox" name="selected_orders[]" value="{{ $order->id }}">
+                                                </td>
+                                                <td>{{ $order->document_number }}</td>
+                                                <td>{{ $order->quantity }}</td>
+                                                <td>{{ $order->rest_quantity }}</td>
+                                                <td>{{ $order->price }}</td>
+                                                <td>
+                                                    <input type="number" 
+                                                           step="any" 
+                                                           name="matched_quantity[{{ $order->id }}]" 
+                                                           class="matched-quantity-input form-control" 
+                                                           min="0" 
+                                                           max="{{ $order->total_quantity }}" 
+                                                           placeholder="Enter quantity" 
+                                                           value="{{ old('matched_quantity.'.$order->id, '') }}">
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Details</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const documentCells = document.querySelectorAll('.document-cell');
-        const purchaseOrderIdInput = document.getElementById('purchaseOrderId');
-
-        // When any document-cell link is clicked, set the hidden purchase order ID
-        documentCells.forEach(function (cell) {
-            cell.addEventListener('click', function () {
-                const purchaseOrderId = this.getAttribute('data-id');
-                purchaseOrderIdInput.value = purchaseOrderId; // Set the purchase order ID in the hidden field
+    </form>
+    
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const purchaseOrderIdInput = document.getElementById('salesOrderId');
+    
+            // Function to set the sales order ID in the hidden field
+            window.setSalesOrderId = function(orderId) {
+                purchaseOrderIdInput.value = orderId; // Set the sales order ID in the hidden field
+            };
+    
+            const checkboxes = document.querySelectorAll('.purchase-order-checkbox');
+    
+            checkboxes.forEach(checkbox => {
+                const matchedQuantityInput = checkbox.closest('tr').querySelector('.matched-quantity-input');
+    
+                // Disable matched quantity input initially
+                matchedQuantityInput.disabled = true;
+    
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        matchedQuantityInput.disabled = false; // Enable input when checkbox is checked
+                        setSalesOrderId(this.value); // Set the sales order ID when checked
+                    } else {
+                        matchedQuantityInput.disabled = true; // Disable input when checkbox is unchecked
+                        // Check if any other checkboxes are checked
+                        const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                        if (!anyChecked) {
+                            purchaseOrderIdInput.value = ''; // Clear the hidden field if no checkboxes are checked
+                        }
+                    }
+                });
             });
         });
-
-        const checkboxes = document.querySelectorAll('.sales-order-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const matchedQuantityInput = this.closest('tr').querySelector('.matched-quantity-input');
-                if (this.checked) {
-                    matchedQuantityInput.disabled = false; // Enable input when checkbox is checked
-                } else {
-                    matchedQuantityInput.disabled = true; // Disable input when checkbox is unchecked
-                }
-            });
-        });
-    });
-</script>
+    </script>
+    
+    
+    
+    
     
     <!-- Modal -->
     {{-- <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
