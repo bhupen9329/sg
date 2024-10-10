@@ -8,6 +8,7 @@ use App\Models\CompanySetting;
 use App\Models\PoReceivedQuantity;
 use App\Models\PurchaseOrder;
 use App\Models\SubCategory;
+use App\Models\PoItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -32,49 +33,39 @@ class PurchaseController extends Controller
     public function index()
     {
 
-        $po_data = PurchaseOrder::join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
-            ->join('categories', 'purchase_orders.category', '=', 'categories.id')
-            ->join('subcategories', 'purchase_orders.sub_category_id', '=', 'subcategories.id')
-            ->whereIn('purchase_orders.status', ['Open', 'Partial Received'])
-            ->select('categories.*', 'subcategories.sub_category', 'companies.*', 'purchase_orders.*', 'purchase_orders.date as date', 'purchase_orders.created_at as po_created_at', 'purchase_orders.id as po_id')
-            ->orderBy('purchase_orders.created_at', 'desc')
-            ->get();
 
-        // dd($po_data);
-        // $balanced_qty = PurchaseOrder::select(
-        //     'purchase_orders.id',
-        //     'purchase_orders.quantity',
-        //     DB::raw('IFNULL(SUM(po_received_quantity.received_quantity), 0) as total_received_quantity'),
-        //     DB::raw('purchase_orders.quantity - IFNULL(SUM(po_received_quantity.received_quantity), 0) as balanced_qty')
-        // )
-        //     ->leftJoin('po_received_quantity', 'purchase_orders.id', '=', 'po_received_quantity.po_id')
-        //     ->groupBy('purchase_orders.id', 'purchase_orders.quantity')
-        //     // ->where('status','Partial Received')
-        //     ->get();
-        // dd($balanced_qty);
-        // $data = $po_data->map(function ($po, $key) use ($balanced_qty) {
-        $data = $po_data->map(function ($po, $key) {
-            $createdDate = Carbon::parse($po->date);
-            $status = strtolower($po->status);
 
-            if ($status === 'partial closed' || $status === 'total closed') {
-                // Check if po_status_changed_at is valid
-                $statusChangedDate = Carbon::parse($po->status);
-                $po->order_age = floor($createdDate->diffInDays($statusChangedDate));
-            } else {
-                // If status is not "partial closed" or "total closed", calculate the age up to now
-                $po->order_age = floor($createdDate->diffInDays(Carbon::now()));
-                // dd($po->order_age);
-            }
+        $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+        ->join('po_items','po_items.po_id','=','purchase_orders.id')
+        ->join('categories','categories.id','=','po_items.item_category')
+        ->join('subcategories','subcategories.id','=','po_items.item_subcategory')
+        ->select('*', 'purchase_orders.id as id','po_items.*','categories.name as category_name','subcategories.sub_category as sub_category_name')
+        ->get();
+    
+// dd($po_data);
 
-            // $po->balanced_qty = $balanced_qty[$key]->balanced_qty ;
+        // $data = $po_data->map(function ($po, $key) {
+        //     $createdDate = Carbon::parse($po->date);
+        //     $status = strtolower($po->status);
 
-            return $po;
-        });
+        //     if ($status === 'partial closed' || $status === 'total closed') {
+        //         // Check if po_status_changed_at is valid
+        //         $statusChangedDate = Carbon::parse($po->status);
+        //         $po->order_age = floor($createdDate->diffInDays($statusChangedDate));
+        //     } else {
+        //         // If status is not "partial closed" or "total closed", calculate the age up to now
+        //         $po->order_age = floor($createdDate->diffInDays(Carbon::now()));
+        //         // dd($po->order_age);
+        //     }
+
+        //     // $po->balanced_qty = $balanced_qty[$key]->balanced_qty ;
+
+        //     return $po;
+        // });
 
         // dd($po_data);
 
-        return view('purchase.index', ['data' => $data]);
+        return view('purchase.index', compact('po_data'));
 
     }
 
@@ -96,9 +87,11 @@ class PurchaseController extends Controller
         $company = Company::where('id', $request->company_id)->first();
         $custom_due_date = CompanySetting::first();
         $sub_category = SubCategory::all();
+        $category = Category::all();
         $data = [
             'po_id' => $po_id,
             'company' => $company,
+            'category' => $category,
             'sub_category' => $sub_category,
             'custom_due_date' => $custom_due_date,
         ];
@@ -108,31 +101,53 @@ class PurchaseController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request);
-        // dd($request->company_id);
-
-
-        // dd($po_id);
-        $po_data = [
-            'supplier_id' => $request->company_id,
-            'document_number' => $request->po_id,
-            'category' => $request->category_id,
-            'sub_category_id' => $request->sub_category_id,
-            'quantity' => $request->quantity,
-            'rest_quantity' => $request->quantity,
-            'price' => $request->price,
-            'remark' => $request->remark,
-            'date' => $request->date,
-            'no_of_due_date' => $request->no_of_due_date,
-            'due_date' => $request->due_date,
-            'status' => 'Open',
-            'match_position' =>'open',
-        ];
-
-        // dd($po_data);
-        PurchaseOrder::create($po_data);
-        return redirect()->route('purchase.index')->with('success', 'Purchase order created Successfully');
+    //  dd($request);
+        $purchaseOrder = new PurchaseOrder();
+        $purchaseOrder->supplier_id = $request->company_id;
+        $purchaseOrder->document_number = $request->po_id;
+        $purchaseOrder->category = $request->category_id;
+        $purchaseOrder->sub_category_id = $request->sub_category_id;
+        $purchaseOrder->quantity = $request->total_quantity;
+        $purchaseOrder->rest_quantity = $request->total_quantity;
+        $purchaseOrder->price = $request->total_price;
+        $purchaseOrder->remark = $request->remark;
+        $purchaseOrder->date = $request->date;
+        $purchaseOrder->no_of_due_date = $request->no_of_due_date;
+        $purchaseOrder->due_date = $request->due_date;
+        $purchaseOrder->status = 'Open';
+        $purchaseOrder->match_position = 'open';
+    
+        // Save Purchase Order
+        $purchaseOrder->save();
+        $po_id = $purchaseOrder->id;
+        
+        if ($po_id) {
+            // Loop through each item for Purchase Order
+            // dd($request);
+            for ($i = 0; $i < count($request->unit_price_); $i++) {
+                $poItem = new PoItem();
+                $poItem->item_category = $request->item_category[$i];
+                $poItem->item_subcategory = $request->item_subcategory[$i];
+                $poItem->qty = $request->qty[$i];
+                $poItem->unit_price = $request->unit_price_[$i];
+                $poItem->price = $request->price[$i];
+    
+                // Generate item serial number (e.g., PO20240002-01, PO20240002-02)
+                $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+                $poItem->po_item_no = $purchaseOrder->document_number . '-' . $itemSerial;
+    
+                // Link the item to the Purchase Order
+                $poItem->po_id = $po_id;
+    
+                // Save Purchase Order Item
+                $poItem->save();
+            }
+    
+            // Redirect with success message
+            return redirect()->route('purchase.index')->with('success', 'Purchase Order Created Successfully');
+        }
     }
+    
 
     public function edit($id)
     {

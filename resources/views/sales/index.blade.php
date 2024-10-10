@@ -89,26 +89,35 @@
                                         <th>#</th>
                                         <th>Date(DD/MM/YY)​</th>
                                         <th>SO No.</th>
-                                        <th>Company Name</th>
-                                        <th>Total Quantity(Q)</th>
-                                        <th>Due Date(DD/MM/YY)​</th>
-                                        <th>Amount</th>
-                                        <th>Position</th>
+                                        <th>SO Item Number</th>
+                                        <th>Buyer Name(Party Name)</th>
+                                        <th>Item Category</th>
+                                        <th>Item Sub-Category</th>
+                                        <th>Quantity(Q)</th>                                        
+                                        <th>SO Unit Price</th>
+                                        <th>SO Price</th>
+                                        <th>Remarks</th>
+
+                                       
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($sales_order as $data)
+                                    {{-- @dd($data); --}}
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->date)) }}</td>
                                             <td>{{ $data->so_number }}</td>
+                                            <td>{{ $data->so_item_no }}</td>
                                             <td>{{ $data->company_name }}</td>
-                                            <td>  {{ $data->total_quantity }}  </td>
-                                            <td>{{ date('d-m-Y', strtotime($data->due_date)) }}</td>
-                                            <td>  {{ $data->total_amount }}  </td>
-                                            <td>  {{ $data->match_position }}  </td>
-
+                                            <td>{{ $data->category_name }}</td>
+                                            <td>{{ $data->sub_category_name }}</td>
+                                            <td>{{ $data->qty }}</td>
+                                            <td>{{ $data->unit_price }}</td>
+                                            <td>{{ $data->price }}</td>
+                                            <td>{{ $data->terms_condition ?? 'N/A' }}</td>
+                                           
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i

@@ -43,15 +43,20 @@ class ManualMatching extends Controller
         ->orderBy('purchase_orders.created_at', 'desc')
         ->get();
 
-        $sales_order = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-        ->select('*', 'sales_orders.id as id')
-        // ->where('sales_orders.status', '!=', 'closed')
+       
+        $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+       
+        ->select('*', 'purchase_orders.id as id')
+        ->get();
 
+        $sales_order = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')      
+        ->select('*', 'sales_orders.id as id')
         ->orderBy('sales_orders.id', 'desc')
         ->get();
+            
     
 // dd($sales_order);
-        return view('manual_matching.index',compact('companies','transactions','buyers','suppliers','manual_match','purchases','sales_order'));
+        return view('manual_matching.index',compact('companies','transactions','buyers','suppliers','manual_match','purchases','sales_order','po_data','sales_order'));
     }
 
     public function showOpenPurchases(Request $request) 
@@ -291,9 +296,45 @@ public function view_all()
 
     
 
-    // public function get_buyer_list()
-    // {
-    //     $buyers = Company::where('type','=','buyer')->get();
-    //     return view('manual_matching.open_purchases', compact('buyers')); // Return the view where the modal is defined
-    // }
+public function match_purchase($id)
+{
+    
+    $purchaseOrder = PurchaseOrder::find($id);
+//     $purchases = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+//     ->join('categories', 'categories.id', '=', 'purchase_orders.category')
+//     ->join('subcategories', 'subcategories.id', '=', 'purchase_orders.sub_category_id')
+//     ->where('purchase_orders.supplier_id', $companyId)
+//     ->where('purchase_orders.rest_quantity', '>', 0)
+//     ->select('purchase_orders.*', 'companies.company_name as company_name', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
+//     ->get();
+
+// if ($purchases->isEmpty()) {
+//     return redirect()->back()->with('error', 'No purchase orders available for this supplier.');
+// }
+
+$salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+        ->where('sales_orders.match_position', 'open') 
+        ->select('sales_orders.*', 'companies.company_name')
+        ->get();
+//    dd($salesOrders);
+    return view('manual_matching.match_purchase', compact('purchaseOrder','salesOrders'));
+}
+
+
+
+public function match_sales()
+{
+    $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+  
+    ->select('sales_orders.*', 'companies.company_name')
+    ->get();
+
+    $purchaseOrders = PurchaseOrder::where('match_position', 'open') // Adjust this based on how you define 'open' orders
+    ->select('purchase_orders.*') // Add any other necessary fields
+    ->get();
+
+
+    return view('manual_matching.match_Sales', compact('salesOrders','purchaseOrders'));    
+}
+
 }
