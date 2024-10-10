@@ -122,143 +122,107 @@
                                 </div>
                             </div>
                             <!-- Table with stripped rows -->
-                            <table class="table" id="Category_table">
+                            <table class="table " id="Category_table">
                                 <thead>
                                     <tr>
-                                        <th>#​</th>
-                                        <th>PO No.​</th>
-                                        <th>Due Date(DD/MM/YY)​</th>
+                                        <th>#</th>
                                         <th>Date(DD/MM/YY)​</th>
-                                        <th>Company</th>
-                                        <th>Category</th>
-                                        <th>Sub Category</th>
-                                        <th>Ordered Quantity (Q)​</th>
-                                        @can('price')
-                                            <th>Rate</th>
-                                        @endcan
-                                        <th>Position​</th>
-                                        {{-- <th>Status</th> --}}
+                                        <th>PO No.</th>
+                                        <th>PO Item Number</th>
+                                        <th>Seller Name(Party Name)</th>
+                                        <th>Item Category</th>
+                                        <th>Item Sub-Category</th>
+                                        <th>Quantity(Q)</th>                                        
+                                        <th>PO Unit Price</th>
+                                        <th>PO Price</th>
+                                        <th>Remarks</th>                                      
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($data as $po)
+                                    @foreach ($po_data as $data)
+                                    {{-- @dd($data); --}}
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $po->document_number }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($po->due_date)) }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($po->date)) }}</td>
-                                            <td>{{ $po->company_name }}</td>
-                                            <td>{{ $po->name }}</td>
-                                            <td>{{ $po->sub_category }}</td>
-                                            <td>{{ $po->quantity }}</td>
-
-                                            @can('price')
-                                                <td>{{ $po->price }}</td>
-                                            @endcan
-                                            <td>{{ $po->match_position }}</td>
-                                            {{-- <td>{{ $po->status }}</td> --}}
-                                            <td>
+                                            <td>{{ date('d-m-Y', strtotime($data->date)) }}</td>
+                                            <td>{{ $data->document_number }}</td>
+                                            <td>{{ $data->po_item_no }}</td>
+                                            <td>{{ $data->company_name }}</td>
+                                            <td>{{ $data->category_name }}</td>
+                                            <td>{{ $data->sub_category_name }}</td>
+                                            <td>{{ $data->qty }}</td>
+                                            <td>{{ $data->unit_price }}</td>
+                                            <td>{{ $data->price }}</td>
+                                            <td>{{ $data->terms_condition ?? 'N/A' }}</td>
+                                           
+                                            <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
                                                             class="bi bi-three-dots"></i></a>
                                                     {{-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                                        <li> <a class="dropdown-item"
+                                                                href="{{ route('buyers.show', $data->id) }}"><i
+                                                                    class="fa-regular fa-eye"></i> View</a></li>
                                                         <li>
-                                                            @can('Purchase-view')
+                                                            @can('Company-edit')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('purchase.edit', $po->po_id) }}"><i
-                                                                        class="fa-regular fa-eye"></i>View/Edit</a>
+                                                                    href="{{ route('buyers.edit', $data->id) }}"><i
+                                                                        class="fa-solid fa-pencil"></i>Edit</a>
                                                             @endcan
                                                         </li>
-                                                        @can('Purchase-close')
-                                                            @if ($po->status !== 'Partial Closed' && $po->status !== 'Total Closed')
-                                                                <li>
-                                                                    <div class="dropdown">
-                                                                        <a data-bs-toggle="modal" href="#"
-                                                                            onclick="get_po_id({{ $po->po_id }})"
-                                                                            class="dropdown-item"
-                                                                            data-bs-target="#Modalforselect_type">
-                                                                            <i class="fa-solid fa-ban"></i> Close
-                                                                        </a>
-                                                                    </div>
-                                                                </li>
-                                                            @endif
-                                                        @endcan
+
                                                         <li>
-                                                            @can('Purchase-delete')
-                                                                <form method="POST"
-                                                                    action="{{ route('purchase.destroy', $po->po_id) }}">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="button" class="dropdown-item delete-button">
-                                                                        <i class="fa-solid fa-trash"></i> Delete
-                                                                    </button>
-                                                                </form>
+                                                            @can('Sales-view')
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('sales.show', $data->id) }}"><i
+                                                                        class="fa-solid fa-eye"></i>View</a>
                                                             @endcan
                                                         </li>
+                                                        <li>
+                                                            @can('Sales-view')
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('sales.edit', $data->id) }}"><i
+                                                                        class="fa-solid fa-pencil"></i>Edit</a>
+                                                            @endcan
+                                                        </li>
+                                                        @if ($data->status == 'pending')
+                                                            <li>
+                                                                @can('Sales-delete')
+                                                                    <form method="POST"
+                                                                        action="{{ route('sales.destroy', $data->id) }}">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="button"
+                                                                            class="dropdown-item delete-button">
+                                                                            <i class="fa-solid fa-trash"></i> Delete
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                            </li>
+                                                        @endif
+                                                        <li>
+                                                            @can('Sales-close')
+                                                                <a class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#select_closed"
+                                                                    onclick="sendId('{{ $data->id }}')"><i
+                                                                        class="fa-regular fa-close"></i> Closed</a>
+                                                            @endcan
+                                                        <li>
+                                                        <li>
+                                                            @can('Sales-download')
+                                                            <a class="dropdown-item" href="{{ $data->document_file }}"
+                                                                target="_blank">
+                                                                <i class="fa-solid fa-download"></i> Download
+                                                            </a>
+                                                            @endcan
+                                                        </li>
+
+
                                                     </ul> --}}
                                                 </div>
                                             </td>
                                         </tr>
                                     @endforeach
-
-
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="Modalforselect_type" tabindex="-1"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-
-                                                <div class="modal-header">
-                                                    <button type="button" class="btn-close p-3" data-bs-dismiss="modal"
-                                                        aria-label="Close"style="width:50px"></button>
-                                                </div>
-                                                <div class="modal-body pt-4 pb-5">
-                                                    <div class="row text-center justify-content-center">
-                                                        <div class="col-lg-6">
-                                                            <div class="dropdown">
-                                                                <button class="form-select" type="button"
-                                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    Select Type
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li>
-                                                                        <a class="dropdown-item" href="#"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#modal1">Partial
-                                                                            Received​</a>
-                                                                    </li>
-                                                                    <li>
-                                                                        <a class="dropdown-item" href="#"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#modal2">Partial
-                                                                            Closed​</a>
-                                                                    </li>
-                                                                    <li>
-                                                                        <a class="dropdown-item" href="#"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#modal3">Total Closed​</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', (event) => {
-                                            // Prevent the outer dropdown from closing when clicking inside the nested dropdown
-                                            document.querySelectorAll('.dropdown-menu .dropdown').forEach(function(dropdown) {
-                                                dropdown.addEventListener('click', function(e) {
-                                                    e.stopPropagation();
-                                                });
-                                            });
-                                        });
-                                    </script>
-
                                 </tbody>
                             </table>
                             <!-- End Table with stripped rows -->

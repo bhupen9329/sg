@@ -336,6 +336,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/match_inventory', [ManualMatching::class, 'match_inventory'])->name('match.inventory');
         Route::post('/purchasesellmatch', [ManualMatching::class, 'storePurSellMatch'])->name('purchasesellmatch.store');
         Route::post('/purchasesellmatchbuyer', [ManualMatching::class, 'storePurSellMatchBuyer'])->name('purchasesellmatch.store.buyer');
+        Route::get('/match_purchase/{id}', [ManualMatching::class, 'match_purchase'])->name('match.purchase');
+
+        Route::get('/match_sales/{id}', [ManualMatching::class, 'match_sales'])->name('match.sales');
 
 });
 

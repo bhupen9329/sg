@@ -32,7 +32,10 @@ class SalesController extends Controller
     public function index()
     {
         $sales_order = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-            ->select('*', 'sales_orders.id as id')
+                                ->join('so_items','so_items.so_id','=','sales_orders.id')
+                                ->join('categories','categories.id','=','so_items.item_category')
+                                ->join('subcategories','subcategories.id','=','so_items.item_subcategory')
+            ->select('*', 'sales_orders.id as id','so_items.*','categories.name as category_name','subcategories.sub_category as sub_category_name')
             // ->where('sales_orders.status', '!=', 'closed')
 
             ->orderBy('sales_orders.id', 'desc')
@@ -54,7 +57,6 @@ class SalesController extends Controller
 
     public function create(Request $request)
     {
-
         $year = date('Y');
         $max_serial_number = SalesOrder::all()->max('so_number');
         $last_serial_number = substr($max_serial_number, -4);
@@ -62,12 +64,14 @@ class SalesController extends Controller
         $so_number = 'SO' . $year . $next_serial_number;
         $company = Company::where('id', $request->company_id)->first();
         $category = Category::all();
+        $custom_due_date = CompanySetting::first();
         $gstsetting = GstSetting::all();
         $data = [
             'company' => $company,
             'category' => $category,
             'gstsetting' => $gstsetting,
             'so_number' => $so_number,
+            'custom_due_date' => $custom_due_date,
 
 
         ];
@@ -80,7 +84,6 @@ class SalesController extends Controller
     public function store(Request $request)
     {
  
-        // dd($request);
         $salesOrder = new SalesOrder();
         $salesOrder->company_id = $request->company_id;
         $salesOrder->address = $request->address;
@@ -89,26 +92,33 @@ class SalesController extends Controller
         $salesOrder->terms_condition = $request->terms_condition;
         $salesOrder->total_quantity = $request->total_quantity;
         $salesOrder->total_amount = $request->total_amount;
+        
+        $salesOrder->total_price = $request->total_price;
+        
         $salesOrder->rest_quantity = $request->total_quantity;
         $salesOrder->status = 'pending';
         $salesOrder->match_position = 'open';
-
+        
         $salesOrder->so_number = $request->so_number;
         // $salesOrder->document_file = $request->document_file;
         $salesOrder->document_file = 'uploads/documents/sales/' . $request->so_number . '/' . $request->so_number . '.pdf';
-
+        
         $salesOrder->save();
         $id = $salesOrder->id;
+        
 
         if ($id) {
-            //SO Item Code
-            for ($i = 0; $i < count($request->amount); $i++) {
+            for ($i = 0; $i < count($request->unit_price_); $i++) {
                 $soItem = new SoItem();
                 $soItem->item_category = $request->item_category[$i];
                 $soItem->item_subcategory = $request->item_subcategory[$i];
                 $soItem->qty = $request->qty[$i];
-                $soItem->amount = $request->amount[$i];
-                $soItem->sale_id = $id;
+                $soItem->unit_price = $request->unit_price_[$i];
+                $soItem->price = $request->price[$i];
+                $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT); 
+                $soItem->so_item_no = $salesOrder->so_number . '-' . $itemSerial; 
+                $soItem->so_id = $id;
+                // dd($soItem);
                 $soItem->save();
             }
             return redirect()->route('sales.index')->with('success', 'Sales Orders Created Successfully');
