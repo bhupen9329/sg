@@ -13,22 +13,25 @@ return new class extends Migration
     {
         Schema::create('purchase_sell_match', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('po_id');
-            $table->unsignedBigInteger('so_id');
-
-        
+            $table->string('po_id')->nullable();
+            $table->string('so_id')->nullable();
+            $table->string('po_item_id')->nullable();
+            $table->string('so_item_id')->nullable();
           
-            $table->decimal('matched_quantity', 10, 2)->nullable(); 
-            $table->decimal('po_rest_quantity', 10, 2)->nullable(); 
-            $table->decimal('so_rest_quantity', 10, 2)->nullable(); 
+            $table->decimal('matched_quantity', 10, 2)->nullable();
+            $table->decimal('po_item_qty', 10, 2)->nullable();
+            $table->decimal('po_item_rest_quantity', 10, 2)->nullable();
+            $table->decimal('so_item_qty', 10, 2)->nullable();
+            $table->decimal('so_item_rest_quantity', 10, 2)->nullable();
             $table->timestamps();
 
-            // Foreign key for purchase_item_id
-            $table->foreign('po_id')->references('id')->on('purchase_orders')->onDelete('cascade');
+            // $table->foreign('po_id')->references('id')->on('purchase_orders')->onDelete('cascade');
+            // $table->foreign('so_id')->references('id')->on('sales_orders')->onDelete('cascade');
 
-            // Foreign key for sell_item_id
-            $table->foreign('so_id')->references('id')->on('sales_orders')->onDelete('cascade');
+
         });
+        
+        
     }
 
     /**

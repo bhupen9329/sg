@@ -197,55 +197,48 @@
                                         <th>PO No</th>
                                         <th>PO Date</th>                                       
                                         <th>Seller Name (Party Name)</th>
-                                        {{-- <th>Item Category</th>
-                                        <th>Item Sub Category</th> --}}
-
                                         <th>PO Qty</th>
-                                        {{-- <th>PO Unit Price</th> --}}
                                         <th>PO Price</th>
                                         <th>Matched SO Qty</th>
                                         <th>Matched SO Unit Price(Avg)</th>
                                         <th>Matched SO Price(Total)</th>
                                         <th>PO Pending Qty</th>
                                         <th>Status</th>
-                                        
-
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- @dd($po_data); --}}
-                                    @foreach ($po_data as $data)
-                                   
+                                    {{-- Check if there is any data in $po_data --}}
+                                    @forelse ($po_data as $data)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            {{-- <td>
+                                            <td>
                                                 <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
                                                     {{ $data->document_number }}
                                                 </a>
-                                            </td> --}}
-                                            <td>{{ $data->document_number }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>                                         
-
+                                            </td>
+                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
                                             <td>{{ $data->company_name }}</td>
-                                            {{-- <td>{{ $data->category_name }}</td>
-                                            <td>{{ $data->sub_category_name }}</td> --}}
-
                                             <td>{{ $data->quantity }}</td>
                                             <td>{{ $data->price }}</td>
-                                            {{-- <td>{{ number_format($data->qty * $data->unit_price, 2) }}</td> --}}
                                             <td></td>
                                             <td></td>
                                             <td></td>
-                                            <td>{{ $data->rest_quantity }}</td>
-                                           
-
-
-                                            <td>{{ $data->match_position }} </td>
-
+                                            <td>
+                                                <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
+                                                    {{ $data->rest_quantity }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $data->match_position }}</td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        {{-- Show this row if no data is available --}}
+                                        <tr>
+                                            <td colspan="11" class="text-center">No data available</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
+                            
                       
 
                         </div>
@@ -319,56 +312,50 @@
                                         <th>SO No</th>
                                         <th>SO Date</th>                                       
                                         <th>Buyer Name (Party Name)</th>
-                                        {{-- <th>Item Category</th>
-                                        <th>Item Sub Category</th> --}}
                                         <th>SO Qty</th>
-                                        {{-- <th>SO Unit Price</th> --}}
                                         <th>SO Price</th>
                                         <th>Matched PO Qty</th>
-                                        <th>Matched PO Unit Price(Avg)</th>
-                                        <th>Matched PO Price(Total)</th>
+                                        <th>Matched PO Unit Price (Avg)</th>
+                                        <th>Matched PO Price (Total)</th>
                                         <th>SO Pending Qty</th>
                                         <th>Status</th>
-                                        
-
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- @dd($sales_order); --}}
-                                 
-
-                                    @foreach ($sales_order as $data)
-                                   
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        {{-- <td>
-                                            <a href="{{ route('match.sales', ['id' => $data->id]) }}">
-                                                {{ $data->so_number }}
-                                            </a>
-                                        </td> --}}
-                                        <td>{{ $data->so_number }}</td>
-                                        <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>                                         
-
-                                        <td>{{ $data->company_name }}</td>
-                                        {{-- <td>{{ $data->category_name }}</td>
-                                        <td>{{ $data->sub_category_name }}</td> --}}
-
-                                        <td>{{ $data->total_quantity }}</td>
-                                        <td>{{ $data->total_price }}</td>
-                                        {{-- <td>{{ number_format($data->qty * $data->unit_price, 2) }}</td> --}}
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>{{ $data->rest_quantity }}</td>
-                                       
-
-
-                                        <td>{{ $data->match_position }} </td>
-
-                                    </tr>
-                                @endforeach
+                                    {{-- Check if there is any data in $sales_order --}}
+                                    @forelse ($sales_order as $data)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                <a href="{{ route('match.sales', ['id' => $data->id]) }}">
+                                                    {{ $data->so_number }}
+                                                </a>
+                                            </td>
+                                            {{-- <td>{{ $data->so_number }}</td> --}}
+                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>                                         
+                                            <td>{{ $data->company_name }}</td>
+                                            <td>{{ $data->total_quantity }}</td>
+                                            <td>{{ $data->total_price }}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <a href="{{ route('match.sales', ['id' => $data->id]) }}">
+                                                    {{ $data->rest_quantity }}
+                                                </a>
+                                            </td>
+                                        
+                                            <td>{{ $data->match_position }} </td>
+                                        </tr>
+                                    @empty
+                                        {{-- Show this row if no data is available --}}
+                                        <tr>
+                                            <td colspan="11" class="text-center">No data available</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
+                            
 
                         </div>
                     </div>
