@@ -9,28 +9,23 @@ class PurchaseSellMatch extends Model
 {
     use HasFactory;
 
-     // Define the table name if necessary (if Laravel doesn't pluralize it correctly)
-     protected $table = 'purchase_sell_match';
+    // Define the table name if it's not the plural of the model name
+    protected $table = 'purchase_sell_match';
 
-     // Specify the fillable attributes to allow mass assignment
-     protected $fillable = [
-         'po_id', 
-         'so_id', 
-         'matched_quantity',
-         'po_rest_quantity',
-         'so_rest_quantity',
-        
-     ];
- 
-     // Define relationship with PurchaseItem model
-     public function purchaseItem()
-     {
-         return $this->belongsTo(PurchaseOrder::class, 'po_id');
-     }
- 
-     // Define relationship with SellItem model
-     public function sellItem()
-     {
-         return $this->belongsTo(SalesOrder::class, 'so_id');
-     }
+    // Define the fillable fields to allow mass assignment
+    protected $fillable = [
+        'po_id',
+        'so_id',
+        'po_item_id',
+        'so_item_id',
+        'matched_quantity',
+        'po_item_qty',
+        'po_item_rest_quantity',
+        'so_item_qty',
+        'so_item_rest_quantity',
+    ];
+
+    
+
+  
 }

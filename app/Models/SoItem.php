@@ -16,6 +16,7 @@ class SoItem extends Model
         'item_subcategory',
         'qty',
         'unit_price',
+        'so_rest_qty',
         'price'
     ];
       

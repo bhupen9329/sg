@@ -129,6 +129,7 @@ class PurchaseController extends Controller
                 $poItem->item_category = $request->item_category[$i];
                 $poItem->item_subcategory = $request->item_subcategory[$i];
                 $poItem->qty = $request->qty[$i];
+                $poItem->po_rest_qty = $request->qty[$i];
                 $poItem->unit_price = $request->unit_price_[$i];
                 $poItem->price = $request->price[$i];
     

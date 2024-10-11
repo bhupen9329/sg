@@ -17,6 +17,7 @@ class PoItem extends Model
         'item_subcategory',
         'qty',
         'unit_price',
+        'po_rest_qty',
         'price'
     ];
       

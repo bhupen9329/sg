@@ -20,6 +20,7 @@ return new class extends Migration
 
             $table->string('item_subcategory', 50);
             $table->string('qty', 10);
+            $table->string('po_rest_qty', 10)->nullable();
             $table->string('unit_price')->nullable();
             $table->string('price')->nullable();
             $table->timestamps();
