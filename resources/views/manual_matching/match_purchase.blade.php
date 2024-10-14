@@ -158,37 +158,34 @@
                             <table class="table table-bordered table-hover table-striped">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th>#</th>
                                         <th>Date(DD/MM/YY)​</th>
                                         <th>PO No.</th>
                                         <th>PO Item Number</th>
                                         <th>Seller Name(Party Name)</th>
                                         <th>Item Category</th>
                                         <th>Item Sub-Category</th>
-                                        <th>Quantity(Q)</th>                                        
+                                        <th>Quantity(Q)</th>    
+                                        <th>Rest Quantity(Q)</th>                                       
                                         <th>PO Unit Price</th>
                                         <th>PO Price</th>
                                       
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($po_data as $data)
-                                    {{-- @dd($data); --}}
+                                    @if ($po_data)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->date)) }}</td>
-                                            <td>{{ $data->document_number }}</td>
-                                            <td>{{ $data->po_item_no }}</td>
-                                            <td>{{ $data->supplier_name }}</td>
-                                            <td>{{ $data->category_name }}</td>
-                                            <td>{{ $data->sub_category_name }}</td>
-                                            <td>{{ $data->qty }}</td>
-                                            <td>{{ $data->unit_price }}</td>
-                                            <td>{{ $data->price }}</td>
-                                           
-                                          
+                                            <td>{{ date('d-m-Y', strtotime($po_data->date)) }}</td>
+                                            <td>{{ $po_data->document_number }}</td>
+                                            <td>{{ $po_data->po_item_no }}</td>
+                                            <td>{{ $po_data->supplier_name }}</td>
+                                            <td>{{ $po_data->category_name }}</td>
+                                            <td>{{ $po_data->sub_category_name }}</td>
+                                            <td>{{ $po_data->qty }}</td>
+                                            <td>{{ $po_data->po_rest_qty }}</td>
+                                            <td>{{ $po_data->unit_price }}</td>
+                                            <td>{{ $po_data->price }}</td>
                                         </tr>
-                                    @endforeach
+                                    @endif
                                 </tbody>
                             </table>
                             
@@ -240,7 +237,6 @@
                                     {{-- @dd($manual_match); --}}
                                     @foreach ($manual_match as $data)
                                         @php
-                                            
                                             $po_status = $data->po_rest_quantity > 0 ? 'Open' : 'Closed';
                                             $so_status = $data->so_rest_quantity > 0 ? 'Open' : 'Closed';
                                         @endphp
@@ -328,7 +324,7 @@
                                 </div>
             
                                 <input type="hidden" name="purchase_order_id" id="purchaseOrderId" value="{{ $purchaseOrder->id }}">
-                                <input type="hidden" name="po_item_id" id="poItemId" value="{{ $purchaseOrder->po_item_id }}">
+                                <input type="hidden" name="po_item_id" id="poItemId" value="{{ $po_data->po_item_id }}">
             
                                 <button type="submit" class="btn btn-primary float-end" id="submit_btn">Submit</button>
                                 <div id="on_submit" class="text-danger mt-2" style="display: none;">At least one row must be selected.</div>

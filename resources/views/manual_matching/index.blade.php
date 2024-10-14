@@ -94,53 +94,7 @@
                 </ol>
             </nav>
         </div><!-- End Page Title -->
-        <div class="row">
-            <div class="col-md-6 col-sm-12">
-                <div class="pd-20">
-                    <h4 class="text-blue h4">Purchase</h4>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-sm-12 d-flex justify-content-end">
-
-
-                {{-- <div class="btn-group ps-3">
-                    @can('Inward-create')
-                        <a href="{{ route('view.all') }}" class="btn btn-primary mb-4 mr-3">View All </a>
-                    @endcan   
-                </div>
-                <div class="btn-group ps-3">
-                    @can('Inward-create')
-                        <a href="#" class="btn btn-primary mb-4 mr-3" data-bs-toggle="modal"
-                            data-bs-target="#selectbuyerorsupplier">Match Inventory </a>
-                    @endcan
-                </div>
-
-                <div class="btn-group ps-3">
-                    @can('Inward-create')
-                        <a href="{{ route('position.report') }}" class="btn btn-primary mb-4 mr-3">Position
-                            Report </a>
-                    @endcan
-                </div> --}}
-                {{-- <div class="btn-group ps-3">
-                    @can('Inward-create')
-                        <a href="{{ route('inventory.lifo') }}" class="btn btn-primary mb-4 mr-3">LIFO</a>
-                    @endcan
-                </div>
-
-                <div class="btn-group ps-3">
-                    @can('Inward-create')
-                        <a href="{{ route('inventory_valuation.valuation') }}" class="btn btn-primary mb-4 mr-3">Valuation</a>
-                    @endcan
-                </div>
-
-                <div class="btn-group ps-3">
-                    @can('Inward-create')
-                        <a href="{{ route('position.report') }}" class="btn btn-primary mb-4 mr-3">Position Report</a>
-                    @endcan
-                </div> --}}
-            </div>
-        </div>
+     
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
@@ -189,6 +143,17 @@
                             </div> --}}
 
                             <!-- Existing Table Section -->
+
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="pd-20">
+                                        <h4 class="text-blue h4">Purchase</h4>
+                                    </div>
+                                </div>
+                    
+                                <div class="col-md-6 col-sm-12 d-flex justify-content-end">
+                                </div>
+                            </div>
                         
                             <table class="table table-bordered table-hover table-striped">
                                 <thead class="thead-dark">
@@ -197,7 +162,10 @@
                                         <th>PO No</th>
                                         <th>PO Date</th>                                       
                                         <th>Seller Name (Party Name)</th>
+                                        <th>Category</th>
+                                        <th>Sub Category</th>
                                         <th>PO Qty</th>
+                                        <th>PO Unit Price</th>
                                         <th>PO Price</th>
                                         <th>Matched SO Qty</th>
                                         <th>Matched SO Unit Price(Avg)</th>
@@ -218,14 +186,18 @@
                                             </td>
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
                                             <td>{{ $data->company_name }}</td>
-                                            <td>{{ $data->quantity }}</td>
+
+                                            <td>{{ $data->name }}</td>
+                                            <td>{{ $data->sub_category }}</td>
+                                            <td>{{ $data->qty }}</td>
+                                            <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
                                             <td>
                                                 <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
-                                                    {{ $data->rest_quantity }}
+                                                    {{ $data->po_rest_qty }}
                                                 </a>
                                             </td>
                                             <td>{{ $data->match_position }}</td>
@@ -312,7 +284,10 @@
                                         <th>SO No</th>
                                         <th>SO Date</th>                                       
                                         <th>Buyer Name (Party Name)</th>
+                                        <th>Category</th>
+                                        <th>Sub Category</th>
                                         <th>SO Qty</th>
+                                        <th>SO Unit Price</th>
                                         <th>SO Price</th>
                                         <th>Matched PO Qty</th>
                                         <th>Matched PO Unit Price (Avg)</th>
@@ -334,14 +309,17 @@
                                             {{-- <td>{{ $data->so_number }}</td> --}}
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>                                         
                                             <td>{{ $data->company_name }}</td>
-                                            <td>{{ $data->total_quantity }}</td>
-                                            <td>{{ $data->total_price }}</td>
+                                            <td>{{ $data->name }}</td>
+                                            <td>{{ $data->sub_category }}</td>
+                                            <td>{{ $data->qty }}</td>
+                                            <td>{{ $data->unit_price }}</td>
+                                            <td>{{ $data->price }}</td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
                                             <td>
                                                 <a href="{{ route('match.sales', ['id' => $data->id]) }}">
-                                                    {{ $data->rest_quantity }}
+                                                    {{ $data->so_rest_qty }}
                                                 </a>
                                             </td>
                                         

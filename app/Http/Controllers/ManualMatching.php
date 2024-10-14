@@ -47,18 +47,25 @@ class ManualMatching extends Controller
 
        
         $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-       
-        ->select('*', 'purchase_orders.id as id')
+        ->join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+        ->join('categories', 'po_items.item_category', '=', 'categories.id')
+        ->join('subcategories', 'po_items.item_subcategory', '=', 'subcategories.id')
+        ->select('purchase_orders.*', 'companies.company_name', 'po_items.*',  'po_items.id as id*', 'categories.name', 'subcategories.sub_category')
         ->get();
 
-        $sales_order = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')      
-        ->select('*', 'sales_orders.id as id')
+
+        $sales_order = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id') 
+        ->join('so_items', 'sales_orders.id', '=', 'so_items.so_id')     
+        ->join('categories', 'so_items.item_category', '=', 'categories.id')
+        ->join('subcategories', 'so_items.item_subcategory', '=', 'subcategories.id')
+        ->select('sales_orders.*',  'companies.company_name',  'so_items.*', 'so_items.id as id', 'categories.name', 'subcategories.sub_category')
         ->orderBy('sales_orders.id', 'desc')
         ->get();
             
+        // dd($po_data);
     
-// dd($sales_order);
-        return view('manual_matching.index',compact('companies','transactions','buyers','suppliers','manual_match','purchases','sales_order','po_data','sales_order'));
+
+        return view('manual_matching.index',compact('companies','transactions','buyers','suppliers','manual_match','purchases','sales_order','po_data'));
     }
 
     public function showOpenPurchases(Request $request) 
@@ -192,23 +199,11 @@ public function match_inventory(Request $request)
 
 public function match_purchase($id)
 {
-    
-    $purchaseOrder = PurchaseOrder::join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
-    ->join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-    ->select('companies.company_name','purchase_orders.*','po_items.*','po_items.id as po_item_id')
-    ->find($id);
 
-   
-    if (!$purchaseOrder) {
-        return response()->json(['error' => 'Purchase Order not found'], 404);
-    }
-
-
-$po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+    $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
     ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
     ->join('categories', 'categories.id', '=', 'po_items.item_category')
     ->join('subcategories', 'subcategories.id', '=', 'po_items.item_subcategory')
-    ->where('purchase_orders.id', $id)
     ->select(
         'purchase_orders.id as purchase_order_id',
         'companies.company_name as supplier_name',
@@ -216,26 +211,43 @@ $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_order
         'po_items.id as po_item_id',
         'po_items.po_item_no as po_item_no',
         'po_items.qty',
+        'po_items.po_rest_qty',
         'po_items.unit_price',
         'po_items.price',
         'categories.id as category_id',  // Ensure you select the category ID
         'subcategories.id as subcategory_id', 
         'categories.name as category_name', 'subcategories.sub_category as sub_category_name'// Ensure you select the subcategory ID
     )
-    ->get();
+    ->where('po_items.id', $id)
+    ->first();
+    // dd($po_data);
 
-$categoryIds = $po_data->pluck('category_id')->unique()->toArray(); // Unique category IDs
-$subcategoryIds = $po_data->pluck('subcategory_id')->unique()->toArray(); // Unique subcategory IDs
 
-$salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-    ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
-    ->join('categories', 'categories.id', '=', 'so_items.item_category')
-    ->join('subcategories', 'subcategories.id', '=', 'so_items.item_subcategory')
-    ->where('sales_orders.match_position', 'open')
-    ->whereIn('so_items.item_category', $categoryIds)  // Match category IDs
-    ->whereIn('so_items.item_subcategory', $subcategoryIds) // Match subcategory IDs
-    ->select('sales_orders.*', 'companies.company_name', 'so_items.id as so_item_id','so_items.*', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
-    ->get();
+    $purchaseOrder = PurchaseOrder::
+    join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+    ->select('companies.company_name','purchase_orders.*')
+    ->where('purchase_orders.id', $po_data->purchase_order_id)->first();
+    // dd($purchaseOrder);
+
+   
+    if (!$purchaseOrder) {
+        return response()->json(['error' => 'Purchase Order not found'], 404);
+    }
+
+    // dd($po_data);
+    $categoryIds = is_array($po_data->category_id) ? $po_data->category_id : [$po_data->category_id]; // Ensure it's an array
+    $subcategoryIds = is_array($po_data->subcategory_id) ? $po_data->subcategory_id : [$po_data->subcategory_id]; // Ensure it's an array
+    
+    $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+        ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
+        ->join('categories', 'categories.id', '=', 'so_items.item_category')
+        ->join('subcategories', 'subcategories.id', '=', 'so_items.item_subcategory')
+        ->where('sales_orders.match_position', 'open')
+        ->whereIn('so_items.item_category', $categoryIds)  // Match category IDs
+        ->whereIn('so_items.item_subcategory', $subcategoryIds) // Match subcategory IDs
+        ->select('sales_orders.*', 'companies.company_name', 'so_items.id as so_item_id','so_items.*', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
+        ->get();
+    
 
 // dd($salesOrders);
 $manual_match = PurchaseSellMatch::join('purchase_orders', 'purchase_sell_match.po_id', '=', 'purchase_orders.id')
@@ -268,6 +280,7 @@ $manual_match = PurchaseSellMatch::join('purchase_orders', 'purchase_sell_match.
         'so_categories.name as so_category_name', 
         'so_subcategories.sub_category as so_sub_category_name' 
     )
+    ->whereColumn('purchase_sell_match.po_item_id', '=', 'po_items.id')
     ->get();
 
 
@@ -293,17 +306,14 @@ public function storePurSellMatch(Request $request)
 
   
     foreach ($request->selected_so_items as $soItemId) {
+
+        // dd($soItemId);
     
         $matchedQuantity = $request->input('matched_quantity.' . $soItemId, 0);
-        
-        
         $poItemId = $request->input('po_item_id');
-        
-        
         $salesOrderItem = SoItem::find($soItemId);
         $purchaseOrderItem = PoItem::find($poItemId);
-        
-        
+        // dd( $salesOrderItem,  $purchaseOrderItem);
         if (!$salesOrderItem || !$purchaseOrderItem) {
             continue; 
         }
@@ -312,7 +322,6 @@ public function storePurSellMatch(Request $request)
         if ($matchedQuantity <= 0 || 
         $matchedQuantity > $salesOrderItem->so_rest_qty || 
         $matchedQuantity > $purchaseOrderItem->po_rest_qty) {
-            dd(1);
             continue; 
         }
         
@@ -330,6 +339,7 @@ public function storePurSellMatch(Request $request)
             
             $remainingSoItemQuantity = $salesOrderItem->so_rest_qty - $matchedQuantity;
             $remainingPoItemQuantity = $purchaseOrderItem->po_rest_qty - $matchedQuantity;
+            // dd( $remainingSoItemQuantity, $remainingPoItemQuantity);
             
             
             $purchaseSellMatch = PurchaseSellMatch::create([
@@ -340,8 +350,8 @@ public function storePurSellMatch(Request $request)
                 'so_item_rest_quantity' => $remainingSoItemQuantity, 
             ]);
             
-            $salesOrderItem->update(['so_rest_qty' => $remainingSoItemQuantity]);
-            $purchaseOrderItem->update(['po_rest_qty' => $remainingPoItemQuantity]);
+            // $salesOrderItem->update(['so_rest_qty' => $remainingSoItemQuantity]);
+            // $purchaseOrderItem->update(['po_rest_qty' => $remainingPoItemQuantity]);
             
             $purchaseSellMatch->update([
                 'so_id' => $salesOrderId, 
@@ -349,7 +359,12 @@ public function storePurSellMatch(Request $request)
                 'so_item_qty' => $salesOrderItem->so_rest_qty, 
                 'po_item_qty' => $purchaseOrderItem->po_rest_qty, 
             ]);
-            // dd($purchaseSellMatch);
+
+          $s =  $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => $remainingSoItemQuantity]);
+        $d =  $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => $remainingPoItemQuantity]);
+
+
+            // dd( $s, $d );
         
 
       
@@ -486,6 +501,8 @@ public function view_all()
 
 public function match_sales($id)
 {
+
+
     $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')    
     ->where('sales_orders.id', $id)
     ->select('sales_orders.*', 'companies.company_name')
@@ -527,6 +544,7 @@ public function match_sales($id)
         'so_subcategories.sub_category as so_sub_category_name' 
     )
     ->get();
+    // dd( $manual_match );
 
 
     return view('manual_matching.match_Sales', compact('salesOrders','purchaseOrders','manual_match'));    
