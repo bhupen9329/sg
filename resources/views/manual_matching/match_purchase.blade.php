@@ -237,6 +237,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {{-- @dd($manual_match); --}}
                                     @foreach ($manual_match as $data)
                                         @php
                                             
