@@ -11,6 +11,7 @@ use App\Models\SubCategory;
 use App\Models\PoItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\InventoryTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -142,6 +143,23 @@ class PurchaseController extends Controller
     
                 // Save Purchase Order Item
                 $poItem->save();
+
+                $categoryName = Category::find($poItem->item_category)->name; 
+
+                $subcategoryName = Subcategory::find($poItem->item_subcategory)->sub_category; 
+                $companyName = Company::find($purchaseOrder->supplier_id)->company_name; 
+                // dd($subcategoryName);
+
+              
+                $inventoryTransaction = new InventoryTransaction();
+                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
+                $inventoryTransaction->transaction_type = 'purchase'; 
+                $inventoryTransaction->quantity = $poItem->qty;
+                $inventoryTransaction->transaction_date = now(); 
+                $inventoryTransaction->unit_price = $poItem->unit_price; 
+                $inventoryTransaction->company_name = $companyName;
+                $inventoryTransaction->position = 'open';
+                $inventoryTransaction->save();
             }
     
             // Redirect with success message
