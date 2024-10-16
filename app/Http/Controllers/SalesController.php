@@ -14,6 +14,7 @@ use App\Models\Quotation;
 use App\Models\SalesOrder;
 use App\Models\SoItem;
 use App\Models\SubCategory;
+use App\Models\InventoryTransaction;
 use App\Models\WareHouseModel;
 use Illuminate\Http\Request;
 
@@ -72,8 +73,6 @@ class SalesController extends Controller
             'gstsetting' => $gstsetting,
             'so_number' => $so_number,
             'custom_due_date' => $custom_due_date,
-
-
         ];
         // dd($data);
         return view('sales.create')->with($data);
@@ -119,13 +118,29 @@ class SalesController extends Controller
                 $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT); 
                 $soItem->so_item_no = $salesOrder->so_number . '-' . $itemSerial; 
                 $soItem->so_id = $id;
-                // dd($soItem);
+               
                 $soItem->save();
+
+                $categoryName = Category::find($soItem->item_category)->name; 
+
+                $subcategoryName = Subcategory::find($soItem->item_subcategory)->sub_category; 
+                $companyName = Company::find($salesOrder->company_id)->company_name; 
+                // dd($subcategoryName);
+
+              
+                $inventoryTransaction = new InventoryTransaction();
+                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
+                $inventoryTransaction->transaction_type = 'sell'; 
+                $inventoryTransaction->quantity = $soItem->qty;
+                $inventoryTransaction->transaction_date = now(); 
+                $inventoryTransaction->unit_price = $soItem->unit_price; 
+                $inventoryTransaction->company_name = $companyName;
+                $inventoryTransaction->position = 'open';
+                $inventoryTransaction->save();
             }
             return redirect()->route('sales.index')->with('success', 'Sales Orders Created Successfully');
             ;
-            // return redirect()->route('sales.pdf',$id)->with('success', 'Sales Orders Created Successfully');;
-            // return redirect()->route('sales.pdf', $id)->with('success', 'Sales Orders Created Successfully');
+        
         }
     }
 

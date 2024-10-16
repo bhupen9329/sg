@@ -400,8 +400,8 @@
 
                         <li>
                         
-                                <a href="{{ route('lifo_report') }}">
-                                    <i class="bi bi-circle"></i><span>LIFO </span>
+                                <a href="{{ route('position.report') }}">
+                                    <i class="bi bi-circle"></i><span>Position Report </span>
                                 </a>
                           
                         </li>
