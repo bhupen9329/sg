@@ -18,7 +18,8 @@ class PoItem extends Model
         'qty',
         'unit_price',
         'po_rest_qty',
-        'price'
+        'price',
+         'po_item_status'
     ];
       
     public $timestamps = true;

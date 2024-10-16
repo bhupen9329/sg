@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('po_rest_qty', 10)->nullable();
             $table->string('unit_price')->nullable();
             $table->string('price')->nullable();
+            $table->string('po_item_status')->default('Open');
             $table->timestamps();
         });
     }

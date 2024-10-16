@@ -96,6 +96,7 @@
                                         <th>Quantity(Q)</th>                                        
                                         <th>SO Unit Price</th>
                                         <th>SO Price</th>
+                                        <th>SO Match Position</th>
                                         <th>Remarks</th>
 
                                        
@@ -116,6 +117,7 @@
                                             <td>{{ $data->qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
+                                            <td>{{ $data->match_position }}</td>
                                             <td>{{ $data->terms_condition ?? 'N/A' }}</td>
                                            
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">

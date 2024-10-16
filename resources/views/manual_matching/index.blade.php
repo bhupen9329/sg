@@ -156,11 +156,10 @@
                                             <td>{{ number_format($data->avg_price, 2) }}</td>
                                             <td>{{ $data->total_so_price ?? 0}}</td>
                                             <td>
-                                               
                                                     {{ $data->po_rest_qty }}
                                                 
                                             </td>
-                                            <td>{{ $data->match_position }}</td>
+                                            <td>{{ $data->po_item_status }}</td>
                                         </tr>
                                     @empty
                                         {{-- Show this row if no data is available --}}
@@ -289,7 +288,7 @@
                                                
                                             </td>
                                         
-                                            <td>{{ $data->match_position }} </td>
+                                            <td>{{ $data->so_item_status }} </td>
                                         </tr>
                                     @empty
                                         {{-- Show this row if no data is available --}}
