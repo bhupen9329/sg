@@ -72,7 +72,7 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Inventory Details</h1>
+            <h1>Purchase -Sell Details</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
@@ -178,8 +178,8 @@
                                             <td>{{ $data->so_company_name }}</td>
 
                                             <td>{{ $data->matched_quantity }}</td>
-                                            <td>{{ $data->po_rest_quantity }}</td>
-                                            <td>{{ $data->so_rest_quantity }}</td>
+                                            <td>{{ $data->po_item_rest_quantity }}</td>
+                                            <td>{{ $data->so_item_rest_quantity }}</td>
                                             <td>{{ $data->po_match_position }} </td>
                                             <td>{{ $data->so_match_position }} </td>
                                             

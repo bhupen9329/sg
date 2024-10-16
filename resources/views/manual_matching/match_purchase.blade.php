@@ -61,6 +61,19 @@
             </div>
         @endif
 
+               
+        @if (session('msg'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: "{{ session('msg') }}",
+                        icon: "error"
+                    });
+                });
+            </script>
+        @endif
+
         <section class="section">
 
 
@@ -106,7 +119,7 @@
                         </div>
                     </div>
 
-                    <div class="row mb-3">
+                    {{-- <div class="row mb-3">
                         <label for="poQuantity" class="col-sm-2 col-form-label"><strong>PO Qty</strong></label>
                         <div class="col-sm-4">
                             {{ $purchaseOrder->quantity }} MT
@@ -125,7 +138,7 @@
                         <div class="col-sm-4">
                             {{ $purchaseOrder->price }}
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="row mb-3">
                         <label for="position" class="col-sm-2 col-form-label"><strong>Position</strong></label>
@@ -174,7 +187,7 @@
                                 <tbody>
                                     @if ($po_data)
                                         <tr>
-                                            <td>{{ date('d-m-Y', strtotime($po_data->date)) }}</td>
+                                            <td>{{ date('d-m-Y', strtotime($po_data->po_date ?? 'N/A')) }}</td>
                                             <td>{{ $po_data->document_number }}</td>
                                             <td>{{ $po_data->po_item_no }}</td>
                                             <td>{{ $po_data->supplier_name }}</td>
@@ -221,6 +234,7 @@
                                         <th>#</th>
                                         <th>Transaction Date</th>
                                         <th>Purchase Order</th>    
+                                        <th>PO Item No</th>
                                         <th>Company Name</th>                                       
                                         <th>PO Item Name</th>  
                                         <th>Sales Order</th>
@@ -245,6 +259,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
                                             <td>{{ $data->po_number }}</td>
+                                            <td>{{ $data->po_item_no }}</td>
                                             <td>{{ $data->po_company_name }}</td>
                                             <td>{{ $data->po_category_name }} {{ $data->po_sub_category_name }}</td>
                                             <td>{{ $data->so_number }}</td>
@@ -286,15 +301,16 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>Select</th>
+                                                <th>Action</th>
                                                 <th>Sales Order</th>
-                                                <th>Category</th>
-                                                <th>Sub Category</th>
-                                                <th>Open Qty</th>
-                                                <th>SO Rem Qty</th>
-                                                <th>Qty</th>
-                                                <th>Unit Price</th>
-                                                <th>Price</th>
+                                                <th>SO Item NO</th>
+                                                <th>Buyer Name(Party Name)</th>
+                                                <th>Item Category</th>
+                                                <th>Item Sub-Category</th>
+                                                <th>Quantity(Q)</th>    
+                                                <th>Rest Quantity(Q)</th>                                       
+                                                <th>SO Unit Price</th>
+                                                <th>SO Price</th>
                                                 <th>Matched Quantity</th>
                                             </tr>
                                         </thead>
@@ -305,17 +321,18 @@
                                                         <input type="checkbox" class="sales-order-checkbox" name="selected_so_items[]" value="{{ $order->so_item_id }}">
                                                     </td>
                                                     <td>{{ $order->so_number }}</td>
+                                                    <td>{{ $order->so_item_no }}</td>
+                                                    <td>{{ $order->company_name }}</td>
                                                     <td>{{ $order->category_name }}</td>
                                                     <td>{{ $order->sub_category_name }}</td>
-                                                    <td>{{ $order->total_quantity }}</td>
-                                                    <td>{{ $order->rest_quantity }}</td>
                                                     <td>{{ $order->qty }}</td>
+                                                    <td>{{ $order->so_rest_qty }}</td>
                                                     <td>{{ $order->unit_price }}</td>
                                                     <td>{{ $order->price }}</td>
                                                     <td>
-                                                        <input type="number" step="any" name="matched_quantity[{{ $order->so_item_id }}]" class="matched-quantity-input form-control" disabled min="0" max="{{ $order->total_quantity }}" placeholder="Enter quantity">
+                                                        <input type="number" step="any" name="matched_quantity[{{ $order->so_item_id }}]" class="matched-quantity-input form-control" disabled min="0" max="{{ $order->so_rest_qty }}" placeholder="Enter quantity">
                                                     </td>
-                                <input type="hidden" name="sales_order_id" id="salesOrderId" value="{{ $order->id }}">
+                                                   <input type="hidden" name="sales_order_id" id="salesOrderId" value="{{ $order->so_id }}">
 
                                                 </tr>
                                             @endforeach

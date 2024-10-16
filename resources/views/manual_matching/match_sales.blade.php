@@ -61,6 +61,19 @@
             </div>
         @endif
 
+        
+        @if (session('msg'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: "{{ session('msg') }}",
+                        icon: "error"
+                    });
+                });
+            </script>
+        @endif
+
         <section class="section">
 
 
@@ -108,7 +121,7 @@
                         </div>
                     </div>
 
-                    <div class="row mb-3">
+                    {{-- <div class="row mb-3">
                         <label for="poQuantity" class="col-sm-2 col-form-label"><strong>SO Quantity</strong></label>
                         <div class="col-sm-4">
                             {{ $salesOrders->total_quantity }}
@@ -134,12 +147,72 @@
                         <div class="col-sm-4">
                             {{ $salesOrders->total_price }}
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="row mb-3">
                         <label for="position" class="col-sm-2 col-form-label"><strong>Position</strong></label>
                         <div class="col-sm-4">
                             {{ $salesOrders->match_position }}
+                        </div>
+                    </div>
+                </div>
+            </div><br><br>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                           
+                          
+
+                            <!-- Existing Table Section -->
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="pd-20">
+                                        <h4 class="text-blue h4">Purchase Transaction Details</h4>
+                                    </div>
+                                </div>
+
+                           
+                            </div>
+
+                            <!-- Table with stripped rows -->
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Date(DD/MM/YY)​</th>
+                                        <th>SO No.</th>
+                                        <th>SO Item Number</th>
+                                        <th>Buyer Name(Party Name)</th>
+                                        <th>Item Category</th>
+                                        <th>Item Sub-Category</th>
+                                        <th>Quantity(Q)</th>    
+                                        <th>Rest Quantity(Q)</th>                                       
+                                        <th>SO Unit Price</th>
+                                        <th>SO Price</th>
+                                      
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ($so_data)
+                                        <tr>
+                                            <td>{{ date('d-m-Y', strtotime($so_data->so_date ?? 'N/A')) }}</td>
+                                            <td>{{ $so_data->so_number }}</td>
+                                            <td>{{ $so_data->po_item_no }}</td>
+                                            <td>{{ $so_data->supplier_name }}</td>
+                                            <td>{{ $so_data->category_name }}</td>
+                                            <td>{{ $so_data->sub_category_name }}</td>
+                                            <td>{{ $so_data->qty }}</td>
+                                            <td>{{ $so_data->so_rest_qty }}</td>
+                                            <td>{{ $so_data->unit_price }}</td>
+                                            <td>{{ $so_data->price }}</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                            
+                            
+                            <!-- End Table with stripped rows -->
                         </div>
                     </div>
                 </div>
@@ -229,43 +302,47 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Select</th>
+                                        <th>Action</th>
                                         <th>Purchase Order</th>
-                                        <th>Total Quantity</th>
-                                        <th>Remaining Quantity</th>
-                                        <th>Rate</th>
+                                        <th>PO Item NO</th>
+                                        <th>Seller Name(Party Name)</th>
+                                        <th>Item Category</th>
+                                        <th>Item Sub-Category</th>
+                                        <th>Quantity(Q)</th>    
+                                        <th>Rest Quantity(Q)</th>                                       
+                                        <th>PO Unit Price</th>
+                                        <th>PO Price</th>
                                         <th>Matched Quantity</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($purchaseOrders->isEmpty())
+                                    @foreach ($purchaseOrders as $order)
                                         <tr>
-                                            <td colspan="6" class="text-center">No open purchase orders available.</td>
+                                            <td>
+                                                <input type="checkbox" class="sales-order-checkbox" name="selected_po_items[]" value="{{ $order->po_item_id }}">
+                                            </td>
+                                            <td>{{ $order->document_number }}</td>
+                                            <td>{{ $order->po_item_no }}</td>
+                                            <td>{{ $order->company_name }}</td>
+                                            <td>{{ $order->category_name }}</td>
+                                            <td>{{ $order->sub_category_name }}</td>
+                                            <td>{{ $order->qty }}</td>
+                                            <td>{{ $order->po_rest_qty }}</td>
+                                            <td>{{ $order->unit_price }}</td>
+                                            <td>{{ $order->price }}</td>
+                                            <td>
+                                                <input type="number" step="any" name="matched_quantity[{{ $order->po_item_id }}]" class="matched-quantity-input form-control" disabled  min="0" max="{{ $order->po_rest_qty }}" placeholder="Enter quantity">
+                                            </td>
+                                           <input type="hidden" name="purchase_order_id" id="salesOrderId" value="{{ $order->po_id }}">
+
                                         </tr>
-                                    @else
-                                        @foreach ($purchaseOrders as $order)
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox" class="purchase-order-checkbox"
-                                                        name="selected_orders[]" value="{{ $order->id }}">
-                                                </td>
-                                                <td>{{ $order->document_number }}</td>
-                                                <td>{{ $order->quantity }}</td>
-                                                <td>{{ $order->rest_quantity }}</td>
-                                                <td>{{ $order->price }}</td>
-                                                <td>
-                                                    <input type="number" step="any"
-                                                        name="matched_quantity[{{ $order->id }}]"
-                                                        class="matched-quantity-input form-control" min="0"
-                                                        max="{{ $order->total_quantity }}" placeholder="Enter quantity"
-                                                        value="{{ old('matched_quantity.' . $order->id, '') }}">
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @endif
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
+
+                        <input type="hidden" name="sales_order_id"  value="{{ $salesOrders->so_id }}">
+                        <input type="hidden" name="so_item_id"  value="{{ $so_data->so_item_id }}">
 
                         <button type="submit" class="btn btn-primary float-end" id="submit_btn">Submit</button>
                         <div id="on_submit" class="text-danger mt-2" style="display: none;">At least one row must be
@@ -279,41 +356,64 @@
     </section>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const purchaseOrderIdInput = document.getElementById('salesOrderId');
-
-            // Function to set the sales order ID in the hidden field
-            window.setSalesOrderId = function(orderId) {
-                purchaseOrderIdInput.value = orderId; // Set the sales order ID in the hidden field
+            const documentCells = document.querySelectorAll('.document-cell');
+            const purchaseOrderIdInput = document.getElementById('purchaseOrderId');
+            const checkboxes = document.querySelectorAll('.sales-order-checkbox');
+    
+            // Function to set the hidden purchase order ID when a document-cell is clicked
+            const setPurchaseOrderId = (id) => {
+                if (id) {
+                    purchaseOrderIdInput.value = id; // Set the purchase order ID in the hidden field
+                } else {
+                    console.error('Purchase Order ID not found on clicked element.');
+                }
             };
-
-            const checkboxes = document.querySelectorAll('.purchase-order-checkbox');
-
+    
+            // Add click event listeners to document cells
+            documentCells.forEach(cell => {
+                cell.addEventListener('click', function() {
+                    const purchaseOrderId = this.getAttribute('data-id'); // Ensure this attribute is set in HTML
+                    setPurchaseOrderId(purchaseOrderId);
+                });
+            });
+    
+            // Function to handle enabling/disabling matched quantity input
+            const toggleMatchedQuantityInput = (checkbox, matchedQuantityInput) => {
+                matchedQuantityInput.disabled = !checkbox.checked; // Enable/disable input based on checkbox state
+                if (!checkbox.checked) {
+                    matchedQuantityInput.value = ''; // Clear the value if unchecked
+                }
+            };
+    
+            // Add change event listeners to sales order checkboxes
             checkboxes.forEach(checkbox => {
-                const matchedQuantityInput = checkbox.closest('tr').querySelector(
-                '.matched-quantity-input');
-
-                // Disable matched quantity input initially
-                matchedQuantityInput.disabled = true;
-
                 checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        matchedQuantityInput.disabled =
-                        false; // Enable input when checkbox is checked
-                        setSalesOrderId(this.value); // Set the sales order ID when checked
-                    } else {
-                        matchedQuantityInput.disabled =
-                        true; // Disable input when checkbox is unchecked
-                        // Check if any other checkboxes are checked
-                        const anyChecked = Array.from(checkboxes).some(checkbox => checkbox
-                        .checked);
-                        if (!anyChecked) {
-                            purchaseOrderIdInput.value =
-                            ''; // Clear the hidden field if no checkboxes are checked
-                        }
-                    }
+                    const matchedQuantityInput = this.closest('tr').querySelector('.matched-quantity-input');
+                    toggleMatchedQuantityInput(this, matchedQuantityInput);
                 });
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.sales-order-checkbox');
+    
+    // Function to enable/disable matched quantity input based on checkbox selection
+    const toggleMatchedQuantityInput = (checkbox, matchedQuantityInput) => {
+        matchedQuantityInput.disabled = !checkbox.checked; // Enable/disable input based on checkbox state
+        if (!checkbox.checked) {
+            matchedQuantityInput.value = ''; // Clear value if unchecked
+        }
+    };
+
+    // Add change event listeners to sales order checkboxes
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const matchedQuantityInput = this.closest('tr').querySelector('.matched-quantity-input');
+            toggleMatchedQuantityInput(this, matchedQuantityInput);
+        });
+    });
+});
+
     </script>
 
 @endsection

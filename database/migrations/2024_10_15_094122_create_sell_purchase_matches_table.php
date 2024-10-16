@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_sell_match', function (Blueprint $table) {
+        Schema::create('sell_purchase_matches', function (Blueprint $table) {
             $table->id();
             $table->string('po_id')->nullable();
             $table->string('so_id')->nullable();
@@ -31,13 +31,7 @@ return new class extends Migration
             $table->decimal('po_item_price', 10, 2)->default(0);
             $table->timestamps();
 
-            // $table->foreign('po_id')->references('id')->on('purchase_orders')->onDelete('cascade');
-            // $table->foreign('so_id')->references('id')->on('sales_orders')->onDelete('cascade');
-
-
         });
-        
-        
     }
 
     /**
@@ -45,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_sell_match');
+        Schema::dropIfExists('sell_purchase_matches');
     }
 };

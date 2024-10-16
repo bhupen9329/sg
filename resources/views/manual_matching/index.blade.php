@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Inward - Saraswati Globals')
+@section('title', 'Index - Manual Matching')
 @section('content')
     <style>
 
@@ -100,50 +100,6 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <!-- Add Filter Section -->
-                            {{-- <div class="row mb-4">
-
-                                <div class="col-md-4 col-sm-6">
-                                    <label for="date_filter" class="form-label">Select Filter</label>
-                                    <select class="form-select" id="filterType" name="filterType">
-                                        <option value="">Select Filter Type</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="monthly">Monthly</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2 col-sm-6" style="margin-top: 7px">
-                                    <label for="filterTodate"><strong>From Date</strong></label>
-                                    <?php
-                                    $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
-                                    ?>
-                                    <input type="date" class="form-control" value="<?php echo $firstDayOfMonth; ?>" name="to_date"
-                                        id="filterTodate" required>
-                                </div>
-                                <div class="col-md-2 col-sm-6" style="margin-top: 7px">
-                                    <label for="filterFromdate"><strong>To Date</strong></label>
-                                    <?php
-                                    $lastDayOfMonth = (new DateTime('last day of this month'))->format('Y-m-d');
-                                    ?>
-                                    <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
-                                        id="filterFromdate" required>
-                                </div>
-                                <div class="col-md-4 col-sm-12 d-flex align-items-end">
-
-                                    <button class=" m-1 btn btn-primary" type="button"
-                                    onclick="filterButton(
-                                        $('#filterType').val(),  
-                                        $('#filterTodate').val(),
-                                        $('#filterFromdate').val(),
-                                    )">
-                                    Apply
-                                </button>
-                                
-                                </div>
-
-                            </div> --}}
-
-                            <!-- Existing Table Section -->
-
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
@@ -151,8 +107,7 @@
                                     </div>
                                 </div>
                     
-                                <div class="col-md-6 col-sm-12 d-flex justify-content-end">
-                                </div>
+                                
                             </div>
                         
                             <table class="table table-bordered table-hover table-striped">
@@ -160,6 +115,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>PO No</th>
+                                        <th>PO Item NO</th>
                                         <th>PO Date</th>                                       
                                         <th>Seller Name (Party Name)</th>
                                         <th>Category</th>
@@ -180,25 +136,29 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
-                                                <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
+                                                {{-- <a href="{{ route('match.purchase', ['id' => $data->id]) }}"> --}}
                                                     {{ $data->document_number }}
-                                                </a>
+                                                {{-- </a> --}}
                                             </td>
+                                            <td>{{ $data->po_item_no }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
                                             <td>{{ $data->company_name }}</td>
-
                                             <td>{{ $data->name }}</td>
                                             <td>{{ $data->sub_category }}</td>
                                             <td>{{ $data->qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
                                             <td>
                                                 <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
+                                                {{ $data->total_matched_quantity ?? 0}}
+                                            </a>
+                                            </td>
+                                            <td>{{ number_format($data->avg_price, 2) }}</td>
+                                            <td>{{ $data->total_so_price ?? 0}}</td>
+                                            <td>
+                                               
                                                     {{ $data->po_rest_qty }}
-                                                </a>
+                                                
                                             </td>
                                             <td>{{ $data->match_position }}</td>
                                         </tr>
@@ -282,6 +242,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>SO No</th>
+                                        <th>SO Item NO</th>
                                         <th>SO Date</th>                                       
                                         <th>Buyer Name (Party Name)</th>
                                         <th>Category</th>
@@ -302,11 +263,11 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
-                                                <a href="{{ route('match.sales', ['id' => $data->id]) }}">
+                                                {{-- <a href="{{ route('match.sales', ['id' => $data->id]) }}"> --}}
                                                     {{ $data->so_number }}
-                                                </a>
+                                                {{-- </a> --}}
                                             </td>
-                                            {{-- <td>{{ $data->so_number }}</td> --}}
+                                            <td>{{ $data->so_item_no }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>                                         
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->name }}</td>
@@ -314,13 +275,18 @@
                                             <td>{{ $data->qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
                                             <td>
-                                                <a href="{{ route('match.sales', ['id' => $data->id]) }}">
+                                                <a href="{{ route('match.sales', ['id' => $data->so_item_id]) }}">
+                                                {{ $data->total_matched_quantity ?? 0}}
+                                            </a>
+                                            
+                                            </td>
+                                            <td>{{ number_format($data->avg_price, 2) }}</td>
+                                            <td>{{ $data->total_po_price ?? 0 }}</td>
+                                            <td>
+                                               
                                                     {{ $data->so_rest_qty }}
-                                                </a>
+                                               
                                             </td>
                                         
                                             <td>{{ $data->match_position }} </td>
