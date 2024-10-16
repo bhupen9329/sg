@@ -331,7 +331,12 @@
                                             <td>{{ $order->unit_price }}</td>
                                             <td>{{ $order->price }}</td>
                                             <td>
+                                                @if($order->po_rest_qty > $so_data->so_rest_qty)
+                                                <input type="number" step="any" name="matched_quantity[{{ $order->po_item_id }}]" class="matched-quantity-input form-control" disabled  min="0" max="{{ $so_data->so_rest_qty }}" placeholder="Enter quantity">
+                                                @else
                                                 <input type="number" step="any" name="matched_quantity[{{ $order->po_item_id }}]" class="matched-quantity-input form-control" disabled  min="0" max="{{ $order->po_rest_qty }}" placeholder="Enter quantity">
+
+                                                @endif
                                             </td>
                                            <input type="hidden" name="purchase_order_id" id="salesOrderId" value="{{ $order->po_id }}">
 

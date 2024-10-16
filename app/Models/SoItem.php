@@ -17,7 +17,12 @@ class SoItem extends Model
         'qty',
         'unit_price',
         'so_rest_qty',
-        'price'
+        'price',
+        'so_item_status'
+
+        
+          
+          
     ];
       
     public $timestamps = true;
