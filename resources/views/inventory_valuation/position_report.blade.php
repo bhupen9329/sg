@@ -196,7 +196,7 @@
                                                 <td style="padding: 8px;">{{ date('d-m-Y') }}</td>
 
                                                 <td style="padding: 8px;">{{ $lifoData['item_name'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">{{ $lifoData['final_balance_qty'] ?? 'N/A' }}</td>
+                                                <td style="padding: 8px;">{{ number_format($lifoData['final_balance_qty'], 2) ?? 'N/A' }}</td>
                                                 <td style="padding: 8px;">
                                                     <a href="{{ route('show.lifo') }}" >
                                                         {{-- {{ $lifoData['final_balance_value'] ?? 'N/A' }} --}}
