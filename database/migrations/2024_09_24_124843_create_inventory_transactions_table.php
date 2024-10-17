@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('inventory_transactions', function (Blueprint $table) {
             $table->id();
-            $table->date('transaction_date');
-            $table->string('item_name');
-            $table->string('company_name');
-            $table->enum('transaction_type', ['purchase', 'sell']);
+            $table->date('transaction_date')->nullable();
+            $table->string('item_name')->nullable();
+            $table->string('company_name')->nullable();
+            $table->enum('transaction_type', ['purchase', 'sell'])->nullable();
             $table->decimal('unit_price', 10, 2)->nullable(); 
-            $table->decimal('quantity'); 
-            $table->string('position');
+            $table->decimal('quantity')->nullable(); 
+            $table->string('position')->nullable();
 
       
           

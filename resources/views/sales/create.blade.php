@@ -283,7 +283,7 @@
 
                                                             cell3.innerHTML =
                                                                 `
-                                                            <input type="number" name="qty[]" id="qty_${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" style="height: 34px; width: 105px"  placeholder="Qty" min="1"  required>`;
+                                                            <input type="number" name="qty[]" step="any" id="qty_${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" style="height: 34px; width: 105px"  placeholder="Qty" min="1"  required>`;
 
 
                                                             cell4.innerHTML =
