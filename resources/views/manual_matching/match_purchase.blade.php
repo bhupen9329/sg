@@ -233,19 +233,21 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Transaction Date</th>
-                                        <th>Sales Order</th>
-                                        <th>SO Item No</th>  
-                                        <th>Company Name</th>                                       
-                                        <th>SO Item Name</th> 
                                         <th>Purchase Order</th>    
                                         <th>PO Item No</th>
                                         <th>Company Name</th>                                       
                                         <th>PO Item Name</th>
+                                        <th>Sales Order</th>
+                                        <th>SO Item No</th>  
+                                        <th>Company Name</th>                                       
+                                        <th>SO Item Name</th> 
                                         <th>Matched Quantity</th>
                                         <th>PO Item Rem Qty</th>
                                         <th>SO Item Rem Qty</th>    
                                         <th>Purchase Position (Status)</th>
                                         <th>Sales Position (Status)</th>
+                                        <th>Action</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -259,19 +261,23 @@
                                             {{-- @dd($data); --}}
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
-                                            <td>{{ $data->so_number }}</td>
-                                            <td>{{ $data->so_item_no }}</td>
-                                            <td>{{ $data->so_company_name }}</td>
-                                            <td>{{ $data->so_category_name }} {{ $data->so_sub_category_name }}</td>
                                             <td>{{ $data->po_number }}</td>
                                             <td>{{ $data->po_item_no }}</td>
                                             <td>{{ $data->po_company_name }}</td>
                                             <td>{{ $data->po_category_name }} {{ $data->po_sub_category_name }}</td>
+                                            <td>{{ $data->so_number }}</td>
+                                            <td>{{ $data->so_item_no }}</td>
+                                            <td>{{ $data->so_company_name }}</td>
+                                            <td>{{ $data->so_category_name }} {{ $data->so_sub_category_name }}</td>
                                             <td>{{ $data->matched_quantity }}</td>
                                             <td>{{ $data->po_item_rest_quantity }}</td>
                                             <td>{{ $data->so_item_rest_quantity }}</td>
                                             <td>{{ $data->po_match_position }} </td>
                                             <td>{{ $data->so_match_position }} </td>
+                                            <td> 
+                                                <button type="button" class="btn btn-primary float-end" id="submit_btn" data-bs-toggle="modal" data-bs-target="#revertModal">Revert</button>
+                                            </td>
+                                              
                                             
                                         </tr>
                                     @endforeach
@@ -318,6 +324,9 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($salesOrders as $order)
+                                            @if($order->so_rest_qty == 0)
+                                            @continue
+                                            @endif
                                                 <tr>
                                                     <td>
                                                         <input type="checkbox" class="sales-order-checkbox" name="selected_so_items[]" value="{{ $order->so_item_id }}">
@@ -358,7 +367,27 @@
                 </div>
             </div>
             
+ {{-- ...............................................modal...............................................  --}}
 
+ <!-- Modal -->
+<div class="modal fade" id="revertModal" tabindex="-1" aria-labelledby="revertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="revertModalLabel">Confirm Revert</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to revert the changes?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" route="{{('')}}" class="btn btn-primary">Yes, Revert</button>
+        </div>
+      </div>
+    </div>
+</div>
+  
 
     </main><!-- End #main -->
     </section>

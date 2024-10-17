@@ -783,7 +783,9 @@ class ManualMatching extends Controller
                 'po_categories.name as po_category_name', // Select Purchase Order category name
                 'po_subcategories.sub_category as po_sub_category_name', // Select Purchase Order subcategory name
                 'so_categories.name as so_category_name', // Select Sales Order category name
-                'so_subcategories.sub_category as so_sub_category_name'
+                'so_subcategories.sub_category as so_sub_category_name',
+                'po_items.po_item_no',
+                'so_items.so_item_no',
             )
             ->where('purchase_sell_match.so_item_id', $id)
             ->where('so_items.item_category', $categoryIds)

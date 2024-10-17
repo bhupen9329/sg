@@ -242,12 +242,14 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Transaction Date</th>
-                                        <th>Purchase Order</th>    
-                                        <th>Company Name</th>                                       
-                                        <th>PO Item Name</th>  
                                         <th>Sales Order</th>
+                                        <th>SO Item No</th>  
                                         <th>Company Name</th>                                       
                                         <th>SO Item Name</th>  
+                                        <th>Purchase Order</th>    
+                                        <th>PO Item No</th>  
+                                        <th>Company Name</th>                                       
+                                        <th>PO Item Name</th>  
                                         <th>Matched Quantity</th>
                                         <th>PO Item Rem Qty</th>
                                         <th>SO Item Rem Qty</th>    
@@ -258,7 +260,6 @@
                                 <tbody>
                                     @foreach ($manual_match as $data)
                                         @php
-                                            
                                             $po_status = $data->po_rest_quantity > 0 ? 'Open' : 'Closed';
                                             $so_status = $data->so_rest_quantity > 0 ? 'Open' : 'Closed';
                                         @endphp
@@ -266,12 +267,14 @@
                                             {{-- @dd($data); --}}
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
-                                            <td>{{ $data->po_number }}</td>
-                                            <td>{{ $data->po_company_name }}</td>
-                                            <td>{{ $data->po_category_name }} {{ $data->po_sub_category_name }}</td>
                                             <td>{{ $data->so_number }}</td>
+                                            <td>{{ $data->so_item_no }}</td>
                                             <td>{{ $data->so_company_name }}</td>
                                             <td>{{ $data->so_category_name }} {{ $data->so_sub_category_name }}</td>
+                                            <td>{{ $data->po_number }}</td>
+                                            <td>{{ $data->po_item_no }}</td>
+                                            <td>{{ $data->po_company_name }}</td>
+                                            <td>{{ $data->po_category_name }} {{ $data->po_sub_category_name }}</td>
                                             <td>{{ $data->matched_quantity }}</td>
                                             <td>{{ $data->po_item_rest_quantity }}</td>
                                             <td>{{ $data->so_item_rest_quantity }}</td>
