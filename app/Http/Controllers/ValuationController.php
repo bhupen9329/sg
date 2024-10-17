@@ -546,7 +546,7 @@ class ValuationController extends Controller
                     'status' => $totalQuantity >= 0 ? 'Long' : 'Short',
                     'details' => $logEntry['details'],
                 ];
-    dump($transactionLogs);
+    // dump($transactionLogs);
                 
                 $lastTransactionStatus = $totalQuantity >= 0 ? 'Long' : 'Short';
             }
