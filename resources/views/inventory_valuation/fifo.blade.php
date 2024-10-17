@@ -331,7 +331,7 @@
                                                             ?>
                                                             <div>
                                                             
-                                                                {{ number_format($detail['unit_price'], 2) }} @ {{ number_format($detail['used_qty'], 2) }} = 
+                                                               
                                                                 {{ number_format($sellValue, 2) }} 
                                                             </div>
                                                         @endif
