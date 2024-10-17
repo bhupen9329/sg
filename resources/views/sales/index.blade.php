@@ -124,19 +124,17 @@
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
                                                             class="bi bi-three-dots"></i></a>
-                                                    {{-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                                        <li> <a class="dropdown-item"
-                                                                href="{{ route('buyers.show', $data->id) }}"><i
-                                                                    class="fa-regular fa-eye"></i> View</a></li>
+                                                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                  
                                                         <li>
                                                             @can('Company-edit')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('buyers.edit', $data->id) }}"><i
-                                                                        class="fa-solid fa-pencil"></i>Edit</a>
+                                                                        class="fa-solid fa-pencil"></i>View/Edit</a>
                                                             @endcan
                                                         </li>
 
-                                                        <li>
+                                                        {{-- <li>
                                                             @can('Sales-view')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('sales.show', $data->id) }}"><i
@@ -180,10 +178,10 @@
                                                                 <i class="fa-solid fa-download"></i> Download
                                                             </a>
                                                             @endcan
-                                                        </li>
+                                                        </li> --}}
 
 
-                                                    </ul> --}}
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>

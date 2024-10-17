@@ -149,14 +149,24 @@
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             <td>
+                                                @if( $data->po_rest_qty != 0)
                                                 <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
                                                 {{ $data->total_matched_quantity ?? 0}}
                                             </a>
+                                            @else
+                                            {{ $data->total_matched_quantity ?? 0}}
+                                            @endif
                                             </td>
                                             <td>{{ number_format($data->avg_price, 2) }}</td>
                                             <td>{{ $data->total_so_price ?? 0}}</td>
                                             <td>
+                                                @if( $data->po_rest_qty != 0)
+                                                <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
                                                     {{ $data->po_rest_qty }}
+                                                </a>
+                                                @else
+                                                {{ $data->po_rest_qty }}
+                                                @endif
                                                 
                                             </td>
                                             <td>{{ $data->po_item_status }}</td>
@@ -275,17 +285,24 @@
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             <td>
+                                                @if( $data->so_rest_qty != 0)
                                                 <a href="{{ route('match.sales', ['id' => $data->so_item_id]) }}">
                                                 {{ $data->total_matched_quantity ?? 0}}
                                             </a>
-                                            
+                                            @else
+                                            {{ $data->total_matched_quantity ?? 0}}
+                                            @endif
                                             </td>
                                             <td>{{ number_format($data->avg_price, 2) }}</td>
                                             <td>{{ $data->total_po_price ?? 0 }}</td>
                                             <td>
-                                               
+                                                @if( $data->so_rest_qty != 0)
+                                                <a href="{{ route('match.sales', ['id' => $data->so_item_id]) }}">
                                                     {{ $data->so_rest_qty }}
-                                               
+                                                </a>
+                                                @else
+                                                {{ $data->so_rest_qty }}
+                                                @endif
                                             </td>
                                         
                                             <td>{{ $data->so_item_status }} </td>
