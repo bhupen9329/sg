@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             BuyerSupplierSeeder::class,
             WareHouseSeeder::class,
             SubCategorySeeder::class,
-            InventoryTransactionSeeder::class,
+            // InventoryTransactionSeeder::class,
             
    
         ]);

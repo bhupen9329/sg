@@ -24,6 +24,7 @@ class ValuationController extends Controller
     
     public function calculateLIFO()
     {
+        // dd(1);
         $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
         // dd( $transactions);
@@ -36,29 +37,49 @@ class ValuationController extends Controller
         $totalQuantity = 0;
         $totalValue = 0;
         $totalProfitLoss = 0;
-        $lastTransactionStatus = 'Long'; // Initialize to 'Long' or adjust based on your logic
-    
+        $lastTransactionStatus = 'N/A'; // Initialize to 'Long' or adjust based on your logic
+        $lastPurchasePrice = null;
+        $lastSellPrice = null;
         foreach ($transactions as $transaction) {
             $item_name = $transaction->item_name;
     
             if (strtolower($transaction->transaction_type) === 'purchase') {
                 // Add the purchase to the inventory stack (LIFO)
+
+                $lastPurchasePrice = $transaction->unit_price;
+
                 $inventoryStack[] = [
                     'quantity' => $transaction->quantity,
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
                 ];
-                // Update total quantity and value for stock
-                $totalQuantity += $transaction->quantity;
+            
+                // Check if totalQuantity is negative, and reduce it with the new purchase
+                if ($totalQuantity < 0) {
+                    $negativeBalance = abs($totalQuantity);
+                    if ($transaction->quantity >= $negativeBalance) {
+                        // If purchase quantity is enough to cover the negative balance
+                        $totalQuantity = $transaction->quantity - $negativeBalance;
+                    } else {
+                        // If purchase quantity is not enough to cover the negative balance
+                        $totalQuantity = $totalQuantity + $transaction->quantity;
+                    }
+                } else {
+                    // Normal case, just add the purchase quantity
+                    $totalQuantity += $transaction->quantity;
+                }
+            
+                // Update total value for stock
                 $totalValue += $transaction->quantity * $transaction->unit_price;
                 
                 // Calculate the log amount for the purchase
                 $logAmount = $transaction->quantity * $transaction->unit_price;
-                
+            
                 // Log purchase details
                 $transactionLogs[] = [
                     'transaction_type' => 'Purchase',
                     'quantity' => $transaction->quantity,
+                    'last_purchase_price' => $lastPurchasePrice, 
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
                     'balance_qty' => $totalQuantity,
@@ -73,13 +94,15 @@ class ValuationController extends Controller
                         'amount' => $transaction->quantity * $transaction->unit_price,
                         'remaining_qty' => 0, // All of this purchase is accounted for
                         'remaining_value' => 0, // No remaining value
-                        ]],
-                    ];
-                    $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
+                    ]],
+                ];
+            // dump($transactionLogs);
+                $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             } elseif (strtolower($transaction->transaction_type) === 'sell') {
                 $sellQtyCheck = abs($transaction->quantity); // Quantity to sell
                 $sellQty = number_format($sellQtyCheck, 2);
                 $costOfGoodsSold = 0;
+                $lastSellPrice = $transaction->unit_price;
                 $logEntry = [
                     'transaction_type' => 'Sell',
                     'quantity' => $sellQty,
@@ -186,10 +209,12 @@ class ValuationController extends Controller
                     $unit_cogs_price = 0; // Or handle it according to your business logic
                 }
                 
+              
                 // Log the transaction
                 $transactionLogs[] = [
                     'cogs_amount' => $logEntry['total_amount'],
                     'unit_cogs_price' => $unit_cogs_price,
+                    'last_sell_price' => $lastSellPrice,
                     'transaction_type' => 'Sell',
                     'sell_qty' => abs($transaction->quantity),
                     'quantity' => $logEntry['total_bal_qty'],
@@ -205,20 +230,23 @@ class ValuationController extends Controller
                     'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                     'details' => $logEntry['details'],
                 ];
+                // dd($transactionLogs);
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
                
-    // dump($transactionLogs);
                 
             }
         }
-    
+        $finalPrice = ($lastTransactionStatus === 'Long') ? $lastPurchasePrice : $lastSellPrice;
+
+        // dd($finalPrice);
         return [
             'transaction_logs' => $transactionLogs,
             'final_balance_qty' => $totalQuantity,
             'final_balance_value' => $totalValue,
             'final_profit_loss' => $totalProfitLoss,
             'last_transaction_status' => $lastTransactionStatus,
-            'item_name' => $item_name,    
+            // 'item_name' => $item_name,    
+            'final_price' => $finalPrice, 
             'last_transaction_date' => $lastTransactionDate,       
         ];
     }
@@ -583,7 +611,7 @@ class ValuationController extends Controller
             'final_profit_loss' => $totalProfitLoss,
             'last_transaction_status' => $lastTransactionStatus,
             'calculatedLogs' => $calculatedLogs, 
-            'item_name' => $item_name,       
+            // 'item_name' => $item_name,       
             'last_transaction_date' => $lastTransactionDate,  
         ];
     }
@@ -692,6 +720,7 @@ class ValuationController extends Controller
                 'details' => $logEntry['details'],
             ];
         }
+        // dump($transactionLogs);
     }
 
     // Return the calculated average data as an array
@@ -700,7 +729,7 @@ class ValuationController extends Controller
         'final_balance_qty' => $totalQuantity,
         'final_balance_value' => $totalValue,
         'final_profit_loss' => $totalProfitLoss,
-        'item_name' => $item_name,
+        // 'item_name' => $item_name,
     ];
 }
 
