@@ -209,13 +209,13 @@ class ValuationController extends Controller
                 $profitLoss = $totalSaleValue - $costOfGoodsSold;
                 $totalProfitLoss += $profitLoss;
                 
-                
+                $totalUsedQty = array_sum(array_column($logEntry['details'], 'used_qty'));
                 $transactionLogs[] = [
                     'cogs_amount' => $totalAmountForLogEntry,
                     // 'unit_cogs_price' => !empty($logEntry['details']) ? $totalAmountForLogEntry / array_sum(array_column($logEntry['details'], 'used_qty')) : 0,
-                    'unit_cogs_price' => !empty($logEntry['details']) && array_sum(array_column($logEntry['details'], 'used_qty')) > 0 
-                        ? $totalAmountForLogEntry / array_sum(array_column($logEntry['details'], 'used_qty')) 
-                        : 0,
+                    'unit_cogs_price' => $totalUsedQty > 0 
+                    ? $costOfGoodsSold / $totalUsedQty 
+                    : 0,
 
                     'last_sell_price' => $lastSellPrice,
                     'transaction_type' => 'Sell',
@@ -302,36 +302,36 @@ class ValuationController extends Controller
 
 public function calculateFIFO()
 {
-    // Retrieve all transactions ordered by date (FIFO principle is date-based)
+   
     $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
     
-    // Variables initialization
+   
     $firstTransaction = $transactions->first();
     $firstTransactionDate = $firstTransaction ? $firstTransaction->transaction_date : null;
     
-    $inventoryQueue = []; // FIFO - purchases will be consumed in the order they were added
+    $inventoryQueue = []; 
     $transactionLogs = [];
     $totalQuantity = 0;
     $totalValue = 0;
     $totalProfitLoss = 0;
-    $lastTransactionStatus = 'Long'; // Default status
+    $lastTransactionStatus = 'Long'; 
     
     foreach ($transactions as $transaction) {
         $item_name = $transaction->item_name;
 
         if (strtolower($transaction->transaction_type) === 'purchase') {
-            // Add the purchase to the inventory queue (FIFO)
+          
             $inventoryQueue[] = [
                 'quantity' => $transaction->quantity,
                 'unit_price' => $transaction->unit_price,
                 'transaction_date' => $transaction->transaction_date,
             ];
 
-            // Update total quantity and value for stock
+           
             $totalQuantity += $transaction->quantity;
             $totalValue += $transaction->quantity * $transaction->unit_price;
 
-            // Log purchase details
+          
             $transactionLogs[] = [
                 'transaction_type' => 'Purchase',
                 'quantity' => $transaction->quantity,
@@ -350,13 +350,12 @@ public function calculateFIFO()
                         'remaining_value' => 0,
                     ]
                 ],
-                'inventory_queue' => $inventoryQueue, // Log the current state of the inventory queue
+                'inventory_queue' => $inventoryQueue, 
             ];
             $lastTransactionStatus = $totalQuantity >= 0 ? 'Long' : 'Short';
         } elseif (strtolower($transaction->transaction_type) === 'sell') {
-            $sellQty = abs($transaction->quantity); // Quantity to sell
+            $sellQty = abs($transaction->quantity); 
             $costOfGoodsSold = 0;
-            $profitLoss = 0;
 
             $logEntry = [
                 'transaction_type' => 'Sell',
@@ -368,14 +367,14 @@ public function calculateFIFO()
             ];
             
             while ($sellQty > 0 && !empty($inventoryQueue)) {
-                // FIFO: consume the oldest purchase first
+              
                 $firstPurchase = array_shift($inventoryQueue);
 
                 if ($firstPurchase['quantity'] >= $sellQty) {
-                    // Consume part of the inventory
+                    
                     $remainingQty = $firstPurchase['quantity'] - $sellQty;
                     if ($remainingQty > 0) {
-                        // Push back the remaining quantity
+                       
                         $inventoryQueue[] = [
                             'quantity' => $remainingQty,
                             'unit_price' => $firstPurchase['unit_price'],
@@ -383,9 +382,9 @@ public function calculateFIFO()
                         ];
                     }
 
+                  
                     $costOfGoodsSold += $sellQty * $firstPurchase['unit_price'];
-                    $totalQuantity -= $sellQty;
-                    $totalValue -= $sellQty * $firstPurchase['unit_price'];
+                    $logEntry['total_amount'] += $sellQty * $transaction->unit_price;
 
                     $logEntry['details'][] = [
                         'used_qty' => $sellQty,
@@ -395,13 +394,11 @@ public function calculateFIFO()
                         'remaining_value' => $remainingQty * $firstPurchase['unit_price'],
                     ];
 
-                    $sellQty = 0;
+                    $sellQty = 0; 
                 } else {
-                    // Consume the entire first purchase
+                   
                     $costOfGoodsSold += $firstPurchase['quantity'] * $firstPurchase['unit_price'];
-                    $sellQty -= $firstPurchase['quantity'];
-                    $totalQuantity -= $firstPurchase['quantity'];
-                    $totalValue -= $firstPurchase['quantity'] * $firstPurchase['unit_price'];
+                    $logEntry['total_amount'] += $firstPurchase['quantity'] * $transaction->unit_price;
 
                     $logEntry['details'][] = [
                         'used_qty' => $firstPurchase['quantity'],
@@ -410,11 +407,12 @@ public function calculateFIFO()
                         'remaining_qty' => 0,
                         'remaining_value' => 0,
                     ];
+                    $sellQty -= $firstPurchase['quantity'];
                 }
             }
 
             if ($sellQty > 0) {
-                // If there is a shortfall in inventory (no more stock to sell)
+              
                 $logEntry['details'][] = [
                     'used_qty' => 0,
                     'unit_price' => 0,
@@ -425,20 +423,24 @@ public function calculateFIFO()
                 $totalQuantity -= $sellQty;
             }
 
-            // Calculate profit or loss
+        
             $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
             $profitLoss = $totalSaleValue - $costOfGoodsSold;
             $totalProfitLoss += $profitLoss;
 
-            // Log the sale transaction
+        
             $transactionLogs[] = [
                 'transaction_type' => 'Sell',
                 'quantity' => abs($transaction->quantity),
                 'selling_price' => $transaction->unit_price,
                 'actual_sales_value' => abs($transaction->quantity) * $transaction->unit_price,
+                'unit_sell_price' => (abs($transaction->quantity) * $transaction->unit_price)/abs($transaction->quantity),
                 'transaction_date' => $transaction->transaction_date,
                 'balance_qty' => $totalQuantity,
                 'balance_value' => $totalValue,
+                'unit_cogs_price' => abs($transaction->quantity) > 0 
+                ? $costOfGoodsSold / abs($transaction->quantity) 
+                : 0,
                 'cost_of_goods_sold' => $costOfGoodsSold,
                 'profit_loss' => $profitLoss,
                 'total_profit_loss' => $totalProfitLoss,
@@ -448,9 +450,17 @@ public function calculateFIFO()
             ];
         }
     }
-
-    // Final price based on inventory state and transaction type
-    $finalPrice = $lastTransactionStatus === 'Long' ? $inventoryQueue[0]['unit_price'] : $transactionLogs[count($transactionLogs) - 2]['selling_price'];
+    
+    // dump($transactionLogs);
+    
+    // Determine final price based on the last transaction status
+    if (!empty($inventoryQueue)) {
+        $finalPrice = $lastTransactionStatus === 'Long' 
+                    ? $inventoryQueue[0]['unit_price'] 
+                    : $transactionLogs[count($transactionLogs) - 2]['selling_price'];
+    } else {
+        $finalPrice = 'N/A';
+    }
 
     return [
         'transaction_logs' => $transactionLogs,
