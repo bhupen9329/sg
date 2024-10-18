@@ -205,7 +205,8 @@
                                                 </td>
                                                 <td style="padding: 8px;">
                                                     <a href="{{ route('show.fifo') }}" >
-                                                        {{ $fifoData['final_balance_value'] ?? 'N/A' }}
+                                                        {{-- {{ $fifoData['final_balance_value'] ?? 'N/A' }} --}}
+                                                        N/A
                                                     </a>  
                                                 </td>
                                                 <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
