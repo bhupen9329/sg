@@ -275,7 +275,7 @@
                                             <td>{{ $data->po_match_position }} </td>
                                             <td>{{ $data->so_match_position }} </td>
                                             <td> 
-                                                <button type="button" class="btn btn-primary float-end" id="submit_btn" data-bs-toggle="modal" data-bs-target="#revertModal">Revert</button>
+                                                <button type="button" class="btn btn-primary float-end" id="submit_btn" data-bs-toggle="modal" onClick="reply_click('{{ $data->transaction_id }}')" data-bs-target="#revertModal">Revert</button>
                                             </td>
                                               
                                             
@@ -381,8 +381,13 @@
           Are you sure you want to revert the changes?
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" route="{{('')}}" class="btn btn-primary">Yes, Revert</button>
+            <form action="{{ route('transaction_revert') }}" method="post">
+                @csrf
+           <input type="hidden" name="transaction_id" id="transaction_id">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" route="{{('')}}" class="btn btn-primary">Yes, Revert</button>
+        </form>
+
         </div>
       </div>
     </div>
@@ -451,6 +456,14 @@
     });
 });
 
+    </script>
+
+    <script>
+        
+function reply_click(id)
+{
+$('#transaction_id').val(id);
+}
     </script>
     
 

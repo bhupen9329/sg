@@ -255,6 +255,8 @@
                                         <th>SO Item Rem Qty</th>    
                                         <th>Purchase Position (Status)</th>
                                         <th>Sales Position (Status)</th>
+                                        <th>Action</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -280,6 +282,9 @@
                                             <td>{{ $data->so_item_rest_quantity }}</td>
                                             <td>{{ $data->po_match_position }} </td>
                                             <td>{{ $data->so_match_position }} </td>
+                                            <td> 
+                                                <button type="button" class="btn btn-primary float-end" id="submit_btn" data-bs-toggle="modal" onClick="reply_click('{{ $data->transaction_id }}')" data-bs-target="#revertModal">Revert</button>
+                                            </td>
                                             
                                         </tr>
                                     @endforeach
@@ -358,7 +363,31 @@
                     </form>
                 </div>
             </div>
+ {{-- ...............................................modal...............................................  --}}
 
+ <!-- Modal -->
+ <div class="modal fade" id="revertModal" tabindex="-1" aria-labelledby="revertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="revertModalLabel">Confirm Revert</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to revert the changes?
+        </div>
+        <div class="modal-footer">
+            <form action="{{ route('transaction_revert') }}" method="post">
+                @csrf
+           <input type="hidden" name="transaction_id" id="transaction_id">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" route="{{('')}}" class="btn btn-primary">Yes, Revert</button>
+        </form>
+
+        </div>
+      </div>
+    </div>
+</div>
 
     </main><!-- End #main -->
     </section>
@@ -423,5 +452,14 @@
 });
 
     </script>
+
+    
+<script>
+        
+        function reply_click(id)
+        {
+        $('#transaction_id').val(id);
+        }
+            </script>
 
 @endsection
