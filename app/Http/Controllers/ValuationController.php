@@ -79,9 +79,6 @@ class ValuationController extends Controller
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
                 
             } elseif (strtolower($transaction->transaction_type) === 'sell') {
-
-                 
-                    
               
                 $sellQtyCheck = abs($transaction->quantity);
                 $sellQty = number_format($sellQtyCheck, 2);
@@ -244,27 +241,27 @@ class ValuationController extends Controller
         }
     
      
-        // $finalPrice = ($lastTransactionStatus === 'Long') ? $lastPurchasePrice : $lastSellPrice;
+        $finalPrice = ($lastTransactionStatus === 'Long') ? $lastPurchasePrice : $lastSellPrice;
         // $finalPrice = ($lastTransactionStatus === 'Long') 
         // ? $lastPurchasePrice 
         // : ($lastSellPrice + $transactionLogs[count($transactionLogs) - 2]['last_sell_price']) / 2;
 
-        if (count($transactionLogs) >= 2) {
-            $secondLastTransaction = $transactionLogs[count($transactionLogs) - 3];
-            // dump($secondLastTransaction);
-        }
+        // if (count($transactionLogs) >= 2) {
+        //     $secondLastTransaction = $transactionLogs[count($transactionLogs) - 2];
+        //     // dump($secondLastTransaction);
+        // }
 
         
-        if ($lastTransactionStatus === 'Long') {
-            $finalPrice = $lastPurchasePrice;
-        } else {
-            if (count($transactionLogs) >= 2) {
-                $secondLastSellPrice = $transactionLogs[count($transactionLogs) - 3]['last_sell_price'];
-                $finalPrice = ($lastSellPrice + $secondLastSellPrice) / 2;
-            } else {
-                $finalPrice = $lastSellPrice;
-            }
-        }
+        // if ($lastTransactionStatus === 'Long') {
+        //     $finalPrice = $lastPurchasePrice;
+        // } else {
+        //     if (count($transactionLogs) >= 2) {
+        //         $secondLastSellPrice = $transactionLogs[count($transactionLogs) - 3]['last_sell_price'];
+        //         $finalPrice = ($lastSellPrice + $secondLastSellPrice) / 2;
+        //     } else {
+        //         $finalPrice = $lastSellPrice;
+        //     }
+        // }
         
         // dd([
         //     'lastTransactionStatus' => $lastTransactionStatus,
