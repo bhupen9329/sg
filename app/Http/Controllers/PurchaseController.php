@@ -40,7 +40,7 @@ class PurchaseController extends Controller
         ->join('po_items','po_items.po_id','=','purchase_orders.id')
         ->join('categories','categories.id','=','po_items.item_category')
         ->join('subcategories','subcategories.id','=','po_items.item_subcategory')
-        ->select('*', 'purchase_orders.id as id','po_items.*','categories.name as category_name','subcategories.sub_category as sub_category_name')
+        ->select('*', 'purchase_orders.id as po_id','po_items.*','categories.name as category_name','subcategories.sub_category as sub_category_name')
         ->get();
     
 // dd($po_data);
@@ -108,15 +108,17 @@ class PurchaseController extends Controller
         $purchaseOrder->document_number = $request->po_id;
         $purchaseOrder->category = $request->category_id;
         $purchaseOrder->sub_category_id = $request->sub_category_id;
-        $purchaseOrder->quantity = $request->total_quantity;
+        $purchaseOrder->total_quantity = $request->total_quantity;
         $purchaseOrder->rest_quantity = $request->total_quantity;
-        $purchaseOrder->price = $request->total_price;
+        $purchaseOrder->total_price = $request->total_price;
+        $purchaseOrder->total_amount = $request->total_amount;
         $purchaseOrder->remark = $request->remark;
         $purchaseOrder->date = $request->date;
         $purchaseOrder->no_of_due_date = $request->no_of_due_date;
         $purchaseOrder->due_date = $request->due_date;
         $purchaseOrder->status = 'Open';
         $purchaseOrder->match_position = 'open';
+
     
         // Save Purchase Order
         $purchaseOrder->save();
@@ -172,43 +174,100 @@ class PurchaseController extends Controller
     {
         // dd($id);
         $po_data = PurchaseOrder::where('id', $id)->first();
-        $PoReceivedQuantity = PoReceivedQuantity::where('po_id', $id)->sum('received_quantity');
-        $balance_qty = $po_data->quantity - $PoReceivedQuantity;
-
-        // dd($balance_qty);
-        $selected_category = Category::find($po_data->category);
-        $selected_sub_category = SubCategory::find($po_data->sub_category_id);
-        $category = Category::all();
-        // dd($category);
+      
         $company = Company::where('id', $po_data->supplier_id)->first();
+        $sub_category = SubCategory::all();
+        $category = Category::all();
+        $po_number = $po_data->document_number;
 
-        // dd($po_data , $company);
+        $category_2 = Category::all();
 
-        return view('purchase.edit', compact('po_data', 'company', 'category', 'selected_category', 'selected_sub_category', 'balance_qty'));
+        if( $po_data->due_date != null){
+            $due_date = Carbon::parse($po_data->due_date);
+            $date = Carbon::parse($po_data->date);
+            $number_of_days = $date->diffInDays($due_date, false);
+        }
+
+        $po_items = PoItem::join('categories', 'po_items.item_category', '=', 'categories.id')->join('subcategories','po_items.item_subcategory', '=', 'subcategories.id')->where('po_items.po_id', $id)->where('po_items.po_item_status', 'Open')->get();
+// dd( $po_items);
+        $data = [
+            'company' => $company,
+            'category' => $category,
+            'po_number' => $po_number,
+            'number_of_days'=> $number_of_days,
+            'po_data' => $po_data,
+            'po_items' => $po_items,
+            'category_2'=> $category_2
+        ];
+
+ 
+        return view('purchase.edit')->with($data);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
 
         // dd($request);
-        $po_data = [
-            'supplier_id' => $request->company_id,
-            'document_number' => $request->po_id,
-            'category' => $request->category_id,
-            'quantity' => $request->quantity,
-            'rest_quantity' => $request->quantity,
-            'price' => $request->price,
+        $po_data = PurchaseOrder::where('id', $id)->first();
+
+        $data = [
             'date' => $request->date,
             'due_date' => $request->due_date,
-            'no_of_due_date' => $request->no_of_due_date,
-            'remark' => $request->remark,
+            'remark' =>  $request->remarks,
+            'total_quantity' => $request->total_quantity,
+            'total_amount' => $request->total_amount,
+            'total_price' => $request->total_price,
         ];
+        PurchaseOrder::where('id', $id)->update($data);
+        PoItem::where('po_id', $id)->where('po_item_status', 'Open')->delete();
 
-        // dd($request->po_id);
-        // dd($po_data);
-        PurchaseOrder::where('document_number', $request->po_id)->update($po_data);
-        return redirect()->route('purchase.index')->with('update', 'Purchase order Updated Successfully');
-        ;
+
+        if ($id) {
+            // Loop through each item for Purchase Order
+            // dd($request);
+            for ($i = 0; $i < count($request->unit_price_); $i++) {
+                $poItem = new PoItem();
+                $poItem->item_category = $request->item_category[$i];
+                $poItem->item_subcategory = $request->item_subcategory[$i];
+                $poItem->qty = $request->qty[$i];
+                $poItem->po_rest_qty = $request->qty[$i];
+                $poItem->unit_price = $request->unit_price_[$i];
+                $poItem->price = $request->price[$i];
+    
+                // Generate item serial number (e.g., PO20240002-01, PO20240002-02)
+                $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+                $poItem->po_item_no = $po_data->document_number . '-' . $itemSerial;
+    
+                // Link the item to the Purchase Order
+                $poItem->po_id = $id;
+    
+                // Save Purchase Order Item
+                $poItem->save();
+
+                $categoryName = Category::find($poItem->item_category)->name; 
+
+                $subcategoryName = Subcategory::find($poItem->item_subcategory)->sub_category; 
+                $companyName = Company::find($po_data->supplier_id)->company_name; 
+                // dd($subcategoryName);
+
+              
+                $inventoryTransaction = new InventoryTransaction();
+                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
+                $inventoryTransaction->transaction_type = 'purchase'; 
+                $inventoryTransaction->quantity = $poItem->qty;
+                $inventoryTransaction->transaction_date = now(); 
+                $inventoryTransaction->unit_price = $poItem->unit_price; 
+                $inventoryTransaction->company_name = $companyName;
+                $inventoryTransaction->position = 'open';
+                $inventoryTransaction->save();
+            }
+    
+            // Redirect with success message
+            return redirect()->route('purchase.index')->with('update', 'Purchase Order Updated Successfully');
+        }
+      
+      
+        
     }
 
     public function show($id)

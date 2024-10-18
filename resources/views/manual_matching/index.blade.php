@@ -133,6 +133,9 @@
                                 <tbody>
                                     {{-- Check if there is any data in $po_data --}}
                                     @forelse ($po_data as $data)
+                                    @php
+                                    $total_price =  ($data->total_matched_quantity * $data->avg_price);
+                                    @endphp
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
@@ -145,29 +148,22 @@
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->name }}</td>
                                             <td>{{ $data->sub_category }}</td>
-                                            <td>{{ $data->qty }}</td>
-                                            <td>{{ $data->unit_price }}</td>
-                                            <td>{{ $data->price }}</td>
+                                            <td>{{ number_format($data->qty, 3) }}</td>
+                                            <td>{{ number_format($data->unit_price, 2) }}</td>
+                                            <td>{{ number_format($data->price, 2) }}</td>
                                             <td>
-                                                @if( $data->po_rest_qty != 0)
+                                               
                                                 <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
-                                                {{ $data->total_matched_quantity ?? 0}}
+                                                {{ number_format($data->total_matched_quantity ?? 0, 3)}}
                                             </a>
-                                            @else
-                                            {{ $data->total_matched_quantity ?? 0}}
-                                            @endif
                                             </td>
                                             <td>{{ number_format($data->avg_price, 2) }}</td>
-                                            <td>{{ $data->total_so_price ?? 0}}</td>
+                                            <td>{{  number_format($total_price, 2) }}</td>
                                             <td>
-                                                @if( $data->po_rest_qty != 0)
+                                           
                                                 <a href="{{ route('match.purchase', ['id' => $data->id]) }}">
-                                                    {{ $data->po_rest_qty }}
+                                                    {{ number_format($data->po_rest_qty, 3) }}
                                                 </a>
-                                                @else
-                                                {{ $data->po_rest_qty }}
-                                                @endif
-                                                
                                             </td>
                                             <td>{{ $data->po_item_status }}</td>
                                         </tr>
@@ -269,6 +265,9 @@
                                 <tbody>
                                     {{-- Check if there is any data in $sales_order --}}
                                     @forelse ($sales_order as $data)
+                                    @php
+                                    $total_price =  ($data->total_matched_quantity * $data->avg_price);
+                                    @endphp
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
@@ -281,28 +280,21 @@
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->name }}</td>
                                             <td>{{ $data->sub_category }}</td>
-                                            <td>{{ $data->qty }}</td>
-                                            <td>{{ $data->unit_price }}</td>
-                                            <td>{{ $data->price }}</td>
+                                            <td>{{ number_format($data->qty, 3) }}</td>
+                                            <td>{{ number_format($data->unit_price, 2) }}</td>
+                                            <td>{{ number_format($data->price, 2) }}</td>
                                             <td>
-                                                @if( $data->so_rest_qty != 0)
+                                              
                                                 <a href="{{ route('match.sales', ['id' => $data->so_item_id]) }}">
-                                                {{ $data->total_matched_quantity ?? 0}}
+                                                {{ number_format($data->total_matched_quantity ?? 0, 3)}}
                                             </a>
-                                            @else
-                                            {{ $data->total_matched_quantity ?? 0}}
-                                            @endif
                                             </td>
                                             <td>{{ number_format($data->avg_price, 2) }}</td>
-                                            <td>{{ $data->total_po_price ?? 0 }}</td>
+                                            <td>{{ number_format($total_price, 2) }}</td>
                                             <td>
-                                                @if( $data->so_rest_qty != 0)
                                                 <a href="{{ route('match.sales', ['id' => $data->so_item_id]) }}">
-                                                    {{ $data->so_rest_qty }}
+                                                    {{ number_format($data->so_rest_qty, 3) }}
                                                 </a>
-                                                @else
-                                                {{ $data->so_rest_qty }}
-                                                @endif
                                             </td>
                                         
                                             <td>{{ $data->so_item_status }} </td>

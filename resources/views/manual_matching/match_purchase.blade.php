@@ -244,8 +244,10 @@
                                         <th>Matched Quantity</th>
                                         <th>PO Item Rem Qty</th>
                                         <th>SO Item Rem Qty</th>    
-                                        <th>Purchase Position (Status)</th>
-                                        <th>Sales Position (Status)</th>
+                                        <th>PO Item Position (Status)</th>
+                                        <th>SO Item Position (Status)</th>  
+                                        {{-- <th>Purchase Position (Status)</th>
+                                        <th>Sales Position (Status)</th> --}}
                                         <th>Action</th>
 
                                     </tr>
@@ -272,8 +274,10 @@
                                             <td>{{ $data->matched_quantity }}</td>
                                             <td>{{ $data->po_item_rest_quantity }}</td>
                                             <td>{{ $data->so_item_rest_quantity }}</td>
-                                            <td>{{ $data->po_match_position }} </td>
-                                            <td>{{ $data->so_match_position }} </td>
+                                            <td>{{ $data->po_item_status }} </td>
+                                            <td>{{ $data->so_item_status }} </td>
+                                            {{-- <td>{{ $data->po_match_position }} </td>
+                                            <td>{{ $data->so_match_position }} </td> --}}
                                             <td> 
                                                 <button type="button" class="btn btn-primary float-end" id="submit_btn" data-bs-toggle="modal" onClick="reply_click('{{ $data->transaction_id }}')" data-bs-target="#revertModal">Revert</button>
                                             </td>
@@ -291,7 +295,7 @@
                 </div>
             </div><br><br>
 
-
+@if($po_data->po_item_status == 'Open')
             <div class="card">
                 <div class="card-body">
                     <form id="billForm" action="{{ route('purchasesellmatch.store') }}" method="post" enctype="multipart/form-data">
@@ -366,6 +370,7 @@
                     </form>
                 </div>
             </div>
+            @endif
             
  {{-- ...............................................modal...............................................  --}}
 

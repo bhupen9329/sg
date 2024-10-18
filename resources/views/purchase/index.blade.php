@@ -136,6 +136,8 @@
                                         <th>PO Unit Price</th>
                                         <th>PO Price</th>
                                         <th>PO Match Position</th>
+                                        <th>PO Item Match Position</th>
+
                                         <th>Remarks</th>                                      
                                         <th>Action</th>
                                     </tr>
@@ -155,6 +157,7 @@
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             <td>{{ $data->match_position }}</td>
+                                            <td>{{ $data->po_item_status }}</td>
 
                                             <td>{{ $data->terms_condition ?? 'N/A' }}</td>
                                            
@@ -162,19 +165,19 @@
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
                                                             class="bi bi-three-dots"></i></a>
-                                                    {{-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                                        <li> <a class="dropdown-item"
+                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                                        {{-- <li> <a class="dropdown-item"
                                                                 href="{{ route('buyers.show', $data->id) }}"><i
-                                                                    class="fa-regular fa-eye"></i> View</a></li>
+                                                                    class="fa-regular fa-eye"></i> </a></li> --}}
                                                         <li>
                                                             @can('Company-edit')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('buyers.edit', $data->id) }}"><i
-                                                                        class="fa-solid fa-pencil"></i>Edit</a>
+                                                                    href="{{ route('purchase.edit', $data->po_id) }}"><i
+                                                                        class="fa-solid fa-pencil"></i>View/Edit</a>
                                                             @endcan
                                                         </li>
 
-                                                        <li>
+                                                        {{-- <li>
                                                             @can('Sales-view')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('sales.show', $data->id) }}"><i
@@ -218,10 +221,10 @@
                                                                 <i class="fa-solid fa-download"></i> Download
                                                             </a>
                                                             @endcan
-                                                        </li>
+                                                        </li> --}}
 
 
-                                                    </ul> --}}
+                                                    </ul> 
                                                 </div>
                                             </td>
                                         </tr>

@@ -23,6 +23,7 @@ class ManualMatching extends Controller
         $companies = Company::where('type', '=', 'supplier')->get();
         $buyers = Company::where('type', '=', 'buyer')->get(); // Retrieve all companies
         $transactions = InventoryTransaction::all();
+        
         $manual_match = PurchaseSellMatch::join('purchase_orders', 'purchase_sell_match.po_id', '=', 'purchase_orders.id')
             ->join('sales_orders', 'purchase_sell_match.so_id', '=', 'sales_orders.id')
             ->select(
@@ -89,6 +90,13 @@ class ManualMatching extends Controller
                 'purchase_orders.close_date',
                 'purchase_orders.created_at',
                 'purchase_orders.updated_at',
+
+                'purchase_orders.total_amount',
+
+                'purchase_orders.total_price',
+
+
+                'purchase_orders.total_quantity',
 
                 'po_items.id',
                 'po_items.po_id',
@@ -335,6 +343,7 @@ class ManualMatching extends Controller
                 'po_items.qty',
                 'po_items.po_rest_qty',
                 'po_items.unit_price',
+                'po_items.po_item_status',
                 'po_items.price',
                 'categories.id as category_id',  // Ensure you select the category ID
                 'subcategories.id as subcategory_id',
@@ -372,7 +381,7 @@ class ManualMatching extends Controller
 
 
 
-            $manual_match = PurchaseSellMatch::Join('purchase_orders', 'purchase_sell_match.po_id', '=', 'purchase_orders.id')
+        $manual_match = PurchaseSellMatch::Join('purchase_orders', 'purchase_sell_match.po_id', '=', 'purchase_orders.id')
             ->Join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
             ->Join('sales_orders', 'purchase_sell_match.so_id', '=', 'sales_orders.id')
             ->Join('so_items', 'purchase_sell_match.so_item_id', '=', 'so_items.id')
@@ -409,9 +418,9 @@ class ManualMatching extends Controller
             ->where('po_items.item_category', $categoryIds)
             ->where('po_items.item_subcategory', $subcategoryIds)
             ->get(); // Add this line to debug the raw SQL
-        
+
         // dd($manual_match);
-        
+
 
         // dd($manual_match);
 
@@ -426,8 +435,8 @@ class ManualMatching extends Controller
         $purchaseOrderId = $request->input('purchase_order_id');
         $salesOrderId = $request->input('sales_order_id');
 
-        if($request->selected_so_items){
-        }else{
+        if ($request->selected_so_items) {
+        } else {
             return redirect()->back()->with('msg', 'Please Select atleast one item');
         }
 
@@ -504,19 +513,19 @@ class ManualMatching extends Controller
                 'po_item_qty' => $purchaseOrderItem->po_rest_qty,
             ]);
 
-          $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => $remainingSoItemQuantity]);
-         $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => $remainingPoItemQuantity]);
+            $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => $remainingSoItemQuantity]);
+            $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => $remainingPoItemQuantity]);
 
-         $new_so_item  = SoItem::where('id', $soItemId)->first();
-         $new_po_item  = PoItem::where('id', $poItemId)->first();
+            $new_so_item  = SoItem::where('id', $soItemId)->first();
+            $new_po_item  = PoItem::where('id', $poItemId)->first();
 
 
-         if($new_so_item->so_rest_qty == 0){
-            SoItem::where('id', $soItemId)->update(['so_item_status' => 'Close']);
-         }
-     if($new_po_item->po_rest_qty == 0){
-        PoItem::where('id', $poItemId)->update(['po_item_status' => 'Close']);
-     }
+            if ($new_so_item->so_rest_qty == 0) {
+                SoItem::where('id', $soItemId)->update(['so_item_status' => 'Close']);
+            }
+            if ($new_po_item->po_rest_qty == 0) {
+                PoItem::where('id', $poItemId)->update(['po_item_status' => 'Close']);
+            }
 
             // dd( $s, $d );
             // $salesOrderItem->update(['so_match_position' => $remainingSoItemQuantity > 0 ? 'open' : 'close']);
@@ -527,15 +536,14 @@ class ManualMatching extends Controller
         $purchase_order = PoItem::where('po_id',  $purchaseOrderId)->where('po_item_status', 'Open')->first();
         // dd( $purchase_order);
 
-        if($sales_order){
-         }
-         else{
+        if ($sales_order) {
+        } else {
             SalesOrder::where('id', $salesOrderId)->update(['match_position' => 'Close']);
-         }
-     if($purchase_order){
-     }else{
-        PurchaseOrder::where('id', $purchaseOrderId)->update(['match_position' => 'Close']);
-     }
+        }
+        if ($purchase_order) {
+        } else {
+            PurchaseOrder::where('id', $purchaseOrderId)->update(['match_position' => 'Close']);
+        }
 
 
 
@@ -553,13 +561,12 @@ class ManualMatching extends Controller
     public function storePurSellMatchBuyer(Request $request)
     {
 
-    // dd($request);
+        // dd($request);
 
-    if($request->selected_po_items){
-    
-    }else{
-        return redirect()->back()->with('msg', 'Please Select atleast one item');
-    }
+        if ($request->selected_po_items) {
+        } else {
+            return redirect()->back()->with('msg', 'Please Select atleast one item');
+        }
         $purchaseOrderId = $request->input('purchase_order_id');
         $salesOrderId = $request->input('sales_order_id');
 
@@ -568,7 +575,7 @@ class ManualMatching extends Controller
 
 
         $purchaseOrder = PurchaseOrder::find($purchaseOrderId);
-// dd($purchaseOrder);
+        // dd($purchaseOrder);
 
         if (!$purchaseOrder) {
             return redirect()->back()->with('error', 'Invalid Sales Order');
@@ -627,22 +634,22 @@ class ManualMatching extends Controller
                 'po_item_qty' => $purchaseOrderItem->po_rest_qty,
             ]);
 
-          $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => $remainingSoItemQuantity]);
-          $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => $remainingPoItemQuantity]);
+            $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => $remainingSoItemQuantity]);
+            $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => $remainingPoItemQuantity]);
 
 
             // dd( $s, $d );
 
             $new_so_item  = SoItem::where('id', $soItemId)->first();
             $new_po_item  = PoItem::where('id', $poItemId)->first();
-   
-   
-            if($new_so_item->so_rest_qty == 0){
-               SoItem::where('id', $soItemId)->update(['so_item_status' => 'Close']);
+
+
+            if ($new_so_item->so_rest_qty == 0) {
+                SoItem::where('id', $soItemId)->update(['so_item_status' => 'Close']);
             }
-        if($new_po_item->po_rest_qty == 0){
-           PoItem::where('id', $poItemId)->update(['po_item_status' => 'Close']);
-        }
+            if ($new_po_item->po_rest_qty == 0) {
+                PoItem::where('id', $poItemId)->update(['po_item_status' => 'Close']);
+            }
             // $salesOrderItem->update(['so_match_position' => $remainingSoItemQuantity > 0 ? 'open' : 'close']);
             // $purchaseOrderItem->update(['po_match_position' => $remainingPoItemQuantity > 0 ? 'open' : 'close']);
         }
@@ -705,8 +712,8 @@ class ManualMatching extends Controller
     public function match_sales($id)
     {
 
-// dd($id);
-            $so_data = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+        // dd($id);
+        $so_data = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
             ->join('subcategories', 'subcategories.id', '=', 'so_items.item_subcategory')
@@ -718,7 +725,9 @@ class ManualMatching extends Controller
                 'so_items.id as so_item_id',
                 'so_items.so_item_no as so_item_no',
                 'so_items.qty',
+                'so_items.so_item_no',
                 'so_items.so_rest_qty',
+                'so_items.so_item_status',
                 'so_items.unit_price',
                 'so_items.price',
                 'categories.id as category_id',  // Ensure you select the category ID
@@ -730,23 +739,23 @@ class ManualMatching extends Controller
             ->first();
 
 
-            // dd($so_data);
-            $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+        // dd($so_data);
+        $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->where('sales_orders.id', $so_data->sales_order_id)
             ->select('sales_orders.*', 'companies.company_name', 'sales_orders.id as so_id')
             ->first();
 
-            // dd($salesOrders);
+        // dd($salesOrders);
 
-            $categoryIds = is_array($so_data->category_id) ? $so_data->category_id : [$so_data->category_id]; // Ensure it's an array
-            $subcategoryIds = is_array($so_data->subcategory_id) ? $so_data->subcategory_id : [$so_data->subcategory_id]; // Ensure it's an array
-    
- 
+        $categoryIds = is_array($so_data->category_id) ? $so_data->category_id : [$so_data->category_id]; // Ensure it's an array
+        $subcategoryIds = is_array($so_data->subcategory_id) ? $so_data->subcategory_id : [$so_data->subcategory_id]; // Ensure it's an array
+
+
         // $purchaseOrders = PurchaseOrder::where('match_position', 'open') // Adjust this based on how you define 'open' orders
         //     ->select('purchase_orders.*') // Add any other necessary fields
         //     ->first();
 
-            $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+        $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
             ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
             ->join('categories', 'categories.id', '=', 'po_items.item_category')
             ->join('subcategories', 'subcategories.id', '=', 'po_items.item_subcategory')
@@ -756,7 +765,7 @@ class ManualMatching extends Controller
             ->select('purchase_orders.*', 'companies.company_name', 'po_items.id as po_item_id', 'po_items.*', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
             ->get();
 
-            // dd($purchaseOrders);
+        // dd($purchaseOrders);
 
         $manual_match = PurchaseSellMatch::join('purchase_orders', 'purchase_sell_match.po_id', '=', 'purchase_orders.id')
             ->join('po_items', 'purchase_sell_match.po_item_id', '=', 'po_items.id')
@@ -782,6 +791,9 @@ class ManualMatching extends Controller
                 'sales_orders.so_number as so_number',
                 'so_companies.company_name as so_company_name',
 
+                'po_items.po_item_status',
+                'so_items.so_item_status',
+
                 'sales_orders.match_position as so_match_position',
                 'purchase_sell_match.matched_quantity',
                 'po_categories.name as po_category_name', // Select Purchase Order category name
@@ -796,23 +808,32 @@ class ManualMatching extends Controller
             ->where('so_items.item_subcategory', $subcategoryIds)
             ->get();
 
-            // dd($manual_match);
+        // dd($manual_match);
 
         return view('manual_matching.match_Sales', compact('salesOrders', 'purchaseOrders', 'manual_match', 'so_data', 'purchaseOrders'));
     }
 
-    public function transaction_revert(Request $request){
-      $purchase_sell = PurchaseSellMatch::where('id', $request->transaction_id)->first();
+    public function transaction_revert(Request $request)
+    {
+        $purchase_sell = PurchaseSellMatch::where('id', $request->transaction_id)->first();
 
-      $actual_so_rest_qty = ($purchase_sell->so_item_qty - $purchase_sell->so_item_rest_quantity);
-      $actual_po_rest_qty = ($purchase_sell->po_item_qty - $purchase_sell->po_item_rest_quantity);
+        $actual_so_rest_qty = ($purchase_sell->so_item_qty - $purchase_sell->so_item_rest_quantity);
+        $actual_po_rest_qty = ($purchase_sell->po_item_qty - $purchase_sell->po_item_rest_quantity);
 
-      SoItem::where('id',  $purchase_sell->so_item_id) ->increment('so_rest_qty', $actual_so_rest_qty);
-      PoItem::where('id',  $purchase_sell->po_item_id) ->increment('po_rest_qty', $actual_po_rest_qty);
-      $purchase_sell->delete();
+        SoItem::where('id', $purchase_sell->so_item_id)
+            ->increment('so_rest_qty', $actual_so_rest_qty);
+        SoItem::where('id', $purchase_sell->so_item_id)
+            ->update(['so_item_status' => 'Open']);
 
-      return redirect()->back()->with('success');
+        PoItem::where('id', $purchase_sell->po_item_id)
+            ->increment('po_rest_qty', $actual_po_rest_qty);
+        PoItem::where('id', $purchase_sell->po_item_id)
+            ->update(['po_item_status' => 'Open']);
 
 
+
+        $purchase_sell->delete();
+
+        return redirect()->back()->with('success');
     }
 }
