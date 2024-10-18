@@ -339,7 +339,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/match_purchase/{id}', [ManualMatching::class, 'match_purchase'])->name('match.purchase');
 
         Route::get('/match_sales/{id}', [ManualMatching::class, 'match_sales'])->name('match.sales');
-
+        // dd(1);
+        Route::post('/transaction_revert', [ManualMatching::class, 'transaction_revert'])->name('transaction_revert');
 });
 
 

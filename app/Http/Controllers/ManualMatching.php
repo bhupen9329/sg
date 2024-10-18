@@ -383,6 +383,7 @@ class ManualMatching extends Controller
             ->leftJoin('categories as so_categories', 'so_categories.id', '=', 'so_items.item_category')
             ->leftJoin('subcategories as so_subcategories', 'so_subcategories.id', '=', 'so_items.item_subcategory')
             ->select(
+                'purchase_sell_match.id as transaction_id',
                 'purchase_sell_match.id as match_id',
                 'purchase_sell_match.created_at',
                 'purchase_sell_match.*',
@@ -395,6 +396,8 @@ class ManualMatching extends Controller
                 'so_companies.company_name as so_company_name',
                 'po_items.po_item_no',
                 'so_items.so_item_no',
+                'po_items.po_item_status',
+                'so_items.so_item_status',
                 'sales_orders.match_position as so_match_position',
                 'purchase_sell_match.matched_quantity',
                 'po_categories.name as po_category_name',
@@ -766,6 +769,7 @@ class ManualMatching extends Controller
             ->join('categories as so_categories', 'so_categories.id', '=', 'so_items.item_category') // Join categories for Sales Orders
             ->join('subcategories as so_subcategories', 'so_subcategories.id', '=', 'so_items.item_subcategory') // Join subcategories for Sales Orders
             ->select(
+                'purchase_sell_match.id as transaction_id',
                 'purchase_sell_match.id as match_id',
                 'purchase_sell_match.created_at',
                 'purchase_sell_match.*',
@@ -795,5 +799,20 @@ class ManualMatching extends Controller
             // dd($manual_match);
 
         return view('manual_matching.match_Sales', compact('salesOrders', 'purchaseOrders', 'manual_match', 'so_data', 'purchaseOrders'));
+    }
+
+    public function transaction_revert(Request $request){
+      $purchase_sell = PurchaseSellMatch::where('id', $request->transaction_id)->first();
+
+      $actual_so_rest_qty = ($purchase_sell->so_item_qty - $purchase_sell->so_item_rest_quantity);
+      $actual_po_rest_qty = ($purchase_sell->po_item_qty - $purchase_sell->po_item_rest_quantity);
+
+      SoItem::where('id',  $purchase_sell->so_item_id) ->increment('so_rest_qty', $actual_so_rest_qty);
+      PoItem::where('id',  $purchase_sell->po_item_id) ->increment('po_rest_qty', $actual_po_rest_qty);
+      $purchase_sell->delete();
+
+      return redirect()->back()->with('success');
+
+
     }
 }
