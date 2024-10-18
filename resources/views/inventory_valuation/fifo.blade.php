@@ -114,7 +114,7 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>LIFO Report</h1>
+            <h1>FIFO Report</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
@@ -240,9 +240,24 @@
                                         
                                         
                                           <!-- Balance -->                         
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                          <td>
+                                            @foreach ($log['inventory_queue'] as $stack)
+                                            {{ number_format($stack['quantity'], 2) }}<br>
+                                                <hr>
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @foreach ($log['inventory_queue'] as $stack)
+                                            {{ number_format($stack['unit_price'], 2) }}<br>
+                                                <hr>
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @foreach ($log['inventory_queue'] as $stack)
+                                                {{ number_format($stack['quantity'] * $stack['unit_price'], 2) }}<br>
+                                                <hr>
+                                            @endforeach
+                                        </td>
 
                                             <!-- Used Qty -->                         
                                             <td>
@@ -348,18 +363,81 @@
                                             <td>{{ $log['status'] }}</td>
 
                                                <!-- COGS -->                         
-                                               <td></td>
-                                               <td></td>
-                                               <td></td>
+                                               <td>
+                                                <?php
+                                                $totalSellQty = 0;
+                                                $totalSellValue = 0;
+                                                ?>
+                                                @if (isset($log['details']) && is_array($log['details']))
+                                                    @foreach ($log['details'] as $detail)
+                                                        @if ($log['transaction_type'] == 'Sell')
+                                                            <?php
+                                                            $totalSellQty += $detail['used_qty'];
+                                                            
+                                                            ?>
+                                                        @endif
+                                                    @endforeach
+                                                @else
+                                                    N/A
+                                                @endif
+                                                <div>
+                                                    {{ number_format($totalSellQty, 2) }} <br>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    {{ number_format($log['unit_cogs_price'] ?? 0, 2) }}
+                                                @else
+                                                    0
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    {{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}
+                                                @else
+                                                    0
+                                                @endif
+                                            </td>
 
 
                                                 <!-- Actual Sales -->                         
-                                                <td></td>
-                                                <td></td>
+                                             
+                                            <td>
+                                                @if (isset($log['selling_price']))
+                                                    {{ number_format($log['selling_price'], 2) }}
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    {{ number_format($log['actual_sales_value'] ?? 0, 2) }}
+                                                @else
+                                                    0
+                                                @endif
+                                            </td>
+
                                                
                                              <!-- P/L and Status -->   
-                                                <td></td>
-                                                <td></td>
+                                             <td>
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    {{ number_format($log['profit_loss'] ?? 0, 2) }}
+                                                @else
+                                                    0
+                                                @endif
+                                            </td>
+
+                                            <td>
+
+                                                <strong>
+                                                    @if ($log['profit_loss'] > 0)
+                                                        Profit
+                                                    @elseif ($log['profit_loss'] < 0)
+                                                        Loss
+                                                    @endif
+
+                                                </strong>
+                                            </td>
                                                
 
 
