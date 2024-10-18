@@ -165,7 +165,11 @@ class ValuationController extends Controller
                 // Log the sale transaction
                 $transactionLogs[] = [
                     'cogs_amount' => $totalAmountForLogEntry,
-                    'unit_cogs_price' => !empty($logEntry['details']) ? $totalAmountForLogEntry / array_sum(array_column($logEntry['details'], 'used_qty')) : 0,
+                    // 'unit_cogs_price' => !empty($logEntry['details']) ? $totalAmountForLogEntry / array_sum(array_column($logEntry['details'], 'used_qty')) : 0,
+                    'unit_cogs_price' => !empty($logEntry['details']) && array_sum(array_column($logEntry['details'], 'used_qty')) > 0 
+                        ? $totalAmountForLogEntry / array_sum(array_column($logEntry['details'], 'used_qty')) 
+                        : 0,
+
                     'last_sell_price' => $lastSellPrice,
                     'transaction_type' => 'Sell',
                     'sell_qty' => abs($transaction->quantity),
@@ -183,7 +187,7 @@ class ValuationController extends Controller
                     'details' => $logEntry['details'],
                     'inventory_stack' => $inventoryStack, // Include the current state of the inventory stack after the sale
                 ];
-                dump($transactionLogs);
+                // dump($transactionLogs);
                 
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             }
