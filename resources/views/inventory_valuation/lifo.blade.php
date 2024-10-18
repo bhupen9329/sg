@@ -141,7 +141,7 @@
                                         <th colspan="3" class="text-center">Sell</th>
                                        
                                         <th colspan="3" class="text-center">Used Qty</th>
-                                        <th colspan="3" class="text-center">Balance</th>
+                                        <th colspan="3" class="text-center">Balance(INVENTORY STACK)</th>
                                         <th colspan="3" class="text-center">Stock Balance</th>
                                         <th colspan="3" class="text-center">Cost of Goods Sold(COGS)</th>
                                         <th colspan="2" class="text-center">Actual Sales</th>
@@ -368,13 +368,13 @@
                                         @endforeach
                                     </td>
                                     <td>
-                                        @foreach ($log['inventory_stack'] as $stack)
+                                        @foreach (array_reverse($log['inventory_stack']) as $stack)
                                         {{ number_format($stack['unit_price'], 2) }}<br>
                                             <hr>
                                         @endforeach
                                     </td>
                                     <td>
-                                        @foreach ($log['inventory_stack'] as $stack)
+                                        @foreach (array_reverse($log['inventory_stack']) as $stack)
                                             {{ number_format($stack['quantity'] * $stack['unit_price'], 2) }}<br>
                                             <hr>
                                         @endforeach
