@@ -29,6 +29,11 @@ class PurchaseOrder extends Model
         'order_age',
         'close_date',
         'match_position',
+
+        'total_quantity',
+        'rest_quantity',
+        'total_amount',
+        'total_price',
     ];
     public $timestamps = true;
 }

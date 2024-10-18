@@ -82,7 +82,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/purchase-create', [PurchaseController::class, 'create'])->name('purchase.create');
     Route::post('/save-purchase-order', [PurchaseController::class, 'store'])->name('save.purchase-order');
     Route::get('/purchase-edit/{id}', [PurchaseController::class, 'edit'])->name('purchase.edit');
-    Route::post('/purchase-update', [PurchaseController::class, 'update'])->name('purchase.update');
+    Route::post('/purchase-update/{id}', [PurchaseController::class, 'update'])->name('purchase.update');
     Route::delete('/purchase-delete/{id}', [PurchaseController::class, 'delete'])->name('purchase.destroy');
     Route::get('/purchase-show/{id}', [PurchaseController::class, 'show'])->name('purchase.show');
     Route::post('/po-partial-received-save', [PurchaseController::class, 'partial_receive_save'])->name('po-partial-receive.save');

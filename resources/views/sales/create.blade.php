@@ -222,21 +222,21 @@
                                                                             class="form-control smaller-font"
                                                                             name="total_quantity"
                                                                             id="overall_total_quantity"
-                                                                            style="height: 34px; width: 105px; " required
+                                                                            required
                                                                             readonly>
                                                                     </th>
                                                                     <th>
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
                                                                             name="total_amount" id="overall_total_amount"
-                                                                            style="height: 34px; width: 105px; " required
+                                                                           required
                                                                             readonly>
                                                                     </th>
                                                                     <th>
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
                                                                             name="total_price" id="overall_total_price"
-                                                                            style="height: 34px; width: 105px; " required
+                                                                           required
                                                                             readonly>
                                                                     </th>
                                                                     <th></th>
@@ -267,7 +267,7 @@
                                                             var cell11 = newRow.insertCell(10);
 
                                                             cell1.innerHTML = `
-                                                            <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this); " style="height: 28px; width: 210px;" class="form-control smaller-font item-select-${lastItemId}" required>
+                                                            <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);" style="width:300px"  class="form-control item-select-${lastItemId}" required>
                                                                 <option value="" disabled selected>Select Item</option>
                                                                 @foreach ($category as $category)
                                                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -276,23 +276,23 @@
                                                             $('.item-select-' + lastItemId).select2();
 
                                                             cell2.innerHTML = `
-                                                            <select name="item_subcategory[]" class="form-control smaller-font subcategory-select"  id="subcategory_${lastItemId}" style="height: 28px; width: 210px;" required>
+                                                            <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}"  required>
                                                                 <option value="" selected>Select Subcategory</option>
                                                             </select>`;
                                                             $('.subcategory-select').select2();
 
                                                             cell3.innerHTML =
                                                                 `
-                                                            <input type="number" name="qty[]" step="any" id="qty_${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" style="height: 34px; width: 105px"  placeholder="Qty" min="1"  required>`;
+                                                            <input type="number" name="qty[]" step="0.001" min="0.001" id="qty_${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')"  placeholder="Qty" min="1"  required>`;
 
 
                                                             cell4.innerHTML =
                                                                 `
-                                                            <input type="number" name="unit_price_[]" value="0" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" style="height: 34px; width: 101px" placeholder="Amount"    required  >`;
+                                                            <input type="number" name="unit_price_[]" value="0" step="0.01" min="0.01" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')"  placeholder="Amount"    required  >`;
 
                                                             cell5.innerHTML =
                                                                 `
-                                                            <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font" style="height: 34px; width: 101px" placeholder="Price" readonly>`;
+                                                            <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
                                                             cell6.innerHTML =
                                                                 `
                                                             <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
@@ -827,24 +827,20 @@
 
     <script>
         function check_same_data(lastItemId) {
-            // console.log(lastItemId);
             const currentItemId = document.getElementById(`item_id${lastItemId}`).value;
             const currentItemSubCategory = document.getElementById(`subcategory_${lastItemId}`).value;
-            const currentLength = document.getElementById(`length_${lastItemId}`).value;
             // console.log(currentItemId);
 
             let isDuplicate = false;
 
             //  check for duplicates
-            for (let i = 0; i < lastItemId; i++) {
+            for (let i = 1; i < lastItemId; i++) {
                 const itemId = document.getElementById(`item_id${i}`).value;
                 // console.log(currentItemId);
                 const itemSubCategory = document.getElementById(`subcategory_${i}`).value;
-                const length = document.getElementById(`length_${i}`).value;
 
-                if (currentItemId === itemId && currentItemSubCategory === itemSubCategory && currentLength === length) {
+                if (currentItemId === itemId && currentItemSubCategory === itemSubCategory) {
                     // if (currentItemId === itemId ) {
-                    console.log('check');
                     isDuplicate = true;
                     break;
                 }
@@ -862,36 +858,9 @@
         }
 
         function resetRow_in_same_data(lastItemId) {
-            // Reset specific input fields in the row
-            let pcs = $(`#pcs_${lastItemId}`).val();
-            let weight = $(`#weight_${lastItemId}`).val();
-            let amount = $(`#amount${lastItemId}`).val();
-            let totalWeight = $(`#overall_total_weight`).val();
-            let totalPcs = $(`#overall_total_pcs`).val();
-            let totalamount = $(`#material_value`).val();
 
-            let mainWeight = (totalWeight - weight).toFixed(3);
-            let mainPcs = totalPcs - pcs;
-            let mainAmount = totalamount - amount;
-
-            $(`#overall_total_weight`).val(mainWeight);
-            $(`#overall_total_pcs`).val(mainPcs);
-            $(`#material_value`).val(mainAmount);
-
-            // $(`#item_id${lastItemId}`).val('').trigger('change');
-            // $(`#subcategory_${lastItemId}`).val('').trigger('change');
-
-            $(`#item_id${lastItemId}`).val('');
-            $(`#subcategory_${lastItemId}`).val('');
-
-            $(`#length_${lastItemId}`).val('');
-            $(`#pcs_${lastItemId}`).val('');
-            $(`#weight_${lastItemId}`).val('');
-            // $(`#price_${lastItemId}`).val('');
-            $(`#gst_percent_${lastItemId}`).val('');
-            $(`#qty_${lastItemId}`).val('');
-            $(`#amount${lastItemId}`).val('');
-
+            $(`#item_id${lastItemId}`).val('').trigger('change');  
+            $(`#subcategory_${lastItemId}`).val('').trigger('change');  
         }
 
         function resetRow_in(lastItemId) {

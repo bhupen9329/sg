@@ -169,7 +169,7 @@
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Purchase Transaction Details</h4>
+                                        <h4 class="text-blue h4">Sales Transaction Details</h4>
                                     </div>
                                 </div>
 
@@ -198,7 +198,7 @@
                                         <tr>
                                             <td>{{ date('d-m-Y', strtotime($so_data->so_date ?? 'N/A')) }}</td>
                                             <td>{{ $so_data->so_number }}</td>
-                                            <td>{{ $so_data->po_item_no }}</td>
+                                            <td>{{ $so_data->so_item_no }}</td>
                                             <td>{{ $so_data->supplier_name }}</td>
                                             <td>{{ $so_data->category_name }}</td>
                                             <td>{{ $so_data->sub_category_name }}</td>
@@ -252,9 +252,11 @@
                                         <th>PO Item Name</th>  
                                         <th>Matched Quantity</th>
                                         <th>PO Item Rem Qty</th>
-                                        <th>SO Item Rem Qty</th>    
-                                        <th>Purchase Position (Status)</th>
-                                        <th>Sales Position (Status)</th>
+                                        <th>SO Item Rem Qty</th>   
+                                        <th>PO Item Position(Status)</th>
+                                        <th>SO Item Position(Status)</th>   
+                                        {{-- <th>Purchase Position </th>
+                                        <th>Sales Position (Status)</th> --}}
                                         <th>Action</th>
 
                                     </tr>
@@ -280,8 +282,10 @@
                                             <td>{{ $data->matched_quantity }}</td>
                                             <td>{{ $data->po_item_rest_quantity }}</td>
                                             <td>{{ $data->so_item_rest_quantity }}</td>
-                                            <td>{{ $data->po_match_position }} </td>
-                                            <td>{{ $data->so_match_position }} </td>
+                                            <td>{{ $data->po_item_status }} </td>
+                                            <td>{{ $data->so_item_status }} </td>
+                                            {{-- <td>{{ $data->po_match_position }} </td>
+                                            <td>{{ $data->so_match_position }} </td> --}}
                                             <td> 
                                                 <button type="button" class="btn btn-primary float-end" id="submit_btn" data-bs-toggle="modal" onClick="reply_click('{{ $data->transaction_id }}')" data-bs-target="#revertModal">Revert</button>
                                             </td>
@@ -298,6 +302,7 @@
                 </div>
             </div><br><br>
 
+            @if($so_data->so_item_status == 'Open')
             <div class="card">
                 <div class="card-body">
 
@@ -363,6 +368,7 @@
                     </form>
                 </div>
             </div>
+            @endif
  {{-- ...............................................modal...............................................  --}}
 
  <!-- Modal -->

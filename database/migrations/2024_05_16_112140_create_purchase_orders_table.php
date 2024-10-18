@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('due_date', 100)->nullable();
             $table->string('no_of_due_date', 100)->nullable();
             $table->string('quantity', 200)->nullable();
-            $table->string('rest_quantity', 200)->nullable();
             $table->string('price', 200)->nullable();
             $table->string('mode', 200)->nullable();
             $table->string('broker', 200)->nullable();
@@ -30,6 +29,10 @@ return new class extends Migration
             $table->string('match_position', 100)->default('open');
             $table->string('order_age', 400)->nullable();
             $table->string('close_date', 200)->nullable();
+             $table->string('total_quantity', 200)->nullable();
+            $table->string('rest_quantity', 200)->nullable();
+            $table->string('total_amount', 200)->nullable();
+            $table->string('total_price', 200)->nullable();
             $table->timestamps();
         });
     }

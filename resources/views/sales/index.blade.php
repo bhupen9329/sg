@@ -97,6 +97,7 @@
                                         <th>SO Unit Price</th>
                                         <th>SO Price</th>
                                         <th>SO Match Position</th>
+                                        <th>SO Item Position</th>
                                         <th>Remarks</th>
 
                                        
@@ -118,6 +119,7 @@
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             <td>{{ $data->match_position }}</td>
+                                            <td>{{ $data->so_item_status }}</td>
                                             <td>{{ $data->terms_condition ?? 'N/A' }}</td>
                                            
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
@@ -129,7 +131,7 @@
                                                         <li>
                                                             @can('Company-edit')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('buyers.edit', $data->id) }}"><i
+                                                                    href="{{ route('sales.edit', $data->so_id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>View/Edit</a>
                                                             @endcan
                                                         </li>
