@@ -79,6 +79,9 @@ class ValuationController extends Controller
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
                 
             } elseif (strtolower($transaction->transaction_type) === 'sell') {
+
+                 
+                    
                 // Handle sales: pop items from the stack (LIFO)
                 $sellQtyCheck = abs($transaction->quantity);
                 $sellQty = number_format($sellQtyCheck, 2);
@@ -93,6 +96,7 @@ class ValuationController extends Controller
                     'total_amount' => 0,
                 ];
                 $totalAmountForLogEntry = 0;
+       
                 
                 // Process the sale according to LIFO (last in, first out)
                 while ($sellQty > 0 && !empty($inventoryStack)) {
@@ -145,6 +149,7 @@ class ValuationController extends Controller
                     }
                 }
                 
+                
                 // If the sale couldn't be fully covered, log the shortfall
                 if ($sellQty > 0) {
                     $logEntry['details'][] = [
@@ -189,6 +194,43 @@ class ValuationController extends Controller
                 ];
                 // dump($transactionLogs);
                 
+                         // Check if there is enough inventory to fulfill the sale
+                         if (empty($inventoryStack)) {
+                            // If the inventory is empty
+                            $logEntry['details'][] = [
+                                'used_qty' => 0,
+                                'unit_price' => 0,
+                                'amount' => 0,
+                                'remaining_qty' => -$sellQty, // Indicates a shortfall
+                                'remaining_value' => 0,
+                            ];
+        
+                            // Log the transaction with shortfall
+                            $transactionLogs[] = [
+                                'cogs_amount' => $totalAmountForLogEntry,
+                               'unit_cogs_price' => !empty($logEntry['details']) && array_sum(array_column($logEntry['details'], 'used_qty')) > 0 
+                                ? $totalAmountForLogEntry / array_sum(array_column($logEntry['details'], 'used_qty')) 
+                                : 0,
+                                'transaction_type' => 'Sell',
+                                'quantity' => $sellQty,
+                                'selling_price' => $transaction->unit_price,
+                                'transaction_date' => $transaction->transaction_date,
+                                'balance_qty' => $totalQuantity,
+                                'balance_value' => $totalValue,
+                                'cost_of_goods_sold' => 0,
+                                'sell_qty' => abs($transaction->quantity),
+                                'profit_loss' => 0,
+                                'details' => $logEntry['details'],
+                                'inventory_stack' => $inventoryStack,
+                                'status' => 'Short', // Indicate a shortfall status
+                            ];
+        // dd($transactionLogs);
+                            // Continue to the next transaction
+                            continue;
+                        }
+        
+
+
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             }
         }
