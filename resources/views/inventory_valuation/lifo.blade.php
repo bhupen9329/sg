@@ -144,7 +144,7 @@
                                         <th colspan="4" class="text-center">Balance(INVENTORY STACK)</th>
                                         <th colspan="4" class="text-center">Stock Balance</th>
                                         <th colspan="3" class="text-center">Cost of Goods Sold(COGS)</th>
-                                        <th colspan="2" class="text-center">Actual Sales</th>
+                                        <th colspan="3" class="text-center">Actual Sales</th>
                                         <th>Profit/Loss</th>
                                         <th>Status</th>
                                         {{-- <th>Break Even Unit Price</th> --}}
@@ -190,6 +190,7 @@
                                         <th class="text-center">COGS</th>
 
                                         <!-- Actual Sales -->
+                                        <th class="text-center">Qty </th>
                                         <th class="text-center">Unit Sell Price </th>
                                         <th class="text-center">Sales</th>
 
@@ -395,7 +396,6 @@
                                                         @if ($log['transaction_type'] == 'Sell')
                                                             <?php
                                                             $totalSellQty += $detail['used_qty'];
-                                                            
                                                             ?>
                                                         @endif
                                                     @endforeach
@@ -411,20 +411,36 @@
                                             {{-- to change --}}
 
 
+                                     
+
+                                            <?php
+                                            $unit_cogs_price = 0; // Default value
+                                            
+                                            // Check if $totalSellQty is greater than zero before dividing
+                                            if ($totalSellQty > 0) {
+                                                $unit_cogs_price = $log['cost_of_goods_sold'] / $totalSellQty;
+                                            }
+                                            ?>
                                             <td>
                                                 @if ($log['transaction_type'] === 'Sell')
-                                                    {{ number_format($log['unit_cogs_price'] ?? 0, 2) }}
+                                                    {{ number_format($unit_cogs_price, 2) }}
+                                                @else
+                                                    0
+                                                @endif
+                                            </td>
+                                            
+
+                                            <td>
+                                                
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    {{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}
                                                 @else
                                                     0
                                                 @endif
                                             </td>
 
                                             <td>
-                                                @if ($log['transaction_type'] === 'Sell')
-                                                    {{ number_format($log['cogs_amount'] ?? 0, 2) }}
-                                                @else
-                                                    0
-                                                @endif
+                                          0
                                             </td>
 
                                             {{-- Actual Sales --}}
