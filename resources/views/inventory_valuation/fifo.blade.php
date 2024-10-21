@@ -118,7 +118,7 @@
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">LIFO Report</li>
+                    <li class="breadcrumb-item">FIFO Report</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -136,9 +136,9 @@
                                     <th>Transaction Type</th>
                                     <th colspan="3" class="text-center">Purchase</th>
                                     <th colspan="3" class="text-center">Sell</th>
-                                    <th colspan="3" class="text-center">Balance</th>
                                     <th colspan="3" class="text-center">Used Qty</th>
-                                    <th colspan="3" class="text-center">Stock Balance</th>
+                                    <th colspan="3" class="text-center">Balance</th>                                  
+                                    <th colspan="4" class="text-center">Stock Balance</th>
                                     <th colspan="3" class="text-center">Cost of Goods Sold(COGS)</th>
                                     <th colspan="2" class="text-center">Actual Sales</th>
                                     <th>Profit/Loss</th>
@@ -159,21 +159,24 @@
                                     <th class="text-center">Rate</th>
                                     <th class="text-center">Amount</th>
 
+                                    <!-- Used Qty -->
+                                    <th class="text-center">Qty MT </th>
+                                    <th class="text-center">Rate</th>
+                                    <th class="text-center">Amount</th>
+
                                     <!-- Balance -->
                                     <th class="text-center">Qty MT </th>
                                     <th class="text-center">Rate</th>
                                     <th class="text-center">Amount</th>
 
 
-                                    <!-- Used Qty -->
-                                    <th class="text-center">Qty MT </th>
-                                    <th class="text-center">Rate</th>
-                                    <th class="text-center">Amount</th>
+                                    
 
 
                                     <!-- Stock balance -->
                                     <th class="text-center">Bal Qty </th>
                                     <th class="text-center">Bal Value</th>
+                                    <th class="text-center">Bal Unit Price</th>
                                     <th class="text-center">Position</th>
 
                                     <!-- COGS -->
@@ -221,7 +224,7 @@
 
                                           <td>
                                             @if ($log['transaction_type'] == 'Sell')
-                                                -{{ number_format($log['quantity'], 2) }}
+                                                {{ -number_format($log['quantity'], 2) }}
                                             @endif
                                         </td>                                   
                                         <td>
@@ -237,27 +240,6 @@
                                                
                                             @endif
                                         </td>     
-                                        
-                                        
-                                          <!-- Balance -->                         
-                                          <td>
-                                            @foreach ($log['inventory_queue'] as $stack)
-                                            {{ number_format($stack['quantity'], 2) }}<br>
-                                                <hr>
-                                            @endforeach
-                                        </td>
-                                        <td>
-                                            @foreach ($log['inventory_queue'] as $stack)
-                                            {{ number_format($stack['unit_price'], 2) }}<br>
-                                                <hr>
-                                            @endforeach
-                                        </td>
-                                        <td>
-                                            @foreach ($log['inventory_queue'] as $stack)
-                                                {{ number_format($stack['quantity'] * $stack['unit_price'], 2) }}<br>
-                                                <hr>
-                                            @endforeach
-                                        </td>
 
                                             <!-- Used Qty -->                         
                                             <td>
@@ -355,11 +337,35 @@
                                                     N/A
                                                 @endif
                                             </td>
+                                        
+                                        
+                                          <!-- Balance -->                         
+                                          <td>
+                                            @foreach ($log['inventory_queue'] as $stack)
+                                            {{ number_format($stack['quantity'], 2) }}<br>
+                                                <hr>
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @foreach ($log['inventory_queue'] as $stack)
+                                            {{ number_format($stack['unit_price'], 2) }}<br>
+                                                <hr>
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @foreach ($log['inventory_queue'] as $stack)
+                                                {{ number_format($stack['quantity'] * $stack['unit_price'], 2) }}<br>
+                                                <hr>
+                                            @endforeach
+                                        </td>
+
+                                        
                                             
                                                          
                                             <!-- Stock balance -->
                                             <td>{{ number_format($log['balance_qty'], 2) }}</td>
                                             <td>{{ number_format($log['balance_value'], 2) }}</td>
+                                            <td>{{ number_format($log['balance_value'] / $log['balance_qty'], 2) }}</td>
                                             <td>{{ $log['status'] }}</td>
 
                                                <!-- COGS -->                         
