@@ -272,7 +272,12 @@
 
                                                             </div>
                                                         @else
-                                                      
+                                                        <?php $totalPurchaseQty += $detail['used_qty']; ?>
+                                                            <!-- Display purchase details -->
+                                                            <div>
+                                                                {{ number_format($detail['used_qty'], 2) }},
+
+                                                            </div>
                                                         @endif
                                                     @endforeach
                                                 @endif
@@ -290,13 +295,16 @@
                                                     @foreach ($log['details'] as $detail)
                                                         @if ($log['transaction_type'] == 'Sell')
                                                             <?php $totalPurchaseQty += $detail['used_qty']; ?>
-                                                          
                                                             <div>
-
                                                                 {{ number_format($detail['unit_price'], 2) }}
                                                             </div>
                                                         @else
-                                                      
+                                                        <?php $totalPurchaseQty += $detail['used_qty']; ?>
+                                                            <!-- Display purchase details -->
+                                                            <div>
+                                                                {{ number_format($detail['unit_price'], 2) }},
+
+                                                            </div>
                                                         @endif
                                                     @endforeach
                                                 @endif
@@ -320,9 +328,9 @@
                                                             $purchaseValue = $detail['used_qty'] * $detail['unit_price']; 
                                                             $totalPurchaseValue += $purchaseValue;
                                                             ?>                                                          
-                                                            {{-- <div>                                                             
+                                                            <div>                                                             
                                                                 {{ number_format($purchaseValue, 2) }}                                                               
-                                                            </div> --}}
+                                                            </div> 
                                                             
                                                         @elseif ($log['transaction_type'] == 'Sell')
                                                             <?php
@@ -439,6 +447,7 @@
                                                     0
                                                 @endif
                                             </td>
+                                            
 
 
                                             {{-- @dd($transaction_logs); --}}
