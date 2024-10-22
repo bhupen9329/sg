@@ -40,11 +40,10 @@ class ValuationController extends Controller
         $lastTransactionStatus = '';
     
         foreach ($transactions as $transaction) {
+          
 
             if (strtolower($transaction->transaction_type) === 'purchase') {
                 // Add purchase to the stack
-      
-        
                 $poQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
                 $poQty = $poQtyCheck;
                 $lastPurchasePrice = $transaction->unit_price;
@@ -104,8 +103,6 @@ class ValuationController extends Controller
                         if(abs($lastPurchase['quantity']) > $poQty){
                        
                             if( $lastPurchase['quantity'] > $poQty){
-                              
-          
                                 $logEntry['details'][] = [
                                     'used_qty' => $lastPurchase['quantity'] + $poQty,
                                     'unit_price' => $transaction->unit_price,
@@ -123,8 +120,6 @@ class ValuationController extends Controller
                                     'remaining_value' => $remainingQty *  $transaction->unit_price,
                                 ];
                             }
-
-                   
                        
                         }else{
                             if( $lastTransactionStatus == 'Short'){
@@ -202,15 +197,13 @@ class ValuationController extends Controller
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
                     'balance_unit_price' => $totalValue /$totalQuantity, // Avoid division by zero
-                    'cost_of_goods_sold' => 0,
+                    'cost_of_goods_sold' => $costOfGoodsPurchased,
                     'profit_loss' => 0,
                     'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                     'log_amount' => $transaction->quantity * $transaction->unit_price,
                     'inventory_stack' => $inventoryStack,
                     'details' => $logEntry['details'],
                 ];
-
-    
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             } 
             
@@ -221,7 +214,17 @@ class ValuationController extends Controller
                 $sellQty = $sellQtyCheck; // Use absolute value without formatting
                 $costOfGoodsSold = 0; // Cost of goods sold for this transaction
                 $lastSellPrice = $transaction->unit_price;
-        
+                
+                // dump($sellQty);
+                $logEntry = [
+                    'transaction_type' => 'Sell',
+                    'quantity' => $sellQty,
+                    'transaction_date' => $transaction->transaction_date,
+                    'selling_price' => $transaction->unit_price,
+                    'details' => [],
+                    'sell_qty' => $sellQty,
+                ];
+
 
                 if($totalQuantity < 0){
                     $inventoryStack[] = [
@@ -230,25 +233,26 @@ class ValuationController extends Controller
                         'transaction_date' => $transaction->transaction_date,
                     ];
 
+                    $logEntry['details'][] = [
+                        'used_qty' => 0,
+                        'unit_price' => 0,
+                        'amount' => 0,
+                        'remaining_qty' =>0,
+                        'remaining_value' => 0,
+                    ];
+
                 $totalQuantity -= $transaction->quantity;
                 $totalValue -= $transaction->quantity * $transaction->unit_price;
             
                 }
                 else{
-                    $logEntry = [
-                        'transaction_type' => 'Sell',
-                        'quantity' => $sellQty,
-                        'transaction_date' => $transaction->transaction_date,
-                        'selling_price' => $transaction->unit_price,
-                        'details' => [],
-                        'sell_qty' => $sellQty,
-                    ];
-
+            
 
                     while ($sellQty > 0 && !empty($inventoryStack)) {
+     
                         // Get the last purchase (LIFO: Last In First Out)
                         $lastPurchase = array_pop($inventoryStack);
-                       
+                
                         if ($lastPurchase['quantity'] >= $sellQty) {
                             // Sufficient quantity in the last purchase to fulfill the sale
                             $costOfGoodsSold += $sellQty * $lastPurchase['unit_price'];
@@ -269,7 +273,7 @@ class ValuationController extends Controller
                             }
                 
                             // Log the sale details
-                         
+                
                           
                             if(($totalQuantity > 0)){
                                 $logEntry['details'][] = [
@@ -280,8 +284,7 @@ class ValuationController extends Controller
                                     'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
                                 ];
                            
-                            }else{
-                         
+                            }elseif($totalQuantity < 0){
                                 $logEntry['details'][] = [
                                     'used_qty' => '',
                                     'unit_price' => '',
@@ -290,6 +293,15 @@ class ValuationController extends Controller
                                     'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
                                 ];
                           
+                            }
+                            else{
+                                $logEntry['details'][] = [
+                                    'used_qty' => '',
+                                    'unit_price' => '',
+                                    'amount' => $sellQty * $lastPurchase['unit_price'],
+                                    'remaining_qty' => $remainingQty,
+                                    'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
+                                ];
                             }
                   
                 

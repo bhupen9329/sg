@@ -409,6 +409,14 @@
                                         
                                             if ($totalSellQty > 0) {
                                                 $unit_cogs_price = $log['cost_of_goods_sold'] / $totalSellQty;
+                                            }else{
+                                                // dd( $totalSellQty);
+                                                if( $totalSellQty != 0){
+                                                    $unit_cogs_price = $totalPurchaseValue / $totalSellQty ?? 0;
+                                                }else{
+                                                    $unit_cogs_price = 0;
+                                                }
+                                               
                                             }
                                             ?>
                                             <td>
@@ -419,21 +427,23 @@
                                                 @endif
                                             </td>
 
-                                            
+                                           
                                             <td>
                                                 @if ($log['transaction_type'] === 'Sell')
                                                     {{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}
                                                 @else
-                                                   {{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}
+                                                   {{ number_format( abs($totalPurchaseValue) ?? 0, 2) }}
                                                 @endif
                                             </td>
+
+                                            
                                             {{-- Actual Sales --}}
 
                                             <td>
                                                 @if ($log['transaction_type'] == 'Sell')
-                                                {{ number_format($totalSellQty, 2) }}
+                                                {{ number_format(abs($totalSellQty), 2) }}
                                                 @else
-                                                {{ number_format($totalSellQty, 2) }}
+                                                {{ number_format(abs($totalSellQty), 2) }}
 
                                                 @endif
                                             </td>
