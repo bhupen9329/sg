@@ -377,6 +377,7 @@ class ValuationController extends Controller
             'transaction_logs' => $transactionLogs,
             'final_balance_qty' => $totalQuantity,
             'final_balance_value' => $totalValue,
+            'balance_unit_price' => $totalValue / $totalQuantity ??  0, // Avoid division by zero
             'final_profit_loss' => $totalProfitLoss,
             'last_transaction_status' => $lastTransactionStatus,
             'final_price' => $finalPrice,
@@ -673,6 +674,7 @@ public function calculateFIFO()
     $lastPurchasePrice = null; // Last purchase price
     $lastSellPrice = null; // Last sell price
     $lastTransactionStatus = ''; // Status of the inventory (Short/Long)
+    $lastBalanceUnitPrice = null;
 
     foreach ($transactions as $transaction) {
         // Process purchase transactions
@@ -818,6 +820,7 @@ public function calculateFIFO()
         'final_balance_value' => $totalValue,
         'final_profit_loss' => $totalProfitLoss,
         'last_transaction_status' => $lastTransactionStatus,
+        'balance_unit_price' => $totalQuantity > 0 ? $totalValue / $totalQuantity : 0, // Avoid division by zero
         'final_price' => $finalPrice,
         'last_transaction_date' => $lastTransactionDate,
     ];
@@ -836,6 +839,7 @@ private function logTransaction($type, $transaction, $totalQuantity, $totalValue
         'balance_qty' => $totalQuantity,
         'balance_value' => $totalValue,
         'balance_unit_price' => $totalQuantity > 0 ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+      
         'cost_of_goods_sold' => $costOfGoodsSold,
         'profit_loss' => $profitLoss,
         'details' => $details,
@@ -1118,7 +1122,7 @@ private function logTransaction($type, $transaction, $totalQuantity, $totalValue
         'final_balance_qty' => $totalQuantity,
         'final_balance_value' => $totalValue,
         'final_profit_loss' => $totalProfitLoss,
-        // 'item_name' => $item_name,
+        'item_name' => $item_name,
     ];
 }
 
@@ -1388,10 +1392,6 @@ public function getValuationData(Request $request)
 
 
 
-// public function valuation()
-// {
-//     return view('inventory_valuation.valuation');
-// }
 
 
 

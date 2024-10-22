@@ -199,14 +199,15 @@
                                                 <td style="padding: 8px;">{{ number_format($lifoData['final_balance_qty'], 2) ?? 'N/A' }}</td>
                                                 <td style="padding: 8px;">
                                                     <a href="{{ route('show.lifo') }}" >
-                                                        {{-- {{ $lifoData['final_balance_value'] ?? 'N/A' }} --}}
-                                                        {{ $lifoData['final_price'] ?? 'N/A' }}
+                                                   
+                                                        {{ number_format($lifoData['balance_unit_price'], 2) ?? 'N/A' }}
                                                     </a>
                                                 </td>
                                                 <td style="padding: 8px;">
                                                     <a href="{{ route('show.fifo') }}" >
+                                                       
                                                         {{-- {{ $fifoData['final_balance_value'] ?? 'N/A' }} --}}
-                                                        N/A
+                                                        {{ $fifoData['balance_unit_price'] ?? 'N/A' }}
                                                     </a>  
                                                 </td>
                                                 <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
