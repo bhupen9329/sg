@@ -198,10 +198,10 @@
                                                 <td style="padding: 8px;">{{ $lifoData['item_name'] ?? 'N/A' }}</td>
                                                 <td style="padding: 8px;">{{ number_format($lifoData['final_balance_qty'], 2) ?? 'N/A' }}</td>
                                                 <td style="padding: 8px;">
-                                                    <a href="{{ route('show.lifo') }}" >
-                                                        {{-- {{ $lifoData['final_balance_value'] ?? 'N/A' }} --}}
-                                                        {{ $lifoData['final_price'] ?? 'N/A' }}
+                                                    <a href="{{ route('show.lifo') }}">
+                                                        {{ isset($lifoData['final_price']) ? number_format($lifoData['final_price'], 2) : number_format(2, 2) }}
                                                     </a>
+                                                    
                                                 </td>
                                                 <td style="padding: 8px;">
                                                     <a href="{{ route('show.fifo') }}" >
