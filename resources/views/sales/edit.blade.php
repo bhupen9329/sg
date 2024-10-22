@@ -267,6 +267,8 @@
                                                                 var cell10 = newRow.insertCell(9);
                                                                 var cell11 = newRow.insertCell(10);
 
+                                                                @if($so_item->qty == $so_item->so_rest_qty)
+
                                                                 cell1.innerHTML = `
                                                             <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);" style="width:300px!important"  class="form-control item-select-${lastItemId}" required>
                                                                 <option value="{{ $so_item->item_category }}" selected>{{ $so_item->name }}</option>
@@ -310,6 +312,50 @@
                                                                 $('#subcategory_' + lastItemId).on('select2:open', function() {
                                                                     document.querySelector('.select2-search__field').focus();
                                                                 });
+                                                                @else
+                                                                cell1.innerHTML = `
+                                                            <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);" style="width:300px!important"  class="form-control item-select-${lastItemId}" disabled required>
+                                                                <option value="{{ $so_item->item_category }}" selected>{{ $so_item->name }}</option>
+                                                                @foreach ($category_2 as $category)
+                                                                @if ($so_item->item_category != $category->id)
+                                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                                    @endif
+                                                                @endforeach
+                                                            </select>`;
+                                                                $('.item-select-' + lastItemId).select2();
+
+                                                                cell2.innerHTML = `
+                                                            <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}" disabled required>
+                                                                <option value="{{ $so_item->item_subcategory }}" selected>{{ $so_item->sub_category }}</option>
+                                                            </select>`;
+                                                                $('.subcategory-select').select2();
+
+                                                                cell3.innerHTML =
+                                                                    `
+                                                            <input type="number" name="qty[]" step="0.001" value="{{ $so_item->qty }}" min="0.001" id="qty_${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" disabled placeholder="Qty" min="1"  required>`;
+
+
+                                                                cell4.innerHTML =
+                                                                    `
+                                                            <input type="number" name="unit_price_[]"  value="{{ $so_item->unit_price }}" step="0.01" min="0.01" id="unit_price${lastItemId}" class="form-control smaller-font" disabled oninput="calculatePrice('${lastItemId}')"  placeholder="Amount"    required  >`;
+
+                                                                cell5.innerHTML =
+                                                                    `
+                                                            <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $so_item->price }}"  class="form-control smaller-font"  placeholder="Price"  disabled  >`;
+                                                                cell6.innerHTML =
+                                                    'N/A';
+
+
+                                                                // Focus the search box when the dropdown is opened
+                                                                $('.item-select-' + lastItemId).on('select2:open', function() {
+                                                                    document.querySelector('.select2-search__field').focus();
+                                                                });
+
+                                                                // Focus the search box when the subcategory dropdown is opened
+                                                                $('#subcategory_' + lastItemId).on('select2:open', function() {
+                                                                    document.querySelector('.select2-search__field').focus();
+                                                                });
+                                                                @endif
                                                         
                                                             lastItemId++;
                                                             @endforeach

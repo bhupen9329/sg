@@ -44,7 +44,7 @@ class ValuationController extends Controller
             if (strtolower($transaction->transaction_type) === 'purchase') {
                 // Add purchase to the stack
       
-
+        
                 $poQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
                 $poQty = $poQtyCheck;
                 $lastPurchasePrice = $transaction->unit_price;
@@ -71,15 +71,13 @@ class ValuationController extends Controller
                 }
                 else{
                 
-                    // dump($poQty);
-
                     while ($poQty > 0 && !empty($inventoryStack)) {
                         // Get the last purchase (LIFO: Last In First Out)
                         $lastPurchase = array_pop($inventoryStack);
                         
                         if ($lastPurchase['quantity'] <= $poQty) {
                             // Sufficient quantity in the last purchase to fulfill the PO
-                            $costOfGoodsPurchased += $poQty * $lastPurchase['unit_price'];
+                            $costOfGoodsPurchased = $poQty * $lastPurchase['unit_price'];
                             $remainingQty = $lastPurchase['quantity'] + $poQty;
                          
                             // Update total quantity and value for purchases
@@ -259,7 +257,6 @@ class ValuationController extends Controller
                 
                             // Update total quantity and value
                             $totalQuantity -= $sellQty;
-                       
                             $totalValue -= $sellQty * $lastPurchase['unit_price'];
                 
                             // If there is remaining quantity from the last purchase, push it back to the stack

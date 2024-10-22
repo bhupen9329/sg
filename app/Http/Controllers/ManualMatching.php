@@ -404,7 +404,9 @@ class ManualMatching extends Controller
                 'sales_orders.so_number as so_number',
                 'so_companies.company_name as so_company_name',
                 'po_items.po_item_no',
+                'po_items.unit_price as po_items_unit_price',
                 'so_items.so_item_no',
+                'so_items.unit_price as so_items_unit_price',
                 'po_items.po_item_status',
                 'so_items.so_item_status',
                 'sales_orders.match_position as so_match_position',
@@ -432,13 +434,28 @@ class ManualMatching extends Controller
     public function storePurSellMatch(Request $request)
     {
         // dd($request);
-        $purchaseOrderId = $request->input('purchase_order_id');
-        $salesOrderId = $request->input('sales_order_id');
-
         if ($request->selected_so_items) {
         } else {
             return redirect()->back()->with('msg', 'Please Select atleast one item');
         }
+      $total_matched_qty = 0;
+
+      foreach ($request->selected_so_items as $soItemId){
+        $matchedQuantity = $request->input('matched_quantity.' . $soItemId, 0);
+        $total_matched_qty +=  $matchedQuantity;
+      }
+    
+
+      $POItemCheck = PoItem::find($request->po_item_id);
+
+      if( $POItemCheck->po_rest_qty < $total_matched_qty){
+        return redirect()->back()->with('msg', 'Your Selected qty is greater than PO Item Qty');
+      }
+
+        $purchaseOrderId = $request->input('purchase_order_id');
+        $salesOrderId = $request->input('sales_order_id');
+
+   
 
         $purchaseOrder = PurchaseOrder::find($purchaseOrderId);
 
@@ -560,13 +577,26 @@ class ManualMatching extends Controller
 
     public function storePurSellMatchBuyer(Request $request)
     {
-
-        // dd($request);
-
         if ($request->selected_po_items) {
         } else {
             return redirect()->back()->with('msg', 'Please Select atleast one item');
         }
+        
+        $total_matched_qty = 0;
+
+        foreach ($request->selected_po_items as $poItemId){
+          $matchedQuantity = $request->input('matched_quantity.' . $poItemId, 0);
+          $total_matched_qty +=  $matchedQuantity;
+        }
+      
+  
+        $SOItemCheck = SoItem::find($request->so_item_id);
+  
+        if( $SOItemCheck->so_rest_qty < $total_matched_qty){
+          return redirect()->back()->with('msg', 'Your Selected qty is greater than SO Item Rest Qty');
+        }
+
+    
         $purchaseOrderId = $request->input('purchase_order_id');
         $salesOrderId = $request->input('sales_order_id');
 
@@ -793,6 +823,9 @@ class ManualMatching extends Controller
 
                 'po_items.po_item_status',
                 'so_items.so_item_status',
+
+                'po_items.unit_price as po_items_unit_price',
+                'so_items.unit_price as so_items_unit_price',
 
                 'sales_orders.match_position as so_match_position',
                 'purchase_sell_match.matched_quantity',

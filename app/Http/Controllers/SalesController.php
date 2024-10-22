@@ -38,8 +38,6 @@ class SalesController extends Controller
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
             ->join('subcategories', 'subcategories.id', '=', 'so_items.item_subcategory')
             ->select('*', 'sales_orders.id as so_id', 'so_items.*', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
-            // ->where('sales_orders.status', '!=', 'closed')
-
             ->orderBy('sales_orders.id', 'desc')
             ->get();
         $company = Company::where('type', 'buyer')->get();
@@ -121,6 +119,7 @@ class SalesController extends Controller
                 $soItem->so_id = $id;
 
                 $soItem->save();
+                $newSoItemId = $soItem->id;
 
                 $categoryName = Category::find($soItem->item_category)->name;
 
@@ -130,10 +129,12 @@ class SalesController extends Controller
 
 
                 $inventoryTransaction = new InventoryTransaction();
+                $inventoryTransaction->so_item_id = $newSoItemId;
+                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
                 $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
                 $inventoryTransaction->transaction_type = 'sell';
                 $inventoryTransaction->quantity = $soItem->qty;
-                $inventoryTransaction->transaction_date = now();
+                $inventoryTransaction->transaction_date =  $request->date;
                 $inventoryTransaction->unit_price = $soItem->unit_price;
                 $inventoryTransaction->company_name = $companyName;
                 $inventoryTransaction->position = 'open';
@@ -189,7 +190,7 @@ class SalesController extends Controller
         $gstsetting = GstSetting::all();
         $so_number = $sales_order->so_number;
 
-        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->join('subcategories','so_items.item_subcategory', '=', 'subcategories.id')->where('so_items.so_id', $id)->where('so_items.so_item_status', 'Open')->get();
+        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->join('subcategories','so_items.item_subcategory', '=', 'subcategories.id')->where('so_items.so_id', $id)->get();
     //   dd( $so_items);
         $data = [
             'company' => $company,
@@ -208,6 +209,7 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
+   
         $sales_order = SalesOrder::where('id', $id)->first();
 
             $data = [
@@ -219,7 +221,7 @@ class SalesController extends Controller
                 'total_price' => $request->total_price,
             ];
             SalesOrder::where('id', $id)->update($data);
-            SoItem::where('so_id', $id)->where('so_item_status', 'Open')->delete();
+            SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->delete();
 
             if ($id) {
                 for ($i = 0; $i < count($request->unit_price_); $i++) {
@@ -235,6 +237,7 @@ class SalesController extends Controller
                     $soItem->so_id = $id;
     
                     $soItem->save();
+                    $newSoItemId = $soItem->id;
     
                     $categoryName = Category::find($soItem->item_category)->name;
     
@@ -243,15 +246,16 @@ class SalesController extends Controller
                     // dd($subcategoryName);
     
     
-                    $inventoryTransaction = new InventoryTransaction();
-                    $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
-                    $inventoryTransaction->transaction_type = 'sell';
-                    $inventoryTransaction->quantity = $soItem->qty;
-                    $inventoryTransaction->transaction_date = now();
-                    $inventoryTransaction->unit_price = $soItem->unit_price;
-                    $inventoryTransaction->company_name = $companyName;
-                    $inventoryTransaction->position = 'open';
-                    $inventoryTransaction->save();
+                    // $inventoryTransaction = new InventoryTransaction();
+                    // $inventoryTransaction->so_item_id = $newSoItemId;
+                    // $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
+                    // $inventoryTransaction->transaction_type = 'sell';
+                    // $inventoryTransaction->quantity = $soItem->qty;
+                    // $inventoryTransaction->transaction_date =  $request->date;
+                    // $inventoryTransaction->unit_price = $soItem->unit_price;
+                    // $inventoryTransaction->company_name = $companyName;
+                    // $inventoryTransaction->position = 'open';
+                    // $inventoryTransaction->save();
                 }
                 return redirect()->route('sales.index')->with('update', 'Sales Orders Updated Successfully');;
             }

@@ -175,7 +175,7 @@
                                                             @foreach ($po_items as $po_item)
                                                                 var newRow = table.insertRow(table.rows.length);
                                                                 // console.log(table);
-
+                                                  
                                                                 var cell1 = newRow.insertCell(0);
                                                                 var cell2 = newRow.insertCell(1);
                                                                 var cell3 = newRow.insertCell(2);
@@ -187,6 +187,8 @@
                                                                 var cell9 = newRow.insertCell(8);
                                                                 var cell10 = newRow.insertCell(9);
                                                                 var cell11 = newRow.insertCell(10);
+
+                                                                @if($po_item->qty == $po_item->po_rest_qty)
 
                                                                 cell1.innerHTML = `
     <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);"  style="width:300px!important" class="form-control smaller-font item-select-${lastItemId}" required>
@@ -231,6 +233,52 @@
                                                                 $('#subcategory_' + lastItemId).on('select2:open', function() {
                                                                     document.querySelector('.select2-search__field').focus();
                                                                 });
+                                                                @else
+                                                                cell1.innerHTML = `
+    <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);"  style="width:300px!important" class="form-control smaller-font item-select-${lastItemId}" disabled required>
+        <option value="{{ $po_item->item_category }}" selected>{{ $po_item->name }}</option>
+        @foreach ($category_2 as $category)
+             @if ($po_item->item_category != $category->id)
+                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                @endif
+        @endforeach
+    </select>`;
+                                                                $('.item-select-' + lastItemId).select2();
+
+                                                                cell2.innerHTML = `
+    <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}" disabled required>
+        <option value="{{ $po_item->item_subcategory }}" selected>{{ $po_item->sub_category }}</option>
+    </select>`;
+                                                                $('.subcategory-select').select2();
+
+                                                                cell3.innerHTML =
+                                                                    `
+    <input type="number" name="qty[]" id="qty_${lastItemId}" step="any" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" value="{{ $po_item->qty }}" disabled placeholder="Qty" min="1"  required>`;
+
+
+                                                                cell4.innerHTML =
+                                                                    `
+    <input type="number" name="unit_price_[]" value="{{ $po_item->unit_price }}" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" placeholder="Amount" disabled   required  >`;
+
+                                                                cell5.innerHTML =
+                                                                    `
+    <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $po_item->price }}"  class="form-control smaller-font" disabled  placeholder="Price" readonly>`;
+                                                                cell6.innerHTML =
+                                                                    `
+    N/A`;
+
+
+                                                                // Focus the search box when the dropdown is opened
+                                                                $('.item-select-' + lastItemId).on('select2:open', function() {
+                                                                    document.querySelector('.select2-search__field').focus();
+                                                                });
+
+                                                                // Focus the search box when the subcategory dropdown is opened
+                                                                $('#subcategory_' + lastItemId).on('select2:open', function() {
+                                                                    document.querySelector('.select2-search__field').focus();
+                                                                });
+                                                                @endif
+
 
                                                                 lastItemId++;
                                                             @endforeach
