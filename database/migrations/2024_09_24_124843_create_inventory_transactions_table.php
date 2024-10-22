@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('inventory_transactions', function (Blueprint $table) {
             $table->id();
+            $table->string('po_item_id')->nullable();
+            $table->string('so_item_id')->nullable();
             $table->date('transaction_date')->nullable();
             $table->string('item_name')->nullable();
             $table->string('company_name')->nullable();
@@ -20,9 +22,6 @@ return new class extends Migration
             $table->decimal('unit_price', 10, 2)->nullable(); 
             $table->decimal('quantity')->nullable(); 
             $table->string('position')->nullable();
-
-      
-          
             $table->timestamps();
         });
     }

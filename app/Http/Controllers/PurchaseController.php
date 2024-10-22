@@ -146,6 +146,8 @@ class PurchaseController extends Controller
                 // Save Purchase Order Item
                 $poItem->save();
 
+                $newPoItemId = $poItem->id;
+
                 $categoryName = Category::find($poItem->item_category)->name; 
 
                 $subcategoryName = Subcategory::find($poItem->item_subcategory)->sub_category; 
@@ -154,10 +156,11 @@ class PurchaseController extends Controller
 
               
                 $inventoryTransaction = new InventoryTransaction();
+                $inventoryTransaction->po_item_id =  $newPoItemId; 
                 $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
                 $inventoryTransaction->transaction_type = 'purchase'; 
                 $inventoryTransaction->quantity = $poItem->qty;
-                $inventoryTransaction->transaction_date = now(); 
+                $inventoryTransaction->transaction_date = $request->date; 
                 $inventoryTransaction->unit_price = $poItem->unit_price; 
                 $inventoryTransaction->company_name = $companyName;
                 $inventoryTransaction->position = 'open';
@@ -207,7 +210,7 @@ class PurchaseController extends Controller
     public function update(Request $request, $id)
     {
 
-        // dd($request);
+   
         $po_data = PurchaseOrder::where('id', $id)->first();
 
         $data = [
@@ -219,8 +222,10 @@ class PurchaseController extends Controller
             'total_price' => $request->total_price,
         ];
         PurchaseOrder::where('id', $id)->update($data);
-        PoItem::where('po_id', $id)->where('po_item_status', 'Open')->delete();
-
+        PoItem::where('po_id', $id)
+        ->whereColumn('qty', '=', 'po_rest_qty')
+        ->delete();
+    
 
         if ($id) {
             // Loop through each item for Purchase Order
@@ -244,6 +249,8 @@ class PurchaseController extends Controller
                 // Save Purchase Order Item
                 $poItem->save();
 
+                $newPoItemId = $poItem->id;
+
                 $categoryName = Category::find($poItem->item_category)->name; 
 
                 $subcategoryName = Subcategory::find($poItem->item_subcategory)->sub_category; 
@@ -251,15 +258,16 @@ class PurchaseController extends Controller
                 // dd($subcategoryName);
 
               
-                $inventoryTransaction = new InventoryTransaction();
-                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
-                $inventoryTransaction->transaction_type = 'purchase'; 
-                $inventoryTransaction->quantity = $poItem->qty;
-                $inventoryTransaction->transaction_date = now(); 
-                $inventoryTransaction->unit_price = $poItem->unit_price; 
-                $inventoryTransaction->company_name = $companyName;
-                $inventoryTransaction->position = 'open';
-                $inventoryTransaction->save();
+                // $inventoryTransaction = new InventoryTransaction();
+                // $inventoryTransaction->po_item_id =  $newPoItemId; 
+                // $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
+                // $inventoryTransaction->transaction_type = 'purchase'; 
+                // $inventoryTransaction->quantity = $poItem->qty;
+                // $inventoryTransaction->transaction_date = $request->date; 
+                // $inventoryTransaction->unit_price = $poItem->unit_price; 
+                // $inventoryTransaction->company_name = $companyName;
+                // $inventoryTransaction->position = 'open';
+                // $inventoryTransaction->save();
             }
     
             // Redirect with success message

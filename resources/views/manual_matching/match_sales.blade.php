@@ -252,7 +252,9 @@
                                         <th>PO Item Name</th>  
                                         <th>Matched Quantity</th>
                                         <th>PO Item Rem Qty</th>
-                                        <th>SO Item Rem Qty</th>   
+                                        <th>PO unit price</th>
+                                        <th>SO Item Rem Qty</th> 
+                                        <th>SO unit price</th>   
                                         <th>PO Item Position(Status)</th>
                                         <th>SO Item Position(Status)</th>   
                                         {{-- <th>Purchase Position </th>
@@ -281,7 +283,9 @@
                                             <td>{{ $data->po_category_name }} {{ $data->po_sub_category_name }}</td>
                                             <td>{{ $data->matched_quantity }}</td>
                                             <td>{{ $data->po_item_rest_quantity }}</td>
+                                            <td>{{ $data->po_items_unit_price }}</td>
                                             <td>{{ $data->so_item_rest_quantity }}</td>
+                                            <td>{{ $data->so_items_unit_price }}</td>
                                             <td>{{ $data->po_item_status }} </td>
                                             <td>{{ $data->so_item_status }} </td>
                                             {{-- <td>{{ $data->po_match_position }} </td>
