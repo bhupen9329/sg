@@ -202,6 +202,7 @@
                                                    
                                                         {{ number_format($lifoData['balance_unit_price'], 2) ?? 'N/A' }}
                                                     </a>
+                                                    
                                                 </td>
                                                 <td style="padding: 8px;">
                                                     <a href="{{ route('show.fifo') }}" >

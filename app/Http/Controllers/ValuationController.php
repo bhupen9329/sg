@@ -370,7 +370,7 @@ class ValuationController extends Controller
         }
     
         // Final calculations
-        $finalPrice = ($lastTransactionStatus === 'Long') ? $lastPurchasePrice : $lastSellPrice;
+        $finalPrice = ($lastTransactionStatus === 'Long') ?$totalValue / $totalQuantity : $totalValue / $totalQuantity;
 
     
         return [
