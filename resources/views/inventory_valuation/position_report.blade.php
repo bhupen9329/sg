@@ -208,13 +208,15 @@
                                                     <a href="{{ route('show.fifo') }}" >
                                                        
                                                         {{-- {{ $fifoData['final_balance_value'] ?? 'N/A' }} --}}
-                                                        {{ $fifoData['balance_unit_price'] ?? 'N/A' }}
+                                                        {{ number_format($fifoData['balance_unit_price'], 2) ?? 'N/A' }}
                                                     </a>  
                                                 </td>
                                                 <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
                                                 <td style="padding: 8px;">
                                                     <a href="{{ route('show.average') }}" >
-                                                        {{ $avgData['final_balance_value'] ?? 'N/A' }}
+                                                        {{-- {{ $avgData['final_balance_value'] ?? 'N/A' }}
+                                                         --}}
+                                                         N/A
                                                     </a>
                                                 </td>
                                              
