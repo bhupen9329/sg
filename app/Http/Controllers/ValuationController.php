@@ -40,9 +40,8 @@ class ValuationController extends Controller
         $lastTransactionStatus = '';
     
         foreach ($transactions as $transaction) {
-          
-
             if (strtolower($transaction->transaction_type) === 'purchase') {
+              
                 // Add purchase to the stack
                 $poQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
                 $poQty = $poQtyCheck;
@@ -55,6 +54,8 @@ class ValuationController extends Controller
                     'details' => [],
                     'po_qty' => $poQty,
                 ];
+
+                
         
                 if($lastTransactionStatus == 'Long' ||  $lastTransactionStatus == '' ){
                   
@@ -69,10 +70,13 @@ class ValuationController extends Controller
                 $totalValue += $transaction->quantity * $transaction->unit_price;
                 }
                 else{
-                
+                    $lastPurchaseTotal = 0;
                     while ($poQty > 0 && !empty($inventoryStack)) {
                         // Get the last purchase (LIFO: Last In First Out)
                         $lastPurchase = array_pop($inventoryStack);
+                        $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
+                        $lastPurchaseTotal +=  $lasttotalValue;
+                     
                         
                         if ($lastPurchase['quantity'] <= $poQty) {
                             // Sufficient quantity in the last purchase to fulfill the PO
@@ -156,7 +160,6 @@ class ValuationController extends Controller
                         }
                         
                     }
-                   
                     // If there is remaining unsold quantity (i.e., poQty > 0), it's an excess purchase
               
                     if ($poQty > 0) {
@@ -203,12 +206,12 @@ class ValuationController extends Controller
                     'log_amount' => $transaction->quantity * $transaction->unit_price,
                     'inventory_stack' => $inventoryStack,
                     'details' => $logEntry['details'],
+                    'lastPurchaseTotal' =>  $lastPurchaseTotal,
                 ];
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             } 
             
             elseif (strtolower($transaction->transaction_type) === 'sell') {
-        
         
                 $sellQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
                 $sellQty = $sellQtyCheck; // Use absolute value without formatting
@@ -246,7 +249,6 @@ class ValuationController extends Controller
             
                 }
                 else{
-            
 
                     while ($sellQty > 0 && !empty($inventoryStack)) {
      
@@ -391,6 +393,7 @@ class ValuationController extends Controller
             'last_transaction_status' => $lastTransactionStatus,
             'final_price' => $finalPrice,
             'last_transaction_date' => $lastTransactionDate,
+           
         ];
 
 
