@@ -296,7 +296,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/lifo-report', [ReportController::class, 'lifo_report'])->name('lifo_report');
     
-    Route::get('/show_lifo', [ReportController::class, 'showLIFOReport'])->name('show.lifo');
+    // Route::get('/show_lifo/{id}', [ReportController::class, 'showLIFOReport'])->name('show.lifo');
     Route::get('/calculate_fifo', [ReportController::class, 'calculateFIFO'])->name('inventory.fifo');
     Route::get('/calculate_average', [ReportController::class, 'calculateAverageCost'])->name('inventory.average');
 
@@ -314,7 +314,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/inventory_valuation', [ValuationController::class, 'index'])->name('inventory_valuation.index');
         Route::get('/calculate_lifo', [ValuationController::class, 'calculateLIFO'])->name('inventory.lifo');
-        Route::get('/show_lifo_report', [ValuationController::class, 'showLifoReport'])->name('show.lifo');
+        Route::get('/show_lifo_report/{id}', [ValuationController::class, 'showLifoReport'])->name('show.lifo');
         Route::get('/show_fifo_report', [ValuationController::class, 'showFifoReport'])->name('show.fifo');
         Route::get('/show_average_report', [ValuationController::class, 'showAverageReport'])->name('show.average');
         Route::post('/store_inventory', [ValuationController::class, 'store_inventory'])->name('store_inventory');

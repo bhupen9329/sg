@@ -166,7 +166,81 @@
                                 </button>
 
                             </div>
+            
+                            <!-- Transaction Logs -->
+                            <h2>Transaction Logs</h2>
+            
+                            <div style="overflow-x: auto">
+                                <table class="table table-bordered text-center" id="Category_table" style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background-color: #f2f2f2; text-align: center;">
+                                            <!-- Table Headers with proper alignment -->
+                                            <th style="padding: 8px;">Report Date</th>
+                                            <th style="padding: 8px;">Item Name</th>
+                                            <th style="padding: 8px;">Transaction Type</th>
+                                            <th style="padding: 8px;">LIFO Position (MT)</th>
+                                            <th style="padding: 8px;">LIFO Valuation</th>
+                                            <th style="padding: 8px;">FIFO Position (MT)</th>
+                                            <th style="padding: 8px;">FIFO Valuation</th>
+                                            <th style="padding: 8px;">Manual Match</th>
+                                            <th style="padding: 8px;">Monthly Average</th>
+                                            <th style="padding: 8px;">Netwise</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{-- @dd($avgData); --}}
+                                        @if(!empty($lifoData))
+                                            <!-- Table row with data -->
+                                            @foreach($inventory_transaction as $data)
+                                            <tr>
+                                                <td style="padding: 8px;">{{ $data['transaction_date'] }}</td>
+                                                <td style="padding: 8px;">{{ $data['item_name'] ?? 'N/A' }}</td>
+                                                <td style="padding: 8px;">{{ $data['transaction_type'] ?? 'N/A' }}</td>
+                                                @foreach($lifo_transaction as $lifo_transactions)
+                                                @if( $data['quantity'] == $lifo_transactions['quantity'])
+                                                <td style="padding: 8px;">{{ number_format($lifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
+                                                <td style="padding: 8px;">
+                                                    <a href="{{ route('show.lifo', $data['id']) }}" >
+                                                        {{ number_format($lifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                    </a>
+                                                </td>
+                                                @endif
+                                                @endforeach
 
+                                                @foreach($fifo_transaction as $fifo_transactions)
+                                                @if( $data['quantity'] == $fifo_transactions['quantity'])
+                                                <td style="padding: 8px;">{{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
+                                                <td style="padding: 8px;">
+                                                    <a href="{{ route('show.lifo', $data['id']) }}" >
+                                                        {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                    </a>
+                                                </td>
+                                                @endif
+                                                @endforeach
+                                          
+                                             
+                                                <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
+                                                <td style="padding: 8px;">
+                                                    <a href="{{ route('show.average') }}" >
+                                                        {{-- {{ $avgData['final_balance_value'] ?? 'N/A' }}
+                                                         --}}
+                                                         N/A
+                                                    </a>
+                                                </td>
+                                             
+                                                <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
+                                            </tr>
+                                            @endforeach
+                                        @else
+                                            <!-- No data row -->
+                                            <tr>
+                                                <td colspan="7" style="padding: 8px; text-align: center;">No data available</td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                         </div>
 
                         <!-- Transaction Logs -->
