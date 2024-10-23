@@ -206,7 +206,7 @@ class ValuationController extends Controller
                     'transaction_date' => $transaction->transaction_date,
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
-                    'balance_unit_price' => ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
 
                     'cost_of_goods_sold' => $costOfGoodsPurchased,
                     'profit_loss' => 0,
@@ -366,7 +366,7 @@ class ValuationController extends Controller
                     'transaction_date' => $transaction->transaction_date,
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
-                    'balance_unit_price' => ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
 
                     'cost_of_goods_sold' => $costOfGoodsSold,
                     'profit_loss' => $profitLoss,
@@ -382,17 +382,17 @@ class ValuationController extends Controller
     
         // Final calculations
         // $finalPrice = ($lastTransactionStatus === 'Long') ? $totalValue / $totalQuantity : $totalValue / $totalQuantity;
-        $finalPrice = ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0;
+        $finalPrice = (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0;
 
 
         // Final calculations
-        $finalPrice = ($lastTransactionStatus === 'Long') ? $totalValue / $totalQuantity : $totalValue / $totalQuantity;
+        // $finalPrice = ($lastTransactionStatus === 'Long') ? $totalValue / $totalQuantity : $totalValue / $totalQuantity;
 
         return [
             'transaction_logs' => $transactionLogs,
             'final_balance_qty' => $totalQuantity,
             'final_balance_value' => $totalValue,
-            'balance_unit_price' => ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+            'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
             'final_profit_loss' => $totalProfitLoss,
             'last_transaction_status' => $lastTransactionStatus,
             'final_price' => $finalPrice,
@@ -411,9 +411,21 @@ class ValuationController extends Controller
     }
 
 
-public function calculateFIFO()
+public function calculateFIFO($id = null)
 {
-    $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+    // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+    if ($id) {
+        $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
+        // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+
+        // Get all transactions up to and including the specific transaction_date
+        $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
+            ->orderBy('transaction_date', 'asc')
+            ->get();
+    } else {
+        $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')
+            ->get();
+    }
     $lastTransaction = $transactions->last();
     $lastTransactionDate = $lastTransaction ? $lastTransaction->transaction_date : null;
 
@@ -589,16 +601,18 @@ public function calculateFIFO()
                 'transaction_date' => $transaction->transaction_date,
                 'balance_qty' => $totalQuantity,
                 'balance_value' => $totalValue,
-                'balance_unit_price' => ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+                'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
                 // Avoid division by zero
                 'cost_of_goods_sold' => $costOfGoodsPurchased,
                 'profit_loss' => 0,
                 'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                 'log_amount' => $transaction->quantity * $transaction->unit_price,
-                'inventory_stack' => $inventoryStack,
+                'inventory_stack' => array_reverse($inventoryStack),
                 'details' => $logEntry['details'],
                 'lastPurchaseTotal' =>  $lastPurchaseTotal ?? 0,
             ];
+
+            
             $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
         } 
         
@@ -758,14 +772,14 @@ public function calculateFIFO()
                 'transaction_date' => $transaction->transaction_date,
                 'balance_qty' => $totalQuantity,
                 'balance_value' => $totalValue,
-                'balance_unit_price' => ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+                'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
 
                 'cost_of_goods_sold' => $costOfGoodsSold,
                 'profit_loss' => $profitLoss,
                 'total_profit_loss' => $totalProfitLoss,
                 'details' => $logEntry['details'],
                 'status' => $totalQuantity < 0 ? 'Short' : 'Long',
-                'inventory_stack' => $inventoryStack,
+                'inventory_stack' => array_reverse($inventoryStack),
             ];
 
             $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
@@ -782,7 +796,7 @@ public function calculateFIFO()
         'transaction_logs' => $transactionLogs,
         'final_balance_qty' => $totalQuantity,
         'final_balance_value' => $totalValue,
-        'balance_unit_price' => ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+        'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
       
         'final_profit_loss' => $totalProfitLoss,
         'last_transaction_status' => $lastTransactionStatus,
@@ -795,22 +809,7 @@ public function calculateFIFO()
 }
 
 
-// Sample logTransaction method to log the transactions
-protected function logTransaction($type, $transaction, $totalQty, $totalValue, $cogs, $profitLoss, $inventoryStack)
-{
-    return [
-        'type' => $type,
-        'transaction_id' => $transaction->id,
-        'transaction_date' => $transaction->transaction_date,
-        'quantity' => $transaction->quantity,
-        'unit_price' => $transaction->unit_price,
-        'total_quantity' => $totalQty,
-        'total_value' => $totalValue,
-        'cost_of_goods_sold' => $cogs,
-        'profit_loss' => $profitLoss,
-        'inventory_queue' => $inventoryStack, // Ensure the stack is passed correctly
-    ];
-}
+
 
 
 
@@ -824,11 +823,14 @@ protected function logTransaction($type, $transaction, $totalQty, $totalValue, $
         $fifoData = $this->calculateFIFO();        
         $avgData = $this->calculateAverage();
 
-        // dd($lifoData, $fifoData);
-        $data = InventoryTransaction::all();
+
+        $inventory_transaction = InventoryTransaction::all();
         // dd($data);
+        $lifo_transaction  =  $lifoData['transaction_logs'];
+        $fifo_transaction =  $fifoData['transaction_logs'];
+
         
-        return view('inventory_valuation.position_report', compact('data','lifoData','fifoData','avgData'));
+        return view('inventory_valuation.position_report', compact('inventory_transaction','lifoData','fifoData','avgData', 'lifo_transaction', 'fifo_transaction'));
     }
 
 
@@ -963,10 +965,10 @@ protected function logTransaction($type, $transaction, $totalQty, $totalValue, $
 
 
 
-    public function showFifoReport()
+    public function showFifoReport($id)
     {
 
-        $fifoData = $this->calculateFIFO();
+        $fifoData = $this->calculateFIFO($id);
         //  dd($fifoData);
         return view('inventory_valuation.fifo', $fifoData);
     }
