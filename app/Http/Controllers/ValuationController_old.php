@@ -375,9 +375,7 @@ class ValuationController extends Controller
     {
         $lifoData = $this->calculateLIFO();
         $fifoData = $this->calculateFIFO();
-        // dd($lifoData,  $fifoData);
         $avgData = $this->calculateAverage();
-        
         return view('inventory_valuation.position_report', compact('lifoData','fifoData','avgData'));
     }
 

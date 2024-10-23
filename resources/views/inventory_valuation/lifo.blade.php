@@ -485,11 +485,7 @@
                                                 @endif
                                             </td>
 
-
-
-
                                             {{-- @dd($transaction_logs); --}}
-
 
                                             <td>
                                                 @if ($log['transaction_type'] === 'Sell')
