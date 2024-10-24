@@ -241,15 +241,40 @@
                                                     <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}
                                                     </td>
                                                     <td style="padding: 8px;">
-                                                        <a href="{{ route('show.average') }}">
-                                                            {{-- {{ $avgData['final_balance_value'] ?? 'N/A' }} --}}
-                                                            N/A
+                                                        <a href="{{ route('show.lifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
+                                                            {{ number_format($lifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                        </a>
+                                                        
+                                                    </td>
+                                                    @endif
+                                                @endforeach
+                                        
+                                                @foreach($fifo_transaction as $fifo_transactions)
+                                                    @if(
+                                                        ($data['id'] == ($fifo_transactions['transaction_id'])) && 
+                                                        ($data['quantity'] == $fifo_transactions['quantity'])
+                                                    )
+                                                    <td style="padding: 8px;">{{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
+                                                    <td style="padding: 8px;">
+                                                        <a href="{{ route('show.fifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
+                                                            {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
                                                         </a>
                                                     </td>
-
-                                                    <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
-                                                </tr>
-                                            @endforeach
+                                                    @endif
+                                                @endforeach
+                                        
+                                                <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
+                                                <td style="padding: 8px;">
+                                                    <a href="{{ route('show.average') }}">
+                                                        {{-- {{ $avgData['final_balance_value'] ?? 'N/A' }} --}}
+                                                        N/A
+                                                    </a>
+                                                </td>
+                                        
+                                                <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
+                                            </tr>
+                                        @endforeach
+                                        
                                         @else
                                             <!-- No data row -->
                                             <tr>

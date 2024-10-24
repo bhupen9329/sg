@@ -36,8 +36,7 @@ class SalesController extends Controller
         $sales_order = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->join('subcategories', 'subcategories.id', '=', 'so_items.item_subcategory')
-            ->select('*', 'sales_orders.id as so_id', 'so_items.*', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
+            ->select('*', 'sales_orders.id as so_id', 'so_items.*', 'categories.name as category_name')
             ->orderBy('sales_orders.id', 'desc')
             ->get();
         $company = Company::where('type', 'buyer')->get();
@@ -109,7 +108,7 @@ class SalesController extends Controller
             for ($i = 0; $i < count($request->unit_price_); $i++) {
                 $soItem = new SoItem();
                 $soItem->item_category = $request->item_category[$i];
-                $soItem->item_subcategory = $request->item_subcategory[$i];
+                $soItem->item_subcategory = $request->item_subcategory[$i] ?? 'N/A';
                 $soItem->qty = $request->qty[$i];
                 $soItem->so_rest_qty = $request->qty[$i];
                 $soItem->unit_price = $request->unit_price_[$i];
@@ -122,16 +121,14 @@ class SalesController extends Controller
                 $newSoItemId = $soItem->id;
 
                 $categoryName = Category::find($soItem->item_category)->name;
-
-                $subcategoryName = Subcategory::find($soItem->item_subcategory)->sub_category;
                 $companyName = Company::find($salesOrder->company_id)->company_name;
                 // dd($subcategoryName);
 
 
                 $inventoryTransaction = new InventoryTransaction();
                 $inventoryTransaction->so_item_id = $newSoItemId;
-                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
-                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
+                $inventoryTransaction->item_name = $categoryName;
+                $inventoryTransaction->item_id = $soItem->item_category; 
                 $inventoryTransaction->transaction_type = 'sell';
                 $inventoryTransaction->quantity = $soItem->qty;
                 $inventoryTransaction->transaction_date =  $request->date;
@@ -190,7 +187,7 @@ class SalesController extends Controller
         $gstsetting = GstSetting::all();
         $so_number = $sales_order->so_number;
 
-        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->join('subcategories', 'so_items.item_subcategory', '=', 'subcategories.id')->where('so_items.so_id', $id)->get();
+        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->where('so_items.so_id', $id)->select('categories.*', 'so_items.*', 'so_items.price as price')->get();
         //   dd( $so_items);
         $data = [
             'company' => $company,
@@ -232,7 +229,7 @@ class SalesController extends Controller
             for ($i = 0; $i < count($request->unit_price_); $i++) {
                 $soItem = new SoItem();
                 $soItem->item_category = $request->item_category[$i];
-                $soItem->item_subcategory = $request->item_subcategory[$i];
+                $soItem->item_subcategory = $request->item_subcategory[$i] ?? 'N/A';
                 $soItem->qty = $request->qty[$i];
                 $soItem->so_rest_qty = $request->qty[$i];
                 $soItem->unit_price = $request->unit_price_[$i];
@@ -243,17 +240,19 @@ class SalesController extends Controller
 
                 $soItem->save();
                 $newSoItemId = $soItem->id;
+                // dd($soItem->item_category);
 
                 $categoryName = Category::find($soItem->item_category)->name;
 
-                $subcategoryName = Subcategory::find($soItem->item_subcategory)->sub_category;
+      
                 $companyName = Company::find($sales_order->company_id)->company_name;
                 // dd($subcategoryName);
 
 
                 $inventoryTransaction = new InventoryTransaction();
                 $inventoryTransaction->so_item_id = $newSoItemId;
-                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
+                $inventoryTransaction->item_name = $categoryName;
+                $inventoryTransaction->item_id = $soItem->item_category; 
                 $inventoryTransaction->transaction_type = 'sell';
                 $inventoryTransaction->quantity = $soItem->qty;
                 $inventoryTransaction->transaction_date =  $request->date;

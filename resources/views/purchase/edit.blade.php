@@ -121,9 +121,6 @@
                                                                     <th class="smaller-font">Item Category <span
                                                                             class="required-classes">*</span>
                                                                     </th>
-                                                                    <th class="smaller-font">Item SubCategory<span
-                                                                            class="required-classes">*</span>
-                                                                    </th>
                                                                     <th class="smaller-font">Quantity(Q) <span
                                                                             class="required-classes">*</span></th>
                                                                     <th class="smaller-font">Unit Price<span
@@ -138,7 +135,7 @@
                                                             </tbody>
                                                             <tfoot>
                                                                 <tr>
-                                                                    <th></th>
+                                                              
                                                                     <th>Total</th>
                                                                     <th>
                                                                         <input type="text"
@@ -159,8 +156,7 @@
                                                                             required readonly>
                                                                     </th>
                                                                     <th></th>
-                                                                    <th></th>
-                                                                    <th></th>
+                                                             
 
                                                                 </tr>
                                                             </tfoot>
@@ -183,15 +179,12 @@
                                                                 var cell5 = newRow.insertCell(4);
                                                                 var cell6 = newRow.insertCell(5);
                                                                 var cell7 = newRow.insertCell(6);
-                                                                var cell8 = newRow.insertCell(7);
-                                                                var cell9 = newRow.insertCell(8);
-                                                                var cell10 = newRow.insertCell(9);
-                                                                var cell11 = newRow.insertCell(10);
+                                                  
 
                                                                 @if($po_item->qty == $po_item->po_rest_qty)
 
                                                                 cell1.innerHTML = `
-    <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);"  style="width:300px!important" class="form-control smaller-font item-select-${lastItemId}" required>
+    <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"  style="width:300px!important" class="form-control smaller-font item-select-${lastItemId}" required>
         <option value="{{ $po_item->item_category }}" selected>{{ $po_item->name }}</option>
         @foreach ($category_2 as $category)
              @if ($po_item->item_category != $category->id)
@@ -201,25 +194,21 @@
     </select>`;
                                                                 $('.item-select-' + lastItemId).select2();
 
-                                                                cell2.innerHTML = `
-    <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}"  required>
-        <option value="{{ $po_item->item_subcategory }}" selected>{{ $po_item->sub_category }}</option>
-    </select>`;
-                                                                $('.subcategory-select').select2();
+                                                               
 
-                                                                cell3.innerHTML =
+                                                                cell2.innerHTML =
                                                                     `
     <input type="number" name="qty[]" id="qty_${lastItemId}" step="any" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" value="{{ $po_item->qty }}"  placeholder="Qty" min="1"  required>`;
 
 
-                                                                cell4.innerHTML =
+                                                                cell3.innerHTML =
                                                                     `
     <input type="number" name="unit_price_[]" value="{{ $po_item->unit_price }}" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" placeholder="Amount"    required  >`;
 
-                                                                cell5.innerHTML =
+                                                                cell4.innerHTML =
                                                                     `
     <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $po_item->price }}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
-                                                                cell6.innerHTML =
+                                                                cell5.innerHTML =
                                                                     `
     <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
 
@@ -235,7 +224,7 @@
                                                                 });
                                                                 @else
                                                                 cell1.innerHTML = `
-    <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);"  style="width:300px!important" class="form-control smaller-font item-select-${lastItemId}" disabled required>
+    <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"  style="width:300px!important" class="form-control smaller-font item-select-${lastItemId}" disabled required>
         <option value="{{ $po_item->item_category }}" selected>{{ $po_item->name }}</option>
         @foreach ($category_2 as $category)
              @if ($po_item->item_category != $category->id)
@@ -245,25 +234,19 @@
     </select>`;
                                                                 $('.item-select-' + lastItemId).select2();
 
-                                                                cell2.innerHTML = `
-    <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}" disabled required>
-        <option value="{{ $po_item->item_subcategory }}" selected>{{ $po_item->sub_category }}</option>
-    </select>`;
-                                                                $('.subcategory-select').select2();
-
-                                                                cell3.innerHTML =
+                                                                cell2.innerHTML =
                                                                     `
     <input type="number" name="qty[]" id="qty_${lastItemId}" step="any" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" value="{{ $po_item->qty }}" disabled placeholder="Qty" min="1"  required>`;
 
 
-                                                                cell4.innerHTML =
+                                                                cell3.innerHTML =
                                                                     `
     <input type="number" name="unit_price_[]" value="{{ $po_item->unit_price }}" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" placeholder="Amount" disabled   required  >`;
 
-                                                                cell5.innerHTML =
+                                                                cell4.innerHTML =
                                                                     `
     <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $po_item->price }}"  class="form-control smaller-font" disabled  placeholder="Price" readonly>`;
-                                                                cell6.innerHTML =
+                                                                cell5.innerHTML =
                                                                     `
     N/A`;
 
@@ -274,9 +257,7 @@
                                                                 });
 
                                                                 // Focus the search box when the subcategory dropdown is opened
-                                                                $('#subcategory_' + lastItemId).on('select2:open', function() {
-                                                                    document.querySelector('.select2-search__field').focus();
-                                                                });
+                                                    
                                                                 @endif
 
 
@@ -299,13 +280,9 @@
                                                             var cell5 = newRow.insertCell(4);
                                                             var cell6 = newRow.insertCell(5);
                                                             var cell7 = newRow.insertCell(6);
-                                                            var cell8 = newRow.insertCell(7);
-                                                            var cell9 = newRow.insertCell(8);
-                                                            var cell10 = newRow.insertCell(9);
-                                                            var cell11 = newRow.insertCell(10);
 
                                                             cell1.innerHTML = `
-                                                            <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this); " style="width:300px" class="form-control smaller-font item-select-${lastItemId}" required>
+                                                            <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"  style="width:300px" class="form-control smaller-font item-select-${lastItemId}" required>
                                                                 <option value="" disabled selected>Select Item</option>
                                                                 @foreach ($category_2 as $category)
                                                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -313,36 +290,25 @@
                                                             </select>`;
                                                             $('.item-select-' + lastItemId).select2();
 
-                                                            cell2.innerHTML = `
-                                                            <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}"  required>
-                                                                <option value="" selected>Select Subcategory</option>
-                                                            </select>`;
-                                                            $('.subcategory-select').select2();
-
-                                                            cell3.innerHTML =
+                                                            cell2.innerHTML =
                                                                 `
                                                             <input type="number" name="qty[]" id="qty_${lastItemId}" step="any" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')"   placeholder="Qty" min="1"  required>`;
 
 
-                                                            cell4.innerHTML =
+                                                            cell3.innerHTML =
                                                                 `
                                                             <input type="number" name="unit_price_[]" value="0" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" placeholder="Amount"    required  >`;
 
-                                                            cell5.innerHTML =
+                                                            cell4.innerHTML =
                                                                 `
                                                             <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
-                                                            cell6.innerHTML =
+                                                            cell5.innerHTML =
                                                                 `
                                                             <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
 
 
                                                             // Focus the search box when the dropdown is opened
                                                             $('.item-select-' + lastItemId).on('select2:open', function() {
-                                                                document.querySelector('.select2-search__field').focus();
-                                                            });
-
-                                                            // Focus the search box when the subcategory dropdown is opened
-                                                            $('#subcategory_' + lastItemId).on('select2:open', function() {
                                                                 document.querySelector('.select2-search__field').focus();
                                                             });
 
@@ -529,7 +495,6 @@
 
     <script>
         function calculatePrice(rowId) {
-            console.log(rowId);
             var qty = document.getElementById(`qty_${rowId}`).value;
             var unitPrice = document.getElementById(`unit_price${rowId}`).value;
             var priceField = document.getElementById(`price_${rowId}`);
@@ -598,315 +563,27 @@
 
         });
 
-
-
-
         document.addEventListener("DOMContentLoaded", function() {
             calculateGrandTotalOnInput();
-
         });
-
-        document.getElementById("freight").addEventListener("input", calculateGrandTotalOnInput);
-        document.getElementById("additional_charges").addEventListener("input", calculateGrandTotalOnInput);
-        document.getElementById("loading").addEventListener("input", calculateGrandTotalOnInput);
 
 
         // function calculateTotal(lastItemId) {
         //     console.log(lastItemId);
 
         // }
-
-
-        function calculateTotal(lastItemId) {
-            var table = document.getElementById("myTable");
-            var rows = table.getElementsByTagName("tr");
-
-            var subtotal = 0;
-            var totalSGST = 0;
-            var totalCGST = 0;
-            var totalIGST = 0;
-            var type = document.getElementById('selected_type').value;
-            // console.log(type);
-
-            for (var i = 1; i < rows.length; i++) {
-                var row = rows[i];
-                var price = parseFloat(row.cells[7].getElementsByTagName("input")[0].value) || 0;
-                var gstInput = row.cells[8].getElementsByTagName("select")[0];
-                var totalInput = row.cells[9].getElementsByTagName("input")[0];
-                let igstInput = row.querySelector('.igst-value');
-                let cgstInput = row.querySelector('.cgst-value');
-                let sgstInput = row.querySelector('.sgst-value');
-
-                var gst_percent = parseFloat(gstInput.value) || 0;
-
-                // Calculate total before tax
-                var totalBeforeTax = weight * price;
-                subtotal += totalBeforeTax;
-                totalInput.value = totalBeforeTax.toFixed(2);
-
-                // Calculate SGST, CGST, or IGST based on state
-                var sgst = 0,
-                    cgst = 0,
-                    igst = 0;
-                if (type === 'state_gst') {
-                    var gst_half = gst_percent / 2;
-                    sgst = totalBeforeTax * gst_half / 100;
-                    cgst = totalBeforeTax * gst_half / 100;
-                    // if (cgst - Math.floor(cgst) > 0.5) {
-                    //     cgst = Math.ceil(cgst);
-                    // } else {
-                    //     cgst = Math.floor(cgst);
-                    // }
-
-                    // if (sgst - Math.floor(sgst) > 0.5) {
-                    //     sgst = Math.ceil(sgst);
-                    // } else {
-                    //     sgst = Math.floor(sgst);
-                    // }
-
-                    sgstInput.value = sgst.toFixed(2);
-                    cgstInput.value = cgst.toFixed(2);
-                    totalSGST += sgst;
-                    totalCGST += cgst;
-                } else {
-                    igst = totalBeforeTax * gst_percent / 100;
-
-                    // if (igst - Math.floor(igst) > 0.5) {
-                    //     igst = Math.ceil(igst);
-                    // } else {
-                    //     igst = Math.floor(igst);
-
-                    // }
-                    igstInput.value = igst.toFixed(2);
-                    totalIGST += igst;
-                }
-
-            }
-
-            // Set total SGST, CGST, IGST to respective input fields
-            if (type === 'state_gst') {
-                document.getElementById("totalSGST").value = totalSGST;
-                document.getElementById("totalCGST").value = totalCGST;
-            } else {
-                document.getElementById("totalIGST").value = totalIGST;
-            }
-
-            // Set subtotal to the input field with ID "material_value"
-            document.getElementById("material_value").value = subtotal.toFixed(2);
-
-            // Calculate grand total after updating the subtotal
-            calculateGrandTotal(subtotal);
-            // updateOverallTotaGST();
-        }
-
-        function calculateGrandTotalOnInput() {
-            var subtotal = parseFloat(document.getElementById("material_value").value) || 0;
-            calculateGrandTotal(subtotal);
-        }
-
-        function calculateGrandTotal(subtotal) {
-            var totalSGST = parseFloat(document.getElementById("totalSGST").value) || 0;
-            var totalCGST = parseFloat(document.getElementById("totalCGST").value) || 0;
-            var totalIGST = parseFloat(document.getElementById("totalIGST").value) || 0;
-            var freight = parseFloat(document.getElementById("freight").value) || 0;
-            var additional_charges = parseFloat(document.getElementById("additional_charges").value) || 0;
-            var loading = parseFloat(document.getElementById("loading").value) || 0;
-            var other_gst = 18;
-
-            var freight_gst = freight * (other_gst / 100);
-            var additional_charges_gst = additional_charges * (other_gst / 100);
-            var loading_gst = loading * (other_gst / 100);
-            var total_other_gst = freight_gst + additional_charges_gst + loading_gst;
-            var totalWithoutTax = subtotal + freight + additional_charges + loading;
-
-            var totalTax = 0;
-            if (totalSGST || totalCGST) {
-
-                var grand_total_cgst = totalCGST + (total_other_gst / 2);
-                // if (grand_total_cgst - Math.floor(grand_total_cgst) > 0.5) {
-                //     grand_total_cgst = Math.ceil(grand_total_cgst);
-                // } else {
-                //     grand_total_cgst = Math.floor(grand_total_cgst);
-                // }
-                document.getElementById("grandcgst").value = grand_total_cgst.toFixed(2);
-                document.getElementById("grandsgst").value = grand_total_cgst.toFixed(2);
-
-
-                totalSGST += total_other_gst / 2;
-                totalCGST += total_other_gst / 2;
-
-                // if (totalSGST - Math.floor(totalSGST) > 0.5) {
-                //     totalSGST = Math.ceil(totalSGST);
-                // } else {
-                //     totalSGST = Math.floor(totalSGST);
-                //     totalCGST = Math.floor(totalSGST);
-                // }
-                totalTax = totalSGST + totalCGST;
-            } else if (totalIGST) {
-                var grand_total_igst = totalIGST + total_other_gst;
-                // if (grand_total_igst - Math.floor(grand_total_igst) > 0.5) {
-                //     grand_total_igst = Math.ceil(grand_total_igst);
-                // } else {
-                //     grand_total_igst = Math.floor(grand_total_igst);
-                // }
-                document.getElementById("grandigst").value = grand_total_igst.toFixed(2);
-
-                totalIGST += total_other_gst;
-                // if (totalIGST - Math.floor(totalIGST) > 0.5) {
-                //     totalIGST = Math.ceil(totalIGST);
-                // } else {
-                //     totalIGST = Math.floor(totalIGST);
-                // }
-                totalTax = totalIGST;
-
-            }
-
-            var grandTotal = totalWithoutTax + totalTax;
-            grandTotal_round = Math.round(grandTotal);
-            document.getElementById("grandTotal").value = grandTotal_round.toFixed(0);
-            // document.getElementById("grandTotal").value = grandTotal.toFixed(2);
-
-            // Update the GST values back to their respective HTML elements
-
-        }
-    </script>
-
-
-    <script>
-        function get_subcategory(selectElement) {
-            let item_id = selectElement.value;
-            let row = selectElement.parentNode.parentNode; // Get the parent row of the select element
-            let subcategorySelect = row.querySelector(
-                '.subcategory-select'); // Find the subcategory select element in the same row
-
-            $.ajax({
-                url: "{{ url('get_subcategory_list') }}",
-                method: "POST",
-                data: {
-                    item_id: item_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-                    let data = JSON.parse(res)
-                    if (data) {
-                        let htmldata = '<option value="">Select Subcategory</option>';
-                        for (let item of data) {
-                            htmldata += `
-                <option value="${item.id}">${item.sub_category}</option>
-            `;
-                        }
-                        subcategorySelect.innerHTML =
-                            htmldata; // Populate the subcategory select element in the same row with dynamic options
-                    }
-                }
-            });
-        }
-    </script>
-
-    <script>
-        function get_subcategory_details(selectElement) {
-            let item_id = selectElement.value;
-
-            let row = selectElement.parentNode.parentNode; // Get the parent row of the select element
-            let subcategorySelect = row.querySelector(
-                '.subcategory-select'); // Find the subcategory select element in the same row
-
-            $.ajax({
-                url: "{{ url('get_subcategory_details') }}",
-                method: "POST",
-                data: {
-                    item_id: item_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-                    let data = JSON.parse(res);
-
-                    if (data) {
-                        let weightInput = row.querySelector('.weight-input');
-                        let priceInput = row.querySelector('.price-input');
-                        let weightInput2 = row.querySelector('.weight-input2');
-                        // const margin =  data.category_price + data.category_margin;
-                        // console.log(margin);
-
-                        let margin = data.category_margin;
-                        let price = data.category_price;
-                        let diff = data.difference;
-                        let total = (Number(margin) + Number(price) + Number(diff)) / 1000;
-
-                        weightInput.value = data.weight;
-                        weightInput2.value = data.weight;
-                        priceInput.value = total.toFixed(2);
-                    }
-                }
-
-            });
-        }
-    </script>
-
-    <script>
-        function get_state() {
-
-
-            var type = $('#selected_type').val();
-            if (type === 'state_gst') {
-                $('#cgst').show();
-                $('#igst').hide();
-                $('#divSGST').show(); // Corrected to jQuery syntax
-                $('#divCGST').show(); // Corrected to jQuery syntax
-                $('#divIGST').hide(); // Corrected to jQuery syntax
-            } else {
-                $('#cgst').hide();
-                $('#igst').show();
-                $('#divSGST').hide(); // Corrected to jQuery syntax
-                $('#divCGST').hide(); // Corrected to jQuery syntax
-                $('#divIGST').show(); // Corrected to jQuery syntax
-            }
-
-        }
-    </script>
-
-    <script>
-        function get_sub_category(selectElement) {
-            let item_id = selectElement.value;
-            let row = selectElement.parentNode.parentNode;
-
-            $.ajax({
-                url: "{{ url('get_sub_category') }}",
-                method: "POST",
-                data: {
-                    item_id: item_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-
-                    // Assuming res is an object with a nested array under key 'subcategory'
-                    let htmldata = '<option value="">Select</option>';
-                    for (let item of res.subcategory) {
-                        htmldata += `
-            <option value="${item.id}">${item.sub_category}</option>
-        `;
-                    }
-                    $(.set_sub_category).html(htmldata);
-                }
-            });
-        }
+ 
     </script>
 
     <script>
         function check_same_data(lastItemId) {
             const currentItemId = document.getElementById(`item_id${lastItemId}`).value;
-            const currentItemSubCategory = document.getElementById(`subcategory_${lastItemId}`).value;
-            // console.log(currentItemId);
-
             let isDuplicate = false;
 
             //  check for duplicates
             for (let i = 1; i < lastItemId; i++) {
                 const itemId = document.getElementById(`item_id${i}`).value;
-                // console.log(currentItemId);
-                const itemSubCategory = document.getElementById(`subcategory_${i}`).value;
-
-                if (currentItemId === itemId && currentItemSubCategory === itemSubCategory) {
+                if (currentItemId === itemId) {
                     // if (currentItemId === itemId ) {
                     isDuplicate = true;
                     break;
