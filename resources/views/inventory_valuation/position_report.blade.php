@@ -204,82 +204,55 @@
                                         {{-- @dd($avgData); --}}
                                         @if (!empty($lifoData))
                                             <!-- Table row with data -->
-                                            {{-- @dump($lifo_transaction);
-                                            @dump($inventory_transaction); --}}
+                                            {{-- @dump($lifo_transaction); @dump($inventory_transaction); --}}
                                             @foreach ($inventory_transaction as $data)
                                                 <tr>
                                                     <td style="padding: 8px;">{{ $data['transaction_date'] }}</td>
                                                     <td style="padding: 8px;">{{ $data['item_name'] ?? 'N/A' }}</td>
                                                     <td style="padding: 8px;">{{ $data['transaction_type'] ?? 'N/A' }}</td>
-
+                                    
+                                                    <!-- LIFO Transactions -->
                                                     @foreach ($lifo_transaction as $lifo_transactions)
                                                         @if ($data['id'] == $lifo_transactions['transaction_id'] && $data['quantity'] == $lifo_transactions['quantity'])
                                                             <td style="padding: 8px;">
                                                                 {{ number_format($lifo_transactions['balance_qty'], 2) ?? 'N/A' }}
                                                             </td>
                                                             <td style="padding: 8px;">
-                                                                <a href="{{ route('show.lifo', $data['id']) }}">
+                                                                <a href="{{ route('show.lifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
                                                                     {{ number_format($lifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
                                                                 </a>
                                                             </td>
                                                         @endif
                                                     @endforeach
-
+                                    
+                                                    <!-- FIFO Transactions -->
                                                     @foreach ($fifo_transaction as $fifo_transactions)
                                                         @if ($data['id'] == $fifo_transactions['transaction_id'] && $data['quantity'] == $fifo_transactions['quantity'])
                                                             <td style="padding: 8px;">
                                                                 {{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}
                                                             </td>
                                                             <td style="padding: 8px;">
-                                                                <a href="{{ route('show.fifo', $data['id']) }}">
+                                                                <a href="{{ route('show.fifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
                                                                     {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
                                                                 </a>
                                                             </td>
                                                         @endif
                                                     @endforeach
-
-                                                    <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}
-                                                    </td>
+                                    
+                                                    <!-- LIFO Manual Match and Netwise -->
+                                                    <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
                                                     <td style="padding: 8px;">
-                                                        <a href="{{ route('show.lifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
-                                                            {{ number_format($lifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
-                                                        </a>
-                                                        
-                                                    </td>
-                                                    @endif
-                                                @endforeach
-                                        
-                                                @foreach($fifo_transaction as $fifo_transactions)
-                                                    @if(
-                                                        ($data['id'] == ($fifo_transactions['transaction_id'])) && 
-                                                        ($data['quantity'] == $fifo_transactions['quantity'])
-                                                    )
-                                                    <td style="padding: 8px;">{{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
-                                                    <td style="padding: 8px;">
-                                                        <a href="{{ route('show.fifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
-                                                            {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                        <a href="{{ route('show.average') }}">
+                                                            N/A
                                                         </a>
                                                     </td>
-                                                    @endif
-                                                @endforeach
-                                        
-                                                <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">
-                                                    <a href="{{ route('show.average') }}">
-                                                        {{-- {{ $avgData['final_balance_value'] ?? 'N/A' }} --}}
-                                                        N/A
-                                                    </a>
-                                                </td>
-                                        
-                                                <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
-                                            </tr>
-                                        @endforeach
-                                        
+                                                    <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
+                                                </tr>
+                                            @endforeach
                                         @else
                                             <!-- No data row -->
                                             <tr>
-                                                <td colspan="7" style="padding: 8px; text-align: center;">No data
-                                                    available</td>
+                                                <td colspan="7" style="padding: 8px; text-align: center;">No data available</td>
                                             </tr>
                                         @endif
                                     </tbody>
