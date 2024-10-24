@@ -402,13 +402,6 @@ class ValuationController extends Controller
     }
 
 
-    public function showLifoReport($id)
-    {
-        $lifoData = $this->calculateLIFO($id);
-
-
-        return view('inventory_valuation.lifo', $lifoData);
-    }
 
 
 public function calculateFIFO($id = null)
@@ -444,6 +437,7 @@ public function calculateFIFO($id = null)
     foreach ($transactions as $transaction) {
         if (strtolower($transaction->transaction_type) === 'purchase') {
           
+            
             // Add purchase to the stack
             $poQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
             $poQty = $poQtyCheck;
@@ -466,6 +460,7 @@ public function calculateFIFO($id = null)
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
                 ];
+                // dump($inventoryStack);
 
             // Update inventory totals
             $totalQuantity += $transaction->quantity;
