@@ -138,6 +138,15 @@
                                     <option value="monthly">Monthly</option>
                                 </select>
                             </div>
+                            <div class="col-md-4 col-sm-6">
+                                <label for="date_filter" class="form-label">Item Name</label>
+                                <select class="form-select" id="category_filter" name="category">
+                                    <option value="">Select Item</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->name }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="col-md-2 col-sm-6" style="margin-top: 7px">
                                 <label for="filterTodate"><strong>From Date</strong></label>
                                 <?php
@@ -156,22 +165,26 @@
                             </div>
                             <div class="col-md-4 col-sm-12 d-flex align-items-end">
 
-                                <button class=" m-1 btn btn-primary" type="button"
+                               
+                                <button class="m-1 btn btn-primary" type="button"
                                     onclick="filterButton(
                                         $('#filterType').val(),  
                                         $('#filterTodate').val(),
                                         $('#filterFromdate').val(),
+                                        $('#category_filter').val() // Add the selected category here
                                     )">
                                     Apply
                                 </button>
 
+
                             </div>
-            
+
                             <!-- Transaction Logs -->
                             <h2>Transaction Logs</h2>
-            
+
                             <div style="overflow-x: auto">
-                                <table class="table table-bordered text-center" id="Category_table" style="width: 100%; border-collapse: collapse;">
+                                <table class="table table-bordered text-center" id="Category_table"
+                                    style="width: 100%; border-collapse: collapse;">
                                     <thead>
                                         <tr style="background-color: #f2f2f2; text-align: center;">
                                             <!-- Table Headers with proper alignment -->
@@ -189,70 +202,69 @@
                                     </thead>
                                     <tbody>
                                         {{-- @dd($avgData); --}}
-                                        @if(!empty($lifoData))
+                                        @if (!empty($lifoData))
                                             <!-- Table row with data -->
                                             {{-- @dump($lifo_transaction);
                                             @dump($inventory_transaction); --}}
-                                            @foreach($inventory_transaction as $data)
-                                            <tr>
-                                                <td style="padding: 8px;">{{ $data['transaction_date'] }}</td>
-                                                <td style="padding: 8px;">{{ $data['item_name'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">{{ $data['transaction_type'] ?? 'N/A' }}</td>
-                                        
-                                                @foreach($lifo_transaction as $lifo_transactions)
-                                                    @if(
-                                                        ($data['id'] == ($lifo_transactions['transaction_id'])) && 
-                                                        ($data['quantity'] == $lifo_transactions['quantity'])
-                                                    )
-                                                    <td style="padding: 8px;">{{ number_format($lifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
+                                            @foreach ($inventory_transaction as $data)
+                                                <tr>
+                                                    <td style="padding: 8px;">{{ $data['transaction_date'] }}</td>
+                                                    <td style="padding: 8px;">{{ $data['item_name'] ?? 'N/A' }}</td>
+                                                    <td style="padding: 8px;">{{ $data['transaction_type'] ?? 'N/A' }}</td>
+
+                                                    @foreach ($lifo_transaction as $lifo_transactions)
+                                                        @if ($data['id'] == $lifo_transactions['transaction_id'] && $data['quantity'] == $lifo_transactions['quantity'])
+                                                            <td style="padding: 8px;">
+                                                                {{ number_format($lifo_transactions['balance_qty'], 2) ?? 'N/A' }}
+                                                            </td>
+                                                            <td style="padding: 8px;">
+                                                                <a href="{{ route('show.lifo', $data['id']) }}">
+                                                                    {{ number_format($lifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                                </a>
+                                                            </td>
+                                                        @endif
+                                                    @endforeach
+
+                                                    @foreach ($fifo_transaction as $fifo_transactions)
+                                                        @if ($data['id'] == $fifo_transactions['transaction_id'] && $data['quantity'] == $fifo_transactions['quantity'])
+                                                            <td style="padding: 8px;">
+                                                                {{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}
+                                                            </td>
+                                                            <td style="padding: 8px;">
+                                                                <a href="{{ route('show.fifo', $data['id']) }}">
+                                                                    {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                                </a>
+                                                            </td>
+                                                        @endif
+                                                    @endforeach
+
+                                                    <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}
+                                                    </td>
                                                     <td style="padding: 8px;">
-                                                        <a href="{{ route('show.lifo', $data['id']) }}">
-                                                            {{ number_format($lifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                        <a href="{{ route('show.average') }}">
+                                                            {{-- {{ $avgData['final_balance_value'] ?? 'N/A' }} --}}
+                                                            N/A
                                                         </a>
                                                     </td>
-                                                    @endif
-                                                @endforeach
-                                        
-                                                @foreach($fifo_transaction as $fifo_transactions)
-                                                    @if(
-                                                        ($data['id'] == ($fifo_transactions['transaction_id'])) && 
-                                                        ($data['quantity'] == $fifo_transactions['quantity'])
-                                                    )
-                                                    <td style="padding: 8px;">{{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
-                                                    <td style="padding: 8px;">
-                                                        <a href="{{ route('show.fifo', $data['id']) }}">
-                                                            {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
-                                                        </a>
-                                                    </td>
-                                                    @endif
-                                                @endforeach
-                                        
-                                                <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
-                                                <td style="padding: 8px;">
-                                                    <a href="{{ route('show.average') }}">
-                                                        {{-- {{ $avgData['final_balance_value'] ?? 'N/A' }} --}}
-                                                        N/A
-                                                    </a>
-                                                </td>
-                                        
-                                                <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
-                                            </tr>
-                                        @endforeach
-                                        
+
+                                                    <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
+                                                </tr>
+                                            @endforeach
                                         @else
                                             <!-- No data row -->
                                             <tr>
-                                                <td colspan="7" style="padding: 8px; text-align: center;">No data available</td>
+                                                <td colspan="7" style="padding: 8px; text-align: center;">No data
+                                                    available</td>
                                             </tr>
                                         @endif
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                         </div>
 
                         <!-- Transaction Logs -->
-                  
+
 
                     </div>
                 </section>
@@ -263,45 +275,7 @@
 
 
 
-        <!-- Modal HTML -->
-        <div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel">Transaction Details</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
 
-                    <table class="table" id="">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Inward No.​</th>
-                                <th>Date(DD/MM/YY)​</th>
-                                <th>Company </th>
-                                <th>Quantity (Q)</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <tr>
-
-
-
-
-                            </tr>
-
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
-        </div>
 
 
         <!-- Final Summary -->
@@ -386,6 +360,107 @@
             });
         }
     </script>
+
+
+<script>
+    function filterButton(filterType, toDate, fromDate, category) {
+        $.ajax({
+            url: '{{ route('item_name.filter_data') }}', // Your route for filtering
+            type: 'GET', // or 'POST' depending on your setup
+            
+            data: {
+                filterType: filterType,
+                to_date: toDate,
+                from_date: fromDate,
+                category: $('#category_filter').val() // Include the selected category
+            },
+
+            success: function(response) {
+                // Access the relevant data based on your returned structure
+                let data = response.inventory_transaction; // Adjusted to match the controller's return
+                console.log(data);
+                // Clear the existing table body
+                $('#Category_table tbody').empty();
+
+                if (!data || data.length === 0) {
+                    $('#Category_table tbody').append(
+                        '<tr><td colspan="10" style="text-align: center;">No data available</td></tr>');
+                    return;
+                }
+
+                // Populate the table with new data
+                data.forEach(item => {
+    let transactionDate = item?.transaction_date || 'N/A';
+    let itemName = item?.item_name || 'N/A';
+    let transactionType = item?.transaction_type || 'N/A';
+
+    let row = `<tr>
+        <td style="padding: 8px;">${transactionDate}</td>
+        <td style="padding: 8px;">${itemName}</td>
+        <td style="padding: 8px;">${transactionType}</td>`;
+
+    // Handle LIFO data
+    let lifoMatched = response.lifo_transaction.find(lifo =>
+        lifo.transaction_id === item.id && lifo.quantity === item.quantity
+    );
+
+    if (lifoMatched) {
+        row += `<td style="padding: 8px;">${lifoMatched.balance_qty || 'N/A'}</td>`;
+        row += `<td style="padding: 8px;"><a href="/show_lifo_report/${item.id}">${formatNumber(lifoMatched.balance_unit_price)}</a></td>`;
+    } else {
+        row += `<td style="padding: 8px;">N/A</td><td style="padding: 8px;">N/A</td>`;
+    }
+
+    // Handle FIFO data
+    let fifoMatched = response.fifo_transaction.find(fifo =>
+        fifo.transaction_id === item.id && fifo.quantity === item.quantity
+    );
+
+    if (fifoMatched) {
+        row += `<td style="padding: 8px;">${formatNumber(fifoMatched.balance_qty)}</td>`;
+        row += `<td style="padding: 8px;"><a href="/show_fifo_report/${item.id}">${formatNumber(fifoMatched.balance_unit_price)}</a></td>`;
+    } else {
+        row += `<td style="padding: 8px;">N/A</td><td style="padding: 8px;">N/A</td>`;
+    }
+
+    // Add manual match, average, and netwise fields
+    row += `<td style="padding: 8px;">${item?.manual_match || 'N/A'}</td>`;
+    row += `<td style="padding: 8px;"><a href="/show_average">${item?.avg_balance_value ? formatNumber(item.avg_balance_value) : 'N/A'}</a></td>`;
+    row += `<td style="padding: 8px;">${item?.netwise || 'N/A'}</td>`;
+
+    row += `</tr>`;
+
+    $('#Category_table tbody').append(row);
+});
+
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data: ", error);
+                // Optionally, show an error message to the user
+            }
+        });
+    }
+
+
+    function number_format(number, decimals = 2) {
+    if (isNaN(number) || number == null) {
+        return 'N/A'; // Return 'N/A' if the input is not a number
+    }
+
+    // Round the number to the specified number of decimals
+    number = parseFloat(number).toFixed(decimals);
+
+    // Convert to string and add comma as thousand separator
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+
+function formatNumber(number) {
+    return number != null && !isNaN(number) ? parseFloat(number).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A';
+}
+
+</script>
+
 
 
 
