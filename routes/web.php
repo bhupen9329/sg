@@ -325,6 +325,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/transaction-details', [ValuationController::class, 'getTransactionDetails'])->name('inventory_valuation.valuation');
         Route::get('/position-report', [ValuationController::class, 'getPositionReport'])->name('position.report');
         Route::post('/get_position_report_list', [ValuationController::class, 'get_position_report_list'])->name('get_position_report_list.report');
+        Route::get('/filter-data', [ValuationController::class, 'filterData'])->name('item_name.filter_data');
 
 
         // .................................................................................................................................................

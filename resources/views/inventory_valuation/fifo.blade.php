@@ -501,11 +501,11 @@
                                         <td>
                                             @if ($log['transaction_type'] === 'Sell')
                                                 <?php
-                                                $profit_loss = $totalSellQty * $log['selling_price'] - $log['cost_of_goods_sold'];
+                                                $profit_loss = ($totalSellQty * $log['selling_price']) - $log['cost_of_goods_sold'];
                                                 ?>
                                             @else
                                                 <?php
-                                                $profit_loss = abs($log['lastPurchaseTotal']) - abs($totalPurchaseValue);
+                                                $profit_loss = abs($totalActualSell) - abs($totalPurchaseValue);
                                                 ?>
                                             @endif
                                             @if ($totalSellQty != 0)
