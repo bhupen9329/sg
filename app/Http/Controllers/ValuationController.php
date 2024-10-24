@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\InventoryTransaction;
 use App\Models\Company;
 use Carbon\Carbon;
+use App\Models\Category;
 use Illuminate\Support\Facades\View;
 
 
@@ -406,7 +407,13 @@ class ValuationController extends Controller
         ];
     }
 
+    public function showLifoReport($id)
+    {
+        $lifoData = $this->calculateLIFO($id);
 
+
+        return view('inventory_valuation.lifo', $lifoData);
+    }
 
 
 public function calculateFIFO($id = null)
@@ -827,6 +834,7 @@ public function calculateFIFO($id = null)
     
     public function getPositionReport()
     {
+        $categories = Category::all();
         $lifoData = $this->calculateLIFO();
         $fifoData = $this->calculateFIFO();        
         $avgData = $this->calculateAverage();
@@ -840,7 +848,7 @@ public function calculateFIFO($id = null)
         // dd( $lifo_transaction,    $fifo_transaction);
 
         
-        return view('inventory_valuation.position_report', compact('inventory_transaction','lifoData','fifoData','avgData', 'lifo_transaction', 'fifo_transaction'));
+        return view('inventory_valuation.position_report', compact('categories','inventory_transaction','lifoData','fifoData','avgData', 'lifo_transaction', 'fifo_transaction'));
     }
 
 
@@ -1139,7 +1147,58 @@ public function calculateFIFO($id = null)
         return view('inventory_valuation.fifo', $fifoData);
     }
 
-
+    public function filterData(Request $request) {
+        // Get input from the request
+        $filterType = $request->input('filterType');
+        $toDate = $request->input('to_date');
+        $fromDate = $request->input('from_date');
+        $categoryName = $request->input('category'); // Get the selected category name
+        // Start the query on the InventoryTransaction model
+        $query = InventoryTransaction::query();
+        
+        // Apply filter type if provided
+        if ($filterType) {
+            $query->where('transaction_type', $filterType);
+        }
+    
+        // Filter by date range if provided
+        if ($toDate) {
+            $query->where('transaction_date', '<=', $toDate);
+        }
+        if ($fromDate) {
+            $query->where('transaction_date', '>=', $fromDate);
+        }
+    
+        // Filter by category if provided
+        if ($categoryName) {
+            $query = InventoryTransaction::where('item_name', $categoryName)->get();
+        }
+        
+        // Fetch the filtered inventory transactions
+        $inventory_transaction =  $query;
+        // dd($inventory_transaction);
+    
+        // Uncomment the dd statement to debug
+        // dd($inventory_transaction);
+        
+        // Calculate LIFO, FIFO, and Average data
+        $lifoData = $this->calculateLIFO();
+        $fifoData = $this->calculateFIFO();
+        $avgData = $this->calculateAverage();
+    
+        // Return the data as a JSON response
+        return response()->json([
+            'inventory_transaction' => $inventory_transaction, // Change this to 'data' to match your frontend code
+            'lifo_transaction' => $lifoData['transaction_logs'],
+            'fifo_transaction' => $fifoData['transaction_logs'],
+            'avgData' => $avgData,
+        ]);
+    }
+    
+    
+    
+    
+    
 
     public function filter(Request $request)
     {
