@@ -21,7 +21,7 @@ class ValuationController extends Controller
     }
 
 
-    public function calculateLIFO($id = null)
+    public function calculateLIFO($id = null,  $item_id = null)
     {
         if ($id) {
             $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
@@ -29,6 +29,7 @@ class ValuationController extends Controller
 
             // Get all transactions up to and including the specific transaction_date
             $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
+                ->where('item_id', $item_id)
                 ->orderBy('transaction_date', 'asc')
                 ->get();
         } else {
@@ -169,7 +170,7 @@ class ValuationController extends Controller
                         }
                     }
                     // dump($lastbalance);
-         
+
                     // If there is remaining unsold quantity (i.e., poQty > 0), it's an excess purchase
 
                     if ($poQty > 0) {
@@ -204,6 +205,7 @@ class ValuationController extends Controller
                     'transaction_type' => 'Purchase',
                     'transaction_id' => $transaction->id,
                     'quantity' => $transaction->quantity,
+                    'item_name' => $transaction->item_name,
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
                     'balance_qty' => $totalQuantity,
@@ -220,7 +222,7 @@ class ValuationController extends Controller
                     'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
                 ];
                 // dump($transactionLogs);
-    
+
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             } elseif (strtolower($transaction->transaction_type) === 'sell') {
 
@@ -366,6 +368,7 @@ class ValuationController extends Controller
                 $transactionLogs[] = [
                     'transaction_type' => 'Sell',
                     'transaction_id' => $transaction->id,
+                    'item_name' => $transaction->item_name,
                     'sell_qty' => $transaction->quantity,
                     'quantity' => abs($transaction->quantity),
                     'selling_price' => $transaction->unit_price,
@@ -384,7 +387,7 @@ class ValuationController extends Controller
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             }
         }
-    
+
         // Final calculations
         // $finalPrice = ($lastTransactionStatus === 'Long') ? $totalValue / $totalQuantity : $totalValue / $totalQuantity;
         $finalPrice = (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0;
@@ -409,412 +412,402 @@ class ValuationController extends Controller
 
 
 
-public function calculateFIFO($id = null)
-{
-    // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-    if ($id) {
-        $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
+    public function calculateFIFO($id = null, $item_id = null)
+    {
+      
         // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+        if ($id) {
+            $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
+        
+            // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
-        // Get all transactions up to and including the specific transaction_date
-        $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
-            ->orderBy('transaction_date', 'asc')
-            ->get();
-    } else {
-        $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')
-            ->get();
-    }
-    $lastTransaction = $transactions->last();
-    $lastTransactionDate = $lastTransaction ? $lastTransaction->transaction_date : null;
+            // Get all transactions up to and including the specific transaction_date
+            $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
+                ->where('item_id', $item_id)
+                ->orderBy('transaction_date', 'asc')
+                ->get();
+            // dd($transactions);
+        } else {
+            $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')
+                ->get();
+        }
+        $lastTransaction = $transactions->last();
+        $lastTransactionDate = $lastTransaction ? $lastTransaction->transaction_date : null;
 
-    $inventoryStack = []; // Holds the purchase transactions for LIFO processing
-    $transactionLogs = []; // Logs all transaction details for reporting
-    $totalQuantity = 0; // Total quantity in inventory
-    $totalValue = 0; // Total value of inventory (based on quantity and unit price)
-    $totalProfitLoss = 0; // Running total of profit/loss from sales
-   // Status of the inventory (Short/Long)
-    $lastPurchasePrice = null; // Last purchase price
-    $lastSellPrice = null; // Last sell price
-    $costOfGoodsPurchased = 0;
+        $inventoryStack = []; // Holds the purchase transactions for LIFO processing
+        $transactionLogs = []; // Logs all transaction details for reporting
+        $totalQuantity = 0; // Total quantity in inventory
+        $totalValue = 0; // Total value of inventory (based on quantity and unit price)
+        $totalProfitLoss = 0; // Running total of profit/loss from sales
+        // Status of the inventory (Short/Long)
+        $lastPurchasePrice = null; // Last purchase price
+        $lastSellPrice = null; // Last sell price
+        $costOfGoodsPurchased = 0;
 
-    $lastTransactionStatus = '';
+        $lastTransactionStatus = '';
 
-    foreach ($transactions as $transaction) {
-        if (strtolower($transaction->transaction_type) === 'purchase') {
-          
-            
-            // Add purchase to the stack
-            $poQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
-            $poQty = $poQtyCheck;
-            $lastPurchasePrice = $transaction->unit_price;
-            $logEntry = [
-                'transaction_type' => 'Purchase',
-                'quantity' => $poQty,
-                'transaction_date' => $transaction->transaction_date,
-                'selling_price' => $transaction->unit_price,
-                'details' => [],
-                'po_qty' => $poQty,
-            ];
+        foreach ($transactions as $transaction) {
+            if (strtolower($transaction->transaction_type) === 'purchase') {
 
-            
-    
-            if($lastTransactionStatus == 'Long' ||  $lastTransactionStatus == '' ){
-              
-                $inventoryStack[] = [
+
+                // Add purchase to the stack
+                $poQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
+                $poQty = $poQtyCheck;
+                $lastPurchasePrice = $transaction->unit_price;
+                $logEntry = [
+                    'transaction_type' => 'Purchase',
+                    'quantity' => $poQty,
+                    'transaction_date' => $transaction->transaction_date,
+                    'selling_price' => $transaction->unit_price,
+                    'details' => [],
+                    'po_qty' => $poQty,
+                ];
+
+
+
+                if ($lastTransactionStatus == 'Long' ||  $lastTransactionStatus == '') {
+
+                    $inventoryStack[] = [
+                        'quantity' => $transaction->quantity,
+                        'unit_price' => $transaction->unit_price,
+                        'transaction_date' => $transaction->transaction_date,
+                    ];
+                    // dump($inventoryStack);
+
+                    // Update inventory totals
+                    $totalQuantity += $transaction->quantity;
+                    $totalValue += $transaction->quantity * $transaction->unit_price;
+                } else {
+                    $lastPurchaseTotal = 0;
+                    $lastPurchaseQty = 0;
+                    while ($poQty > 0 && !empty($inventoryStack)) {
+                        // Get the last purchase (LIFO: Last In First Out)
+                        $lastPurchase = array_shift($inventoryStack);
+                        // $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
+                        // $lastPurchaseTotal +=  $lasttotalValue;
+                        $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
+                        $lastPurchaseTotal +=  $lasttotalValue;
+                        $lastPurchaseQty +=  $lastPurchase['quantity'];
+
+
+                        if ($lastPurchase['quantity'] <= $poQty) {
+                            // Sufficient quantity in the last purchase to fulfill the PO
+                            $costOfGoodsPurchased = $poQty * $lastPurchase['unit_price'];
+                            $remainingQty = $lastPurchase['quantity'] + $poQty;
+
+                            // Update total quantity and value for purchases
+                            $totalQuantity +=  $poQty;  // Assuming adding for purchases
+                            $totalValue +=  $poQty * $lastPurchase['unit_price'];
+
+
+                            // If there is remaining quantity from the last purchase, push it back to the stack
+                            if ($remainingQty < 0) {
+                                $inventoryStack[] = [
+                                    'quantity' => $remainingQty,
+                                    'unit_price' => $lastPurchase['unit_price'],
+                                    'transaction_date' => $lastPurchase['transaction_date'],
+                                ];
+                            } else {
+                            }
+
+                            // Log the purchase details
+
+                            // if()
+
+
+                            if (abs($lastPurchase['quantity']) > $poQty) {
+
+                                if ($lastPurchase['quantity'] > $poQty) {
+                                    $logEntry['details'][] = [
+                                        'used_qty' => $lastPurchase['quantity'] + $poQty,
+                                        'unit_price' => $transaction->unit_price,
+                                        'amount' => $poQty * $transaction->unit_price,
+                                        'remaining_qty' => $remainingQty,
+                                        'remaining_value' => $remainingQty *  $transaction->unit_price,
+                                    ];
+                                } else {
+
+                                    $logEntry['details'][] = [
+                                        'used_qty' => -$poQty,
+                                        'unit_price' => $transaction->unit_price,
+                                        'amount' => $poQty * $transaction->unit_price,
+                                        'remaining_qty' => $remainingQty,
+                                        'remaining_value' => $remainingQty *  $transaction->unit_price,
+                                    ];
+                                }
+                            } else {
+                                if ($lastTransactionStatus == 'Short') {
+                                    $logEntry['details'][] = [
+                                        'used_qty' => $lastPurchase['quantity'],
+                                        'unit_price' => $transaction->unit_price,
+                                        'amount' => $poQty * $transaction->unit_price,
+                                        'remaining_qty' => $remainingQty,
+                                        'remaining_value' => $remainingQty *  $transaction->unit_price,
+                                    ];
+                                }
+                            }
+                            // PO is fulfilled
+
+                            $poQty =  $remainingQty;
+                        } else {
+                            // dd(1);
+                            // Not enough quantity in this purchase, use all of it and continue to the next one
+                            $costOfGoodsPurchased += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+                            $poQty -= $lastPurchase['quantity'];
+                            $totalQuantity += $lastPurchase['quantity']; // Assuming adding for purchases
+                            $totalValue += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+
+
+                            // Log the purchase details for this part
+                            $logEntry['details'][] = [
+                                'used_qty' => $lastPurchase['quantity'],
+                                'unit_price' => $lastPurchase['unit_price'],
+                                'amount' => $lastPurchase['quantity'] * $lastPurchase['unit_price'],
+                                'remaining_qty' => 0,
+                                'remaining_value' => 0,
+                            ];
+                        }
+                    }
+                    // If there is remaining unsold quantity (i.e., poQty > 0), it's an excess purchase
+
+                    if ($poQty > 0) {
+                        // Create a new entry for the excess purchase
+                        $inventoryStack[] = [
+                            'quantity' => $poQty,
+                            'unit_price' => $lastPurchasePrice,
+                            'transaction_date' => $transaction->transaction_date,
+                        ];
+
+                        $totalQuantity =  $poQty;  // Assuming adding for purchases
+                        $totalValue  =  $poQty * $transaction->unit_price;
+                    } else {
+                        // $totalQuantity =  $poQty;  // Assuming adding for purchases
+                        // $totalValue =  $poQty * $transaction->unit_price;
+                    }
+
+                    // Check for totalValue less than 0 after purchases
+                    // if ($totalValue < 0) {
+                    //     // Log the negative total value entry into the inventory stack for purchases
+                    //     $inventoryStack[] = [
+                    //         'quantity' => 0, // No additional quantity since we're just logging a state
+                    //         'unit_price' => 0, // No unit price as this is a negative state
+                    //         'transaction_date' => $transaction->transaction_date,
+                    //         'status' => 'Negative Value', // Custom status for identification
+                    //     ];
+                    // }
+
+                }
+
+                // Log the purchase transaction
+                $transactionLogs[] = [
+                    'transaction_type' => 'Purchase',
+                    'transaction_id' => $transaction->id,
+                    'item_name' => $transaction->item_name,
                     'quantity' => $transaction->quantity,
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue,
+                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+                    // Avoid division by zero
+                    'cost_of_goods_sold' => $costOfGoodsPurchased,
+                    'profit_loss' => 0,
+                    'status' => $totalQuantity < 0 ? 'Short' : 'Long',
+                    'log_amount' => $transaction->quantity * $transaction->unit_price,
+                    'inventory_stack' => array_reverse($inventoryStack),
+                    'details' => $logEntry['details'],
+                    'lastPurchaseTotal' =>  $lastPurchaseTotal ?? 0,
+                    'lastPurchaseQty' => $lastPurchaseQty ?? 0,
+                    'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
                 ];
-                // dump($inventoryStack);
-
-            // Update inventory totals
-            $totalQuantity += $transaction->quantity;
-            $totalValue += $transaction->quantity * $transaction->unit_price;
-            }
-            else{
-                $lastPurchaseTotal = 0;
-                $lastPurchaseQty = 0;
-                while ($poQty > 0 && !empty($inventoryStack)) {
-                    // Get the last purchase (LIFO: Last In First Out)
-                    $lastPurchase = array_shift($inventoryStack);
-                    // $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
-                    // $lastPurchaseTotal +=  $lasttotalValue;
-                    $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
-                    $lastPurchaseTotal +=  $lasttotalValue;
-                    $lastPurchaseQty +=  $lastPurchase['quantity'];
-                 
-                    
-                    if ($lastPurchase['quantity'] <= $poQty) {
-                        // Sufficient quantity in the last purchase to fulfill the PO
-                        $costOfGoodsPurchased = $poQty * $lastPurchase['unit_price'];
-                        $remainingQty = $lastPurchase['quantity'] + $poQty;
-                     
-                        // Update total quantity and value for purchases
-                        $totalQuantity +=  $poQty;  // Assuming adding for purchases
-                        $totalValue +=  $poQty * $lastPurchase['unit_price'];
-                      
-                
-                        // If there is remaining quantity from the last purchase, push it back to the stack
-                        if ($remainingQty < 0) {
-                            $inventoryStack[] = [
-                                'quantity' => $remainingQty,
-                                'unit_price' => $lastPurchase['unit_price'],
-                                'transaction_date' => $lastPurchase['transaction_date'],
-                            ];
-                        }else{
-              
-                        }
-                
-                        // Log the purchase details
-
-                        // if()
-                     
-                
-                    if(abs($lastPurchase['quantity']) > $poQty){
-                   
-                        if( $lastPurchase['quantity'] > $poQty){
-                            $logEntry['details'][] = [
-                                'used_qty' => $lastPurchase['quantity'] + $poQty,
-                                'unit_price' => $transaction->unit_price,
-                                'amount' => $poQty * $transaction->unit_price,
-                                'remaining_qty' => $remainingQty,
-                                'remaining_value' => $remainingQty *  $transaction->unit_price,
-                            ];
-                        }else{
-                            
-                        $logEntry['details'][] = [
-                                'used_qty' => -$poQty,
-                                'unit_price' => $transaction->unit_price,
-                                'amount' => $poQty * $transaction->unit_price,
-                                'remaining_qty' => $remainingQty,
-                                'remaining_value' => $remainingQty *  $transaction->unit_price,
-                            ];
-                        }
-                   
-                    }else{
-                        if( $lastTransactionStatus == 'Short'){
-                            $logEntry['details'][] = [
-                                'used_qty' => $lastPurchase['quantity'],
-                                'unit_price' => $transaction->unit_price,
-                                'amount' => $poQty * $transaction->unit_price,
-                                'remaining_qty' => $remainingQty,
-                                'remaining_value' => $remainingQty *  $transaction->unit_price,
-                            ];
-                        }
-                    }
-                        // PO is fulfilled
-                     
-                        $poQty =  $remainingQty;
-                    } else {
-                        // dd(1);
-                        // Not enough quantity in this purchase, use all of it and continue to the next one
-                        $costOfGoodsPurchased += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-                        $poQty -= $lastPurchase['quantity'];
-                        $totalQuantity += $lastPurchase['quantity']; // Assuming adding for purchases
-                        $totalValue += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-                
-                
-                        // Log the purchase details for this part
-                        $logEntry['details'][] = [
-                            'used_qty' => $lastPurchase['quantity'],
-                            'unit_price' => $lastPurchase['unit_price'],
-                            'amount' => $lastPurchase['quantity'] * $lastPurchase['unit_price'],
-                            'remaining_qty' => 0,
-                            'remaining_value' => 0,
-                        ];
-                  
-                    }
-                    
-                }
-                // If there is remaining unsold quantity (i.e., poQty > 0), it's an excess purchase
-          
-                if ($poQty > 0) {
-                    // Create a new entry for the excess purchase
-                    $inventoryStack[] = [
-                        'quantity' => $poQty,
-                        'unit_price' => $lastPurchasePrice,
-                        'transaction_date' => $transaction->transaction_date,
-                    ];
-                   
-                    $totalQuantity =  $poQty;  // Assuming adding for purchases
-                    $totalValue  =  $poQty * $transaction->unit_price;
-                }
-                else{
-                    // $totalQuantity =  $poQty;  // Assuming adding for purchases
-                    // $totalValue =  $poQty * $transaction->unit_price;
-                }
-
-                // Check for totalValue less than 0 after purchases
-                // if ($totalValue < 0) {
-                //     // Log the negative total value entry into the inventory stack for purchases
-                //     $inventoryStack[] = [
-                //         'quantity' => 0, // No additional quantity since we're just logging a state
-                //         'unit_price' => 0, // No unit price as this is a negative state
-                //         'transaction_date' => $transaction->transaction_date,
-                //         'status' => 'Negative Value', // Custom status for identification
-                //     ];
-                // }
-                
-            }
-
-            // Log the purchase transaction
-            $transactionLogs[] = [
-                'transaction_type' => 'Purchase',
-                'transaction_id' => $transaction->id,
-                'quantity' => $transaction->quantity,
-                'unit_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue,
-                'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
-                // Avoid division by zero
-                'cost_of_goods_sold' => $costOfGoodsPurchased,
-                'profit_loss' => 0,
-                'status' => $totalQuantity < 0 ? 'Short' : 'Long',
-                'log_amount' => $transaction->quantity * $transaction->unit_price,
-                'inventory_stack' => array_reverse($inventoryStack),
-                'details' => $logEntry['details'],
-                'lastPurchaseTotal' =>  $lastPurchaseTotal ?? 0,
-                'lastPurchaseQty' => $lastPurchaseQty ?? 0,
-                'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
-            ];
-
-            
-            $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
-        } 
-        
-        elseif (strtolower($transaction->transaction_type) === 'sell') {
-    
-            $sellQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
-            $sellQty = $sellQtyCheck; // Use absolute value without formatting
-            $costOfGoodsSold = 0; // Cost of goods sold for this transaction
-            $lastSellPrice = $transaction->unit_price;
-            
-            // dump($sellQty);
-            $logEntry = [
-                'transaction_type' => 'Sell',
-                'quantity' => $sellQty,
-                'transaction_date' => $transaction->transaction_date,
-                'selling_price' => $transaction->unit_price,
-                'details' => [],
-                'sell_qty' => $sellQty,
-            ];
 
 
-            if($totalQuantity < 0){
-                $inventoryStack[] = [
-                    'quantity' => -$transaction->quantity,
-                    'unit_price' => $transaction->unit_price,
+                $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
+            } elseif (strtolower($transaction->transaction_type) === 'sell') {
+
+                $sellQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
+                $sellQty = $sellQtyCheck; // Use absolute value without formatting
+                $costOfGoodsSold = 0; // Cost of goods sold for this transaction
+                $lastSellPrice = $transaction->unit_price;
+
+                // dump($sellQty);
+                $logEntry = [
+                    'transaction_type' => 'Sell',
+                    'quantity' => $sellQty,
                     'transaction_date' => $transaction->transaction_date,
+                    'selling_price' => $transaction->unit_price,
+                    'details' => [],
+                    'sell_qty' => $sellQty,
                 ];
 
-                $logEntry['details'][] = [
-                    'used_qty' => 0,
-                    'unit_price' => 0,
-                    'amount' => 0,
-                    'remaining_qty' =>0,
-                    'remaining_value' => 0,
-                ];
 
-            $totalQuantity -= $transaction->quantity;
-            $totalValue -= $transaction->quantity * $transaction->unit_price;
-        
-            }
-            else{
-
-                while ($sellQty > 0 && !empty($inventoryStack)) {
- 
-                    // Get the last purchase (LIFO: Last In First Out)
-                    $lastPurchase = array_shift($inventoryStack);
-            
-                    if ($lastPurchase['quantity'] >= $sellQty) {
-                        // Sufficient quantity in the last purchase to fulfill the sale
-                        $costOfGoodsSold += $sellQty * $lastPurchase['unit_price'];
-                        $remainingQty = $lastPurchase['quantity'] - $sellQty;
-                   
-            
-                        // Update total quantity and value
-                        $totalQuantity -= $sellQty;
-                        $totalValue -= $sellQty * $lastPurchase['unit_price'];
-            
-                        // If there is remaining quantity from the last purchase, push it back to the stack
-                        if ($remainingQty > 0) {
-                            $inventoryStack[] = [
-                                'quantity' => $remainingQty,
-                                'unit_price' => $lastPurchase['unit_price'],
-                                'transaction_date' => $lastPurchase['transaction_date'],
-                            ];
-                        }
-            
-                        // Log the sale details
-            
-                      
-                        if(($totalQuantity > 0)){
-                            $logEntry['details'][] = [
-                                'used_qty' => $sellQty,
-                                'unit_price' => $lastPurchase['unit_price'],
-                                'amount' => $sellQty * $lastPurchase['unit_price'],
-                                'remaining_qty' => $remainingQty,
-                                'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
-                            ];
-                       
-                        }elseif($totalQuantity < 0){
-                            $logEntry['details'][] = [
-                                'used_qty' => '',
-                                'unit_price' => '',
-                                'amount' => $sellQty * $lastPurchase['unit_price'],
-                                'remaining_qty' => $remainingQty,
-                                'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
-                            ];
-                      
-                        }
-                        else{
-                            $logEntry['details'][] = [
-                                'used_qty' => '',
-                                'unit_price' => '',
-                                'amount' => $sellQty * $lastPurchase['unit_price'],
-                                'remaining_qty' => $remainingQty,
-                                'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
-                            ];
-                        }
-              
-            
-                        // Sale is fulfilled
-                        $sellQty = 0;
-                    } else {
-                        // Not enough quantity in this purchase, use all of it and continue to the next one
-                        $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-                        $sellQty -= $lastPurchase['quantity'];
-                        $totalQuantity -= $lastPurchase['quantity'];
-                        $totalValue -= $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-                        // Log the sale details for this part
-                        if($totalQuantity > 0){
-                            $logEntry['details'][] = [
-                                'used_qty' => $lastPurchase['quantity'],
-                                'unit_price' => $lastPurchase['unit_price'],
-                                'amount' => $lastPurchase['quantity'] * $lastPurchase['unit_price'],
-                                'remaining_qty' => 0,
-                                'remaining_value' => 0,
-                            ];
-                        }else{
-                          
-                            $logEntry['details'][] = [
-                                'used_qty' => $lastPurchase['quantity'],
-                                'unit_price' => $lastPurchase['unit_price'],
-                                'amount' => $lastPurchase['quantity'] * $lastPurchase['unit_price'],
-                                'remaining_qty' => 0,
-                                'remaining_value' => 0,
-                            ];
-                        }
-                 
-                    }
-                }
-    
-                // If there is remaining unsold quantity (i.e., sellQty > 0), it's a short sale
-                if ($sellQty > 0) {
-                    // Create a new entry for the short sale
+                if ($totalQuantity < 0) {
                     $inventoryStack[] = [
-                        'quantity' => -$sellQty,
-                        'unit_price' => $lastSellPrice,
+                        'quantity' => -$transaction->quantity,
+                        'unit_price' => $transaction->unit_price,
                         'transaction_date' => $transaction->transaction_date,
                     ];
-                    // Update inventory totals with negative quantity
-                    $totalQuantity -= $sellQty;  // this will be a negative update
-                    $totalValue -= $sellQty * $lastSellPrice; // Account for negative value
+
+                    $logEntry['details'][] = [
+                        'used_qty' => 0,
+                        'unit_price' => 0,
+                        'amount' => 0,
+                        'remaining_qty' => 0,
+                        'remaining_value' => 0,
+                    ];
+
+                    $totalQuantity -= $transaction->quantity;
+                    $totalValue -= $transaction->quantity * $transaction->unit_price;
+                } else {
+
+                    while ($sellQty > 0 && !empty($inventoryStack)) {
+
+                        // Get the last purchase (LIFO: Last In First Out)
+                        $lastPurchase = array_shift($inventoryStack);
+
+                        if ($lastPurchase['quantity'] >= $sellQty) {
+                            // Sufficient quantity in the last purchase to fulfill the sale
+                            $costOfGoodsSold += $sellQty * $lastPurchase['unit_price'];
+                            $remainingQty = $lastPurchase['quantity'] - $sellQty;
+
+
+                            // Update total quantity and value
+                            $totalQuantity -= $sellQty;
+                            $totalValue -= $sellQty * $lastPurchase['unit_price'];
+
+                            // If there is remaining quantity from the last purchase, push it back to the stack
+                            if ($remainingQty > 0) {
+                                $inventoryStack[] = [
+                                    'quantity' => $remainingQty,
+                                    'unit_price' => $lastPurchase['unit_price'],
+                                    'transaction_date' => $lastPurchase['transaction_date'],
+                                ];
+                            }
+
+                            // Log the sale details
+
+
+                            if (($totalQuantity > 0)) {
+                                $logEntry['details'][] = [
+                                    'used_qty' => $sellQty,
+                                    'unit_price' => $lastPurchase['unit_price'],
+                                    'amount' => $sellQty * $lastPurchase['unit_price'],
+                                    'remaining_qty' => $remainingQty,
+                                    'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
+                                ];
+                            } elseif ($totalQuantity < 0) {
+                                $logEntry['details'][] = [
+                                    'used_qty' => '',
+                                    'unit_price' => '',
+                                    'amount' => $sellQty * $lastPurchase['unit_price'],
+                                    'remaining_qty' => $remainingQty,
+                                    'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
+                                ];
+                            } else {
+                                $logEntry['details'][] = [
+                                    'used_qty' => '',
+                                    'unit_price' => '',
+                                    'amount' => $sellQty * $lastPurchase['unit_price'],
+                                    'remaining_qty' => $remainingQty,
+                                    'remaining_value' => $remainingQty * $lastPurchase['unit_price'],
+                                ];
+                            }
+
+
+                            // Sale is fulfilled
+                            $sellQty = 0;
+                        } else {
+                            // Not enough quantity in this purchase, use all of it and continue to the next one
+                            $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+                            $sellQty -= $lastPurchase['quantity'];
+                            $totalQuantity -= $lastPurchase['quantity'];
+                            $totalValue -= $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+                            // Log the sale details for this part
+                            if ($totalQuantity > 0) {
+                                $logEntry['details'][] = [
+                                    'used_qty' => $lastPurchase['quantity'],
+                                    'unit_price' => $lastPurchase['unit_price'],
+                                    'amount' => $lastPurchase['quantity'] * $lastPurchase['unit_price'],
+                                    'remaining_qty' => 0,
+                                    'remaining_value' => 0,
+                                ];
+                            } else {
+
+                                $logEntry['details'][] = [
+                                    'used_qty' => $lastPurchase['quantity'],
+                                    'unit_price' => $lastPurchase['unit_price'],
+                                    'amount' => $lastPurchase['quantity'] * $lastPurchase['unit_price'],
+                                    'remaining_qty' => 0,
+                                    'remaining_value' => 0,
+                                ];
+                            }
+                        }
+                    }
+
+                    // If there is remaining unsold quantity (i.e., sellQty > 0), it's a short sale
+                    if ($sellQty > 0) {
+                        // Create a new entry for the short sale
+                        $inventoryStack[] = [
+                            'quantity' => -$sellQty,
+                            'unit_price' => $lastSellPrice,
+                            'transaction_date' => $transaction->transaction_date,
+                        ];
+                        // Update inventory totals with negative quantity
+                        $totalQuantity -= $sellQty;  // this will be a negative update
+                        $totalValue -= $sellQty * $lastSellPrice; // Account for negative value
+                    }
                 }
 
+                // Calculate profit/loss
+                $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
+                $profitLoss = $totalSaleValue - $costOfGoodsSold;
+                $totalProfitLoss += $profitLoss;
+
+                // Log the sell transaction
+                $transactionLogs[] = [
+                    'transaction_type' => 'Sell',
+                    'transaction_id' => $transaction->id,
+                    'item_name' => $transaction->item_name,
+                    'sell_qty' => $transaction->quantity,
+                    'quantity' => abs($transaction->quantity),
+                    'selling_price' => $transaction->unit_price,
+                    'transaction_date' => $transaction->transaction_date,
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue,
+                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+
+                    'cost_of_goods_sold' => $costOfGoodsSold,
+                    'profit_loss' => $profitLoss,
+                    'total_profit_loss' => $totalProfitLoss,
+                    'details' => $logEntry['details'],
+                    'status' => $totalQuantity < 0 ? 'Short' : 'Long',
+                    'inventory_stack' => array_reverse($inventoryStack),
+                ];
+
+                $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             }
-
-            // Calculate profit/loss
-            $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
-            $profitLoss = $totalSaleValue - $costOfGoodsSold;
-            $totalProfitLoss += $profitLoss;
-
-            // Log the sell transaction
-            $transactionLogs[] = [
-                'transaction_type' => 'Sell',
-                'transaction_id' => $transaction->id,
-                'sell_qty' => $transaction->quantity,
-                'quantity' => abs($transaction->quantity),
-                'selling_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue,
-                'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
-
-                'cost_of_goods_sold' => $costOfGoodsSold,
-                'profit_loss' => $profitLoss,
-                'total_profit_loss' => $totalProfitLoss,
-                'details' => $logEntry['details'],
-                'status' => $totalQuantity < 0 ? 'Short' : 'Long',
-                'inventory_stack' => array_reverse($inventoryStack),
-            ];
-
-            $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
         }
+
+        // Final calculations
+        // $finalPrice = ($lastTransactionStatus === 'Long') ?$totalValue / $totalQuantity : $totalValue / $totalQuantity;
+        $finalPrice = ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0;
+
+
+
+        return [
+            'transaction_logs' => $transactionLogs,
+            'final_balance_qty' => $totalQuantity,
+            'final_balance_value' => $totalValue,
+            'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
+
+            'final_profit_loss' => $totalProfitLoss,
+            'last_transaction_status' => $lastTransactionStatus,
+            'final_price' => $finalPrice,
+            'last_transaction_date' => $lastTransactionDate,
+
+        ];
     }
 
-    // Final calculations
-    // $finalPrice = ($lastTransactionStatus === 'Long') ?$totalValue / $totalQuantity : $totalValue / $totalQuantity;
-    $finalPrice = ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0;
-
-
-
-    return [
-        'transaction_logs' => $transactionLogs,
-        'final_balance_qty' => $totalQuantity,
-        'final_balance_value' => $totalValue,
-        'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
-      
-        'final_profit_loss' => $totalProfitLoss,
-        'last_transaction_status' => $lastTransactionStatus,
-        'final_price' => $finalPrice,
-        'last_transaction_date' => $lastTransactionDate,
-       
-    ];
-
-
-}
 
 
 
@@ -822,25 +815,24 @@ public function calculateFIFO($id = null)
 
 
 
-    
-   
-    
+
+
     public function getPositionReport()
     {
         $lifoData = $this->calculateLIFO();
-        $fifoData = $this->calculateFIFO();        
+        $fifoData = $this->calculateFIFO();
         $avgData = $this->calculateAverage();
 
 
         $inventory_transaction = InventoryTransaction::all();
 
-     
+
         $lifo_transaction  =  $lifoData['transaction_logs'];
         $fifo_transaction =  $fifoData['transaction_logs'];
         // dd( $lifo_transaction,    $fifo_transaction);
 
-        
-        return view('inventory_valuation.position_report', compact('inventory_transaction','lifoData','fifoData','avgData', 'lifo_transaction', 'fifo_transaction'));
+
+        return view('inventory_valuation.position_report', compact('inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction'));
     }
 
 
@@ -968,35 +960,35 @@ public function calculateFIFO($id = null)
     {
         // Retrieve all transactions ordered by the transaction date
         $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-    
+
         // Initialize variables for totals and transaction logs
         $totalQuantity = 0;  // Total inventory quantity
         $totalValue = 0;     // Total inventory value (quantity * cost)
         $totalProfitLoss = 0; // Overall profit/loss from sales
         $transactionLogs = []; // Log each transaction details
         $item_name = ''; // Keep track of the item name
-    
+
         // Array to store the remaining quantity and value of each batch
         $inventoryStack = [];
-    
+
         // Loop through each transaction
         foreach ($transactions as $transaction) {
             // Get the item name from the transaction (assuming all transactions relate to the same item)
             $item_name = $transaction->item_name;
-    
+
             // Handle purchase transactions
             if (strtolower($transaction->transaction_type) === 'purchase') {
                 // Update total inventory quantity and value with the new purchase
                 $totalQuantity += $transaction->quantity;
                 $totalValue += $transaction->quantity * $transaction->unit_price;
-    
+
                 // Add the new purchase to inventory batches
                 $inventoryStack[] = [
                     'quantity' => $transaction->quantity,
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
                 ];
-    
+
                 // Log the purchase details
                 $transactionLogs[] = [
                     'transaction_type' => 'Purchase',
@@ -1028,30 +1020,30 @@ public function calculateFIFO($id = null)
                     'selling_price' => $transaction->unit_price,
                     'details' => [], // Log how the inventory is being sold
                 ];
-    
+
                 // Process the sale using inventory batches (FIFO method)
                 while ($sellQty > 0 && count($inventoryStack) > 0) {
                     $batch = array_shift($inventoryStack); // Get the first batch (FIFO method)
-    
+
                     // Check if the sale quantity can be fulfilled from this batch
                     if ($sellQty <= $batch['quantity']) {
                         // If the sale quantity is less than or equal to the batch quantity
                         $costOfGoodsSold += $sellQty * $batch['unit_price'];
                         $totalUsedQty += $sellQty; // Track total used quantity
                         $batch['quantity'] -= $sellQty;
-    
+
                         // Log the used quantity from this batch
                         $logEntry['details'][] = [
                             'used_qty' => $sellQty,
                             'remaining_qty' => $batch['quantity'],
                             'unit_price' => $batch['unit_price'],
                         ];
-    
+
                         // If there is remaining quantity in the batch, put it back
                         if ($batch['quantity'] > 0) {
                             array_unshift($inventoryStack, $batch);
                         }
-    
+
                         // Update the total quantity and value
                         $totalQuantity -= $sellQty;
                         $totalValue -= $sellQty * $batch['unit_price'];
@@ -1061,31 +1053,31 @@ public function calculateFIFO($id = null)
                         $costOfGoodsSold += $batch['quantity'] * $batch['unit_price'];
                         $totalUsedQty += $batch['quantity']; // Track total used quantity
                         $sellQty -= $batch['quantity'];
-    
+
                         // Log the used quantity from this batch
                         $logEntry['details'][] = [
                             'used_qty' => $batch['quantity'],
                             'remaining_qty' => 0, // Batch is fully used
                             'unit_price' => $batch['unit_price'],
                         ];
-    
+
                         // Update the total quantity and value
                         $totalQuantity -= $batch['quantity'];
                         $totalValue -= $batch['quantity'] * $batch['unit_price'];
                     }
                 }
-    
+
                 // Calculate profit/loss for this transaction
                 $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
                 $profitLoss = $totalSaleValue - $costOfGoodsSold;
                 $totalProfitLoss += $profitLoss;
-    
+
                 // Calculate new average cost using the new formula
-                $averageCost = $totalUsedQty > 0 ? 
-                    (($costOfGoodsSold + ($transaction->unit_price * $totalUsedQty)) / $totalUsedQty) 
+                $averageCost = $totalUsedQty > 0 ?
+                    (($costOfGoodsSold + ($transaction->unit_price * $totalUsedQty)) / $totalUsedQty)
                     : 0;
-                    // dump($averageCost);
-    
+                // dump($averageCost);
+
                 // Log the sale details
                 $transactionLogs[] = [
                     'transaction_type' => 'Sell',
@@ -1105,7 +1097,7 @@ public function calculateFIFO($id = null)
                 ];
             }
         }
-    
+
         // Return the calculated average data and transaction logs
         return [
             'transaction_logs' => $transactionLogs,
@@ -1115,9 +1107,9 @@ public function calculateFIFO($id = null)
             'item_name' => $item_name,
         ];
     }
-    
-    
-    
+
+
+
 
 
     public function showAverageReport()
@@ -1131,12 +1123,18 @@ public function calculateFIFO($id = null)
 
 
 
-    public function showFifoReport($id)
+    public function showFifoReport($id, $item_id)
     {
 
-        $fifoData = $this->calculateFIFO($id);
+        $fifoData = $this->calculateFIFO($id, $item_id);
         //  dd($fifoData);
         return view('inventory_valuation.fifo', $fifoData);
+    }
+
+    public function showLifoReport($id, $item_id)
+    {
+        $lifoData = $this->calculateLIFO($id, $item_id);
+        return view('inventory_valuation.lifo', $lifoData);
     }
 
 

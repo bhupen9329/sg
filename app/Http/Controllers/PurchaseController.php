@@ -39,8 +39,7 @@ class PurchaseController extends Controller
         $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
         ->join('po_items','po_items.po_id','=','purchase_orders.id')
         ->join('categories','categories.id','=','po_items.item_category')
-        ->join('subcategories','subcategories.id','=','po_items.item_subcategory')
-        ->select('*', 'purchase_orders.id as po_id','po_items.*','categories.name as category_name','subcategories.sub_category as sub_category_name')
+        ->select('*', 'purchase_orders.id as po_id','po_items.*','categories.name as category_name')
         ->get();
     
 // dd($po_data);
@@ -87,13 +86,11 @@ class PurchaseController extends Controller
 
         $company = Company::where('id', $request->company_id)->first();
         $custom_due_date = CompanySetting::first();
-        $sub_category = SubCategory::all();
         $category = Category::all();
         $data = [
             'po_id' => $po_id,
             'company' => $company,
             'category' => $category,
-            'sub_category' => $sub_category,
             'custom_due_date' => $custom_due_date,
         ];
         // dd($data);
@@ -130,7 +127,7 @@ class PurchaseController extends Controller
             for ($i = 0; $i < count($request->unit_price_); $i++) {
                 $poItem = new PoItem();
                 $poItem->item_category = $request->item_category[$i];
-                $poItem->item_subcategory = $request->item_subcategory[$i];
+                $poItem->item_subcategory = $request->item_subcategory[$i] ?? 'N/A';
                 $poItem->qty = $request->qty[$i];
                 $poItem->po_rest_qty = $request->qty[$i];
                 $poItem->unit_price = $request->unit_price_[$i];
@@ -150,14 +147,14 @@ class PurchaseController extends Controller
 
                 $categoryName = Category::find($poItem->item_category)->name; 
 
-                $subcategoryName = Subcategory::find($poItem->item_subcategory)->sub_category; 
                 $companyName = Company::find($purchaseOrder->supplier_id)->company_name; 
                 // dd($subcategoryName);
 
               
                 $inventoryTransaction = new InventoryTransaction();
                 $inventoryTransaction->po_item_id =  $newPoItemId; 
-                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
+                $inventoryTransaction->item_name = $categoryName; 
+                $inventoryTransaction->item_id = $poItem->item_category; 
                 $inventoryTransaction->transaction_type = 'purchase'; 
                 $inventoryTransaction->quantity = $poItem->qty;
                 $inventoryTransaction->transaction_date = $request->date; 
@@ -191,7 +188,7 @@ class PurchaseController extends Controller
             $number_of_days = $date->diffInDays($due_date, false);
         }
 
-        $po_items = PoItem::join('categories', 'po_items.item_category', '=', 'categories.id')->join('subcategories','po_items.item_subcategory', '=', 'subcategories.id')->where('po_items.po_id', $id)->where('po_items.po_item_status', 'Open')->get();
+        $po_items = PoItem::join('categories', 'po_items.item_category', '=', 'categories.id')->where('po_items.po_id', $id)->where('po_items.po_item_status', 'Open')->select('categories.*', 'po_items.*', 'po_items.price as price')->get();
 // dd( $po_items);
         $data = [
             'company' => $company,
@@ -241,7 +238,7 @@ class PurchaseController extends Controller
             for ($i = 0; $i < count($request->unit_price_); $i++) {
                 $poItem = new PoItem();
                 $poItem->item_category = $request->item_category[$i];
-                $poItem->item_subcategory = $request->item_subcategory[$i];
+                $poItem->item_subcategory = $request->item_subcategory[$i] ?? 'N/A';
                 $poItem->qty = $request->qty[$i];
                 $poItem->po_rest_qty = $request->qty[$i];
                 $poItem->unit_price = $request->unit_price_[$i];
@@ -261,14 +258,15 @@ class PurchaseController extends Controller
 
                 $categoryName = Category::find($poItem->item_category)->name; 
 
-                $subcategoryName = Subcategory::find($poItem->item_subcategory)->sub_category; 
+              
                 $companyName = Company::find($po_data->supplier_id)->company_name; 
                 // dd($subcategoryName);
 
               
                 $inventoryTransaction = new InventoryTransaction();
                 $inventoryTransaction->po_item_id =  $newPoItemId; 
-                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
+                $inventoryTransaction->item_name = $categoryName; 
+                $inventoryTransaction->item_id = $poItem->item_category; 
                 $inventoryTransaction->transaction_type = 'purchase'; 
                 $inventoryTransaction->quantity = $poItem->qty;
                 $inventoryTransaction->transaction_date = $request->date; 

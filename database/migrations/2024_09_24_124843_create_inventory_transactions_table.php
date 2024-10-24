@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('so_item_id')->nullable();
             $table->date('transaction_date')->nullable();
             $table->string('item_name')->nullable();
+            $table->string('item_id', 20);
             $table->string('company_name')->nullable();
             $table->enum('transaction_type', ['purchase', 'sell'])->nullable();
             $table->decimal('unit_price', 10, 2)->nullable(); 

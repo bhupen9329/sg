@@ -127,9 +127,6 @@
                                                                     <th class="smaller-font">Item Category <span
                                                                             class="required-classes">*</span>
                                                                     </th>
-                                                                    <th class="smaller-font">Item SubCategory<span
-                                                                            class="required-classes">*</span>
-                                                                    </th>
                                                                     <th class="smaller-font">Quantity(Q) <span
                                                                             class="required-classes">*</span></th>
                                                                     <th class="smaller-font">Unit Price<span
@@ -144,7 +141,6 @@
                                                             </tbody>
                                                             <tfoot>
                                                                 <tr>
-                                                                    <th></th>
                                                                     <th>Total</th>
                                                                     <th>
                                                                         <input type="text"
@@ -169,8 +165,7 @@
                                                                             readonly>
                                                                     </th>
                                                                     <th></th>
-                                                                    <th></th>
-                                                                    <th></th>
+                                                              
                                                                 </tr>
                                                             </tfoot>
                                                         </table>
@@ -190,13 +185,8 @@
                                                             var cell5 = newRow.insertCell(4);
                                                             var cell6 = newRow.insertCell(5);
                                                             var cell7 = newRow.insertCell(6);
-                                                            var cell8 = newRow.insertCell(7);
-                                                            var cell9 = newRow.insertCell(8);
-                                                            var cell10 = newRow.insertCell(9);
-                                                            var cell11 = newRow.insertCell(10);
-
                                                             cell1.innerHTML = `
-                                                            <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this); " style="width:300px" class="form-control smaller-font item-select-${lastItemId}" required>
+                                                            <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')" style="width:300px" class="form-control smaller-font item-select-${lastItemId}" required>
                                                                 <option value="" disabled selected>Select Item</option>
                                                                 @foreach ($category as $category)
                                                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -204,25 +194,19 @@
                                                             </select>`;
                                                             $('.item-select-' + lastItemId).select2();
 
-                                                            cell2.innerHTML = `
-                                                            <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}"  required>
-                                                                <option value="" selected>Select Subcategory</option>
-                                                            </select>`;
-                                                            $('.subcategory-select').select2();
-
-                                                            cell3.innerHTML =
+                                                            cell2.innerHTML =
                                                                 `
                                                             <input type="number" name="qty[]" id="qty_${lastItemId}" step="any" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')"   placeholder="Qty" min="1"  required>`;
 
 
-                                                            cell4.innerHTML =
+                                                            cell3.innerHTML =
                                                                 `
                                                             <input type="number" name="unit_price_[]" value="0" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" placeholder="Amount"    required  >`;
 
-                                                            cell5.innerHTML =
+                                                            cell4.innerHTML =
                                                                 `
                                                             <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
-                                                            cell6.innerHTML =
+                                                            cell5.innerHTML =
                                                                 `
                                                             <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
 
@@ -792,7 +776,6 @@
     <script>
         function check_same_data(lastItemId) {
             const currentItemId = document.getElementById(`item_id${lastItemId}`).value;
-            const currentItemSubCategory = document.getElementById(`subcategory_${lastItemId}`).value;
             // console.log(currentItemId);
 
             let isDuplicate = false;
@@ -800,10 +783,8 @@
             //  check for duplicates
             for (let i = 1; i < lastItemId; i++) {
                 const itemId = document.getElementById(`item_id${i}`).value;
-                // console.log(currentItemId);
-                const itemSubCategory = document.getElementById(`subcategory_${i}`).value;
 
-                if (currentItemId === itemId && currentItemSubCategory === itemSubCategory) {
+                if (currentItemId === itemId) {
                     // if (currentItemId === itemId ) {
                     isDuplicate = true;
                     break;

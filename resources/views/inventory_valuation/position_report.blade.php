@@ -206,9 +206,10 @@
                                                     )
                                                     <td style="padding: 8px;">{{ number_format($lifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
                                                     <td style="padding: 8px;">
-                                                        <a href="{{ route('show.lifo', $data['id']) }}">
+                                                        <a href="{{ route('show.lifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
                                                             {{ number_format($lifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
                                                         </a>
+                                                        
                                                     </td>
                                                     @endif
                                                 @endforeach
@@ -220,7 +221,7 @@
                                                     )
                                                     <td style="padding: 8px;">{{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}</td>
                                                     <td style="padding: 8px;">
-                                                        <a href="{{ route('show.fifo', $data['id']) }}">
+                                                        <a href="{{ route('show.fifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
                                                             {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
                                                         </a>
                                                     </td>

@@ -12,6 +12,7 @@ class SoItem extends Model
     protected $fillable = [
         'so_id',
         'so_item_no',
+    
         'item_category',
         'item_subcategory',
         'qty',

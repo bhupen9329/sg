@@ -92,7 +92,6 @@
                                         <th>SO Item Number</th>
                                         <th>Buyer Name(Party Name)</th>
                                         <th>Item Category</th>
-                                        <th>Item Sub-Category</th>
                                         <th>Quantity(Q)</th>                                        
                                         <th>SO Unit Price</th>
                                         <th>SO Price</th>
@@ -114,7 +113,6 @@
                                             <td>{{ $data->so_item_no }}</td>
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->category_name }}</td>
-                                            <td>{{ $data->sub_category_name }}</td>
                                             <td>{{ $data->qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>

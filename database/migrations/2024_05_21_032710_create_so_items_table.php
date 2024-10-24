@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('so_id', 20);
             $table->string('so_item_no', 20);
             $table->string('item_category', 20);
+    
             $table->string('item_subcategory', 50);
             $table->string('qty', 10);
             $table->string('so_rest_qty', 10)->nullable();

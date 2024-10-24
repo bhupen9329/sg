@@ -134,6 +134,7 @@
                                 <tr>
                                     <th>Transaction Date</th>
                                     <th>Transaction Type</th>
+                                    <th>Transaction Item</th>
                                     <th colspan="3" class="text-center">Purchase</th>
                                     <th colspan="3" class="text-center">Sell</th>
 
@@ -149,6 +150,7 @@
                                 </tr>
                                 <tr>
 
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <!-- Purchase   -->
@@ -204,6 +206,7 @@
                                             <a href="javascript:void(0);"
                                                 onclick="showModal(this);">{{ $log['transaction_type'] }}</a>
                                         </td>
+                                        <td>{{ $log['item_name'] }}</td>
                                         <!-- Purchase -->
                                         <td>
                                             @if ($log['transaction_type'] == 'Purchase')

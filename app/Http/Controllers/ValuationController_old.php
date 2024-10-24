@@ -220,9 +220,9 @@ class ValuationController extends Controller
 
     
 
-    public function showLifoReport()
+    public function showLifoReport($id)
 {
-    $lifoData = $this->calculateLIFO(); 
+    $lifoData = $this->calculateLIFO($id); 
     // dd($lifoData); 
  
     return view('inventory_valuation.lifo', $lifoData);  
