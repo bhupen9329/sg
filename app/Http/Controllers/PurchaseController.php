@@ -222,6 +222,14 @@ class PurchaseController extends Controller
             'total_price' => $request->total_price,
         ];
         PurchaseOrder::where('id', $id)->update($data);
+
+        $po_item = PoItem::where('po_id', $id)
+        ->whereColumn('qty', '=', 'po_rest_qty')->get();
+
+        foreach ($po_item as $po_items) {
+            InventoryTransaction::where('po_item_id', $po_items->id)->delete();
+        }
+
         PoItem::where('po_id', $id)
         ->whereColumn('qty', '=', 'po_rest_qty')
         ->delete();
@@ -258,16 +266,16 @@ class PurchaseController extends Controller
                 // dd($subcategoryName);
 
               
-                // $inventoryTransaction = new InventoryTransaction();
-                // $inventoryTransaction->po_item_id =  $newPoItemId; 
-                // $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
-                // $inventoryTransaction->transaction_type = 'purchase'; 
-                // $inventoryTransaction->quantity = $poItem->qty;
-                // $inventoryTransaction->transaction_date = $request->date; 
-                // $inventoryTransaction->unit_price = $poItem->unit_price; 
-                // $inventoryTransaction->company_name = $companyName;
-                // $inventoryTransaction->position = 'open';
-                // $inventoryTransaction->save();
+                $inventoryTransaction = new InventoryTransaction();
+                $inventoryTransaction->po_item_id =  $newPoItemId; 
+                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName; 
+                $inventoryTransaction->transaction_type = 'purchase'; 
+                $inventoryTransaction->quantity = $poItem->qty;
+                $inventoryTransaction->transaction_date = $request->date; 
+                $inventoryTransaction->unit_price = $poItem->unit_price; 
+                $inventoryTransaction->company_name = $companyName;
+                $inventoryTransaction->position = 'open';
+                $inventoryTransaction->save();
             }
     
             // Redirect with success message

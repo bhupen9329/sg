@@ -83,12 +83,13 @@ class ValuationController extends Controller
                     $totalValue += $transaction->quantity * $transaction->unit_price;
                 } else {
                     $lastPurchaseTotal = 0;
+                    $lastPurchaseQty = 0;
                     while ($poQty > 0 && !empty($inventoryStack)) {
                         // Get the last purchase (LIFO: Last In First Out)
                         $lastPurchase = array_pop($inventoryStack);
                         $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
                         $lastPurchaseTotal +=  $lasttotalValue;
-
+                        $lastPurchaseQty +=  $lastPurchase['quantity'];
 
                         if ($lastPurchase['quantity'] <= $poQty) {
                             // Sufficient quantity in the last purchase to fulfill the PO
@@ -113,7 +114,6 @@ class ValuationController extends Controller
                             // Log the purchase details
 
                             // if()
-
 
                             if (abs($lastPurchase['quantity']) > $poQty) {
 
@@ -168,6 +168,8 @@ class ValuationController extends Controller
                             ];
                         }
                     }
+                    // dump($lastbalance);
+         
                     // If there is remaining unsold quantity (i.e., poQty > 0), it's an excess purchase
 
                     if ($poQty > 0) {
@@ -181,10 +183,9 @@ class ValuationController extends Controller
                         $totalQuantity =  $poQty;  // Assuming adding for purchases
                         $totalValue  =  $poQty * $transaction->unit_price;
                     } else {
-                        $totalQuantity =  $poQty;  // Assuming adding for purchases
-                        $totalValue =  $poQty * $transaction->unit_price;
+                        // $totalQuantity =  $poQty;  // Assuming adding for purchases
+                        // $totalValue =  $poQty * $transaction->unit_price;
                     }
-
                     // Check for totalValue less than 0 after purchases
                     // if ($totalValue < 0) {
                     //     // Log the negative total value entry into the inventory stack for purchases
@@ -201,21 +202,25 @@ class ValuationController extends Controller
                 // Log the purchase transaction
                 $transactionLogs[] = [
                     'transaction_type' => 'Purchase',
+                    'transaction_id' => $transaction->id,
                     'quantity' => $transaction->quantity,
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
-                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
-
+                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0,
                     'cost_of_goods_sold' => $costOfGoodsPurchased,
                     'profit_loss' => 0,
                     'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                     'log_amount' => $transaction->quantity * $transaction->unit_price,
                     'inventory_stack' => $inventoryStack,
-                    'details' => $logEntry['details'],
-                    'lastPurchaseTotal' =>  $lastPurchaseTotal ?? 0,
+                    'details' => $logEntry['details'] ?? 'No details provided',
+                    'lastPurchaseTotal' => $lastPurchaseTotal ?? 0,
+                    'lastPurchaseQty' => $lastPurchaseQty ?? 0,
+                    'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
                 ];
+                // dump($transactionLogs);
+    
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             } elseif (strtolower($transaction->transaction_type) === 'sell') {
 
@@ -360,6 +365,7 @@ class ValuationController extends Controller
                 // Log the sell transaction
                 $transactionLogs[] = [
                     'transaction_type' => 'Sell',
+                    'transaction_id' => $transaction->id,
                     'sell_qty' => $transaction->quantity,
                     'quantity' => abs($transaction->quantity),
                     'selling_price' => $transaction->unit_price,
@@ -367,7 +373,6 @@ class ValuationController extends Controller
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
                     'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0, // Avoid division by zero
-
                     'cost_of_goods_sold' => $costOfGoodsSold,
                     'profit_loss' => $profitLoss,
                     'total_profit_loss' => $totalProfitLoss,
@@ -473,11 +478,15 @@ public function calculateFIFO($id = null)
             }
             else{
                 $lastPurchaseTotal = 0;
+                $lastPurchaseQty = 0;
                 while ($poQty > 0 && !empty($inventoryStack)) {
                     // Get the last purchase (LIFO: Last In First Out)
                     $lastPurchase = array_shift($inventoryStack);
+                    // $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
+                    // $lastPurchaseTotal +=  $lasttotalValue;
                     $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
                     $lastPurchaseTotal +=  $lasttotalValue;
+                    $lastPurchaseQty +=  $lastPurchase['quantity'];
                  
                     
                     if ($lastPurchase['quantity'] <= $poQty) {
@@ -576,8 +585,8 @@ public function calculateFIFO($id = null)
                     $totalValue  =  $poQty * $transaction->unit_price;
                 }
                 else{
-                    $totalQuantity =  $poQty;  // Assuming adding for purchases
-                    $totalValue =  $poQty * $transaction->unit_price;
+                    // $totalQuantity =  $poQty;  // Assuming adding for purchases
+                    // $totalValue =  $poQty * $transaction->unit_price;
                 }
 
                 // Check for totalValue less than 0 after purchases
@@ -596,6 +605,7 @@ public function calculateFIFO($id = null)
             // Log the purchase transaction
             $transactionLogs[] = [
                 'transaction_type' => 'Purchase',
+                'transaction_id' => $transaction->id,
                 'quantity' => $transaction->quantity,
                 'unit_price' => $transaction->unit_price,
                 'transaction_date' => $transaction->transaction_date,
@@ -610,6 +620,8 @@ public function calculateFIFO($id = null)
                 'inventory_stack' => array_reverse($inventoryStack),
                 'details' => $logEntry['details'],
                 'lastPurchaseTotal' =>  $lastPurchaseTotal ?? 0,
+                'lastPurchaseQty' => $lastPurchaseQty ?? 0,
+                'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
             ];
 
             
@@ -766,6 +778,7 @@ public function calculateFIFO($id = null)
             // Log the sell transaction
             $transactionLogs[] = [
                 'transaction_type' => 'Sell',
+                'transaction_id' => $transaction->id,
                 'sell_qty' => $transaction->quantity,
                 'quantity' => abs($transaction->quantity),
                 'selling_price' => $transaction->unit_price,
@@ -825,9 +838,11 @@ public function calculateFIFO($id = null)
 
 
         $inventory_transaction = InventoryTransaction::all();
-        // dd($data);
+
+     
         $lifo_transaction  =  $lifoData['transaction_logs'];
         $fifo_transaction =  $fifoData['transaction_logs'];
+        // dd( $lifo_transaction,    $fifo_transaction);
 
         
         return view('inventory_valuation.position_report', compact('inventory_transaction','lifoData','fifoData','avgData', 'lifo_transaction', 'fifo_transaction'));

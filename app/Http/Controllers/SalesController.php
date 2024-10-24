@@ -171,12 +171,12 @@ class SalesController extends Controller
             ->first();
 
 
-            if( $sales_order->due_date != null){
-                $due_date = Carbon::parse($sales_order->due_date);
-                $date = Carbon::parse($sales_order->date);
-        
-                $number_of_days = $date->diffInDays($due_date, false);
-            }
+        if ($sales_order->due_date != null) {
+            $due_date = Carbon::parse($sales_order->due_date);
+            $date = Carbon::parse($sales_order->date);
+
+            $number_of_days = $date->diffInDays($due_date, false);
+        }
 
 
         // dd($number_of_days);
@@ -190,18 +190,18 @@ class SalesController extends Controller
         $gstsetting = GstSetting::all();
         $so_number = $sales_order->so_number;
 
-        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->join('subcategories','so_items.item_subcategory', '=', 'subcategories.id')->where('so_items.so_id', $id)->get();
-    //   dd( $so_items);
+        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->join('subcategories', 'so_items.item_subcategory', '=', 'subcategories.id')->where('so_items.so_id', $id)->get();
+        //   dd( $so_items);
         $data = [
             'company' => $company,
             'category' => $category,
             'gstsetting' => $gstsetting,
             'so_number' => $so_number,
             'custom_due_date' => $custom_due_date,
-            'number_of_days'=> $number_of_days,
+            'number_of_days' => $number_of_days,
             'sales_order' => $sales_order,
             'so_items' => $so_items,
-            'category_2'=> $category_2
+            'category_2' => $category_2
         ];
         // dd($data);
         return view('sales.edit')->with($data);
@@ -209,57 +209,61 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
-   
+
         $sales_order = SalesOrder::where('id', $id)->first();
 
-            $data = [
-                'date' => $request->date,
-                'due_date' => $request->due_date,
-                'terms_condition' =>  $request->terms_condition,
-                'total_quantity' => $request->total_quantity,
-                'total_amount' => $request->total_amount,
-                'total_price' => $request->total_price,
-            ];
-            SalesOrder::where('id', $id)->update($data);
-            SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->delete();
+        $data = [
+            'date' => $request->date,
+            'due_date' => $request->due_date,
+            'terms_condition' =>  $request->terms_condition,
+            'total_quantity' => $request->total_quantity,
+            'total_amount' => $request->total_amount,
+            'total_price' => $request->total_price,
+        ];
+        SalesOrder::where('id', $id)->update($data);
+        $so_item = SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->get();
+        foreach ($so_item as $so_items) {
+            InventoryTransaction::where('so_item_id', $so_items->id)->delete();
+        }
 
-            if ($id) {
-                for ($i = 0; $i < count($request->unit_price_); $i++) {
-                    $soItem = new SoItem();
-                    $soItem->item_category = $request->item_category[$i];
-                    $soItem->item_subcategory = $request->item_subcategory[$i];
-                    $soItem->qty = $request->qty[$i];
-                    $soItem->so_rest_qty = $request->qty[$i];
-                    $soItem->unit_price = $request->unit_price_[$i];
-                    $soItem->price = $request->price[$i];
-                    $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
-                    $soItem->so_item_no = $sales_order->so_number . '-' . $itemSerial;
-                    $soItem->so_id = $id;
-    
-                    $soItem->save();
-                    $newSoItemId = $soItem->id;
-    
-                    $categoryName = Category::find($soItem->item_category)->name;
-    
-                    $subcategoryName = Subcategory::find($soItem->item_subcategory)->sub_category;
-                    $companyName = Company::find($sales_order->company_id)->company_name;
-                    // dd($subcategoryName);
-    
-    
-                    // $inventoryTransaction = new InventoryTransaction();
-                    // $inventoryTransaction->so_item_id = $newSoItemId;
-                    // $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
-                    // $inventoryTransaction->transaction_type = 'sell';
-                    // $inventoryTransaction->quantity = $soItem->qty;
-                    // $inventoryTransaction->transaction_date =  $request->date;
-                    // $inventoryTransaction->unit_price = $soItem->unit_price;
-                    // $inventoryTransaction->company_name = $companyName;
-                    // $inventoryTransaction->position = 'open';
-                    // $inventoryTransaction->save();
-                }
-                return redirect()->route('sales.index')->with('update', 'Sales Orders Updated Successfully');;
+        SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->delete();
+
+        if ($id) {
+            for ($i = 0; $i < count($request->unit_price_); $i++) {
+                $soItem = new SoItem();
+                $soItem->item_category = $request->item_category[$i];
+                $soItem->item_subcategory = $request->item_subcategory[$i];
+                $soItem->qty = $request->qty[$i];
+                $soItem->so_rest_qty = $request->qty[$i];
+                $soItem->unit_price = $request->unit_price_[$i];
+                $soItem->price = $request->price[$i];
+                $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+                $soItem->so_item_no = $sales_order->so_number . '-' . $itemSerial;
+                $soItem->so_id = $id;
+
+                $soItem->save();
+                $newSoItemId = $soItem->id;
+
+                $categoryName = Category::find($soItem->item_category)->name;
+
+                $subcategoryName = Subcategory::find($soItem->item_subcategory)->sub_category;
+                $companyName = Company::find($sales_order->company_id)->company_name;
+                // dd($subcategoryName);
+
+
+                $inventoryTransaction = new InventoryTransaction();
+                $inventoryTransaction->so_item_id = $newSoItemId;
+                $inventoryTransaction->item_name = $categoryName . ' - ' . $subcategoryName;
+                $inventoryTransaction->transaction_type = 'sell';
+                $inventoryTransaction->quantity = $soItem->qty;
+                $inventoryTransaction->transaction_date =  $request->date;
+                $inventoryTransaction->unit_price = $soItem->unit_price;
+                $inventoryTransaction->company_name = $companyName;
+                $inventoryTransaction->position = 'open';
+                $inventoryTransaction->save();
             }
-        
+            return redirect()->route('sales.index')->with('update', 'Sales Orders Updated Successfully');;
+        }
     }
 
     public function show($id)

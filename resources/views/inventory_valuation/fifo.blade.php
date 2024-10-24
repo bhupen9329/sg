@@ -435,6 +435,7 @@
 
                                         {{-- Actual Sales --}}
 
+                                  
                                         <td>
                                             @if ($log['transaction_type'] == 'Sell')
                                                 {{ number_format(abs($totalSellQty), 2) }}
@@ -447,7 +448,7 @@
                                             @if ($log['transaction_type'] == 'Purchase')
                                                 <?php
                                                 if ($totalSellQty != 0) {
-                                                    $unit_sell_price = $log['lastPurchaseTotal'] / $totalSellQty;
+                                                    $unit_sell_price = $log['lastbalancePurchase'];
                                                 } else {
                                                     $unit_sell_price = 0; // Handle the case when $totalSellQty is zero
                                                 }
@@ -475,8 +476,14 @@
                                                 {{ number_format($totalSellQty * $log['selling_price'], 2) }}
                                             @else
                                             @if(abs($totalSellQty) > 0)
-                                                {{ number_format(abs($log['lastPurchaseTotal']), 2) }}
+                                            <?php
+                                                $totalActualSell = ($unit_sell_price * $totalSellQty);
+                                            ?>
+                                                {{ number_format(abs($totalActualSell), 2) }}
                                                 @else
+                                                <?php
+                                                $totalActualSell = 0;
+                                            ?>
                                                 0
                                             @endif
                                             @endif
