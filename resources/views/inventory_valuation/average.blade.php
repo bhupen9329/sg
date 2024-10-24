@@ -131,72 +131,409 @@
                             <h1>Average Cost Inventory</h1>
                             <h2>Item: {{ $item_name }}</h2>
                         
-                            <table class="table">
+                            <table class="table table-bordered xl">
                                 <thead>
                                     <tr>
-                                        <th>Transaction Type</th>
-                                        <th>Quantity</th>
-                                        <th>Unit Price</th>
                                         <th>Transaction Date</th>
-                                        <th>Balance Quantity</th>
-                                        <th>Balance Value</th>
-                                        <th>Average Cost</th>
-                                        <th>Cost of Goods Sold</th>
+                                        <th>Transaction Type</th>
+                                        <th colspan="3" class="text-center">Purchase</th>
+                                        <th colspan="3" class="text-center">Sell</th>
+    
+                                        <th colspan="3" class="text-center">Used Qty</th>
+                                        <th colspan="4" class="text-center">Balance(INVENTORY STACK)</th>
+                                        <th colspan="4" class="text-center">Stock Balance</th>
+                                        <th colspan="3" class="text-center">Cost of Goods Sold(COGS)</th>
+                                        <th colspan="3" class="text-center">Actual Sales</th>
                                         <th>Profit/Loss</th>
+                                        <th>Status</th>
+                                        {{-- <th>Break Even Unit Price</th> --}}
+                                        <th>Action</th>
                                     </tr>
+                                    <tr>
+    
+                                        <th></th>
+                                        <th></th>
+                                        <!-- Purchase   -->
+                                        <th class="text-center">Qty MT </th>
+                                        <th class="text-center">Rate</th>
+                                        <th class="text-center">Amount</th>
+                                        <!-- Sell -->
+                                        <th class="text-center">Qty MT </th>
+                                        <th class="text-center">Rate</th>
+                                        <th class="text-center">Amount</th>
+    
+    
+    
+                                        <!-- Used Qty -->
+                                        <th class="text-center">Qty MT </th>
+                                        <th class="text-center">Rate</th>
+                                        <th class="text-center">Amount</th>
+    
+                                        <!-- Balance -->
+                                        <th class="text-center">Purchase Date </th>
+                                        <th class="text-center">Qty MT </th>
+                                        <th class="text-center">Rate</th>
+                                        <th class="text-center">Amount</th>
+    
+    
+    
+                                        <!-- Stock balance -->
+                                        <th class="text-center">Bal Qty </th>
+                                        <th class="text-center">Bal Value</th>
+                                        <th class="text-center">Bal Unit Price</th>
+                                        <th class="text-center">Position</th>
+    
+                                        <!-- COGS -->
+                                        <th class="text-center">Qty </th>
+                                        <th class="text-center">Unit COGS Price</th>
+                                        <th class="text-center">COGS</th>
+    
+                                        <!-- Actual Sales -->
+                                        <th class="text-center">Qty </th>
+                                        <th class="text-center">Unit Sell Price </th>
+                                        <th class="text-center">Sales</th>
+    
+                                    </tr>
+    
                                 </thead>
                                 <tbody>
-                                    @foreach($transaction_logs as $log)
+                                    {{-- @dd($transaction_logs); --}}
+                                    @foreach ($transaction_logs as $log)
                                         <tr>
-                                            <td>{{ $log['transaction_type'] }}</td>
-                                            <td>{{ $log['quantity'] }}</td>
+                                            <td>{{ $log['transaction_date'] }}</td>
+                                            <td class="transaction-type"
+                                                @if (isset($log['details'])) data-details="{{ json_encode($log['details']) }}" @endif>
+                                                <a href="javascript:void(0);"
+                                                    onclick="showModal(this);">{{ $log['transaction_type'] }}</a>
+                                            </td>
+                                            <!-- Purchase -->
                                             <td>
-                                                @if(isset($log['selling_price']))
-                                                    {{ number_format($log['selling_price'], 2) }}
-                                                @else
-                                                    {{ number_format($log['unit_price'], 2) }}
+                                                @if ($log['transaction_type'] == 'Purchase')
+                                                    +{{ number_format($log['quantity'], 2) }}
                                                 @endif
                                             </td>
-                                            <td>{{ \Carbon\Carbon::parse($log['transaction_date'])->format('Y-m-d') }}</td>
-                                            <td>{{ $log['balance_qty'] }}</td>
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Purchase')
+                                                    {{ isset($log['unit_price']) ? number_format($log['unit_price'], 2) : 'N/A' }}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Purchase' && isset($log['unit_price']))
+                                                    {{ number_format($log['quantity'] * $log['unit_price'], 2) }}
+                                                    <!-- Calculate Total Value -->
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </td>
+    
+    
+    
+                                            <!-- Sell -->
+    
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Sell')
+                                                    {{-- -{{ number_format($log['sell_qty'], 2) }} --}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Sell')
+                                                    {{-- @dd($log['selling_price']); --}}
+                                                    {{ isset($log['selling_price']) ? number_format($log['selling_price'], 2) : 'N/A' }}
+                                                @else
+                                                @endif
+                                            </td>
+    
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Sell' && isset($log['selling_price']))
+                                                    {{ number_format($log['quantity'] * $log['selling_price'], 2) }}
+                                                    <!-- Calculate Total Value -->
+                                                @else
+                                                @endif
+                                            </td>
+    
+    
+    
+    
+    
+                                            {{-- Sell COGS --}}
+                                            <td>
+                                                <?php
+                                                $totalUsedQty = 0;
+                                                $totalPurchaseQty = 0;
+                                                $totalSellQty = 0;
+                                                ?>
+                                                @if (isset($log['details']) && is_array($log['details']))
+                                                    @foreach ($log['details'] as $detail)
+                                                        @if ($log['transaction_type'] == 'Sell')
+                                                            <?php $totalPurchaseQty += $detail['used_qty']; ?>
+                                                            <!-- Display purchase details -->
+                                                            <div>
+                                                                {{ number_format($detail['used_qty'], 2) }},
+    
+                                                            </div>
+                                                        @else
+                                                            <?php $totalPurchaseQty += $detail['used_qty']; ?>
+                                                            <!-- Display purchase details -->
+                                                            <div>
+                                                                {{ number_format($detail['used_qty'], 2) }},
+    
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+    
+                                            </td>
+    
+    
+                                            <td>
+                                                <?php
+                                                $totalUsedQty = 0;
+                                                $totalPurchaseQty = 0;
+                                                $totalSellQty = 0;
+                                                ?>
+                                                @if (isset($log['details']) && is_array($log['details']))
+                                                    @foreach ($log['details'] as $detail)
+                                                        @if ($log['transaction_type'] == 'Sell')
+                                                            <?php $totalPurchaseQty += $detail['used_qty']; ?>
+                                                            <div>
+                                                                {{ number_format($detail['unit_price'], 2) }}
+                                                            </div>
+                                                        @else
+                                                            <?php $totalPurchaseQty += $detail['used_qty']; ?>
+                                                            <!-- Display purchase details -->
+                                                            <div>
+                                                                {{ number_format($detail['unit_price'], 2) }},
+    
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+    
+    
+                                            </td>
+    
+                                            <td>
+                                                <?php
+                                                $totalUsedQty = 0;
+                                                $totalPurchaseQty = 0;
+                                                $totalSellQty = 0;
+                                                $totalPurchaseValue = 0;
+                                                $totalSellValue = 0;
+                                                ?>
+                                                @if (isset($log['details']) && is_array($log['details']))
+                                                    @foreach ($log['details'] as $detail)
+                                                        @if ($log['transaction_type'] == 'Purchase')
+                                                            <?php
+                                                            $totalPurchaseQty += $detail['used_qty'];
+                                                            $purchaseValue = $detail['used_qty'] * $detail['unit_price'];
+                                                            $totalPurchaseValue += $purchaseValue;
+                                                            ?>
+                                                            <div>
+                                                                {{ number_format($purchaseValue, 2) }}
+                                                            </div>
+                                                        @elseif ($log['transaction_type'] == 'Sell')
+                                                            <?php
+                                                            $totalSellQty += $detail['used_qty'];
+                                                            $sellValue = $detail['used_qty'] * $detail['unit_price'];
+                                                            $totalSellValue += $sellValue;
+                                                            ?>
+                                                            <div>
+                                                                {{ number_format($sellValue, 2) }}
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                @else
+                                                    N/A
+                                                @endif
+    
+    
+                                            </td>
+    
+                                            <!--Balance -->
+                                            <td>
+                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                    {{ $stack['transaction_date'] }}<br>
+                                                    <hr>
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                    {{ number_format($stack['quantity'], 2) }}<br>
+                                                    <hr>
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                    {{ number_format($stack['unit_price'], 2) }}<br>
+                                                    <hr>
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                    {{ number_format($stack['quantity'] * $stack['unit_price'], 2) }}<br>
+                                                    <hr>
+                                                @endforeach
+                                            </td>
+    
+    
+                                            <!-- Stock balance -->
+                                            <td>{{ number_format($log['balance_qty'], 2) }}</td>
                                             <td>{{ number_format($log['balance_value'], 2) }}</td>
-                                            <td>{{ number_format($log['average_cost'], 2) }}</td>
-                                            <td>{{ isset($log['cost_of_goods_sold']) ? number_format($log['cost_of_goods_sold'], 2) : 'N/A' }}</td>
-                                            <td>{{ number_format($log['profit_loss'], 2) }}</td>
+                                            <td>{{ number_format($log['balance_unit_price'], 2) }}</td>
+                                            <td>{{ $log['status'] }}</td>
+    
+                                            <!-- COGS details -->
+    
+                                            <td>
+                                                <?php
+                                                $totalSellQty = 0;
+                                                $totalSellValue = 0;
+                                                ?>
+                                                @if (isset($log['details']) && is_array($log['details']))
+                                                    @foreach ($log['details'] as $detail)
+                                                        <?php
+                                                        $totalSellQty += $detail['used_qty'];
+                                                        ?>
+                                                    @endforeach
+                                                @else
+                                                    N/A
+                                                @endif
+                                                <div>
+                                                    {{ number_format(abs($totalSellQty), 2) }} <br>
+                                                </div>
+                                            </td>
+    
+                                            <?php
+                                            $unit_cogs_price = 0; // Default value
+                                            
+                                            if ($totalSellQty > 0) {
+                                                $unit_cogs_price = $log['cost_of_goods_sold'] / $totalSellQty;
+                                            } else {
+                                                // dd( $totalSellQty);
+                                                if ($totalSellQty != 0) {
+                                                    $unit_cogs_price = $totalPurchaseValue / $totalSellQty ?? 0;
+                                                } else {
+                                                    $unit_cogs_price = 0;
+                                                }
+                                            }
+                                            ?>
+                                            <td>
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    {{ number_format($unit_cogs_price, 2) }}
+                                                @else
+                                                    {{ number_format($unit_cogs_price, 2) }}
+                                                @endif
+                                            </td>
+    
+    
+                                            <td>
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    {{ number_format($log['cost_of_goods_sold'] ?? 0, 2) }}
+                                                @else
+                                                    {{ number_format(abs($totalPurchaseValue) ?? 0, 2) }}
+                                                @endif
+                                            </td>
+    
+    
+                                            {{-- Actual Sales --}}
+    
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Sell')
+                                                    {{ number_format(abs($totalSellQty), 2) }}
+                                                @else
+                                                    {{ number_format(abs($totalSellQty), 2) }}
+                                                @endif
+                                            </td>
+    
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Purchase')
+                                                    <?php
+                                                    if ($totalSellQty != 0) {
+                                                        $unit_sell_price = $log['lastPurchaseTotal'] / $totalSellQty;
+                                                    } else {
+                                                        $unit_sell_price = 0; // Handle the case when $totalSellQty is zero
+                                                    }
+                                                    ?>
+    
+                                                    {{ number_format($unit_sell_price, 2 ?? 0) }}
+                                                @else
+                                                    @if ($totalSellQty > 0)
+                                                        @if (isset($log['selling_price']))
+                                                            {{ number_format($log['selling_price'], 2) }}
+                                                        @else
+                                                        @endif
+                                                    @else
+                                                        0
+                                                    @endif
+                                                @endif
+    
+    
+    
+                                            </td>
+    
+                                            <td>
+                                                @if ($log['transaction_type'] == 'Sell')
+                                                    {{-- Calculate total sale (sell_qty * selling_price) --}}
+                                                    {{ number_format($totalSellQty * $log['selling_price'], 2) }}
+                                                @else
+                                                @if(abs($totalSellQty) > 0)
+                                                    {{ number_format(abs($log['lastPurchaseTotal']), 2) }}
+                                                    @else
+                                                    0
+                                                @endif
+                                                @endif
+                                            </td>
+    
+    
+    
+    
+                                            {{-- @dd($transaction_logs); --}}
+    
+    
+                                            <td>
+                                                @if ($log['transaction_type'] === 'Sell')
+                                                    <?php
+                                                    $profit_loss = $totalSellQty * $log['selling_price'] - $log['cost_of_goods_sold'];
+                                                    ?>
+                                                @else
+                                                    <?php
+                                                    // $profit_loss = abs($log['lastPurchaseTotal']) - abs($totalPurchaseValue);
+                                                    ?>
+                                                @endif
+                                                @if ($totalSellQty != 0)
+                                                    {{ number_format($profit_loss ?? 0, 2) }}
+                                                @else
+                                                    0
+                                                @endif
+    
+                                            </td>
+    
+                                            <td>
+                                                <strong>
+                                                    @if ($totalSellQty != 0)
+                                                        @if ($profit_loss > 0)
+                                                            Profit
+                                                        @elseif ($profit_loss < 0)
+                                                            Loss
+                                                        @endif
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </strong>
+    
+                                            </td>
+    
+                                            {{-- <td>{{ number_format($log['profit_loss'] ?? 0, 2) }}</td> --}}
+                                            <td><button type="button" class="btn btn-info" data-toggle="modal"
+                                                    data-target="#transactionModal"
+                                                    data-details='@json($log)'>View
+                                                    Transaction</button></td>
                                         </tr>
-                                        @if(isset($log['details']) && count($log['details']) > 0)
-                                            <tr>
-                                                <td colspan="9">
-                                                    <table class="table table-sm">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Used Quantity</th>
-                                                                <th>Unit Price</th>
-                                                                <th>Remaining Quantity</th>
-                                                                <th>Remaining Value</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($log['details'] as $detail)
-                                                                <tr>
-                                                                    <td>{{ $detail['used_qty'] }}</td>
-                                                                    <td>{{ number_format($detail['unit_price'], 2) }}</td>
-                                                                    <td>{{ $detail['remaining_qty'] }}</td>
-                                                                    <td>{{ number_format($detail['remaining_value'], 2) }}</td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
                         
-                            <p>Total Quantity: {{ $final_balance_qty }}</p>
-                            <p>Total Value: {{ number_format($final_balance_value, 2) }}</p>
-                            <p>Total Profit/Loss: {{ number_format($final_profit_loss, 2) }}</p>
+                           
                         </div>
                     </section>
                 </div>
