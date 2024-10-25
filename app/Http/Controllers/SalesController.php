@@ -226,6 +226,7 @@ class SalesController extends Controller
         SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->delete();
 
         if ($id) {
+            if(isset($request->unit_price_) >  0){
             for ($i = 0; $i < count($request->unit_price_); $i++) {
                 $soItem = new SoItem();
                 $soItem->item_category = $request->item_category[$i];
@@ -234,7 +235,16 @@ class SalesController extends Controller
                 $soItem->so_rest_qty = $request->qty[$i];
                 $soItem->unit_price = $request->unit_price_[$i];
                 $soItem->price = $request->price[$i];
-                $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+                $so_item_available = SoItem::where('so_id', $id)->latest()->first();
+
+                if ($so_item_available) {
+                    // Extract the last two digits from `so_item_no` to get the current serial number
+                    $lastSerialNumber = (int)substr($so_item_available->so_item_no, -2);
+                    $itemSerial = str_pad($lastSerialNumber + 1, 2, '0', STR_PAD_LEFT);
+                } else {
+                    // Start from '01' if no previous item exists
+                    $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+                }
                 $soItem->so_item_no = $sales_order->so_number . '-' . $itemSerial;
                 $soItem->so_id = $id;
 
@@ -261,6 +271,9 @@ class SalesController extends Controller
                 $inventoryTransaction->position = 'open';
                 $inventoryTransaction->save();
             }
+        }else{
+            
+        }
             return redirect()->route('sales.index')->with('update', 'Sales Orders Updated Successfully');;
         }
     }
