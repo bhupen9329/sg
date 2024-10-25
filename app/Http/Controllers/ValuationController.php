@@ -24,7 +24,7 @@ class ValuationController extends Controller
 
     public function calculateLIFO($id = null,  $item_id = null)
     {
-        if ($id) {
+        if ($id && $item_id ) {
             $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
             // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
@@ -33,7 +33,14 @@ class ValuationController extends Controller
                 ->where('item_id', $item_id)
                 ->orderBy('transaction_date', 'asc')
                 ->get();
-        } else {
+        }elseif( $item_id){
+            $transactions = InventoryTransaction::
+              where('item_id', $item_id)
+            ->orderBy('transaction_date', 'asc')
+            ->get();
+        }
+        
+        else {
             $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')
                 ->get();
         }

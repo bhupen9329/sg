@@ -119,7 +119,7 @@
                                         <th>PO Date</th>                                       
                                         <th>Seller Name (Party Name)</th>
                                         <th>Category</th>
-                                        <th>Sub Category</th>
+                                        {{-- <th>Sub Category</th> --}}
                                         <th>PO Qty</th>
                                         <th>PO Unit Price</th>
                                         <th>PO Price</th>
@@ -147,7 +147,7 @@
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->name }}</td>
-                                            <td>{{ $data->sub_category }}</td>
+                                            {{-- <td>{{ $data->sub_category }}</td> --}}
                                             <td>{{ number_format($data->qty, 3) }}</td>
                                             <td>{{ number_format($data->unit_price, 2) }}</td>
                                             <td>{{ number_format($data->price, 2) }}</td>
@@ -251,7 +251,7 @@
                                         <th>SO Date</th>                                       
                                         <th>Buyer Name (Party Name)</th>
                                         <th>Category</th>
-                                        <th>Sub Category</th>
+                                        {{-- <th>Sub Category</th> --}}
                                         <th>SO Qty</th>
                                         <th>SO Unit Price</th>
                                         <th>SO Price</th>
@@ -279,7 +279,7 @@
                                             <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>                                         
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->name }}</td>
-                                            <td>{{ $data->sub_category }}</td>
+                                            {{-- <td>{{ $data->sub_category }}</td> --}}
                                             <td>{{ number_format($data->qty, 3) }}</td>
                                             <td>{{ number_format($data->unit_price, 2) }}</td>
                                             <td>{{ number_format($data->price, 2) }}</td>
