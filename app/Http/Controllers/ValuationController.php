@@ -185,6 +185,10 @@ class ValuationController extends Controller
                         $totalQuantity =  $poQty;  // Assuming adding for purchases
                         $totalValue  =  $poQty * $transaction->unit_price;
                     } else {
+
+                        $latestInventory = end($inventoryStack);
+                        $totalQuantity = $latestInventory['quantity'] ?? 0;
+                        $totalValue = ($latestInventory['quantity'] ?? 0) * ($latestInventory['unit_price'] ?? 0);
                         // $totalQuantity =  $poQty;  // Assuming adding for purchases
                         // $totalValue =  $poQty * $transaction->unit_price;
                     }
@@ -576,7 +580,6 @@ class ValuationController extends Controller
                         }
                     }
                     // If there is remaining unsold quantity (i.e., poQty > 0), it's an excess purchase
-
                     if ($poQty > 0) {
                         // Create a new entry for the excess purchase
                         $inventoryStack[] = [
@@ -588,9 +591,12 @@ class ValuationController extends Controller
                         $totalQuantity =  $poQty;  // Assuming adding for purchases
                         $totalValue  =  $poQty * $transaction->unit_price;
                     } else {
-                        // $totalQuantity =  $poQty;  // Assuming adding for purchases
-                        // $totalValue =  $poQty * $transaction->unit_price;
+                        $latestInventory = end($inventoryStack);
+                        $totalQuantity = $latestInventory['quantity'] ?? 0;
+                        $totalValue = ($latestInventory['quantity'] ?? 0) * ($latestInventory['unit_price'] ?? 0);
+                     
                     }
+                
 
                     // Check for totalValue less than 0 after purchases
                     // if ($totalValue < 0) {
@@ -797,9 +803,7 @@ class ValuationController extends Controller
 
         // Final calculations
         // $finalPrice = ($lastTransactionStatus === 'Long') ?$totalValue / $totalQuantity : $totalValue / $totalQuantity;
-        $finalPrice = ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0;
-
-
+        $finalPrice = (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0;
 
         return [
             'transaction_logs' => $transactionLogs,
@@ -832,7 +836,8 @@ class ValuationController extends Controller
         $avgData = $this->calculateAverage();
 
 
-        $inventory_transaction = InventoryTransaction::all();
+        $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+
 
 
         $lifo_transaction  =  $lifoData['transaction_logs'];
