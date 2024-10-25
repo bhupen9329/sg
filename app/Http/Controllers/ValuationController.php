@@ -425,11 +425,11 @@ class ValuationController extends Controller
 
     public function calculateFIFO($id = null, $item_id = null)
     {
-      
+
         // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
         if ($id) {
             $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
-        
+
             // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
             // Get all transactions up to and including the specific transaction_date
@@ -594,9 +594,8 @@ class ValuationController extends Controller
                         $latestInventory = end($inventoryStack);
                         $totalQuantity = $latestInventory['quantity'] ?? 0;
                         $totalValue = ($latestInventory['quantity'] ?? 0) * ($latestInventory['unit_price'] ?? 0);
-                     
                     }
-                
+
 
                     // Check for totalValue less than 0 after purchases
                     // if ($totalValue < 0) {
@@ -831,22 +830,29 @@ class ValuationController extends Controller
     public function getPositionReport()
     {
         $categories = Category::all();
-        $lifoData = $this->calculateLIFO();
-        $fifoData = $this->calculateFIFO();
         $avgData = $this->calculateAverage();
-
-
         $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-
-
-
-        $lifo_transaction  =  $lifoData['transaction_logs'];
-        $fifo_transaction =  $fifoData['transaction_logs'];
-        // dd( $lifo_transaction,    $fifo_transaction);
-
-        
-        return view('inventory_valuation.position_report', compact('categories','inventory_transaction','lifoData','fifoData','avgData', 'lifo_transaction', 'fifo_transaction'));
+    
+        $lifo_transaction = [];
+        $fifo_transaction = [];
+    
+        foreach ($inventory_transaction as $data) {
+            $lifoData = $this->calculateLIFO($data->id, $data->item_id);
+            $fifoData = $this->calculateFIFO($data->id, $data->item_id);
+    
+            // Push only the last element if it exists
+            if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
+                $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
+            }
+    
+            if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
+                $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
+            }
+        }
+    
+        return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction'));
     }
+    
 
 
 
@@ -1151,7 +1157,8 @@ class ValuationController extends Controller
     }
 
 
-    public function filterData(Request $request) {
+    public function filterData(Request $request)
+    {
         // Get input from the request
         $filterType = $request->input('filterType');
         $toDate = $request->input('to_date');
@@ -1159,12 +1166,12 @@ class ValuationController extends Controller
         $categoryName = $request->input('category'); // Get the selected category name
         // Start the query on the InventoryTransaction model
         $query = InventoryTransaction::query();
-        
+
         // Apply filter type if provided
         if ($filterType) {
             $query->where('transaction_type', $filterType);
         }
-    
+
         // Filter by date range if provided
         if ($toDate) {
             $query->where('transaction_date', '<=', $toDate);
@@ -1172,24 +1179,24 @@ class ValuationController extends Controller
         if ($fromDate) {
             $query->where('transaction_date', '>=', $fromDate);
         }
-    
+
         // Filter by category if provided
         if ($categoryName) {
             $query = InventoryTransaction::where('item_name', $categoryName)->get();
         }
-        
+
         // Fetch the filtered inventory transactions
         $inventory_transaction =  $query;
         // dd($inventory_transaction);
-    
+
         // Uncomment the dd statement to debug
         // dd($inventory_transaction);
-        
+
         // Calculate LIFO, FIFO, and Average data
         $lifoData = $this->calculateLIFO();
         $fifoData = $this->calculateFIFO();
         $avgData = $this->calculateAverage();
-    
+
         // Return the data as a JSON response
         return response()->json([
             'inventory_transaction' => $inventory_transaction, // Change this to 'data' to match your frontend code
@@ -1198,11 +1205,11 @@ class ValuationController extends Controller
             'avgData' => $avgData,
         ]);
     }
-    
-    
-    
-    
-    
+
+
+
+
+
 
     public function filter(Request $request)
     {
