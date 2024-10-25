@@ -45,9 +45,8 @@ class ManualMatching extends Controller
 
         $purchases =  PurchaseOrder::join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
             ->join('categories', 'purchase_orders.category', '=', 'categories.id')
-            ->join('subcategories', 'purchase_orders.sub_category_id', '=', 'subcategories.id')
             ->whereIn('purchase_orders.status', ['Open', 'Partial Received'])
-            ->select('categories.*', 'subcategories.sub_category', 'companies.*', 'purchase_orders.*', 'purchase_orders.date as date', 'purchase_orders.created_at as po_created_at', 'purchase_orders.id as po_id')
+            ->select('categories.*', 'companies.*', 'purchase_orders.*', 'purchase_orders.date as date', 'purchase_orders.created_at as po_created_at', 'purchase_orders.id as po_id')
             ->orderBy('purchase_orders.created_at', 'desc')
             ->get();
 
@@ -55,7 +54,6 @@ class ManualMatching extends Controller
         $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
             ->join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
             ->join('categories', 'po_items.item_category', '=', 'categories.id')
-            ->join('subcategories', 'po_items.item_subcategory', '=', 'subcategories.id')
             ->leftJoin('purchase_sell_match', 'po_items.id', '=', 'purchase_sell_match.po_item_id')
             ->select(
                 'purchase_orders.*',
@@ -63,7 +61,6 @@ class ManualMatching extends Controller
                 'po_items.*',
                 'po_items.id as id',
                 'categories.name',
-                'subcategories.sub_category',
                 DB::raw('SUM(purchase_sell_match.matched_quantity) as total_matched_quantity'),
                 DB::raw('SUM(purchase_sell_match.so_item_price) as total_so_price'),
                 DB::raw('SUM(purchase_sell_match.matched_quantity * purchase_sell_match.so_item_unit_price) / SUM(purchase_sell_match.matched_quantity) AS avg_price') // Corrected average price calculation
@@ -112,11 +109,9 @@ class ManualMatching extends Controller
                 'po_items.po_item_status',
 
                 'categories.name',
-                'subcategories.sub_category',
                 'companies.company_name',
                 'po_items.id',
                 'categories.id',
-                'subcategories.id'
             )
 
             ->orderBy('categories.id', 'desc')
@@ -128,7 +123,6 @@ class ManualMatching extends Controller
         $sales_order = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
             ->join('categories', 'so_items.item_category', '=', 'categories.id')
-            ->join('subcategories', 'so_items.item_subcategory', '=', 'subcategories.id')
             ->leftJoin('purchase_sell_match', 'so_items.id', '=', 'purchase_sell_match.so_item_id')
             ->select(
                 'sales_orders.*',
@@ -137,7 +131,6 @@ class ManualMatching extends Controller
                 'so_items.*',
                 'so_items.id as so_item_id',
                 'categories.name',
-                'subcategories.sub_category',
                 DB::raw('SUM(purchase_sell_match.matched_quantity) as total_matched_quantity'),
                 DB::raw('SUM(purchase_sell_match.po_item_price) as total_po_price'),
                 DB::raw('SUM(purchase_sell_match.matched_quantity * purchase_sell_match.po_item_unit_price) / SUM(purchase_sell_match.matched_quantity) AS avg_price') // Corrected average price calculation
@@ -176,16 +169,9 @@ class ManualMatching extends Controller
                 'so_items.updated_at',
                 'so_items.so_item_status',
 
-
-
                 'categories.name',
-                'subcategories.sub_category',
-
                 'companies.company_name',
                 'categories.id',
-                'subcategories.id'
-
-
             )
             ->orderBy('categories.id', 'desc')
             ->get();
@@ -227,13 +213,11 @@ class ManualMatching extends Controller
         }
 
         if ($company->type === 'supplier') {
-            dd(1);
             $purchases = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
                 ->join('categories', 'categories.id', '=', 'purchase_orders.category')
-                ->join('subcategories', 'subcategories.id', '=', 'purchase_orders.sub_category_id')
                 ->where('purchase_orders.supplier_id', $companyId)
                 ->where('purchase_orders.rest_quantity', '>', 0)
-                ->select('purchase_orders.*', 'companies.company_name as company_name', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
+                ->select('purchase_orders.*', 'companies.company_name as company_name', 'categories.name as category_name')
                 ->get();
 
             if ($purchases->isEmpty()) {
@@ -332,7 +316,6 @@ class ManualMatching extends Controller
         $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
             ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
             ->join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->join('subcategories', 'subcategories.id', '=', 'po_items.item_subcategory')
             ->select(
                 'purchase_orders.id as purchase_order_id',
                 'purchase_orders.date as po_date',
@@ -346,9 +329,7 @@ class ManualMatching extends Controller
                 'po_items.po_item_status',
                 'po_items.price',
                 'categories.id as category_id',  // Ensure you select the category ID
-                'subcategories.id as subcategory_id',
                 'categories.name as category_name',
-                'subcategories.sub_category as sub_category_name' // Ensure you select the subcategory ID
             )
             ->where('po_items.id', $id)
             ->first();
@@ -367,16 +348,12 @@ class ManualMatching extends Controller
 
         // dd($po_data);
         $categoryIds = is_array($po_data->category_id) ? $po_data->category_id : [$po_data->category_id]; // Ensure it's an array
-        $subcategoryIds = is_array($po_data->subcategory_id) ? $po_data->subcategory_id : [$po_data->subcategory_id]; // Ensure it's an array
-
         $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->join('subcategories', 'subcategories.id', '=', 'so_items.item_subcategory')
             ->where('sales_orders.match_position', 'open')
             ->whereIn('so_items.item_category', $categoryIds)  // Match category IDs
-            ->whereIn('so_items.item_subcategory', $subcategoryIds) // Match subcategory IDs
-            ->select('sales_orders.*', 'companies.company_name', 'so_items.id as so_item_id', 'so_items.*', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
+            ->select('sales_orders.*', 'companies.company_name', 'so_items.id as so_item_id', 'so_items.*', 'categories.name as category_name')
             ->get();
 
 
@@ -388,9 +365,7 @@ class ManualMatching extends Controller
             ->leftJoin('companies as so_companies', 'so_companies.id', '=', 'sales_orders.company_id')
             ->leftJoin('companies as po_companies', 'po_companies.id', '=', 'purchase_orders.supplier_id')
             ->leftJoin('categories as po_categories', 'po_categories.id', '=', 'po_items.item_category')
-            ->leftJoin('subcategories as po_subcategories', 'po_subcategories.id', '=', 'po_items.item_subcategory')
             ->leftJoin('categories as so_categories', 'so_categories.id', '=', 'so_items.item_category')
-            ->leftJoin('subcategories as so_subcategories', 'so_subcategories.id', '=', 'so_items.item_subcategory')
             ->select(
                 'purchase_sell_match.id as transaction_id',
                 'purchase_sell_match.id as match_id',
@@ -412,13 +387,10 @@ class ManualMatching extends Controller
                 'sales_orders.match_position as so_match_position',
                 'purchase_sell_match.matched_quantity',
                 'po_categories.name as po_category_name',
-                'po_subcategories.sub_category as po_sub_category_name',
                 'so_categories.name as so_category_name',
-                'so_subcategories.sub_category as so_sub_category_name'
             )
             ->where('purchase_sell_match.po_item_id', $id)
             ->where('po_items.item_category', $categoryIds)
-            ->where('po_items.item_subcategory', $subcategoryIds)
             ->get(); // Add this line to debug the raw SQL
 
         // dd($manual_match);
@@ -566,12 +538,6 @@ class ManualMatching extends Controller
 
         return redirect()->route('manual.matching')->with('success', 'Selected Sales Order items have been matched successfully.');
     }
-
-
-
-
-
-
 
 
 
@@ -746,7 +712,6 @@ class ManualMatching extends Controller
         $so_data = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->join('subcategories', 'subcategories.id', '=', 'so_items.item_subcategory')
             ->select(
                 'sales_orders.id as sales_order_id',
                 'sales_orders.date as so_date',
@@ -761,9 +726,7 @@ class ManualMatching extends Controller
                 'so_items.unit_price',
                 'so_items.price',
                 'categories.id as category_id',  // Ensure you select the category ID
-                'subcategories.id as subcategory_id',
                 'categories.name as category_name',
-                'subcategories.sub_category as sub_category_name' // Ensure you select the subcategory ID
             )
             ->where('so_items.id', $id)
             ->first();
@@ -778,8 +741,6 @@ class ManualMatching extends Controller
         // dd($salesOrders);
 
         $categoryIds = is_array($so_data->category_id) ? $so_data->category_id : [$so_data->category_id]; // Ensure it's an array
-        $subcategoryIds = is_array($so_data->subcategory_id) ? $so_data->subcategory_id : [$so_data->subcategory_id]; // Ensure it's an array
-
 
         // $purchaseOrders = PurchaseOrder::where('match_position', 'open') // Adjust this based on how you define 'open' orders
         //     ->select('purchase_orders.*') // Add any other necessary fields
@@ -788,11 +749,9 @@ class ManualMatching extends Controller
         $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
             ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
             ->join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->join('subcategories', 'subcategories.id', '=', 'po_items.item_subcategory')
             ->where('purchase_orders.match_position', 'open')
             ->whereIn('po_items.item_category', $categoryIds)  // Match category IDs
-            ->whereIn('po_items.item_subcategory', $subcategoryIds) // Match subcategory IDs
-            ->select('purchase_orders.*', 'companies.company_name', 'po_items.id as po_item_id', 'po_items.*', 'categories.name as category_name', 'subcategories.sub_category as sub_category_name')
+            ->select('purchase_orders.*', 'companies.company_name', 'po_items.id as po_item_id', 'po_items.*', 'categories.name as category_name')
             ->get();
 
         // dd($purchaseOrders);
@@ -804,9 +763,8 @@ class ManualMatching extends Controller
             ->join('companies as so_companies', 'so_companies.id', '=', 'sales_orders.company_id')
             ->join('companies as po_companies', 'po_companies.id', '=', 'purchase_orders.supplier_id')
             ->join('categories as po_categories', 'po_categories.id', '=', 'po_items.item_category') // Join categories for Purchase Orders
-            ->join('subcategories as po_subcategories', 'po_subcategories.id', '=', 'po_items.item_subcategory') // Join subcategories for Purchase Orders
             ->join('categories as so_categories', 'so_categories.id', '=', 'so_items.item_category') // Join categories for Sales Orders
-            ->join('subcategories as so_subcategories', 'so_subcategories.id', '=', 'so_items.item_subcategory') // Join subcategories for Sales Orders
+           
             ->select(
                 'purchase_sell_match.id as transaction_id',
                 'purchase_sell_match.id as match_id',
@@ -830,15 +788,12 @@ class ManualMatching extends Controller
                 'sales_orders.match_position as so_match_position',
                 'purchase_sell_match.matched_quantity',
                 'po_categories.name as po_category_name', // Select Purchase Order category name
-                'po_subcategories.sub_category as po_sub_category_name', // Select Purchase Order subcategory name
                 'so_categories.name as so_category_name', // Select Sales Order category name
-                'so_subcategories.sub_category as so_sub_category_name',
                 'po_items.po_item_no',
                 'so_items.so_item_no',
             )
             ->where('purchase_sell_match.so_item_id', $id)
             ->where('so_items.item_category', $categoryIds)
-            ->where('so_items.item_subcategory', $subcategoryIds)
             ->get();
 
         // dd($manual_match);

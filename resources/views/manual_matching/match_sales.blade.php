@@ -185,7 +185,6 @@
                                         <th>SO Item Number</th>
                                         <th>Buyer Name(Party Name)</th>
                                         <th>Item Category</th>
-                                        <th>Item Sub-Category</th>
                                         <th>Quantity(Q)</th>    
                                         <th>Rest Quantity(Q)</th>                                       
                                         <th>SO Unit Price</th>
@@ -201,7 +200,6 @@
                                             <td>{{ $so_data->so_item_no }}</td>
                                             <td>{{ $so_data->supplier_name }}</td>
                                             <td>{{ $so_data->category_name }}</td>
-                                            <td>{{ $so_data->sub_category_name }}</td>
                                             <td>{{ $so_data->qty }}</td>
                                             <td>{{ $so_data->so_rest_qty }}</td>
                                             <td>{{ $so_data->unit_price }}</td>
@@ -324,7 +322,6 @@
                                         <th>PO Item NO</th>
                                         <th>Seller Name(Party Name)</th>
                                         <th>Item Category</th>
-                                        <th>Item Sub-Category</th>
                                         <th>Quantity(Q)</th>    
                                         <th>Rest Quantity(Q)</th>                                       
                                         <th>PO Unit Price</th>
@@ -342,7 +339,6 @@
                                             <td>{{ $order->po_item_no }}</td>
                                             <td>{{ $order->company_name }}</td>
                                             <td>{{ $order->category_name }}</td>
-                                            <td>{{ $order->sub_category_name }}</td>
                                             <td>{{ $order->qty }}</td>
                                             <td>{{ $order->po_rest_qty }}</td>
                                             <td>{{ $order->unit_price }}</td>
