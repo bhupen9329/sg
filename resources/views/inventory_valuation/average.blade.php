@@ -129,7 +129,7 @@
                
                    
                             <h1>Average Cost Inventory</h1>
-                            <h2>Item: {{ $item_name }}</h2>
+                            {{-- <h2>Item: {{ $item_name }}</h2> --}}
                         
                             <div style="overflow-x: auto">
                                 <table class="table table-bordered xl">
@@ -233,7 +233,7 @@
     
                                             <td>
                                                 @if ($log['transaction_type'] == 'Sell')
-                                                    {{-- -{{ number_format($log['sell_qty'], 2) }} --}}
+                                                    -{{ number_format($log['quantity'], 2) }}
                                                 @endif
                                             </td>
                                             <td>
@@ -352,25 +352,25 @@
     
                                             <!--Balance -->
                                             <td>
-                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                @foreach ($log['inventory_stack'] as $stack)
                                                     {{ $stack['transaction_date'] }}<br>
                                                     <hr>
                                                 @endforeach
                                             </td>
                                             <td>
-                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                @foreach ($log['inventory_stack'] as $stack)
                                                     {{ number_format($stack['quantity'], 2) }}<br>
                                                     <hr>
                                                 @endforeach
                                             </td>
                                             <td>
-                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                @foreach ($log['inventory_stack'] as $stack)
                                                     {{ number_format($stack['unit_price'], 2) }}<br>
                                                     <hr>
                                                 @endforeach
                                             </td>
                                             <td>
-                                                @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                                @foreach ($log['inventory_stack'] as $stack)
                                                     {{ number_format($stack['quantity'] * $stack['unit_price'], 2) }}<br>
                                                     <hr>
                                                 @endforeach

@@ -1239,19 +1239,22 @@ class ValuationController extends Controller
     public function getPositionReport()
     {
         $categories = Category::all();
-        $avgData = $this->calculateAverage();
+        // $avgData = $this->calculateAverage();
         $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
     
         $lifo_transaction = [];
         $fifo_transaction = [];
         $lifoData = '';
         $fifoData = '';
+        $avgData = '';
 
     
         foreach ($inventory_transaction as $data) {
             $lifoData = $this->calculateLIFO($data->id, $data->item_id);
             $fifoData = $this->calculateFIFO($data->id, $data->item_id);
     
+            $avgData = $this->calculateAverage($data->id, $data->item_id);
+    // dd($avgData);
             // Push only the last element if it exists
             if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
                 $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
@@ -1259,6 +1262,10 @@ class ValuationController extends Controller
             
             if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
                 $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
+            }
+            if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
+                // dd(1);
+                $avg_transaction[] = end($avgData['transaction_logs']); // Get the last transaction log
             }
             // dd($lifo_transaction);
         }
@@ -1387,158 +1394,163 @@ class ValuationController extends Controller
     //     ];
     // }
 
-
     public function calculateAverage()
     {
-        // Retrieve all transactions ordered by the transaction date
         $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
-        // Initialize variables for totals and transaction logs
-        $totalQuantity = 0;  // Total inventory quantity
-        $totalValue = 0;     // Total inventory value (quantity * cost)
-        $totalProfitLoss = 0; // Overall profit/loss from sales
-        $transactionLogs = []; // Log each transaction details
-        $item_name = ''; // Keep track of the item name
-
-        // Array to store the remaining quantity and value of each batch
-        $inventoryStack = [];
-
+        $transactionLogs = []; // To store logs of transactions
+        $inventoryStack = []; // To keep track of inventory
+        $totalQuantity = 0; // Total quantity of items in stock
+        $totalValue = 0; // Total value of items in stock
+        $totalProfitLoss = 0; // Total profit/loss calculated
+    
         // Loop through each transaction
         foreach ($transactions as $transaction) {
-            // Get the item name from the transaction (assuming all transactions relate to the same item)
-            $item_name = $transaction->item_name;
-
+            // Initialize transaction variables
+            $transactionType = strtolower($transaction->transaction_type);
+            $quantity = abs($transaction->quantity);
+            $transactionDate = $transaction->transaction_date;
+    
             // Handle purchase transactions
-            if (strtolower($transaction->transaction_type) === 'purchase') {
-                // Update total inventory quantity and value with the new purchase
-                $totalQuantity += $transaction->quantity;
-                $totalValue += $transaction->quantity * $transaction->unit_price;
-
-                // Add the new purchase to inventory batches
+            if ($transactionType === 'purchase') {
+                // Update the inventory stack
                 $inventoryStack[] = [
-                    'quantity' => $transaction->quantity,
+                    'quantity' => $quantity,
                     'unit_price' => $transaction->unit_price,
-                    'transaction_date' => $transaction->transaction_date,
+                    'transaction_date' => $transactionDate,
                 ];
-
+    
+                // Update total quantity and value
+                $totalQuantity += $quantity;
+                $totalValue += $quantity * $transaction->unit_price;
+    
                 // Log the purchase details
                 $transactionLogs[] = [
                     'transaction_type' => 'Purchase',
-                    'quantity' => $transaction->quantity,
+                    'quantity' => $quantity,
                     'unit_price' => $transaction->unit_price,
-                    'transaction_date' => $transaction->transaction_date,
+                    'transaction_date' => $transactionDate,
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
-                    'average_cost' => $totalQuantity > 0 ? $totalValue / $totalQuantity : 0,
-                    'profit_loss' => 0, // No profit/loss on purchases
-                    'details' => [[
-                        'used_qty' => 0,
-                        'remaining_qty' => $transaction->quantity,
-                        'unit_price' => $transaction->unit_price,
-                    ]],
+                    'average_cost' => ($totalQuantity > 0) ? ($totalValue / $totalQuantity) : 0,
+                    'details' => [],
                     'inventory_stack' => $inventoryStack,
-                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0,
-                    'status' => $totalQuantity < 0 ? 'Short' : 'Long',
+                    'balance_unit_price' => ($totalQuantity > 0) ? ($totalValue / $totalQuantity) : 0,
+                    'status' => 'Long',
                 ];
-            } elseif (strtolower($transaction->transaction_type) === 'sell') {
+            } elseif ($transactionType === 'sell') {
                 // For sales transactions
-                $sellQty = abs($transaction->quantity);
+                $sellQty = $quantity;
                 $costOfGoodsSold = 0; // Track the COGS for this sale
                 $totalUsedQty = 0; // Total quantity used in this sale
+                $averageCost = ($totalQuantity > 0) ? ($totalValue / $totalQuantity) : 0; // Calculate the current average cost
+    
                 $logEntry = [
                     'transaction_type' => 'Sell',
                     'quantity' => $sellQty,
-                    'transaction_date' => $transaction->transaction_date,
+                    'transaction_date' => $transactionDate,
                     'selling_price' => $transaction->unit_price,
                     'details' => [], // Log how the inventory is being sold
                 ];
-
+    
                 // Process the sale using inventory batches (FIFO method)
                 while ($sellQty > 0 && count($inventoryStack) > 0) {
                     $batch = array_shift($inventoryStack); // Get the first batch (FIFO method)
-
+    
                     // Check if the sale quantity can be fulfilled from this batch
                     if ($sellQty <= $batch['quantity']) {
                         // If the sale quantity is less than or equal to the batch quantity
-                        $costOfGoodsSold += $sellQty * $batch['unit_price'];
+                        $costOfGoodsSold += $sellQty * $averageCost; // Use average cost for COGS
                         $totalUsedQty += $sellQty; // Track total used quantity
                         $batch['quantity'] -= $sellQty;
-
+    
                         // Log the used quantity from this batch
                         $logEntry['details'][] = [
                             'used_qty' => $sellQty,
                             'remaining_qty' => $batch['quantity'],
-                            'unit_price' => $batch['unit_price'],
+                            'unit_price' => $averageCost, // Log average cost
                         ];
-
+    
                         // If there is remaining quantity in the batch, put it back
                         if ($batch['quantity'] > 0) {
                             array_unshift($inventoryStack, $batch);
                         }
-
+    
                         // Update the total quantity and value
                         $totalQuantity -= $sellQty;
-                        $totalValue -= $sellQty * $batch['unit_price'];
+                        $totalValue -= $sellQty * $averageCost; // Use average cost for total value
                         $sellQty = 0; // All sale quantity processed
                     } else {
                         // If the sale quantity is larger than the batch quantity
-                        $costOfGoodsSold += $batch['quantity'] * $batch['unit_price'];
+                        $costOfGoodsSold += $batch['quantity'] * $averageCost; // Use average cost for COGS
                         $totalUsedQty += $batch['quantity']; // Track total used quantity
                         $sellQty -= $batch['quantity'];
-
+    
                         // Log the used quantity from this batch
                         $logEntry['details'][] = [
                             'used_qty' => $batch['quantity'],
                             'remaining_qty' => 0, // Batch is fully used
-                            'unit_price' => $batch['unit_price'],
+                            'unit_price' => $averageCost, // Log average cost
                         ];
-
+    
                         // Update the total quantity and value
                         $totalQuantity -= $batch['quantity'];
-                        $totalValue -= $batch['quantity'] * $batch['unit_price'];
+                        $totalValue -= $batch['quantity'] * $averageCost; // Use average cost for total value
                     }
                 }
-
+    
+                // If there are still quantities left to sell, calculate COGS with the average cost
+                if ($sellQty > 0) {
+                    $remainingAverageCost = ($totalQuantity > 0) ? ($totalValue / $totalQuantity) : 0; // Recalculate average if there's remaining balance
+                    $costOfGoodsSold += $sellQty * $remainingAverageCost; // Use average cost for any remaining sell quantities
+                    $totalQuantity -= $sellQty; // Deduct remaining sell quantity from total
+                    $totalValue -= $sellQty * $remainingAverageCost; // Deduct from total value
+    
+                    // Log remaining details with the average cost
+                    $logEntry['details'][] = [
+                        'used_qty' => $sellQty,
+                        'remaining_qty' => 0, // All remaining quantity used
+                        'unit_price' => $remainingAverageCost, // Use average cost for remaining quantity
+                    ];
+                }
+    
                 // Calculate profit/loss for this transaction
                 $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
                 $profitLoss = $totalSaleValue - $costOfGoodsSold;
                 $totalProfitLoss += $profitLoss;
-
-                // Calculate new average cost using the new formula
-                $averageCost = $totalUsedQty > 0 ?
-                    (($costOfGoodsSold + ($transaction->unit_price * $totalUsedQty)) / $totalUsedQty)
-                    : 0;
-                // dump($averageCost);
-
+    
                 // Log the sale details
                 $transactionLogs[] = [
                     'transaction_type' => 'Sell',
                     'quantity' => abs($transaction->quantity),
                     'selling_price' => $transaction->unit_price,
-                    'transaction_date' => $transaction->transaction_date,
+                    'transaction_date' => $transactionDate,
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
                     'cost_of_goods_sold' => $costOfGoodsSold,
                     'profit_loss' => $profitLoss,
                     'total_profit_loss' => $totalProfitLoss,
-                    'average_cost' => $averageCost, // New average cost
+                    'average_cost' => $averageCost, // Updated average cost
                     'details' => $logEntry['details'],
                     'inventory_stack' => $inventoryStack,
-                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0,
-                    'status' => $totalQuantity < 0 ? 'Short' : 'Long',
+                    'balance_unit_price' => ($totalQuantity > 0) ? ($totalValue / $totalQuantity) : 0,
+                    'status' => ($totalQuantity < 0) ? 'Short' : 'Long',
                 ];
+                dump($transactionLogs);
             }
         }
-
+    
         // Return the calculated average data and transaction logs
         return [
             'transaction_logs' => $transactionLogs,
             'final_balance_qty' => $totalQuantity,
             'final_balance_value' => $totalValue,
             'final_profit_loss' => $totalProfitLoss,
-            'item_name' => $item_name,
         ];
     }
+    
+    
+    
 
 
 
