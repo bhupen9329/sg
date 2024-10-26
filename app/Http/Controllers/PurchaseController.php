@@ -171,11 +171,21 @@ class PurchaseController extends Controller
 
                 $inventoryTransactionId = $inventoryTransaction->id;
                 $inventoryItemId = $inventoryTransaction->item_id;
-                
 
-                
+         
+$lifo_calculations = $valuationcontroller->lifoCalculation($inventoryItemId);
+// dd($lifo_calculations);
+
+if (isset($lifo_calculations['transaction_logs']) && is_array($lifo_calculations['transaction_logs'])) {
+  
+    $transaction = end($lifo_calculations['transaction_logs']);
+} else {
+    $transaction = null; // Or handle this case as needed
+}
+// dd( $transaction);
+        
                 // $avilable_lifo = LifoTransaction::where('item_id', $inventoryItemId)->get();
-            
+
                 // if ($avilable_lifo->isNotEmpty()) {
                 //     $lifoTransactionIds = $avilable_lifo->pluck('id')->toArray();
                 //     LifoTransactionUsedQty::whereIn('lifo_transaction_id', $lifoTransactionIds)->truncate();
@@ -186,61 +196,61 @@ class PurchaseController extends Controller
                 // $lifoData = $valuationcontroller->calculateLIFO($inventoryItemId);
                 // // dd( $lifoData);
 
-                // foreach ($lifoData['transaction_logs'] as $transaction) {
-                //     // Create a new LifoTransaction record
-                //     $lifoTransaction = new LifoTransaction();
-                //     $lifoTransaction->inventory_transaction_id = $transaction['transaction_id'];
-                //     $lifoTransaction->stock_bal_qty = $transaction['balance_qty'];;
-                //     $lifoTransaction->stock_bal_unit_price = $transaction['balance_unit_price'];
-                //     $lifoTransaction->stock_bal_value = $transaction['balance_value'];
-                //     $lifoTransaction->cogs_qty = $transaction['quantity'];
-                //     $lifoTransaction->cogs_unit_price = $transaction['cost_of_goods_sold'] / $transaction['quantity'];
-                //     $lifoTransaction->cogs_bal_value = $transaction['cost_of_goods_sold'];
+               
+                    // Create a new LifoTransaction record
+                    $lifoTransaction = new LifoTransaction();
+                    $lifoTransaction->inventory_transaction_id = $transaction['transaction_id'];
+                    $lifoTransaction->stock_bal_qty = $transaction['balance_qty'];;
+                    $lifoTransaction->stock_bal_unit_price = $transaction['balance_unit_price'];
+                    $lifoTransaction->stock_bal_value = $transaction['balance_value'];
+                    $lifoTransaction->cogs_qty = $transaction['cost_of_goods_sold_qty'];
+                    $lifoTransaction->cogs_unit_price = $transaction['cost_of_goods_sold_balance'];
+                    $lifoTransaction->cogs_bal_value = $transaction['cost_of_goods_sold'];
 
-                //     $lifoTransaction->actual_sales_qty	 = $transaction['quantity'];
-                //     $lifoTransaction->actual_sales_unit_price = $transaction['cost_of_goods_sold'] / $transaction['quantity'];
-                //     $lifoTransaction->actual_sales_value = $transaction['cost_of_goods_sold'];
+                    $lifoTransaction->actual_sales_qty	 = $transaction['actual_sale_qty'];
+                    $lifoTransaction->actual_sales_unit_price = $transaction['actual_sale_balance_unit_price'];
+                    $lifoTransaction->actual_sales_value = $transaction['actual_sale_value'];
 
-                //     $lifoTransaction->profit_loss = $transaction['profit_loss'];
-                //     $lifoTransaction->status = $transaction['status'];
-             
-                //     $lifoTransaction->item_id = $transaction['item_name'];
-                //     $lifoTransaction->stock_position = 'Long';
+                    $lifoTransaction->profit_loss = abs($transaction['actual_sale_value']) - abs($transaction['cost_of_goods_sold']);
+                    if($lifoTransaction->profit_loss > 0){
+                        $lifoTransaction->status = 'Profit';
+                    }else{
+                        $lifoTransaction->status = 'Loss';
+                    }
                   
-                //     // Save the LIFO transaction
-                //     $lifoTransaction->save();
-            
-                //     // Save the inventory stack
-                //     foreach ($transaction['inventory_stack'] as $inventory) {
-                //         $lifoTransactionChild = new LifoTransactionStack(); // Assuming you have a LifoTransactionChild model
-                //         $lifoTransactionChild->lifo_transaction_id = $lifoTransaction->id; // Set the parent transaction ID
-                //         $lifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; // Set the parent transaction ID
-                //         $lifoTransactionChild->lifo_transaction_stacks_bal_qty = $inventory['quantity'];
-                //         $lifoTransactionChild->lifo_transaction_stacks_bal_unit_price = $inventory['unit_price'];
-                //         $lifoTransactionChild->lifo_transaction_stacks_bal_value = $inventory['quantity'] * $inventory['unit_price'];
-                //         $lifoTransactionChild->purchase_date = $request->date;
-            
-                //         // Save the child inventory stack data
-                //         $lifoTransactionChild->save();
-                //     }
-            
-                //     // Optional: If you have any details to save, you can do that similarly here
-                //     if ($transaction['details'] && count($transaction['details']) > 0) {
-                //         foreach ($transaction['details'] as $detail) {
-                //             $lifoTransactionChild = new LifoTransactionUsedQty();
-                //             $lifoTransactionChild->lifo_transaction_id = $lifoTransaction->id; // Set the parent transaction ID
-                //             $lifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; // Set the parent transaction ID
-                //             $lifoTransactionChild->lifo_transaction_stacks_bal_qty = $detail['used_qty'];
-                //             $lifoTransactionChild->lifo_transaction_stacks_bal_unit_price = $detail['unit_price'];
-                //             $lifoTransactionChild->lifo_transaction_stacks_bal_value = $detail['used_qty'] * $detail['unit_price'];
-                //             $lifoTransactionChild->purchase_date = $request->date;
-                    
-                //             // Save the child record
-                //             $lifoTransactionChild->save(); // This line was missing
-                //         }
-                //     }
-                    
-                // }
+                    $lifoTransaction->item_id = $transaction['item_id'];
+                    $lifoTransaction->stock_position =  $transaction['status'];
+
+                    // Save the LIFO transaction
+                    $lifoTransaction->save();
+
+                    // Save the inventory stack
+                    foreach ($transaction['inventory_stack'] as $inventory) {
+                        $lifoTransactionChild = new LifoTransactionStack(); // Assuming you have a LifoTransactionChild model
+                        $lifoTransactionChild->lifo_transaction_id = $lifoTransaction->id; // Set the parent transaction ID
+                        $lifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; // Set the parent transaction ID
+                        $lifoTransactionChild->lifo_transaction_stacks_bal_qty = $inventory['quantity'];
+                        $lifoTransactionChild->lifo_transaction_stacks_bal_unit_price = $inventory['unit_price'];
+                        $lifoTransactionChild->lifo_transaction_stacks_bal_value = $inventory['quantity'] * $inventory['unit_price'];
+                        $lifoTransactionChild->purchase_date = $request->date;
+
+                        // Save the child inventory stack data
+                        $lifoTransactionChild->save();
+                    }
+
+                    // Optional: If you have any details to save, you can do that similarly here
+                    if ($transaction['details'] && count($transaction['details']) > 0) {
+                        foreach ($transaction['details'] as $detail) {
+                            $lifoTransactionChild = new LifoTransactionUsedQty();
+                            $lifoTransactionChild->lifo_transaction_id = $lifoTransaction->id; // Set the parent transaction ID
+                            $lifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; // Set the parent transaction ID
+                            $lifoTransactionChild->lifo_transaction_used_bal_qty = $detail['used_qty'];
+                            $lifoTransactionChild->lifo_transaction_used_bal_unit_price = $detail['unit_price'];
+                            $lifoTransactionChild->lifo_transaction_used_bal_value = $detail['used_qty'] * $detail['unit_price'];
+                            // Save the child record
+                            $lifoTransactionChild->save(); // This line was missing
+                        }
+                    }
             }
 
             // Redirect with success message
@@ -249,13 +259,15 @@ class PurchaseController extends Controller
     }
 
 
+
+
     public function edit($id)
     {
         // dd($id);
         $po_data = PurchaseOrder::where('id', $id)->first();
 
         $company = Company::where('id', $po_data->supplier_id)->first();
-        $sub_category = SubCategory::all();     
+        $sub_category = SubCategory::all();
         $category = Category::all();
         $po_number = $po_data->document_number;
 
@@ -314,7 +326,7 @@ class PurchaseController extends Controller
         if ($id) {
             // Loop through each item for Purchase Order
             // dd($request);
-            if(isset($request->unit_price_) >  0){
+            if (isset($request->unit_price_) >  0) {
                 for ($i = 0; $i < count($request->unit_price_); $i++) {
                     $poItem = new PoItem();
                     $poItem->item_category = $request->item_category[$i];
@@ -323,9 +335,9 @@ class PurchaseController extends Controller
                     $poItem->po_rest_qty = $request->qty[$i];
                     $poItem->unit_price = $request->unit_price_[$i];
                     $poItem->price = $request->price[$i];
-    
+
                     $po_item_available = PoItem::where('po_id', $id)->latest()->first();
-    
+
                     if ($po_item_available) {
                         $lastSerialNumber = (int)substr($po_item_available->po_item_no, -2);
                         $itemSerial = str_pad($lastSerialNumber + 1, 2, '0', STR_PAD_LEFT);
@@ -335,16 +347,16 @@ class PurchaseController extends Controller
                     $poItem->po_item_no = $po_data->document_number . '-' . $itemSerial;
                     $poItem->po_id = $id;
                     $poItem->save();
-    
+
                     $newPoItemId = $poItem->id;
-    
+
                     $categoryName = Category::find($poItem->item_category)->name;
-    
-    
+
+
                     $companyName = Company::find($po_data->supplier_id)->company_name;
                     // dd($subcategoryName);
-    
-    
+
+
                     $inventoryTransaction = new InventoryTransaction();
                     $inventoryTransaction->po_item_id =  $newPoItemId;
                     $inventoryTransaction->item_name = $categoryName;
@@ -357,11 +369,9 @@ class PurchaseController extends Controller
                     $inventoryTransaction->position = 'open';
                     $inventoryTransaction->save();
                 }
+            } else {
             }
-            else{
-               
-            }
-           
+
 
             // Redirect with success message
             return redirect()->route('purchase.index')->with('update', 'Purchase Order Updated Successfully');
