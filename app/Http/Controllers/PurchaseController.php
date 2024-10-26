@@ -255,7 +255,7 @@ class PurchaseController extends Controller
         $po_data = PurchaseOrder::where('id', $id)->first();
 
         $company = Company::where('id', $po_data->supplier_id)->first();
-        $sub_category = SubCategory::all();
+        $sub_category = SubCategory::all();     
         $category = Category::all();
         $po_number = $po_data->document_number;
 
