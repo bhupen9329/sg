@@ -842,6 +842,8 @@ class ValuationController extends Controller
     
         $lifo_transaction = [];
         $fifo_transaction = [];
+        $lifoData = '';
+        $fifoData = '';
     
         foreach ($inventory_transaction as $data) {
             $lifoData = $this->calculateLIFO($data->id, $data->item_id);

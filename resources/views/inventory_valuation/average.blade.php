@@ -126,12 +126,13 @@
    
             <div class="dashboard-header pagetitle">
                 <div class="breadcrum">
-                    <section class="section">
-                        <div class="container">
+               
+                   
                             <h1>Average Cost Inventory</h1>
                             <h2>Item: {{ $item_name }}</h2>
                         
-                            <table class="table table-bordered xl">
+                            <div style="overflow-x: auto">
+                                <table class="table table-bordered xl">
                                 <thead>
                                     <tr>
                                         <th>Transaction Date</th>
@@ -532,10 +533,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        
-                           
                         </div>
-                    </section>
                 </div>
             </div>
             
