@@ -22,18 +22,41 @@ class ValuationController extends Controller
     }
 
 
-    public function calculateLIFO($id = null,  $item_id = null)
+    public function calculateLIFO($id = null,  $item_id = null, $i = null)
     {
-        if ($id && $item_id ) {
+
+  
+        if ($id && $item_id &&  $i) {
             $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
          
             // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
             // Get all transactions up to and including the specific transaction_date
+          
+
+
             $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
-                ->where('item_id', $item_id)
-                ->orderBy('transaction_date', 'asc')
-                ->get();
+            ->where('item_id', $item_id)
+            ->orderBy('transaction_date', 'asc')
+            ->orderBy('id', 'asc') // Ensures unique order even on same date
+            ->limit($i)
+            ->get();
+      
+     
+        } elseif($id && $item_id){
+            $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
+         
+            // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+
+            // Get all transactions up to and including the specific transaction_date
+          
+
+
+            $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
+            ->where('item_id', $item_id)
+            ->orderBy('transaction_date', 'asc')
+            ->orderBy('id', 'asc') // Ensures unique order even on same date
+            ->get();
         }
         else {
             if($item_id){
@@ -44,6 +67,7 @@ class ValuationController extends Controller
             }else{
                 $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')
                 ->get();
+                // dd( $transactions);
             }
          
         }
@@ -96,9 +120,11 @@ class ValuationController extends Controller
                 } else {
                     $lastPurchaseTotal = 0;
                     $lastPurchaseQty = 0;
+                    // dump(  $lastPurchaseQty );
                     while ($poQty > 0 && !empty($inventoryStack)) {
                         // Get the last purchase (LIFO: Last In First Out)
                         $lastPurchase = array_pop($inventoryStack);
+                        // dd($lastPurchase);
                         $lasttotalValue = ($lastPurchase['quantity'] * $lastPurchase['unit_price']);
                         $lastPurchaseTotal +=  $lasttotalValue;
                         $lastPurchaseQty +=  $lastPurchase['quantity'];
@@ -126,6 +152,7 @@ class ValuationController extends Controller
                             // Log the purchase details
 
                             // if()
+           
 
                             if (abs($lastPurchase['quantity']) > $poQty) {
 
@@ -196,10 +223,11 @@ class ValuationController extends Controller
                         $totalQuantity =  $poQty;  // Assuming adding for purchases
                         $totalValue  =  $poQty * $transaction->unit_price;
                     } else {
-
-                        // $latestInventory = end($inventoryStack);
-                        // $totalQuantity = $latestInventory['quantity'] ?? 0;
-                        // $totalValue = ($latestInventory['quantity'] ?? 0) * ($latestInventory['unit_price'] ?? 0);
+                      
+                        $totalQuantity = array_sum(array_column($inventoryStack, 'quantity'));
+                        $totalUnitPrice = array_sum(array_column($inventoryStack, 'unit_price'));
+                        // dd( $totalQuantity);
+                        $totalValue = ($totalQuantity ?? 0) * ( $totalUnitPrice ?? 0);
 
                         // $latestInventory = end($inventoryStack);
                         // $totalQuantity = (abs($costOfGoodsPurchasedQty) +  abs($latestInventory['quantity']));
@@ -207,9 +235,11 @@ class ValuationController extends Controller
                         // $total_stack = ($latestInventory['quantity'] * $latestInventory['unit_price']);
                         // // $totalQuantity = ($costOfGoodsPurchasedQty -  $total_stack);
                         // $totalValue = ($costOfGoodsPurchased ?? 0) - ($total_stack ?? 0);
-                        $totalQuantity =  $poQty;  // Assuming adding for purchases
-                        $totalValue =  $poQty * $transaction->unit_price;
+                        // $totalQuantity =  $poQty;  // Assuming adding for purchases
+                        // $totalValue =  $poQty * $transaction->unit_price;
                     }
+
+        
                     // Check for totalValue less than 0 after purchases
                     // if ($totalValue < 0) {
                     //     // Log the negative total value entry into the inventory stack for purchases
@@ -222,6 +252,8 @@ class ValuationController extends Controller
                     // }
 
                 }
+
+                
 
                 // Log the purchase transaction
                 $transactionLogs[] = [
@@ -840,7 +872,7 @@ class ValuationController extends Controller
     // }
 
 
-    public function calculateFIFO($id = null, $item_id = null)
+    public function calculateFIFO($id = null, $item_id = null, $i = null)
     {
 
         // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
@@ -853,6 +885,7 @@ class ValuationController extends Controller
             $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
                 ->where('item_id', $item_id)
                 ->orderBy('transaction_date', 'asc')
+                ->limit($i)
                 ->get();
             // dd($transactions);
         } else {
@@ -1011,12 +1044,17 @@ class ValuationController extends Controller
                         $totalValue  =  $poQty * $transaction->unit_price;
                      
                     } else {
-                        $latestInventory = $inventoryStack;
-                        // dd( $totalQuantity );
-                        foreach( $latestInventory as $data){
-                            $totalQuantity = $data['quantity'] ?? 0;
-                            $totalValue = ($data['quantity'] ?? 0) * ($data['unit_price'] ?? 0);
-                        }
+                        // $latestInventory = $inventoryStack;
+                        // // dd( $totalQuantity );
+                        // foreach( $latestInventory as $data){
+                        //     $totalQuantity = $data['quantity'] ?? 0;
+                        //     $totalValue = ($data['quantity'] ?? 0) * ($data['unit_price'] ?? 0);
+                        // }
+
+                        $totalQuantity = array_sum(array_column($inventoryStack, 'quantity'));
+                        $totalUnitPrice = array_sum(array_column($inventoryStack, 'unit_price'));
+                        // dd( $totalQuantity);
+                        $totalValue = ($totalQuantity ?? 0) * ( $totalUnitPrice ?? 0);
                        
                     }
 
@@ -1266,29 +1304,33 @@ class ValuationController extends Controller
         $lifoData = '';
         $fifoData = '';
         $avgData = '';
+// Initialize an empty array to store counters for each item_id
+$itemCounters = [];
 
+foreach ($inventory_transaction as $data) {
+    // Check if an $i counter already exists for this item_id
+    if (!isset($itemCounters[$data->item_id])) {
+        $itemCounters[$data->item_id] = 1; // Start a new counter for this item_id
+    }
     
-        foreach ($inventory_transaction as $data) {
-            $lifoData = $this->calculateLIFO($data->id, $data->item_id);
-            $fifoData = $this->calculateFIFO($data->id, $data->item_id);
-            // dd(   $lifoData);
-          
-    
-            $avgData = $this->calculateAverage($data->id, $data->item_id);
-    // dd($avgData);
-            // Push only the last element if it exists
-            if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
-                $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
-            }
-            
-            if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
-                $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
-            }
-        }
-        // dd( $lifo_transaction);
+    // Use the item-specific counter in the function calls
+    $lifoData = $this->calculateLIFO($data->id, $data->item_id, $itemCounters[$data->item_id]);
+    $fifoData = $this->calculateFIFO($data->id, $data->item_id, $itemCounters[$data->item_id]);
 
-        
-   
+    $avgData = $this->calculateAverage($data->id, $data->item_id);
+
+    // Push only the last element if it exists
+    if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
+        $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
+    }
+    
+    if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
+        $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
+    }
+    
+    // Increment the counter for this specific item_id
+    $itemCounters[$data->item_id]++;
+}
         return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction'));
     }
     
@@ -1555,7 +1597,7 @@ class ValuationController extends Controller
                     'balance_unit_price' => ($totalQuantity > 0) ? ($totalValue / $totalQuantity) : 0,
                     'status' => ($totalQuantity < 0) ? 'Short' : 'Long',
                 ];
-                dump($transactionLogs);
+                // dump($transactionLogs);
             }
         }
     
