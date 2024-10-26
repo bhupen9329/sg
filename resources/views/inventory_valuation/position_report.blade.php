@@ -191,13 +191,14 @@
                                             <th style="padding: 8px;">Report Date</th>
                                             <th style="padding: 8px;">Item Name</th>
                                             <th style="padding: 8px;">Transaction Type</th>
+                                            <th style="padding: 8px;">Quantity</th>
                                             <th style="padding: 8px;">LIFO Position (MT)</th>
-                                            <th style="padding: 8px;">LIFO Valuation</th>
+                                            <th style="padding: 8px;">LIFO Valuation (र)</th>
                                             <th style="padding: 8px;">FIFO Position (MT)</th>
-                                            <th style="padding: 8px;">FIFO Valuation</th>
-                                            <th style="padding: 8px;">Manual Match</th>
-                                            <th style="padding: 8px;">Monthly Average</th>
-                                            <th style="padding: 8px;">Netwise</th>
+                                            <th style="padding: 8px;">FIFO Valuation (र)</th>
+                                            {{-- <th style="padding: 8px;">Manual Match</th> --}}
+                                            <th style="padding: 8px;">Average Valuation (र)</th>
+                                            {{-- <th style="padding: 8px;">Netwise</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -210,6 +211,7 @@
                                                     <td style="padding: 8px;">{{ $data['transaction_date'] }}</td>
                                                     <td style="padding: 8px;">{{ $data['item_name'] ?? 'N/A' }}</td>
                                                     <td style="padding: 8px;">{{ $data['transaction_type'] ?? 'N/A' }}</td>
+                                                    <td style="padding: 8px;">{{ $data['quantity'] ?? 'N/A' }}</td>
                                     
                                                     <!-- LIFO Transactions -->
                                                     @foreach ($lifo_transaction as $lifo_transactions)
@@ -238,15 +240,17 @@
                                                             </td>
                                                         @endif
                                                     @endforeach
+
+                                                   
                                     
                                                     <!-- LIFO Manual Match and Netwise -->
-                                                    <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td>
+                                                    {{-- <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td> --}}
                                                     <td style="padding: 8px;">
                                                         <a href="{{ route('show.average') }}">
                                                             N/A
                                                         </a>
                                                     </td>
-                                                    <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td>
+                                                    {{-- <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td> --}}
                                                 </tr>
                                             @endforeach
                                         @else
