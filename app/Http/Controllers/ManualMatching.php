@@ -496,7 +496,7 @@ class ManualMatching extends Controller
             // $purchaseOrderItem->update(['po_rest_qty' => $remainingPoItemQuantity]);
 
             $purchaseSellMatch->update([
-                'so_id' => $salesOrderId,
+                'so_id' => $salesOrderItem->so_id,
                 'po_id' => $purchaseOrderId,
                 'so_item_qty' => $salesOrderItem->so_rest_qty,
                 'po_item_qty' => $purchaseOrderItem->po_rest_qty,
@@ -606,7 +606,7 @@ class ManualMatching extends Controller
 
             $PurchaseSell = PurchaseSellMatch::create([
                 'so_item_id' => $soItemId,
-                'po_item_id' => $poItemId,
+                'po_item_id' =>  $purchaseOrderItem->po_id,
 
                 'so_item_unit_price' =>  $salesOrderItem->unit_price,
                 'po_item_unit_price' => $purchaseOrderItem->unit_price,

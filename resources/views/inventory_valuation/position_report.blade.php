@@ -215,7 +215,7 @@
                                     
                                                     <!-- LIFO Transactions -->
                                                     @foreach ($lifo_transaction as $lifo_transactions)
-                                                        @if ($data['id'] == $lifo_transactions['transaction_id'] && $data['quantity'] == $lifo_transactions['quantity'])
+                                                        @if ($data['id'] == $lifo_transactions['transaction_id'] && $data['item_id'] == $lifo_transactions['item_id'])
                                                             <td style="padding: 8px;">
                                                                 {{ number_format($lifo_transactions['balance_qty'], 2) ?? 'N/A' }}
                                                             </td>
@@ -229,7 +229,7 @@
                                     
                                                     <!-- FIFO Transactions -->
                                                     @foreach ($fifo_transaction as $fifo_transactions)
-                                                        @if ($data['id'] == $fifo_transactions['transaction_id'] && $data['quantity'] == $fifo_transactions['quantity'])
+                                                        @if ($data['id'] == $fifo_transactions['transaction_id'] && $data['item_id'] == $fifo_transactions['item_id'])
                                                             <td style="padding: 8px;">
                                                                 {{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}
                                                             </td>
