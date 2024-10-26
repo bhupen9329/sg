@@ -802,6 +802,7 @@ class ValuationController extends Controller
                     'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                     'inventory_stack' => array_reverse($inventoryStack),
                 ];
+                // dump($transactionLogs);
 
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             }
@@ -844,6 +845,7 @@ class ValuationController extends Controller
         $fifo_transaction = [];
         $lifoData = '';
         $fifoData = '';
+
     
         foreach ($inventory_transaction as $data) {
             $lifoData = $this->calculateLIFO($data->id, $data->item_id);
@@ -853,10 +855,11 @@ class ValuationController extends Controller
             if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
                 $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
             }
-    
+            
             if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
                 $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
             }
+            // dd($lifo_transaction);
         }
     
         return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction'));
