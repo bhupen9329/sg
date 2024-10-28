@@ -114,7 +114,7 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>FIFO Report</h1>
+            <h1>Average Report</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>

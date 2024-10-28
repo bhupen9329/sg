@@ -143,7 +143,7 @@
                                 <select class="form-select" id="category_filter" name="category">
                                     <option value="">Select Item</option>
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->name }}">{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -192,9 +192,8 @@
                                             <th style="padding: 8px;">Item Name</th>
                                             <th style="padding: 8px;">Transaction Type</th>
                                             <th style="padding: 8px;">Quantity</th>
-                                            <th style="padding: 8px;">LIFO Position (MT)</th>
+                                            <th style="padding: 8px;">Position (MT)</th>
                                             <th style="padding: 8px;">LIFO Valuation (र)</th>
-                                            <th style="padding: 8px;">FIFO Position (MT)</th>
                                             <th style="padding: 8px;">FIFO Valuation (र)</th>
                                             {{-- <th style="padding: 8px;">Manual Match</th> --}}
                                             <th style="padding: 8px;">Average Valuation (र)</th>
@@ -231,9 +230,6 @@
                                                     @foreach ($fifo_transaction as $fifo_transactions)
                                                         @if ($data['id'] == $fifo_transactions['transaction_id'] && $data['item_id'] == $fifo_transactions['item_id'])
                                                             <td style="padding: 8px;">
-                                                                {{ number_format($fifo_transactions['balance_qty'], 2) ?? 'N/A' }}
-                                                            </td>
-                                                            <td style="padding: 8px;">
                                                                 <a href="{{ route('show.fifo', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
                                                                     {{ number_format($fifo_transactions['balance_unit_price'], 2) ?? 'N/A' }}
                                                                 </a>
@@ -241,15 +237,27 @@
                                                         @endif
                                                     @endforeach
 
+
+                                                    @foreach ($avg_transaction as $avg_transactions)
+                                                    @if ($data['id'] == $avg_transactions['transaction_id'] && $data['item_id'] == $avg_transactions['item_id'])
+                                                        <td style="padding: 8px;">
+                                                            <a href="{{ route('show.average', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
+                                                                {{ number_format($avg_transactions['balance_unit_price'], 2) ?? 'N/A' }}
+                                                            </a>
+                                                        </td>
+                                                    @endif
+                                                @endforeach
+
                                                    
                                     
                                                     <!-- LIFO Manual Match and Netwise -->
                                                     {{-- <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td> --}}
-                                                    <td style="padding: 8px;">
+                                                    {{-- <td style="padding: 8px;">
+                                                        
                                                             <a href="{{ route('show.average', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
                                                             N/A
                                                         </a>
-                                                    </td>
+                                                    </td> --}}
                                                     {{-- <td style="padding: 8px;">{{ $lifoData['netwise'] ?? 'N/A' }}</td> --}}
                                                 </tr>
                                             @endforeach
@@ -316,52 +324,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
-    <script>
-        function filterButton(filterType, filterTodate, filterFromdate) {
-            $.ajax({
-                type: 'POST',
-                url: 'get_position_report_list',
-                data: {
-                    filterTodate: filterTodate,
-                    filterFromdate: filterFromdate,
-                    filterType: filterType,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    if (response && Array.isArray(response)) {
-                        var table = $('#Category_table').DataTable();
-                        table.clear().draw();
-                        response.forEach(function(data, index) {
-                            var indentQty = data.indent_qty ?? 0;
-                            var poQty = data.po_qty ?? 0; // Default to 0 if null or undefined
-                            var inwardQty = data.inward_qty ?? 0; // Default to 0 if null or undefined
-                            var allocateQty = data.allocation_qty ?? 0;
-
-                            // Calculate remainingQty and pendingIndent
-                            var remainingQty = poQty != 0 ? poQty - inwardQty : 0;
-                            var pendingIndent = indentQty - (poQty + allocateQty);
-
-                            table.row.add([
-                                index + 1,
-                                data.last_transaction_date,
-                                data.item_name ?? 'N/A',
-                                data.final_balance_qty ?? 'N/A',
-                                data.quantity ?? 'N/A',
-                                data.item_name ?? 'N/A',
-                                data.item_name ?? 'N/A',
-                                data.item_name ?? 'N/A',
-                            ]).draw(false);
-                        });
-                    } else {
-                        console.error("Invalid or empty response received.");
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX request failed:", status, error);
-                }
-            });
-        }
-    </script>
+   
 
 
 <script>
@@ -380,7 +343,6 @@
             success: function(response) {
                 // Access the relevant data based on your returned structure
                 let data = response.inventory_transaction; // Adjusted to match the controller's return
-                console.log(data);
                 // Clear the existing table body
                 $('#Category_table tbody').empty();
 
@@ -395,41 +357,50 @@
     let transactionDate = item?.transaction_date || 'N/A';
     let itemName = item?.item_name || 'N/A';
     let transactionType = item?.transaction_type || 'N/A';
+    let transactionqty = item?.quantity || 'N/A';
+
 
     let row = `<tr>
         <td style="padding: 8px;">${transactionDate}</td>
         <td style="padding: 8px;">${itemName}</td>
-        <td style="padding: 8px;">${transactionType}</td>`;
+        <td style="padding: 8px;">${transactionType}</td>
+          <td style="padding: 8px;">${transactionqty}</td>`;
 
     // Handle LIFO data
     let lifoMatched = response.lifo_transaction.find(lifo =>
-        lifo.transaction_id === item.id && lifo.quantity === item.quantity
+        lifo.transaction_id === item.id && lifo.item_id === item.item_id
     );
 
     if (lifoMatched) {
         row += `<td style="padding: 8px;">${lifoMatched.balance_qty || 'N/A'}</td>`;
-        row += `<td style="padding: 8px;"><a href="/show_lifo_report/${item.id}">${formatNumber(lifoMatched.balance_unit_price)}</a></td>`;
+        row += `<td style="padding: 8px;"><a href="/show_lifo_report/${item.id}/${item.item_id}">${formatNumber(lifoMatched.balance_unit_price)}</a></td>`;
     } else {
         row += `<td style="padding: 8px;">N/A</td><td style="padding: 8px;">N/A</td>`;
     }
 
     // Handle FIFO data
     let fifoMatched = response.fifo_transaction.find(fifo =>
-        fifo.transaction_id === item.id && fifo.quantity === item.quantity
+        fifo.transaction_id === item.id && fifo.item_id === item.item_id
     );
 
     if (fifoMatched) {
-        row += `<td style="padding: 8px;">${formatNumber(fifoMatched.balance_qty)}</td>`;
-        row += `<td style="padding: 8px;"><a href="/show_fifo_report/${item.id}">${formatNumber(fifoMatched.balance_unit_price)}</a></td>`;
+        row += `<td style="padding: 8px;"><a href="/show_fifo_report/${item.id}/${item.item_id}">${formatNumber(fifoMatched.balance_unit_price)}</a></td>`;
     } else {
-        row += `<td style="padding: 8px;">N/A</td><td style="padding: 8px;">N/A</td>`;
+        row += `<td style="padding: 8px;">N/A</td>`;
+    }
+
+    let avgMatched = response.avg_transaction.find(avg =>
+    avg.transaction_id === item.id && avg.item_id === item.item_id
+    );
+
+    if (avgMatched) {
+        row += `<td style="padding: 8px;"><a href="/show_average_report/${item.id}/${item.item_id}">${formatNumber(avgMatched.balance_unit_price)}</a></td>`;
+    } else {
+        row += `<td style="padding: 8px;">N/A</td>`;
     }
 
     // Add manual match, average, and netwise fields
-    row += `<td style="padding: 8px;">${item?.manual_match || 'N/A'}</td>`;
-    row += `<td style="padding: 8px;"><a href="/show_average">${item?.avg_balance_value ? formatNumber(item.avg_balance_value) : 'N/A'}</a></td>`;
-    row += `<td style="padding: 8px;">${item?.netwise || 'N/A'}</td>`;
-
+    
     row += `</tr>`;
 
     $('#Category_table tbody').append(row);
