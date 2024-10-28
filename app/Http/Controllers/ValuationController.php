@@ -24,21 +24,38 @@ class ValuationController extends Controller
     public function calculateAverage($id = null,  $item_id = null, $i = null)
     {
        // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-       if ($id) {
+       if ($id && $item_id &&  $i) {
         $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
 
-        // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-
-        // Get all transactions up to and including the specific transaction_date
         $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
-            ->where('item_id', $item_id)
-            ->orderBy('transaction_date', 'asc')
-            ->limit($i)
+        ->where('item_id', $item_id)
+        ->orderBy('transaction_date', 'asc')
+        ->orderBy('id', 'asc') // Ensures unique order even on same date
+        ->limit($i)
+        ->get();
+   
+ 
+    } elseif($id && $item_id){
+        $transaction_data = InventoryTransaction::where('id', $id)->orderBy('transaction_date', 'desc')->select('transaction_date')->first();
+     
+        $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
+        ->where('item_id', $item_id)
+        ->orderBy('transaction_date', 'asc')
+        ->orderBy('id', 'asc') // Ensures unique order even on same date
+        ->get();
+    }
+    else {
+        if($item_id){
+            $transactions = InventoryTransaction::
+            where('item_id', $item_id)
+          ->orderBy('transaction_date', 'asc')
+          ->get();
+        }else{
+            $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')
             ->get();
-        // dd($transactions);
-    } else {
-        $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')
-            ->get();
+            // dd( $transactions);
+        }
+     
     }
     $lastTransaction = $transactions->last();
     $lastTransactionDate = $lastTransaction ? $lastTransaction->transaction_date : null;
@@ -1028,6 +1045,8 @@ class ValuationController extends Controller
         $lastSellPrice = null; // Last sell price
         $costOfGoodsPurchased = 0;
         $costOfGoodsPurchasedQty = 0;
+
+        $totalactualSell = 0;
      
         $costOfGoodsSold = 0;
         $costOfGoodsSoldQty = 0;
@@ -1107,6 +1126,7 @@ class ValuationController extends Controller
                                         'remaining_value' => $remainingQty *  $transaction->unit_price,
                                     ];
                                     $costOfGoodsPurchasedQty += $lastPurchase['quantity'] + $poQty;
+                                    $totalactualSell += $poQty * $transaction->unit_price;
                                 } else {
 
                                     $logEntry['details'][] = [
@@ -1117,6 +1137,7 @@ class ValuationController extends Controller
                                         'remaining_value' => $remainingQty *  $transaction->unit_price,
                                     ];
                                     $costOfGoodsPurchasedQty +=  (-$poQty);
+                                    $totalactualSell += (-$poQty) * $transaction->unit_price;
                                 }
                             } 
                             else {
@@ -1130,6 +1151,7 @@ class ValuationController extends Controller
                                     ];
                                     // dd($logEntry);
                                     $costOfGoodsPurchasedQty += $lastPurchase['quantity'];
+                                    $totalactualSell += $poQty * $transaction->unit_price;
 
                                 }
                             }
@@ -1154,6 +1176,7 @@ class ValuationController extends Controller
                                 'remaining_value' => 0,
                             ];
                             $costOfGoodsPurchasedQty +=  $lastPurchase['quantity'];
+                            $totalactualSell += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
                         }
                     }
                   
@@ -1200,9 +1223,9 @@ class ValuationController extends Controller
                     'cost_of_goods_sold' => $costOfGoodsPurchased,
                     'cost_of_goods_sold_qty' => $costOfGoodsPurchasedQty,
                     'cost_of_goods_sold_balance' =>   (abs($costOfGoodsPurchasedQty) > 0) ? $costOfGoodsPurchased / $costOfGoodsPurchasedQty : 0,
-                    'actual_sale_balance_unit_price' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0,
+                    'actual_sale_balance_unit_price' => ($lastPurchaseQty ?? 0) != 0 ? ($totalactualSell ?? 0) / $lastPurchaseQty : 0,
                     'actual_sale_qty' => $costOfGoodsPurchasedQty ?? 0,
-                    'actual_sale_value' => $costOfGoodsPurchasedQty * (($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0),
+                    'actual_sale_value' => $totalactualSell ?? 0,
                     'profit_loss' => 0,
                     'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                     'log_amount' => $transaction->quantity * $transaction->unit_price,
@@ -2181,11 +2204,15 @@ class ValuationController extends Controller
     
         $lifo_transaction = [];
         $fifo_transaction = [];
+        $avg_transaction = [];
+
+  
         $lifoData = '';
         $fifoData = '';
         $avgData = '';
 // Initialize an empty array to store counters for each item_id
 $itemCounters = [];
+
 
 foreach ($inventory_transaction as $data) {
     // Check if an $i counter already exists for this item_id
@@ -2199,6 +2226,7 @@ foreach ($inventory_transaction as $data) {
 
     $avgData = $this->calculateAverage($data->id, $data->item_id, $itemCounters[$data->item_id]);
 
+
     // Push only the last element if it exists
     if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
         $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
@@ -2207,11 +2235,14 @@ foreach ($inventory_transaction as $data) {
     if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
         $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
     }
-    
+        
+    if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
+        $avg_transaction[] = end($avgData['transaction_logs']); // Get the last transaction log
+    }
     // Increment the counter for this specific item_id
     $itemCounters[$data->item_id]++;
 }
-        return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction'));
+        return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction', 'avg_transaction'));
     }
     
 
@@ -2372,28 +2403,37 @@ foreach ($inventory_transaction as $data) {
         $fromDate = $request->input('from_date');
         $categoryName = $request->input('category'); // Get the selected category name
         // Start the query on the InventoryTransaction model
-        $query = InventoryTransaction::query();
-
+        $filterType = $request->input('filterType');
+        $toDate = $request->input('to_date');
+        $fromDate = $request->input('from_date');
+        $categoryName = $request->input('category');
+        
+        // Start the query on the InventoryTransaction model
+        if($toDate && $fromDate){
+            $query = InventoryTransaction::whereBetween('transaction_date', [$toDate, $fromDate]);
+        }
         // Apply filter type if provided
         if ($filterType) {
             $query->where('transaction_type', $filterType);
         }
-
+        
         // Filter by date range if provided
-        if ($toDate) {
-            $query->where('transaction_date', '<=', $toDate);
-        }
-        if ($fromDate) {
-            $query->where('transaction_date', '>=', $fromDate);
-        }
-
+        // if ($toDate) {
+        //     $query->where('transaction_date', '<=', $toDate);
+        // }
+        // if ($fromDate) {
+        //     $query->where('transaction_date', '>=', $fromDate);
+        // }
+        
         // Filter by category if provided
         if ($categoryName) {
-            $query = InventoryTransaction::where('item_name', $categoryName)->get();
+            $query->where('item_id', $categoryName);
         }
-
+        
         // Fetch the filtered inventory transactions
-        $inventory_transaction =  $query;
+        $inventory_transaction = $query->get();
+        
+        // dd($inventory_transaction );
         // dd($inventory_transaction);
 
         // Uncomment the dd statement to debug
@@ -2403,14 +2443,15 @@ foreach ($inventory_transaction as $data) {
         $lifoData = $this->calculateLIFO();
         $fifoData = $this->calculateFIFO();
         $avgData = $this->calculateAverage();
-
+// dd( $avgData);
         // Return the data as a JSON response
         return response()->json([
             'inventory_transaction' => $inventory_transaction, // Change this to 'data' to match your frontend code
             'lifo_transaction' => $lifoData['transaction_logs'],
             'fifo_transaction' => $fifoData['transaction_logs'],
-            'avgData' => $avgData,
+            'avg_transaction' => $avgData['transaction_logs'],
         ]);
+
     }
 
 
