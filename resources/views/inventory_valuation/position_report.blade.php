@@ -246,7 +246,7 @@
                                                     <!-- LIFO Manual Match and Netwise -->
                                                     {{-- <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td> --}}
                                                     <td style="padding: 8px;">
-                                                        <a href="{{ route('show.average') }}">
+                                                            <a href="{{ route('show.average', ['id' => $data['id'], 'item_id' => $data['item_id']]) }}">
                                                             N/A
                                                         </a>
                                                     </td>
