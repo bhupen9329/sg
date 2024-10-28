@@ -21,6 +21,10 @@ use App\Models\FifoTransactionUsedQty;
 use App\Models\FifoTransactionStack;
 use App\Models\FifoTransaction;
 
+use App\Models\AverageTransactionUsedQty;
+use App\Models\AverageTransactionStack;
+use App\Models\AverageFifoTransaction;
+
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Http\Controllers\ValuationController;
@@ -176,6 +180,7 @@ class PurchaseController extends Controller
                   // Call LIFO and FIFO handling methods
             $this->handleLifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
             $this->handleFifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
+            // $this->handleAverageTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
 
          
       
@@ -185,6 +190,77 @@ class PurchaseController extends Controller
             return redirect()->route('purchase.index')->with('success', 'Purchase Order Created Successfully');
         }
     }
+
+    private function handleAverageTransaction($inventoryItemId, $inventoryTransactionId, $transactionDate, $valuationcontroller, Request $request)
+    {
+    
+        $average_calculations = $valuationcontroller->averageCalculation($inventoryItemId);
+        // dd($lifo_ca  lculations);
+     
+
+        if (isset($average_calculations['transaction_logs']) && is_array($average_calculations['transaction_logs'])) {
+        
+            $transaction = end($average_calculations['transaction_logs']);
+        } else {
+            $transaction = null; 
+        }      
+    
+                $averageTransaction = new AverageTransaction();
+                $averageTransaction->inventory_transaction_id = $transaction['transaction_id'];
+                $averageTransaction->stock_bal_qty = $transaction['balance_qty'];;
+                $averageTransaction->stock_bal_unit_price = $transaction['balance_unit_price'];
+                $averageTransaction->stock_bal_value = $transaction['balance_value'];
+                $averageTransaction->cogs_qty = $transaction['cost_of_goods_sold_qty'];
+                $averageTransaction->cogs_unit_price = $transaction['cost_of_goods_sold_balance'];
+                $averageTransaction->cogs_bal_value = $transaction['cost_of_goods_sold'];
+
+                $averageTransaction->actual_sales_qty	 = $transaction['actual_sale_qty'];
+                $averageTransaction->actual_sales_unit_price = $transaction['actual_sale_balance_unit_price'];
+                $averageTransaction->actual_sales_value = $transaction['actual_sale_value'];
+
+                $averageTransaction->profit_loss = abs($transaction['actual_sale_value']) - abs($transaction['cost_of_goods_sold']);
+                if($averageTransaction->profit_loss > 0){
+                    $averageTransaction->status = 'Profit';
+                }else{
+                    $averageTransaction->status = 'Loss';
+                }
+              
+                $averageTransaction->item_id = $transaction['item_id'];
+                $averageTransaction->stock_position =  $transaction['status'];
+
+              
+                $averageTransaction->save();
+
+            
+                foreach ($transaction['inventory_stack'] as $inventory) {
+                    $averageTransactionChild = new AverageTransactionStack();
+                    $averageTransactionChild->average_transaction_id = $averageTransaction->id; 
+                    $averageTransactionChild->inventory_transaction_id = $inventoryTransactionId; 
+                    $averageTransactionChild->average_transaction_stacks_bal_qty = $inventory['quantity'];
+                    $averageTransactionChild->average_transaction_stacks_bal_unit_price = $inventory['unit_price'];
+                    $averageTransactionChild->average_transaction_stacks_bal_value = $inventory['quantity'] * $inventory['unit_price'];
+                    $averageTransactionChild->purchase_date = $request->date;
+
+                  
+                    $averageTransactionChild->save();
+                }
+
+             
+                if ($transaction['details'] && count($transaction['details']) > 0) {
+                    foreach ($transaction['details'] as $detail) {
+                        $averageTransactionChild = new AverageTransactionUsedQty();
+                        $averageTransactionChild->lifo_transaction_id = $averageTransaction->id; 
+                        $averageTransactionChild->inventory_transaction_id = $inventoryTransactionId; 
+                        $averageTransactionChild->average_transaction_used_bal_qty = $detail['used_qty'];
+                        $averageTransactionChild->average_transaction_used_bal_unit_price = $detail['unit_price'];
+                        $averageTransactionChild->average_transaction_used_bal_value = $detail['used_qty'] * $detail['unit_price'];
+                       
+                        $averageTransactionChild->save(); 
+                    }
+                }
+
+    }
+
 
 
     private function handleLifoTransaction($inventoryItemId, $inventoryTransactionId, $transactionDate, $valuationcontroller, Request $request)
