@@ -18,6 +18,14 @@ use App\Models\InventoryTransaction;
 use App\Models\WareHouseModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Http\Controllers\ValuationController;
+use App\Models\LifoTransactionUsedQty;
+use App\Models\LifoTransactionStack;
+use App\Models\LifoTransaction;
+
+use App\Models\FifoTransactionUsedQty;
+use App\Models\FifoTransactionStack;
+use App\Models\FifoTransaction;
 
 class SalesController extends Controller
 {
@@ -78,7 +86,7 @@ class SalesController extends Controller
 
 
 
-    public function store(Request $request)
+    public function store(Request $request, ValuationController $valuationcontroller)
     {
 
         $salesOrder = new SalesOrder();
@@ -136,9 +144,157 @@ class SalesController extends Controller
                 $inventoryTransaction->company_name = $companyName;
                 $inventoryTransaction->position = 'open';
                 $inventoryTransaction->save();
+
+                $inventoryTransactionId = $inventoryTransaction->id;
+                $inventoryItemId = $inventoryTransaction->item_id;
+
+            $this->handleLifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
+            $this->handleFifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
+
+
+            
             }
             return redirect()->route('sales.index')->with('success', 'Sales Orders Created Successfully');;
         }
+    }
+
+    private function handleLifoTransaction($inventoryItemId, $inventoryTransactionId, $transactionDate, $valuationcontroller, Request $request)
+    {
+        $lifo_calculations = $valuationcontroller->lifoCalculation($inventoryItemId);
+
+
+        if (isset($lifo_calculations['transaction_logs']) && is_array($lifo_calculations['transaction_logs'])) {
+        
+            $transaction = end($lifo_calculations['transaction_logs']);
+        } else {
+            $transaction = null; 
+        }
+        // dd($transaction);
+
+        
+        // Create a new LifoTransaction record
+        $lifoTransaction = new LifoTransaction();
+        $lifoTransaction->inventory_transaction_id = $transaction['transaction_id'];
+        $lifoTransaction->stock_bal_qty = $transaction['balance_qty'];;
+        $lifoTransaction->stock_bal_unit_price = $transaction['balance_unit_price'];
+        $lifoTransaction->stock_bal_value = $transaction['balance_value'];
+        $lifoTransaction->cogs_qty = $transaction['cost_of_goods_sold_qty'];
+        $lifoTransaction->cogs_unit_price = $transaction['cost_of_goods_sold_balance'];
+        $lifoTransaction->cogs_bal_value = $transaction['cost_of_goods_sold'];
+        
+        $lifoTransaction->actual_sales_qty	 = $transaction['actual_sale_qty'];
+        $lifoTransaction->actual_sales_unit_price = $transaction['actual_sale_balance_unit_price'];
+        $lifoTransaction->actual_sales_value = $transaction['actual_sale_value'];
+        
+        $lifoTransaction->profit_loss = abs($transaction['actual_sale_value']) - abs($transaction['cost_of_goods_sold']);
+        if($lifoTransaction->profit_loss > 0){
+            $lifoTransaction->status = 'Profit';
+        }else{
+            $lifoTransaction->status = 'Loss';
+        }
+        
+        $lifoTransaction->item_id = $transaction['item_id'];
+        $lifoTransaction->stock_position =  $transaction['status'];
+        
+        // dd($lifoTransaction);
+                  // Save the LIFO transaction
+                  $lifoTransaction->save();
+
+                  // Save the inventory stack
+                  foreach ($transaction['inventory_stack'] as $inventory) {
+                      $lifoTransactionChild = new LifoTransactionStack(); // Assuming you have a LifoTransactionChild model
+                      $lifoTransactionChild->lifo_transaction_id = $lifoTransaction->id; // Set the parent transaction ID
+                      $lifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; // Set the parent transaction ID
+                      $lifoTransactionChild->lifo_transaction_stacks_bal_qty = $inventory['quantity'];
+                      $lifoTransactionChild->lifo_transaction_stacks_bal_unit_price = $inventory['unit_price'];
+                      $lifoTransactionChild->lifo_transaction_stacks_bal_value = $inventory['quantity'] * $inventory['unit_price'];
+                      $lifoTransactionChild->purchase_date = $request->date;
+
+                      // Save the child inventory stack data
+                      $lifoTransactionChild->save();
+                  }
+
+                  // Optional: If you have any details to save, you can do that similarly here
+                  if ($transaction['details'] && count($transaction['details']) > 0) {
+                      foreach ($transaction['details'] as $detail) {
+                          $lifoTransactionChild = new LifoTransactionUsedQty();
+                          $lifoTransactionChild->lifo_transaction_id = $lifoTransaction->id; // Set the parent transaction ID
+                          $lifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; // Set the parent transaction ID
+                          $lifoTransactionChild->lifo_transaction_used_bal_qty = $detail['used_qty'];
+                          $lifoTransactionChild->lifo_transaction_used_bal_unit_price = $detail['unit_price'];
+                          $lifoTransactionChild->lifo_transaction_used_bal_value = $detail['used_qty'] * $detail['unit_price'];
+                          // Save the child record
+                          $lifoTransactionChild->save(); // This line was missing
+                      }
+                  }
+    }
+
+    private function handleFifoTransaction($inventoryItemId, $inventoryTransactionId, $transactionDate, $valuationcontroller, Request $request)
+    {
+        $fifo_calculations = $valuationcontroller->fifoCalculation($inventoryItemId);
+     
+
+        if (isset($fifo_calculations['transaction_logs']) && is_array($fifo_calculations['transaction_logs'])) {
+        
+            $transaction = end($fifo_calculations['transaction_logs']);
+        } else {
+            $transaction = null; 
+        }      
+    
+                $fifoTransaction = new FifoTransaction();
+                $fifoTransaction->inventory_transaction_id = $transaction['transaction_id'];
+                $fifoTransaction->stock_bal_qty = $transaction['balance_qty'];;
+                $fifoTransaction->stock_bal_unit_price = $transaction['balance_unit_price'];
+                $fifoTransaction->stock_bal_value = $transaction['balance_value'];
+                $fifoTransaction->cogs_qty = $transaction['cost_of_goods_sold_qty'];
+                $fifoTransaction->cogs_unit_price = $transaction['cost_of_goods_sold_balance'];
+                $fifoTransaction->cogs_bal_value = $transaction['cost_of_goods_sold'];
+
+                $fifoTransaction->actual_sales_qty	 = $transaction['actual_sale_qty'];
+                $fifoTransaction->actual_sales_unit_price = $transaction['actual_sale_balance_unit_price'];
+                $fifoTransaction->actual_sales_value = $transaction['actual_sale_value'];
+
+                $fifoTransaction->profit_loss = abs($transaction['actual_sale_value']) - abs($transaction['cost_of_goods_sold']);
+                if($fifoTransaction->profit_loss > 0){
+                    $fifoTransaction->status = 'Profit';
+                }else{
+                    $fifoTransaction->status = 'Loss';
+                }
+              
+                $fifoTransaction->item_id = $transaction['item_id'];
+                $fifoTransaction->stock_position =  $transaction['status'];
+
+              
+                $fifoTransaction->save();
+
+            
+                foreach ($transaction['inventory_stack'] as $inventory) {
+                    $fifoTransactionChild = new FifoTransactionStack();
+                    $fifoTransactionChild->fifo_transaction_id = $fifoTransaction->id; 
+                    $fifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; 
+                    $fifoTransactionChild->fifo_transaction_stacks_bal_qty = $inventory['quantity'];
+                    $fifoTransactionChild->fifo_transaction_stacks_bal_unit_price = $inventory['unit_price'];
+                    $fifoTransactionChild->fifo_transaction_stacks_bal_value = $inventory['quantity'] * $inventory['unit_price'];
+                    $fifoTransactionChild->purchase_date = $request->date;
+
+                  
+                    $fifoTransactionChild->save();
+                }
+
+             
+                if ($transaction['details'] && count($transaction['details']) > 0) {
+                    foreach ($transaction['details'] as $detail) {
+                        $fifoTransactionChild = new FifoTransactionUsedQty();
+                        $fifoTransactionChild->fifo_transaction_id = $fifoTransaction->id; 
+                        $fifoTransactionChild->inventory_transaction_id = $inventoryTransactionId; 
+                        $fifoTransactionChild->fifo_transaction_used_bal_qty = $detail['used_qty'];
+                        $fifoTransactionChild->fifo_transaction_used_bal_unit_price = $detail['unit_price'];
+                        $fifoTransactionChild->fifo_transaction_used_bal_value = $detail['used_qty'] * $detail['unit_price'];
+                       
+                        $fifoTransactionChild->save(); 
+                    }
+                }
+
     }
 
     public function delete($id)
