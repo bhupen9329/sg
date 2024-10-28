@@ -118,7 +118,7 @@
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">FIFO Report</li>
+                    <li class="breadcrumb-item">Average Report</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->

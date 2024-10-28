@@ -1098,7 +1098,6 @@ class ValuationController extends Controller
 
                          
                             if (abs($lastPurchase['quantity']) > $poQty) {
-
                                 if ($lastPurchase['quantity'] > $poQty) {
                                     $logEntry['details'][] = [
                                         'used_qty' => $lastPurchase['quantity'] + $poQty,
@@ -1119,7 +1118,8 @@ class ValuationController extends Controller
                                     ];
                                     $costOfGoodsPurchasedQty +=  (-$poQty);
                                 }
-                            } else {
+                            } 
+                            else {
                                 if ($lastTransactionStatus == 'Short') {
                                     $logEntry['details'][] = [
                                         'used_qty' => $lastPurchase['quantity'],
@@ -1128,14 +1128,14 @@ class ValuationController extends Controller
                                         'remaining_qty' => $remainingQty,
                                         'remaining_value' => $remainingQty *  $transaction->unit_price,
                                     ];
-                                    dd($logEntry);
+                                    // dd($logEntry);
                                     $costOfGoodsPurchasedQty += $lastPurchase['quantity'];
 
                                 }
                             }
-                           
-
+    //   dd($logEntry);
                             $poQty =  $remainingQty;
+                       
                         } else {
                       
                             $costOfGoodsPurchased += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
@@ -1169,11 +1169,16 @@ class ValuationController extends Controller
                         $totalQuantity =  $poQty;  
                         $totalValue  =  $poQty * $transaction->unit_price;
                     } else {
-                        $latestInventory = end($inventoryStack);
-                        $total_stack = ($latestInventory['quantity'] * $latestInventory['unit_price']);
-                        $totalQuantity = ($costOfGoodsPurchasedQty -  $total_stack);
+                        // $latestInventory = end($inventoryStack);
+                        // $total_stack = ($latestInventory['quantity'] * $latestInventory['unit_price']);
+                        // $totalQuantity = ($costOfGoodsPurchasedQty -  $total_stack);
                        
-                        $totalValue = ($costOfGoodsPurchased ?? 0) - ($total_stack ?? 0);
+                        // $totalValue = ($costOfGoodsPurchased ?? 0) - ($total_stack ?? 0);
+
+                        $totalQuantity = array_sum(array_column($inventoryStack, 'quantity'));
+                        $totalUnitPrice = array_sum(array_column($inventoryStack, 'unit_price'));
+                        // dd( $totalQuantity);
+                        $totalValue = ($totalQuantity ?? 0) * ( $totalUnitPrice ?? 0);
                     
                     }
                    
@@ -1207,6 +1212,7 @@ class ValuationController extends Controller
                     'lastPurchaseQty' => $lastPurchaseQty ?? 0,
                     'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
                 ];
+                // dd( $transactionLogs);
             
 
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
@@ -1948,11 +1954,15 @@ class ValuationController extends Controller
                         $totalQuantity =  $poQty;  
                         $totalValue  =  $poQty * $transaction->unit_price;
                     } else {
-                        $latestInventory = end($inventoryStack);
-                        $total_stack = ($latestInventory['quantity'] * $latestInventory['unit_price']);
-                        $totalQuantity = ($costOfGoodsPurchasedQty -  $total_stack);
+                        // $latestInventory = end($inventoryStack);
+                        // $total_stack = ($latestInventory['quantity'] * $latestInventory['unit_price']);
+                        // $totalQuantity = ($costOfGoodsPurchasedQty -  $total_stack);
                        
-                        $totalValue = ($costOfGoodsPurchased ?? 0) - ($total_stack ?? 0);
+                        // $totalValue = ($costOfGoodsPurchased ?? 0) - ($total_stack ?? 0);
+                        $totalQuantity = array_sum(array_column($inventoryStack, 'quantity'));
+                        $totalUnitPrice = array_sum(array_column($inventoryStack, 'unit_price'));
+                        // dd( $totalQuantity);
+                        $totalValue = ($totalQuantity ?? 0) * ( $totalUnitPrice ?? 0);
                     
                     }
                    
