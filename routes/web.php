@@ -316,7 +316,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/calculate_lifo', [ValuationController::class, 'calculateLIFO'])->name('inventory.lifo');
         Route::get('/show_lifo_report/{id}/{item_id}', [ValuationController::class, 'showLIFOReport'])->name('show.lifo');
         Route::get('/show_fifo_report/{id}/{item_id}', [ValuationController::class, 'showFifoReport'])->name('show.fifo');
-        Route::get('/show_average_report', [ValuationController::class, 'showAverageReport'])->name('show.average');
+        Route::get('/show_average_report/{id}/{item_id}', [ValuationController::class, 'showAverageReport'])->name('show.average');
         Route::post('/store_inventory', [ValuationController::class, 'store_inventory'])->name('store_inventory');
         Route::get('/inventory/filter', [ValuationController::class, 'filter'])->name('inventory.filter');
         // Route::get('/valuation', [ValuationController::class, 'valuation'])->name('inventory.valuation');
