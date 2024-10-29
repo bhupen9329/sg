@@ -227,7 +227,7 @@
             @endif
 
 
-            @can('Inward-index')
+            {{-- @can('Inward-index')
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('inward.index') }}">
                         <i class="fa-solid fa-down-left-and-up-right-to-center"></i>
@@ -254,7 +254,7 @@
                         <span>Virtual Store</span>
                     </a>
                 </li>
-            @endcan
+            @endcan --}}
             {{-- @can('Stock-Adjustment-index')
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('adjustment.index') }}">
@@ -293,13 +293,13 @@
                         </li>
 
 
-                        <li>
+                        {{-- <li>
                             @can('Sub-Category-index')
                                 <a href="{{ route('subcategory.index') }}">
                                     <i class="bi bi-circle"></i><span>Sub Category</span>
                                 </a>
                             @endcan
-                        </li>
+                        </li> --}}
                     </ul>
                 </li><!-- End Icons Nav -->
             @endif
@@ -356,7 +356,7 @@
                         </i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <ul id="report-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                        <li>
+                        {{-- <li>
                             @can('PO-Report')
                                 <a href="{{ route('po_report') }}">
                                     <i class="bi bi-circle"></i><span>Purchase Order Report</span>
@@ -393,7 +393,7 @@
                                     <i class="bi bi-circle"></i><span>Virtual Store Report</span>
                                 </a>
                             @endcan
-                        </li>
+                        </li> --}}
  
 
                         
@@ -466,13 +466,13 @@
                         </i><span>Setting</span><i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <ul id="setting-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                        @can('Setting-email')
+                        {{-- @can('Setting-email')
                             <li>
                                 <a href="{{ route('email.create') }}">
                                     <i class="bi bi-circle"></i><span>Email</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
                         @can('Setting-company')
                             <li>
                                 <a href="{{ route('setting.company_create') }}">
@@ -480,13 +480,13 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('GST-index')
+                        {{-- @can('GST-index')
                             <li>
                                 <a href="{{ route('setting.gst') }}">
                                     <i class="bi bi-circle"></i><span>GST</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
 
 
                     </ul>

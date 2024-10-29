@@ -98,8 +98,6 @@
                                         <th>SO Match Position</th>
                                         <th>SO Item Position</th>
                                         <th>Remarks</th>
-
-                                       
                                         <th>Action</th>
                                     </tr>
                                 </thead>
