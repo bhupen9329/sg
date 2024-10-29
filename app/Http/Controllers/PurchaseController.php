@@ -23,7 +23,7 @@ use App\Models\FifoTransaction;
 
 use App\Models\AverageTransactionUsedQty;
 use App\Models\AverageTransactionStack;
-use App\Models\AverageFifoTransaction;
+use App\Models\AverageTransaction;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -195,7 +195,7 @@ class PurchaseController extends Controller
     {
     
         $average_calculations = $valuationcontroller->averageCalculation($inventoryItemId);
-        // dd($lifo_ca  lculations);
+        // dd($lifo_calculations);
      
 
         if (isset($average_calculations['transaction_logs']) && is_array($average_calculations['transaction_logs'])) {
