@@ -1523,6 +1523,7 @@ class ValuationController extends Controller
                         $totallastQuantity += $item['quantity'];
                     }
                     $averagelastUnitPrice = $totalQuantity < 0 ? $totallastPrice / $totalQuantity : 0;
+                    // dd($poQty);
                     while ($poQty > 0 && !empty($inventoryStack)) {
                         
                         $lastPurchase = array_pop($inventoryStack);
@@ -1595,7 +1596,8 @@ class ValuationController extends Controller
     //   dd($logEntry);
                             $poQty =  $remainingQty;
                        
-                        } else {
+                        } 
+                        else {
                       
                             $costOfGoodsPurchased += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
                          
@@ -2837,6 +2839,7 @@ foreach ($inventory_transaction as $data) {
         // $toDate = $request->input('to_date');
         // $fromDate = $request->input('from_date');
         // $categoryName = $request->input('category');
+        // dd( $filterType);
    
         
         // Start the query on the InventoryTransaction model

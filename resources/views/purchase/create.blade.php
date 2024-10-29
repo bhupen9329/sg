@@ -124,7 +124,7 @@
                                                                         }
                                                                     </style>
 
-                                                                    <th class="smaller-font">Item Category <span
+                                                                    <th class="smaller-font" style="width: 25%;">Item Category <span
                                                                             class="required-classes">*</span>
                                                                     </th>
                                                                     <th class="smaller-font">Quantity(Q) <span
@@ -186,7 +186,7 @@
                                                             var cell6 = newRow.insertCell(5);
                                                             var cell7 = newRow.insertCell(6);
                                                             cell1.innerHTML = `
-                                                            <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')" style="width:300px" class="form-control smaller-font item-select-${lastItemId}" required>
+                                                            <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"  class="form-control smaller-font item-select-${lastItemId}" required>
                                                                 <option value="" disabled selected>Select Item</option>
                                                                 @foreach ($category as $category)
                                                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
