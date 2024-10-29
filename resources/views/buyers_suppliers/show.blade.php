@@ -39,11 +39,11 @@
                                         </tr>
                                         <tr>
                                             <th scope="row">Mobile</th>
-                                            <td>{{ $companies->mobile }}</td>
+                                            <td>{{ $companies->mobile  ?? 'N/A'}}</td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Email</th>
-                                            <td>{{ $companies->email }}</td>
+                                            <td>{{ $companies->email  ?? 'N/A'}}</td>
                                         </tr>
                                       
                                        

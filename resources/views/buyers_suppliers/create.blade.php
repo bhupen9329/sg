@@ -57,19 +57,18 @@
                                                 <option value="supplier">Supplier</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-6" style="display: none" id="virtual_div">
+                                        {{-- <div class="col-md-6" style="display: none" id="virtual_div">
                                             <label for="inputName5" class="form-label">Virtual Store</label><span
                                                 class="required-classes">*</span>
                                             <input type="text" name="virtual_store" class="form-control" id="name-input"
                                                 required>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="inputName5" class="form-label">Mobile</label><span
-                                        class="required-classes">*</span>
+                                    <label for="inputName5" class="form-label">Mobile</label>
                                     <input type="tel" name="mobile" maxlength="10" class="form-control" id="inputName5"
-                                        required pattern="\d{10}" title="Please enter a 10-digit mobile number">
+                                         pattern="\d{10}" title="Please enter a 10-digit mobile number">
 
                                     @if ($errors->has('mobile'))
                                         <p class="error">{{ $errors->first('mobile') }}</p>
@@ -77,9 +76,8 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="inputName5" class="form-label">Email</label><span
-                                        class="required-classes">*</span>
-                                    <input type="email" name="email" class="form-control" id="inputName5" required>
+                                    <label for="inputName5" class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" id="inputName5">
 
                                     @if ($errors->has('email'))
                                         <p class="error">{{ $errors->first('email') }}</p>

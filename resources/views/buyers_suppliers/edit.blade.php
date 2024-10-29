@@ -59,27 +59,25 @@
                                             </select>
 
                                         </div>
-                                        <div class="col-md-6" style="display: none" id="virtual_div">
+                                        {{-- <div class="col-md-6" style="display: none" id="virtual_div">
                                             <label for="inputName5" class="form-label">Virtual Store</label><span
                                                 class="required-classes">*</span>
                                             <input type="text" name="virtual_store" class="form-control" id="virtual_input"
                                                 value="{{ $companies->virtual_store }}" >
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="inputName5" class="form-label">Mobile</label><span
-                                        class="required-classes">*</span>
+                                    <label for="inputName5" class="form-label">Mobile</label>
                                     <input type="text" name="mobile" maxlength="10" minlength="10" class="form-control"
-                                        value="{{ $companies->mobile }}" id="inputName5" required>
+                                        value="{{ $companies->mobile }}" id="inputName5">
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="inputName5" class="form-label">Email</label><span
-                                        class="required-classes">*</span>
+                                    <label for="inputName5" class="form-label">Email</label>
                                     <input type="email" name="email" class="form-control"
-                                        value="{{ $companies->email }}" id="inputName5" required>
+                                        value="{{ $companies->email }}" id="inputName5">
                                 </div>
 
                                 <div class="col-6">

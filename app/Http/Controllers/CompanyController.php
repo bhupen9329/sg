@@ -37,12 +37,10 @@ class CompanyController extends Controller
   {
     // dd($req);
 
-    $vaildation = $req->validate([
-      'company_name' => 'required',
-      'address' => 'required',
-      'email' => 'required',
-      'mobile' => 'required',
-    ]);
+    // $vaildation = $req->validate([
+    //   'company_name' => 'required',
+    //   'address' => 'required',
+    // ]);
 
     $data = [
       'company_name' => $req->company_name,
@@ -83,9 +81,6 @@ class CompanyController extends Controller
     $vaildation = $req->validate([
       'company_name' => 'required',
       'address' => 'required',
-      'mobile' => 'required',
-      'email' => 'required',
-
     ]);
 
     $data = [

@@ -207,7 +207,8 @@
                                             {{-- @dump($lifo_transaction); @dump($inventory_transaction); --}}
                                             @foreach ($inventory_transaction as $data)
                                                 <tr>
-                                                    <td style="padding: 8px;">{{ $data['transaction_date'] }}</td>
+                                                    {{-- <td style="padding: 8px;">{{ ($data['transaction_date']) }}</td> --}}
+                                                    <td style="padding: 8px;">{{ date('d-m-Y', strtotime($data['transaction_date'])) }}</td>
                                                     <td style="padding: 8px;">{{ $data['item_name'] ?? 'N/A' }}</td>
                                                     <td style="padding: 8px;">{{ $data['transaction_type'] ?? 'N/A' }}</td>
                                                     <td style="padding: 8px;">{{ $data['quantity'] ?? 'N/A' }}</td>
@@ -361,7 +362,9 @@
 
 
     let row = `<tr>
-        <td style="padding: 8px;">${transactionDate}</td>
+         <td style="padding: 8px;">
+        ${new Date(transactionDate).toLocaleDateString('en-GB')}
+    </td>
         <td style="padding: 8px;">${itemName}</td>
         <td style="padding: 8px;">${transactionType}</td>
           <td style="padding: 8px;">${transactionqty}</td>`;
