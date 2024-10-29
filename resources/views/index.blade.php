@@ -111,29 +111,7 @@
                         </div><!-- End Revenue Card -->
 
 
-                        <div class="dashboard-card-3 ">
-                            <div class="card info-card customers-card">
-
-                                <div class="card-body">
-                                    <h5 class="card-title"> Virtual Store
-                                        <span style="color: #fff">Pending</span>
-                                    </h5>
-
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-people"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ $virtual_store }}</h6>
-                                            {{-- <h6>0</h6> --}}
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                        </div>
+                     
                         <!-- Customers Card -->
                      
                         {{-- <div class="dashboard-card-4">

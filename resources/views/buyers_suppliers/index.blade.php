@@ -90,7 +90,6 @@
                                         <th>Email</th>
                                         <th>Address</th>
                                         <th>Type</th>
-                                        <th>Virtual Store</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -99,13 +98,11 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $data->company_name }}</td>
-                                            <td>{{ $data->mobile }}</td>
-                                            <td>{{ $data->email }}</td>
+                                            <td>{{ $data->mobile ?? 'N/A'}}</td>
+                                            <td>{{ $data->email ?? 'N/A'}}</td>
 
                                             <td>  {{ $data->address }} </td>
                                             <td>  {{ $data->type }} </td>
-                                            <td>  {{ $data->virtual_store }} </td>
-
                                             <td>
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
