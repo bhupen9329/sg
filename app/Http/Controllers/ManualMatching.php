@@ -502,8 +502,8 @@ class ManualMatching extends Controller
                 'po_item_qty' => $purchaseOrderItem->po_rest_qty,
             ]);
 
-            $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => $remainingSoItemQuantity]);
-            $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => $remainingPoItemQuantity]);
+            $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => number_format($remainingSoItemQuantity, 3)]);
+            $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => number_format($remainingPoItemQuantity, 3)]);
 
             $new_so_item  = SoItem::where('id', $soItemId)->first();
             $new_po_item  = PoItem::where('id', $poItemId)->first();
@@ -630,8 +630,8 @@ class ManualMatching extends Controller
                 'po_item_qty' => $purchaseOrderItem->po_rest_qty,
             ]);
 
-            $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => $remainingSoItemQuantity]);
-            $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => $remainingPoItemQuantity]);
+            $salesOrderItem = SoItem::where('id', $soItemId)->update(['so_rest_qty' => number_format($remainingSoItemQuantity, 3)]);
+            $purchaseOrderItem = PoItem::where('id', $poItemId)->update(['po_rest_qty' => number_format($remainingPoItemQuantity, 3)]);
 
 
             // dd( $s, $d );
@@ -798,7 +798,7 @@ class ManualMatching extends Controller
 
         // dd($manual_match);
 
-        return view('manual_matching.match_Sales', compact('salesOrders', 'purchaseOrders', 'manual_match', 'so_data', 'purchaseOrders'));
+        return view('manual_matching.match_sales', compact('salesOrders', 'purchaseOrders', 'manual_match', 'so_data', 'purchaseOrders'));
     }
 
     public function transaction_revert(Request $request)
