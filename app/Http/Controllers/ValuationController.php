@@ -10,6 +10,7 @@ use App\Models\Category;
 use Illuminate\Support\Facades\View;
 
 
+
 class ValuationController extends Controller
 {
     public function index()
@@ -1514,6 +1515,14 @@ class ValuationController extends Controller
                  else {
                     $lastPurchaseTotal = 0;
                     $lastPurchaseQty = 0;
+
+                    $totallastPrice = 0;
+                    $totallastQuantity = 0;
+                    foreach ($inventoryStack as $item) {
+                        $totallastPrice += $item['unit_price'] * $item['quantity'];
+                        $totallastQuantity += $item['quantity'];
+                    }
+                    $averagelastUnitPrice = $totalQuantity < 0 ? $totallastPrice / $totalQuantity : 0;
                     while ($poQty > 0 && !empty($inventoryStack)) {
                         
                         $lastPurchase = array_pop($inventoryStack);
@@ -1523,7 +1532,7 @@ class ValuationController extends Controller
 
                         if ($lastPurchase['quantity'] <= $poQty) {
                          
-                            $costOfGoodsPurchased = $poQty * $lastPurchase['unit_price'];
+                            $costOfGoodsPurchased += $poQty * $lastPurchase['unit_price'];
                        
                             $remainingQty = $lastPurchase['quantity'] + $poQty;
 
@@ -1593,8 +1602,6 @@ class ValuationController extends Controller
                             $poQty -= $lastPurchase['quantity'];
                             $totalQuantity += $lastPurchase['quantity']; 
                             $totalValue += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-
-
                        
                             $logEntry['details'][] = [
                                 'used_qty' => $lastPurchase['quantity'],
@@ -1636,33 +1643,37 @@ class ValuationController extends Controller
 
                 }
 
+
+            $transactionLogs[] = [
+                'transaction_type' => 'Purchase',
+                'transaction_id' => $transaction->id,
+                'item_id' => $transaction->item_id,
+                'quantity' => $transaction->quantity,
+                'item_name' => $transaction->item_name,
+                'unit_price' => $transaction->unit_price,
+                'transaction_date' => $transaction->transaction_date,
+                'balance_qty' => $totalQuantity,
+                'balance_value' => $totalValue,
+                'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0,
+                'cost_of_goods_sold' => $costOfGoodsPurchased,
+                'cost_of_goods_sold_qty' => $costOfGoodsPurchasedQty,
+                'cost_of_goods_sold_balance' =>   (abs($costOfGoodsPurchasedQty) > 0) ? $costOfGoodsPurchased / $costOfGoodsPurchasedQty : 0,
+                'actual_sale_balance_unit_price' => ($lastPurchaseQty ?? 0) != 0 ? ($totalactualSell ?? 0) / $lastPurchaseQty : 0,
+                'actual_sale_qty' => $costOfGoodsPurchasedQty ?? 0,
+                'actual_sale_value' => $costOfGoodsPurchased ?? 0,
+                'profit_loss' => 0,
+                'status' => $totalQuantity < 0 ? 'Short' : 'Long',
+                'log_amount' => $transaction->quantity * $transaction->unit_price,
+                'inventory_stack' => $inventoryStack,
+                'details' => $logEntry['details'] ?? 'No details provided',
+                'lastPurchaseTotal' => $lastPurchaseTotal ?? 0,
+                'lastPurchaseQty' => $lastPurchaseQty ?? 0,
+                'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
+            ];
+      
+
+            
                
-                $transactionLogs[] = [
-                    'transaction_type' => 'Purchase',
-                    'transaction_id' => $transaction->id,
-                    'item_id' => $transaction->item_id,
-                    'quantity' => $transaction->quantity,
-                    'item_name' => $transaction->item_name,
-                    'unit_price' => $transaction->unit_price,
-                    'transaction_date' => $transaction->transaction_date,
-                    'balance_qty' => $totalQuantity,
-                    'balance_value' => $totalValue,
-                    'balance_unit_price' => (abs($totalQuantity) > 0) ? $totalValue / $totalQuantity : 0,
-                    'cost_of_goods_sold' => $costOfGoodsPurchased,
-                    'cost_of_goods_sold_qty' => $costOfGoodsPurchasedQty,
-                    'cost_of_goods_sold_balance' =>   (abs($costOfGoodsPurchasedQty) > 0) ? $costOfGoodsPurchased / $costOfGoodsPurchasedQty : 0,
-                    'actual_sale_balance_unit_price' => ($lastPurchaseQty ?? 0) != 0 ? ($totalactualSell ?? 0) / $lastPurchaseQty : 0,
-                    'actual_sale_qty' => $costOfGoodsPurchasedQty ?? 0,
-                    'actual_sale_value' => $totalactualSell ?? 0,
-                    'profit_loss' => 0,
-                    'status' => $totalQuantity < 0 ? 'Short' : 'Long',
-                    'log_amount' => $transaction->quantity * $transaction->unit_price,
-                    'inventory_stack' => $inventoryStack,
-                    'details' => $logEntry['details'] ?? 'No details provided',
-                    'lastPurchaseTotal' => $lastPurchaseTotal ?? 0,
-                    'lastPurchaseQty' => $lastPurchaseQty ?? 0,
-                    'lastbalancePurchase' => ($lastPurchaseQty ?? 0) != 0 ? ($lastPurchaseTotal ?? 0) / $lastPurchaseQty : 0
-                ];
                 // dd( $transactionLogs);
             
 
@@ -2822,18 +2833,20 @@ foreach ($inventory_transaction as $data) {
         $fromDate = $request->input('from_date');
         $categoryName = $request->input('category'); // Get the selected category name
         // Start the query on the InventoryTransaction model
-        $filterType = $request->input('filterType');
-        $toDate = $request->input('to_date');
-        $fromDate = $request->input('from_date');
-        $categoryName = $request->input('category');
+        // $filterType = $request->input('filterType');
+        // $toDate = $request->input('to_date');
+        // $fromDate = $request->input('from_date');
+        // $categoryName = $request->input('category');
+   
         
         // Start the query on the InventoryTransaction model
         if($toDate && $fromDate){
             $query = InventoryTransaction::whereBetween('transaction_date', [$toDate, $fromDate]);
         }
         // Apply filter type if provided
-        if ($filterType) {
-            $query->where('transaction_type', $filterType);
+        if ($filterType == 'weekly') {
+            $sevenDaysAgo = Carbon::now()->subDays(7);
+            $query = InventoryTransaction::where('transaction_date', '>=', $sevenDaysAgo);
         }
         
         // Filter by date range if provided
@@ -2848,6 +2861,7 @@ foreach ($inventory_transaction as $data) {
         if ($categoryName) {
             $query->where('item_id', $categoryName);
         }
+
         
         // Fetch the filtered inventory transactions
         $inventory_transaction = $query->get();
