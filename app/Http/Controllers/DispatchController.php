@@ -91,7 +91,8 @@ public function storeDispatch(Request $request)
     $dispatch->so_id = $request->sales_order_number; // Assigning the Sales Order number
     $dispatch->po_item_id = $request->po_item_id; // Assigning the PO item ID
     $dispatch->so_item_sub_category_id = $request->sub_cat_id[$index]; // Get the sub-category ID based on index
-    $dispatch->so_item_qty = $quantity; // Get the quantity based on index
+    $dispatch->so_item_qty = $request->conv_rate[$index]; // Get the quantity based on index
+    $dispatch->dispatched_quantity = $quantity;
     // Optionally, you can add other fields here as needed
 
     $dispatch->save(); // Save the dispatch record
