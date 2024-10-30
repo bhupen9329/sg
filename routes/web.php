@@ -23,6 +23,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ValuationController;
+use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\ManualMatching;
 use App\Models\CompanySetting;
 use App\Models\SubCategory;
@@ -338,10 +339,26 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/purchasesellmatch', [ManualMatching::class, 'storePurSellMatch'])->name('purchasesellmatch.store');
         Route::post('/purchasesellmatchbuyer', [ManualMatching::class, 'storePurSellMatchBuyer'])->name('purchasesellmatch.store.buyer');
         Route::get('/match_purchase/{id}', [ManualMatching::class, 'match_purchase'])->name('match.purchase');
-
         Route::get('/match_sales/{id}', [ManualMatching::class, 'match_sales'])->name('match.sales');
-        // dd(1);
         Route::post('/transaction_revert', [ManualMatching::class, 'transaction_revert'])->name('transaction_revert');
+
+
+
+        // .................................................................................................................................................
+
+        Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
+        Route::get('/dispatch_create', [DispatchController::class, 'create'])->name('dispatch.create');
+        Route::post('/dispatch-store', [DispatchController::class,'storeDispatch'])->name('dispatch.store');
+
+        Route::post('/get-purchase-orders', [DispatchController::class,'getPurchaseOrders']);
+        Route::post('/get-po-items', [DispatchController::class,'getPoItems'])->name('getPoItems');
+        Route::post('/get-sales-orders', [DispatchController::class, 'getSalesOrders'])->name('getSalesOrders');
+        Route::post('/get-so-items', [DispatchController::class, 'getSoItems'])->name('getSoItems');
+        Route::post('/get-item-details', [DispatchController::class, 'getItemDetails'])->name('getItemdetails');
+        Route::post('/get-so-items-filtered', [DispatchController::class, 'getSoItemsFiltered'])->name('getSoItemsFiltered');
+
+
+
 });
 
 
