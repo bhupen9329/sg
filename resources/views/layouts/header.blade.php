@@ -330,6 +330,13 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('dispatch.index') }}">
+                    <i class="fa-solid fas fa fa-paper-plane"></i>
+                    <span>Dispatch</span>
+                </a>
+            </li>
+
             {{-- <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('inventory_valuation.index')}}">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
