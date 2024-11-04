@@ -7,6 +7,9 @@ use App\Models\InventoryTransaction;
 use App\Models\Company;
 use Carbon\Carbon;
 use App\Models\Category;
+use App\Models\LifoTransaction;
+use App\Models\LifoTransactionStack;
+use App\Models\LifoTransactionUsedQty;
 use Illuminate\Support\Facades\View;
 
 
@@ -1459,11 +1462,16 @@ class ValuationController extends Controller
 
 
 
-    public function lifoCalculation($item_id)
+    public function lifoCalculation($inventoryTransactionId)
     {
 
-        $transactions  = InventoryTransaction::where('item_id', $item_id)->get();
+        $transactions  = InventoryTransaction::where('id', $inventoryTransactionId)->get();
       
+        $last_lifo_transaction = LifoTransaction::latest()->first();
+        if($last_lifo_transaction){
+            $last_stack = LifoTransactionStack::where('lifo_transaction_id', $last_lifo_transaction->id)->get();
+            $last_used = LifoTransactionUsedQty::where('lifo_transaction_id', $last_lifo_transaction->id)->get();
+        }      
         $inventoryStack = []; // Holds the purchase transactions for LIFO processing
         $transactionLogs = []; // Logs all transaction details for reporting
         $totalQuantity = 0; // Total quantity in inventory

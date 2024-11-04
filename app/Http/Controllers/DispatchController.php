@@ -59,9 +59,8 @@ public function getSalesOrders(Request $request)
     $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
     ->leftJoin('so_items', 'so_items.so_id', '=', 'sales_orders.id')
     ->leftJoin('categories', 'categories.id', '=', 'so_items.item_category')->where('company_id', $companyId)
+    ->where('so_items.item_category', $request->ItemId)
     ->get();
-    // dd($salesOrders);
-    
     return response()->json(['salesOrders' => $salesOrders]);
 }
 

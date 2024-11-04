@@ -25,6 +25,9 @@ return new class extends Migration
             $table->string('unit_price')->nullable();
             $table->string('price')->nullable();
             $table->string('po_item_status')->default('Open');
+            $table->string('po_dispatch_item_status', 10)->default('Open');
+            $table->string('po_dispatch_rest_qty', 10)->nullable();
+            
             $table->timestamps();
         });
     }

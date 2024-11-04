@@ -125,6 +125,7 @@ class SalesController extends Controller
                 $soItem->item_subcategory = $request->item_subcategory[$i] ?? 'N/A';
                 $soItem->qty = $request->qty[$i];
                 $soItem->so_rest_qty = $request->qty[$i];
+                $soItem->so_dispatch_rest_qty = $request->qty[$i];
                 $soItem->unit_price = $request->unit_price_[$i];
                 $soItem->price = $request->price[$i];
                 $itemSerial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
@@ -468,6 +469,7 @@ class SalesController extends Controller
                 $soItem->item_subcategory = $request->item_subcategory[$i] ?? 'N/A';
                 $soItem->qty = $request->qty[$i];
                 $soItem->so_rest_qty = $request->qty[$i];
+                $soItem->so_dispatch_rest_qty = $request->qty[$i];
                 $soItem->unit_price = $request->unit_price_[$i];
                 $soItem->price = $request->price[$i];
                 $so_item_available = SoItem::where('so_id', $id)->latest()->first();
