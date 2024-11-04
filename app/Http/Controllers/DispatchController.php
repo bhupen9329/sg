@@ -93,7 +93,7 @@ public function getItemDetails(Request $request)
 
 public function storeDispatch(Request $request)
 {
-//   dd($request);
+  dd($request);
 
  // Loop through the quantities and sub_cat_ids to save each dispatch entry
  foreach ($request->quantity as $index => $quantity) {
