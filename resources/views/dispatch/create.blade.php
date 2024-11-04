@@ -18,19 +18,7 @@
                 <div class="pg active"></div>
             </div>
         @endif
-        @if ($message = Session::get('success'))
-            <div class="tt active">
-                <div class="tt-content">
-                    <i class="fas fa-solid fa-check check"></i>
-                    <div class="message">
-                        <span class="text text-1">Success</span>
-                        <span class="text text-2"> {{ $message }}</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-xmark close"></i>
-                <div class="pg active"></div>
-            </div>
-        @endif
+
         @if ($message = Session::get('error'))
             <div class="tt active">
                 <div class="tt-content">
@@ -101,24 +89,11 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form class="row g-3" method="post" action="{{ route('dispatch.store')}}">
+                            <form class="row g-3" method="post" action="{{ route('dispatch.store') }}">
                                 @csrf
-
-                                {{-- FROM Purchase orders --}}
                                 <div class="row mb-3">
-                                    <!-- Company Dropdown -->
-                                    {{-- <div class="col-md-4">
-                                        <label for="get_miller_id" class="form-label">From</label><span class="required-classes">*</span>
-                                        <select class="form-select Select-Company" id="get_miller_id" name="company_id" onchange="fetchPoNumbers(this)" required>
-                                            <option selected disabled>Select Company</option>
-                                            @foreach ($companies as $company)
-                                                <option value="{{ $company->id }}">{{ $company->company_name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div> --}}
-
-
-                                    <div class="col-md-4">
+                                    <!-- Company Dropdown (From) -->
+                                    <div class="col-md-6"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="get_miller_id" class="form-label">From</label><span class="required-classes">*</span>
                                         <select class="form-select Select-Company" id="get_miller_id" name="po_company_id" onchange="fetchPoNumbers(this)" required>
                                             <option selected disabled>Select Company</option>
@@ -127,65 +102,27 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    
                                 
-                                    <!-- Purchase Order Number Dropdown -->
-                                    <div class="col-md-4">
-                                        <label for="po_number" class="form-label">Purchase Order Number</label><span class="required-classes">*</span>
-                                        <select class="form-select" id="po_number" name="po_number" onchange="fetchPoItems(this)" required>
-                                            <option selected disabled>Select Purchase Order</option>
-                                            <!-- Options will be populated dynamically based on the selected company -->
-                                        </select>
-                                    </div>
-                                
-                                    <!-- PO Items Dropdown -->
-                                    <div class="col-md-4">
-                                        <label for="po_item" class="form-label">PO Items</label><span class="required-classes">*</span>
-                                        <select class="form-select" id="po_item" name="po_item_id" onchange="addRowItem()" required>
-                                            <option selected disabled>Select PO Item</option>
-                                            <!-- Options will be populated dynamically based on the selected PO -->
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {{-- To sales orders --}}
-                                <div class="row mb-3">
-                                    <!-- Company Dropdown (To) -->
-                                    <div class="col-md-4">
-                                        <label for="get_miller_id" class="form-label">To</label><span class="required-classes">*</span>
-                                        <select class="form-select Select-Company" id="get_miller_id" name="so_company_id" onchange="fetchSalesOrders(this)" required>
+                                    <!-- PO Items Dropdown (To) -->
+                                    <div class="col-md-6"> <!-- Change this to col-md-6 for equal width -->
+                                        <label for="to_company_id" class="form-label">To</label><span class="required-classes">*</span>
+                                        <select class="form-select Select-Company" id="to_company_id" name="so_company_id" onchange="fetchSalesOrders(this)" required>
                                             <option selected disabled>Select Company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                
-                                    <!-- Sales Order Number Dropdown -->
-                                    <div class="col-md-4">
-                                        <label for="sales_order_number" class="form-label">Sales Order Number</label><span class="required-classes">*</span>
-                                        <select class="form-select" id="sales_order_number" name="sales_order_number" onchange="fetchSoItems(this)" required>
-                                            <option selected disabled>Select Sales Order</option>
-                                            <!-- Options will be populated dynamically based on the selected company -->
-                                          </select>
-                                    </div>
-                                
-                                    <!-- SO Items Dropdown -->
-                                    {{-- <div class="col-md-4">
-                                        <label for="so_item" class="form-label">SO Items</label><span class="required-classes">*</span>
-                                        <select class="form-select" id="so_item" name="so_item" onchange="addRowItem()" required>
-                                            <option selected disabled>Select SO Item</option>
-                                            <!-- Options will be populated dynamically based on the selected Sales Order -->
-                                        </select>
-                                    </div> --}}
                                 </div>
+                                
+        
                               
-                              
+        
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">Dispatch Details</h4>
-                                    <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button>
+                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
                                 </div>
-                                
+        
                                 <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table">
                                     <thead>
                                         <tr>
@@ -200,91 +137,17 @@
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
                                 </table>
-
+        
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
                                     <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter remarks here..."></textarea>
                                 </div>
-                                
-                                <style>
-                                    tbody,
-                                    td,
-                                    tfoot,
-                                    th,
-                                    thead,
-                                    tr {
-                                        border-color: inherit;
-                                        border-style: none;
-                                        border-width: 0;
-                                    }
-                                </style>
-                                
-                                <script>
-                                    var lastItemId = 1; // Initialize a global counter for item IDs
-                                
-                                    function addRow() {
-                                        var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
-                                        var newRow = table.insertRow(table.rows.length);
-                                
-                                        var cell1 = newRow.insertCell(0);
-                                        var cell2 = newRow.insertCell(1);
-                                        var cell3 = newRow.insertCell(2);
-                                        var cell4 = newRow.insertCell(3);
-                                        var cell5 = newRow.insertCell(4);
-                                
-                                        cell1.innerHTML = `
-                                        
-                                            <input type="text" name="selected_buyer_name[]" id="buyer_name_id" onchange="fetchSoItems(this)" style="height: 34px; width: 220px;" class="form-control" required />
-
-                                        `;
-                                        $('#buyer_name_id' + lastItemId).select2();
-                                
-                                        cell2.innerHTML = `
-                                                <select name="sub_cat_id[]" id="brand_name_id" onchange="fetchPOItemsRate(this)" style="height: 34px; width: 220px;" class="form-select select_brand_name">
-                                                    <option value="" disabled selected>Select Item</option>
-                                                    <!-- Populate this with your brand options -->
-                                                </select>
-                                            `;
-                                            $('#brand_name_id' + lastItemId).select2();
-
-                                
-                                        cell3.innerHTML = `                                         
-                                            <input type="text" name="conv_rate[]" id="conv_rate"  style="height: 34px; width: 220px;" class="form-control" required />
-                                        `;
-                                        $('.bag-name-' + lastItemId).select2();
-
-                                
-                                        cell4.innerHTML = ` 
-                                            <input type="number" name="quantity[]" id="quantity_qty${lastItemId}" class="form-control" style="height: 34px" placeholder="Quantity" required>
-                                        `;
-                                
-                                        cell5.innerHTML = `
-                                            <button onclick="addRow()" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
-                                        `;
-                                        if (lastItemId > 1) {
-                                            cell5.innerHTML += `
-                                                <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
-                                            `;
-                                        }
-                                
-                                        lastItemId++;
-                                    }
-                                
-                                    function deleteRow(button) {
-                                        var row = button.parentNode.parentNode;
-                                        row.parentNode.removeChild(row);
-                                    }
-                                </script>
-                                
-
-
+        
                                 <div class="text-end mt-5">
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                     <a class="btn btn-secondary" href="#">Back</a>
                                 </div>
                             </form>
-
-
                         </div>
                     </div>
                 </div>
@@ -296,54 +159,335 @@
 
     </main><!-- End #main -->
 
-    <!-- Modal Structure -->
-<div class="modal fade" id="getCompanyData" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
+
+
+<!-- Purchase Order Modal -->
+<div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="dataModalLabel">Company Data</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table" id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>PO Number</th>
-                            <th>Other Field 1</th>
-                            <th>Other Field 2</th>
-                            <!-- Add more columns as needed -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+            <form method="POST" action="/your-action-url">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="companyModalLabel">Select Purchase Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Date (DD/MM/YY)</th>
+                                    <th>PO Number</th>
+                                    <th>Item Name</th>
+                                    <th>PO Item No.</th>
+                                    <th>Quantity (Q)</th>
+                                    <th>Rest Quantity (Q)</th>
+                                    <th>PO Unit Price</th>
+                                    <th>PO Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rows will be populated here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="populateDispatchDetails()">Add to Dispatch</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 
+
+<!-- Sales Order Modal -->
+<div class="modal fade" id="SalescompanyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="/your-action-url">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="companyModalLabel">Select Sales Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Date (DD/MM/YY)</th>
+                                    <th>SO Number</th>
+                                    <th>Item Name</th>
+                                    <th>SO Item No.</th>
+                                    <th>Quantity (Q)</th>
+                                    <th>Rest Quantity (Q)</th>
+                                    <th>SO Unit Price</th>
+                                    <th>SO Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rows will be populated here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Add to Dispatch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var lastItemId = 1;
+
+    function addRow(itemName = '', quantity = '', unitPrice = '', subItems = []) {
+        console.log(subItems);
+        var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
+        var newRow = table.insertRow(table.rows.length);
+        let subItemOptions = '<option selected>Select Item</option>';
+        subItems.forEach(subItem => {
+            subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
+        });
+
+        newRow.innerHTML = `
+            <td><input type="text" name="selected_buyer_name[]" class="form-control" value="${itemName}" required /></td>
+            <td>
+            <select name="sub_cat_id[]" class="form-select select_brand_name">${subItemOptions}</select>
+        </td>
+            <td><input type="text" name="conv_rate[]" class="form-control"  required /></td>
+            <td><input type="number" name="quantity[]" class="form-control" value="" required /></td>
+            <td>
+                <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
+            </td>
+        `;
+        lastItemId++;
+    }
+
+    function deleteRow(button) {
+        var row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    // function populateDispatchDetails() {
+    //     const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
+        
+    //     selectedPOs.forEach(po => {
+    //         addRow(po.dataset.itemName, po.dataset.quantity, po.dataset.unitPrice);
+    //     });
+        
+    //     // Close the modal after populating details
+    //     var modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
+    //     modal.hide();
+    // }
+
+    function populateDispatchDetails() {
+    const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
+
+    selectedPOs.forEach(po => {
+        // Get item name, quantity, and unit price from the checkbox dataset
+        const itemId = po.dataset.id;
+        const itemName = po.dataset.itemName;
+        const quantity = po.dataset.quantity;
+        const unitPrice = po.dataset.unitPrice;
+        // console.log(`Item ID: ${itemId}.Item Name: ${itemName}, Quantity: ${quantity}, Unit Price: ${unitPrice}`);
+
+        // Make an AJAX request to fetch additional item details based on the item name
+        $.ajax({
+            url: '/get-item-details',  // Adjust to the route handling item details
+            method: 'POST',
+            data: {
+                item_name: itemName,
+                item_id: itemId,
+                _token: '{{ csrf_token() }}'  // Include CSRF token for security
+            },
+            success: function(response) {
+                // Assuming `response` contains the detailed data for the item
+                const details = response.item_details;
+                const subitems = response.subItems;
+                // Populate the row with additional details
+                addRow(details.name, quantity, unitPrice, subitems);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching item details:", error);
+            }
+        });
+    });
+
+    // Close the modal after populating details
+    const modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
+    modal.hide();
+}
+
+</script>
+
+
+
+
     <script>
+
+    $(document).ready(function() {
+        $('#get_miller_id').on('change', function() {
+            const selectedCompanyId = $(this).val();
+            
+            if (selectedCompanyId) {
+                // Show the modal
+                $('#companyModal').modal('show');
+                
+                // Optional: Fetch and display data in the modal based on selectedCompanyId
+                // $.ajax({
+                //     url: '/get-company-details', // Adjust this to your route
+                //     type: 'GET',
+                //     data: { company_id: selectedCompanyId },
+                //     success: function(response) {
+                //         $('#companyModal .modal-body').html(response); // Update modal content
+                //     },
+                //     error: function(error) {
+                //         console.error("Error fetching company details:", error);
+                //     }
+                // });
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        $('#to_company_id').on('change', function() {
+            const selectedCompanyId = $(this).val();
+            
+            if (selectedCompanyId) {
+                // Show the modal
+                $('#SalescompanyModal').modal('show');
+                
+                // Optional: Fetch and display data in the modal based on selectedCompanyId
+                // $.ajax({
+                //     url: '/get-company-details', // Adjust this to your route
+                //     type: 'GET',
+                //     data: { company_id: selectedCompanyId },
+                //     success: function(response) {
+                //         $('#companyModal .modal-body').html(response); // Update modal content
+                //     },
+                //     error: function(error) {
+                //         console.error("Error fetching company details:", error);
+                //     }
+                // });
+            }
+        });
+    });
+
+
+        
+
+
         function fetchPoNumbers(companySelect) {
-            const companyId = companySelect.value;
-    
-            $.ajax({
-                url: '/get-purchase-orders',  // Update to the correct route
-                method: 'POST',
-                data: { company_id: companyId, _token: '{{ csrf_token() }}' },
-                success: function(response) {
-                    let poOptions = '<option selected disabled>Select Purchase Order</option>';
-                    response.purchase_orders.forEach(po => {
-                        poOptions += `<option value="${po.id}">${po.document_number}</option>`;
-                    });
-                    $('#po_number').html(poOptions);
-                }
+    const companyId = companySelect.value;
+
+    $.ajax({
+        url: '/get-purchase-orders',  // Ensure this is the correct route
+        method: 'POST',
+        data: { company_id: companyId, _token: '{{ csrf_token() }}' },
+        success: function(response) {
+            // Clear previous rows in the table body
+            const tableBody = $('#dataTable tbody');
+            tableBody.empty();
+
+            // Populate the table with new rows from the response
+            response.purchase_orders.forEach(po => {
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="po-checkbox" 
+                                   data-id="${po.id}" 
+                                   data-item-name="${po.name}" 
+                                   data-quantity="${po.qty}" 
+                                   data-unit-price="${po.unit_price}">
+                        </td>
+                        <td>${new Date(po.date).toLocaleDateString('en-GB')}</td>
+                        <td>${po.document_number}</td>
+                        <td>${po.name}</td>
+                        <td>${po.po_item_no}</td>
+                        <td>${po.qty}</td>
+                        <td>${po.po_rest_qty}</td>
+                        <td>${po.unit_price}</td>
+                        <td>${po.total_price}</td>
+                    </tr>`;
+                tableBody.append(row);
             });
+
+            // Show the modal after populating the table
+            $('#companyModal').modal('show');
+        },
+        error: function(xhr) {
+            console.error('Error fetching purchase orders:', xhr);
+            alert('An error occurred while fetching purchase orders. Please try again.');
         }
+    });
+}
+
+function fetchSalesOrders(selectElement) {
+    const companyId = selectElement.value;
+
+    $.ajax({
+        url: '/get-sales-orders',  // Adjust this URL to match your backend route
+        type: 'POST',
+        data: {
+            company_id: companyId,
+            "_token": "{{ csrf_token() }}"  // CSRF token for security in Laravel
+        },
+        success: function(response) {
+            // Clear previous rows in the table body
+            const tableBody = $('#dataTable tbody');
+            tableBody.empty();
+
+            // Check if sales_orders is defined and is an array
+            if (response.sales_orders && Array.isArray(response.sales_orders)) {
+                // Populate the table with new rows from the response
+                response.sales_orders.forEach(so => {
+                    const row = `
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="po-checkbox" 
+                                       data-id="${so.id}" 
+                                       data-item-name="${so.name}" 
+                                       data-quantity="${so.qty}" 
+                                       data-unit-price="${so.unit_price}">
+                            </td>
+                            <td>${new Date(so.date).toLocaleDateString('en-GB')}</td>
+                            <td>${so.document_number}</td>
+                            <td>${so.name}</td>
+                            <td>${so.po_item_no}</td>
+                            <td>${so.qty}</td>
+                            <td>${so.po_rest_qty}</td>
+                            <td>${so.unit_price}</td>
+                            <td>${so.total_price}</td>
+                        </tr>`;
+                    tableBody.append(row);
+                });
+
+                // Show the modal after populating the table
+                $('#SalescompanyModal').modal('show');
+            } else {
+                console.error('No sales orders found or response is not in expected format:', response);
+                alert('No sales orders available for this company.');
+            }
+        },
+        error: function(xhr) {
+            console.error('Error fetching sales orders:', xhr);
+            alert('An error occurred while fetching sales orders. Please try again.');
+        }
+    });
+}
+
+
+
+
 
         let selectedPoItems = [];
 
@@ -387,25 +531,6 @@ function fetchPoItems(element) {
             });
         }
 
-        function fetchSalesOrders(selectElement) {
-    const companyId = selectElement.value;
-
-    $.ajax({
-        url: '/get-sales-orders',  // Adjust the URL to match your route
-        type: 'POST',
-        data: {
-            company_id: companyId,
-            "_token": "{{ csrf_token() }}"  // CSRF token for security
-        },
-        success: function (response) {
-            let salesOrderOptions = '<option selected disabled>Select Sales Order</option>';
-            response.salesOrders.forEach(order => {
-                salesOrderOptions += `<option value="${order.id}">${order.so_number}</option>`;
-            });
-            $('#sales_order_number').html(salesOrderOptions);
-        }
-    });
-}
 
 function fetchSoItems(selectElement) {
     const salesOrderId = selectElement.value;
@@ -662,67 +787,9 @@ $.ajax({
         });
     }
 
-        function get_bags(selectElement) {
+       
 
-            let item_id = selectElement.value;
-            let row = selectElement.parentNode.parentNode; // Get the parent row of the select element
-            let BrandSelect = row.querySelector(
-                '.bag-name'); // Find the subcategory select element in the same row
-
-            $.ajax({
-                url: "{{ url('get_bags_list') }}",
-                method: "POST",
-                data: {
-                    item_id: item_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-                    // console.log(res);
-
-                    // Access the 'bag' property of the response
-                    let data = res.bag;
-                    if (data) {
-                        let htmldata = '<option value="" disabled selected>Select Bags</option>';
-                        for (let item of data) {
-                            htmldata += `
-                            <option value="${item.id}">${item.bag_name}</option>
-                            `;
-                        }
-                        BrandSelect.innerHTML =
-                            htmldata; // Populate the subcategory select element in the same row with dynamic options
-                    }
-                }
-            });
-        }
-
-
-
-        function get_weight(selectElement) {
-            let item_id = selectElement.value;
-            let row = selectElement.parentNode.parentNode; // Get the parent row of the select element
-            let WeightSelect = row.querySelector(
-                '.bag-weight'); // Find the subcategory select element in the same row
-
-            $.ajax({
-                url: "{{ url('get_weight_list') }}",
-                method: "POST",
-                data: {
-                    item_id: item_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-                    // Access the 'bag' property of the response
-                    let weight = res.bag_weight.bag_size;
-                    // console.log(weight);
-
-                    WeightSelect.value =
-                        weight;
-
-
-
-                }
-            });
-        }
+        
     </script>
 
 

@@ -356,6 +356,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/get-so-items', [DispatchController::class, 'getSoItems'])->name('getSoItems');
         Route::post('/get-item-details', [DispatchController::class, 'getItemDetails'])->name('getItemdetails');
         Route::post('/get-so-items-filtered', [DispatchController::class, 'getSoItemsFiltered'])->name('getSoItemsFiltered');
+        Route::get('/get-company-purchase-orders', [DispatchController::class, 'getCompanyPurchaseOrders']);
+
 
 
 

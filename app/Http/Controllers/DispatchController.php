@@ -23,7 +23,9 @@ class DispatchController extends Controller
 
     public function create()
     {
-        $purchase_orders = PurchaseOrder::join('companies', 'companies.id','=','purchase_orders.supplier_id')->get();
+        $purchase_orders = PurchaseOrder::join('companies', 'companies.id','=','purchase_orders.supplier_id')
+                                         ->get();
+        // dd($purchase_orders);
         $sales_orders = SalesOrder::all();
         $companies = Company::all();
         // dd($purchase_orders);
@@ -32,7 +34,14 @@ class DispatchController extends Controller
 
     public function getPurchaseOrders(Request $request)
 {
-    $purchaseOrders = PurchaseOrder::where('supplier_id', $request->company_id)->get();
+    $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+    ->leftJoin('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
+    ->leftJoin('categories', 'categories.id', '=', 'po_items.item_category')
+    ->where('purchase_orders.supplier_id', $request->company_id)
+   
+    ->get();
+    // dd($purchaseOrders);
+
     return response()->json(['purchase_orders' => $purchaseOrders]);
 }
 
@@ -46,9 +55,12 @@ public function getPoItems(Request $request)
 public function getSalesOrders(Request $request)
 {
     $companyId = $request->company_id;
-    // dd($companyId);
-  
-    $salesOrders = SalesOrder::where('company_id', $companyId)->get(['id', 'so_number']);
+    
+    $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+    ->leftJoin('so_items', 'so_items.so_id', '=', 'sales_orders.id')
+    ->leftJoin('categories', 'categories.id', '=', 'so_items.item_category')->where('company_id', $companyId)
+    ->get();
+    // dd($salesOrders);
     
     return response()->json(['salesOrders' => $salesOrders]);
 }
@@ -67,18 +79,18 @@ public function getSoItems(Request $request)
 
 public function getItemDetails(Request $request)
 {
-    $ItemId = $request->item_id;
-    
-    // Retrieve items associated with the selected sales order
-    $items = Category::where('id',  $ItemId)->first();
-    $subItems = SubCategory::where('category_id', $ItemId)->get();
+    $itemId = $request->item_id;
+    // dd($itemId);
 
+    // Retrieve the item and its sub-items based on the item ID
+    $item = Category::where('id', $itemId)->first();
+    $subItems = SubCategory::where('category_id', $itemId)->get();
     // dd($subItems);
 
-
-    
-    return response()->json(['items' => $items, 'subItems' =>  $subItems]);
+    // Return response with both item and sub-item details
+    return response()->json(['item_details' => $item, 'subItems' => $subItems]);
 }
+
 
 public function storeDispatch(Request $request)
 {
@@ -102,6 +114,9 @@ public function storeDispatch(Request $request)
 // Redirect or return a response
 return redirect()->route('dispatch.index')->with('success', 'Dispatch details saved successfully.');
 }
+
+
+
 
 
 
