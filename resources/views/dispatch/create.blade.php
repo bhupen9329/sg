@@ -269,6 +269,7 @@
             <td>
                 <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
             </td>
+
         `;
         lastItemId++;
     }
