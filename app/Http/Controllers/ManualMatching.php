@@ -107,6 +107,10 @@ class ManualMatching extends Controller
                 'po_items.created_at',
                 'po_items.updated_at',
                 'po_items.po_item_status',
+                'po_items.po_item_status',
+                'po_items.po_dispatch_item_status',
+                'po_items.po_dispatch_rest_qty',
+
 
                 'categories.name',
                 'companies.company_name',
@@ -168,6 +172,8 @@ class ManualMatching extends Controller
                 'so_items.created_at',
                 'so_items.updated_at',
                 'so_items.so_item_status',
+                'so_items.so_dispatch_item_status',
+                'so_items.so_dispatch_rest_qty',
 
                 'categories.name',
                 'companies.company_name',
