@@ -114,9 +114,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                
-        
-                              
         
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">Dispatch Details</h4>
@@ -137,6 +134,8 @@
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
                                 </table>
+                                <input type="hidden" id="po_item_id">
+                                <input type="hidden" id="so_item_no">
         
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
@@ -147,6 +146,7 @@
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                     <a class="btn btn-secondary" href="#">Back</a>
                                 </div>
+                     
                             </form>
                         </div>
                     </div>
@@ -167,6 +167,7 @@
         <div class="modal-content">
             <form method="POST" action="/your-action-url">
                 @csrf
+        
                 <div class="modal-header">
                     <h5 class="modal-title" id="companyModalLabel">Select Purchase Order</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -238,7 +239,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Add to Dispatch</button>
+                    <button type="button" class="btn btn-primary"  onclick="populateSODispatchDetails()">Add to Dispatch</button>
                 </div>
             </form>
         </div>
@@ -288,16 +289,30 @@
     //     var modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
     //     modal.hide();
     // }
+    function populateSODispatchDetails() {
+        const selectedSOs = document.querySelectorAll('.so-checkbox:checked');
+
+        selectedSOs.forEach(so => {
+        // Get item name, quantity, and unit price from the checkbox dataset
+        const so_item_no = so.dataset.id;
+        const itemName = so.dataset.itemName;
+        const quantity = so.dataset.quantity;
+        const unitPrice = so.dataset.unitPrice;
+        $('#so_item_no').val(so_item_no);
+        });
+        $('#SalescompanyModal').modal('hide');
+        
+    }
 
     function populateDispatchDetails() {
     const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
-
     selectedPOs.forEach(po => {
         // Get item name, quantity, and unit price from the checkbox dataset
         const itemId = po.dataset.id;
         const itemName = po.dataset.itemName;
         const quantity = po.dataset.quantity;
         const unitPrice = po.dataset.unitPrice;
+        $('#po_item_id').val(itemId);
         // console.log(`Item ID: ${itemId}.Item Name: ${itemName}, Quantity: ${quantity}, Unit Price: ${unitPrice}`);
 
         // Make an AJAX request to fetch additional item details based on the item name
@@ -414,11 +429,13 @@
                         <td>${po.name}</td>
                         <td>${po.po_item_no}</td>
                         <td>${po.qty}</td>
-                        <td>${po.po_rest_qty}</td>
+                        <td>${po.po_dispatch_rest_qty}</td>
                         <td>${po.unit_price}</td>
                         <td>${po.total_price}</td>
                     </tr>`;
                 tableBody.append(row);
+
+                
             });
 
             // Show the modal after populating the table
@@ -433,12 +450,13 @@
 
 function fetchSalesOrders(selectElement) {
     const companyId = selectElement.value;
-
+    let ItemId = document.getElementById('po_item_id').value;
     $.ajax({
         url: '/get-sales-orders',  // Adjust this URL to match your backend route
         type: 'POST',
         data: {
             company_id: companyId,
+            ItemId: ItemId,
             "_token": "{{ csrf_token() }}"  // CSRF token for security in Laravel
         },
         success: function(response) {
@@ -447,24 +465,24 @@ function fetchSalesOrders(selectElement) {
             tableBody.empty();
 
             // Check if sales_orders is defined and is an array
-            if (response.sales_orders && Array.isArray(response.sales_orders)) {
+            if (response.salesOrders && Array.isArray(response.salesOrders)) {
                 // Populate the table with new rows from the response
-                response.sales_orders.forEach(so => {
+                response.salesOrders.forEach(so => {
                     const row = `
                         <tr>
                             <td>
-                                <input type="checkbox" class="po-checkbox" 
-                                       data-id="${so.id}" 
-                                       data-item-name="${so.name}" 
+                                <input type="checkbox" class="so-checkbox" 
+                                       data-id="${so.so_item_no}" 
+                                       data-item-name="${so.so_number}" 
                                        data-quantity="${so.qty}" 
                                        data-unit-price="${so.unit_price}">
                             </td>
                             <td>${new Date(so.date).toLocaleDateString('en-GB')}</td>
-                            <td>${so.document_number}</td>
+                            <td>${so.so_number}</td>
                             <td>${so.name}</td>
-                            <td>${so.po_item_no}</td>
+                            <td>${so.so_item_no}</td>
                             <td>${so.qty}</td>
-                            <td>${so.po_rest_qty}</td>
+                            <td>${so.so_dispatch_rest_qty  }</td>
                             <td>${so.unit_price}</td>
                             <td>${so.total_price}</td>
                         </tr>`;
@@ -527,6 +545,7 @@ function fetchPoItems(element) {
                         itemOptions += `<option value="${item.id}">${item.name}</option>`;
                     });
                     $('#po_item').html(itemOptions);
+                    
                 }
             });
         }

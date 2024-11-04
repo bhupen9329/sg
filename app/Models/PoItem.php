@@ -21,6 +21,8 @@ class PoItem extends Model
         'po_rest_qty',
         'price',
          'po_item_status',
+         'po_dispatch_item_status',
+         'po_dispatch_rest_qty',
         
     ];
       

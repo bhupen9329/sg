@@ -15,13 +15,14 @@ return new class extends Migration {
             $table->string('so_id', 20);
             $table->string('so_item_no', 20);
             $table->string('item_category', 20);
-    
             $table->string('item_subcategory', 50);
             $table->string('qty', 10);
             $table->string('so_rest_qty', 10)->nullable();
+            $table->string('so_dispatch_rest_qty', 10)->nullable();
             $table->string('unit_price')->nullable();
             $table->string('price')->nullable();
             $table->string('so_item_status')->default('Open');
+            $table->string('so_dispatch_item_status', 10)->default('Open');
             $table->timestamps();
         });
     }
