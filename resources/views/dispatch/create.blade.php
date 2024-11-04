@@ -136,6 +136,7 @@
                                 </table>
                                 <input type="hidden" id="po_item_id">
                                 <input type="hidden" id="so_item_no">
+                                <input type="hidden" id="po_item_no">
         
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
@@ -313,7 +314,10 @@
         const itemName = po.dataset.itemName;
         const quantity = po.dataset.quantity;
         const unitPrice = po.dataset.unitPrice;
+        const poItemNo = po.dataset.poItemNo; 
+
         $('#po_item_id').val(itemId);
+        $('#po_item_no').val(poItemNo);
         // console.log(`Item ID: ${itemId}.Item Name: ${itemName}, Quantity: ${quantity}, Unit Price: ${unitPrice}`);
 
         // Make an AJAX request to fetch additional item details based on the item name
@@ -423,7 +427,8 @@
                                    data-id="${po.id}" 
                                    data-item-name="${po.name}" 
                                    data-quantity="${po.qty}" 
-                                   data-unit-price="${po.unit_price}">
+                                   data-unit-price="${po.unit_price}"
+                                   data-po-item-no="${po.po_item_no}">
                         </td>
                         <td>${new Date(po.date).toLocaleDateString('en-GB')}</td>
                         <td>${po.document_number}</td>
