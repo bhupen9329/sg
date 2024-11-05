@@ -113,6 +113,7 @@
                                         <th>Base Item</th>
                                         <th>Conv Item</th>
                                         <th>Conv Rate</th>
+                                        <th>Remarks</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -120,10 +121,11 @@
                                     @foreach ($convItems as $data)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $data->selected_date }}</td>
+                                            <td>{{ date('d-m-Y', strtotime($data->selected_date)) }}</td>
                                             <td>{{ $data->name }}</td>                                           
                                             <td>{{ $data->sub_category }}</td>
                                             <td>{{ $data->item_price }}</td>
+                                            <td>{{ $data->remarks }}</td>
                                         
                                             <td>
                                                 <div class="filter">

@@ -14,5 +14,6 @@ class ConvRate extends Model
         'subcategory_id',
         'selected_date',
         'item_price',
+        'remarks',
     ];
 }

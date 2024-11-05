@@ -57,6 +57,11 @@
                                             required>
                                     </div>
 
+                                    <div class="col-md-8 mt-4">
+                                        <label for="remarks" class="form-label">Remarks</label>
+                                        <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter remarks here..."></textarea>
+                                    </div>
+
 
                                  
 
