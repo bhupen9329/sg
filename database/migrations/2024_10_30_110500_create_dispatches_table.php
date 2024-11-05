@@ -14,25 +14,16 @@ return new class extends Migration
         Schema::create('dispatches', function (Blueprint $table) {
           
             $table->id();
-            $table->string('po_company_id')->nullable();
-            $table->string('po_id')->nullable();
-            $table->string('po_item_id')->nullable();
-
-            $table->string('so_id')->nullable();
-            $table->string('so_company_id')->nullable();
-            $table->string('so_item_category_id')->nullable();
-            $table->string('so_item_sub_category_id')->nullable();
-
-
-          
+            $table->string('po_company_id');
+            $table->string('so_company_id');
+            $table->string('po_id');
+            $table->string('so_id');
+            $table->string('po_item_id');
+            $table->string('so_item_id');
+            $table->string('category_id');
+            $table->string('subcategory_id');
             $table->decimal('dispatched_quantity', 10, 2)->nullable();
-            $table->decimal('po_item_qty', 10, 2)->nullable();
-            $table->decimal('po_item_rest_quantity', 10, 2)->nullable();
-            $table->decimal('so_item_qty', 10, 2)->nullable();
-            $table->decimal('so_item_rest_quantity', 10, 2)->nullable();
-
-            $table->string('remarks')->nullable();
-          
+            $table->decimal('conv_rate', 10, 2)->nullable();
             $table->timestamps();
 
         });

@@ -18,7 +18,29 @@ class DispatchController extends Controller
 
         public function index()
     {
-        return view('dispatch.index');
+
+        $disaptch_data = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
+        ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+        ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+        ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+        ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+        ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+        ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+        ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+        ->select('dispatches.*', 'so_items.so_dispatch_rest_qty', 'po_items.po_dispatch_rest_qty', 'po_company.company_name as po_company',
+         'so_company.company_name as so_company',
+         'sales_orders.so_number',
+         'purchase_orders.document_number as po_number',
+         'sales_orders.date as so_date',
+         'purchase_orders.date as po_date',
+         'categories.name as category_name',
+         'subcategories.sub_category as sub_category_name',
+         'po_items.po_item_no',
+         'so_items.so_item_no',
+        )
+        ->get();
+
+        return view('dispatch.index', compact('disaptch_data'));
     }
 
     public function create()
@@ -93,30 +115,42 @@ public function getItemDetails(Request $request)
 
 public function storeDispatch(Request $request)
 {
-  dd($request);
+//   dd($request);
+foreach ($request->quantity as $index => $quantity) {
+    $so_item = SoItem::where('so_item_no', $request->so_item_no)->first();
+    $po_item = PoItem::where('po_item_no', $request->po_item_no)->first();
+
+    if(($request->quantity[$index] > $so_item->so_dispatch_rest_qty) || ($request->quantity[$index] > $po_item->po_dispatch_rest_qty)){
+        return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
+    }
+
+}
 
  // Loop through the quantities and sub_cat_ids to save each dispatch entry
  foreach ($request->quantity as $index => $quantity) {
+    $so_item = SoItem::where('so_item_no', $request->so_item_no)->first();
+    $po_item = PoItem::where('po_item_no', $request->po_item_no)->first();
+
     $dispatch = new Dispatch();
-    $dispatch->po_id = $request->po_number; // Assigning the PO number
-    $dispatch->so_id = $request->sales_order_number; // Assigning the Sales Order number
-    $dispatch->po_item_id = $request->po_item_id; // Assigning the PO item ID
-    $dispatch->so_item_sub_category_id = $request->sub_cat_id[$index]; // Get the sub-category ID based on index
-    $dispatch->so_item_qty = $request->conv_rate[$index]; // Get the quantity based on index
-    $dispatch->dispatched_quantity = $quantity;
-    // Optionally, you can add other fields here as needed
+    $dispatch->po_company_id = $request->po_company_id; 
+    $dispatch->so_company_id = $request->so_company_id; 
+    $dispatch->po_id = $po_item->po_id; 
+    $dispatch->so_id = $so_item->so_id; 
+    $dispatch->po_item_id = $po_item->id; 
+    $dispatch->so_item_id =$so_item->id;
+    $dispatch->category_id = $request->cat_id[$index]; // Get the sub-category ID based on index
+    $dispatch->subcategory_id = $request->sub_cat_id[$index]; // Get the quantity based on index
+    $dispatch->dispatched_quantity = $request->quantity[$index];
+    $dispatch->conv_rate = $request->conv_rate[$index];
+    $dispatch->save(); 
+    $actual_so_dispatch_qty = ($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity);
+    $actual_po_dispatch_qty = ($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity);
 
-    $dispatch->save(); // Save the dispatch record
+    $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
+    $po_item->update(['po_dispatch_rest_qty' => $actual_po_dispatch_qty]);
+
 }
-
-
-// Redirect or return a response
 return redirect()->route('dispatch.index')->with('success', 'Dispatch details saved successfully.');
 }
-
-
-
-
-
 
 }

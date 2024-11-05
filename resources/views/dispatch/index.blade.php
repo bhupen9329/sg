@@ -127,23 +127,45 @@
                                     <tr>
                                         <th>#</th>
                                         <th>PO No</th>
-                                        <th>PO Item NO</th>
-                                        <th>PO Date</th>                                       
+                                        <th>PO Item No</th>
+                                        <th>PO Date</th>     
+                                        <th>Buyer Name (Party Name)</th>
+
+                                        <th>SO No</th>
+                                        <th>SO Item No</th>
+                                        <th>SO Date</th>     
                                         <th>Seller Name (Party Name)</th>
+
                                         <th>Category</th>
-                                        {{-- <th>Sub Category</th> --}}
-                                        <th>PO Qty</th>
-                                        <th>PO Unit Price</th>
-                                        <th>PO Price</th>
-                                        <th>Dispatch SO Qty</th>
-                                        <th>Dispatch SO Unit Price(Avg)</th>
-                                        <th>Dispatch SO Price(Total)</th>
-                                        <th>PO Pending Qty</th>
-                                        <th>Status</th>
+                                        <th>Sub Category</th> 
+                               
+                                        <th>Dispatch Convt Rs</th>
+                                        <th>Dispatch Qty</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                  
+                                  @foreach($disaptch_data as $data)
+                                  <tr>
+                                   <td>{{$loop->iteration}}</td>
+
+                                   <td>{{$data->po_number }}</td>
+                                   <td>{{$data->po_item_no }}</td>
+                                   <td>{{ date('d-m-Y', strtotime($data->po_date)) }}</td>
+                                   <td>{{$data->po_company }}</td>
+
+                                   <td>{{$data->so_number }}</td>
+                                   <td>{{$data->so_item_no }}</td>
+                                   <td>{{ date('d-m-Y', strtotime($data->so_date)) }}</td>
+                                   <td>{{$data->so_company }}</td>
+
+                                   <td>{{$data->category_name }}</td>
+                                   <td>{{$data->sub_category_name }}</td>
+
+                                   <td>{{$data->conv_rate }}</td>
+                                   <td>{{$data->dispatched_quantity }}</td>
+
+                                  </tr>
+                                  @endforeach
                                 </tbody>
                             </table>
                             
