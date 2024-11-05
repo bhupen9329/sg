@@ -73,7 +73,7 @@ class SubCategoryController extends Controller
 
         SubCategory::create($data);
 
-        return redirect()->route('subcategory.index')->with('success', 'Sub Category Created Successfully');
+        return redirect()->route('subcategory.index')->with('success', 'Conv Item Created Successfully');
     }
 
     public function edit($id)
@@ -114,7 +114,7 @@ class SubCategoryController extends Controller
     {
         // dd($id);
         SubCategory::where('id', $id)->delete();
-        return redirect()->route('subcategory.index')->with('delete', 'Sub Category Deleted Successfully');
+        return redirect()->route('subcategory.index')->with('delete', 'Conv Item Deleted Successfully');
     }
 
 
@@ -132,7 +132,7 @@ class SubCategoryController extends Controller
         // dd($data);
 
         SubCategory::where('id', $id)->update($data);
-        return redirect()->route('subcategory.index')->with('update', 'Sub Category Updated Successfully');
+        return redirect()->route('subcategory.index')->with('update', 'Conv Item Updated Successfully');
     }
 
     public function get_subcategory_list(Request $request)
@@ -213,7 +213,7 @@ class SubCategoryController extends Controller
 
         $model = new SubCategory();
         Excel::import(new SubCategoryImport,request()->file('file'));
-        return redirect()->route('subcategory.index')->with('success', 'Sub Category Imported Successfully');
+        return redirect()->route('subcategory.index')->with('success', 'Conv Item Imported Successfully');
     }
 
     public function export() 

@@ -276,34 +276,7 @@
                @endcan --}}
 
 
-            @if ((auth()->check() && auth()->user()->can('Category-index')) || auth()->user()->can('Sub-Category-index'))
-                <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-target="#category-nav" data-bs-toggle="collapse"
-                        href="#">
-                        <i class="bi bi-archive-fill"></i>
-                        </i><span>Item Master</span><i class="bi bi-chevron-down ms-auto"></i>
-                    </a>
-                    <ul id="category-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                        <li>
-                            @can('Category-index')
-                                <a href="{{ route('category.index') }}">
-                                    <i class="bi bi-circle"></i><span>Category</span>
-                                </a>
-                            @endcan
-                        </li>
-
-
-                        {{-- <li>
-                            @can('Sub-Category-index')
-                                <a href="{{ route('subcategory.index') }}">
-                                    <i class="bi bi-circle"></i><span>Sub Category</span>
-                                </a>
-                            @endcan
-                        </li> --}}
-                    </ul>
-                </li><!-- End Icons Nav -->
-            @endif
-
+    
 
             {{-- @can('Warehouse-index')
                 <li class="nav-item">
@@ -433,6 +406,43 @@
                     </ul>
                 </li><!-- End Icons Nav -->
             @endif
+
+            @if ((auth()->check() && auth()->user()->can('Category-index')) || auth()->user()->can('Sub-Category-index'))
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#category-nav" data-bs-toggle="collapse"
+                    href="#">
+                    <i class="bi bi-archive-fill"></i>
+                    </i><span>Item Master</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="category-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        @can('Category-index')
+                            <a href="{{ route('category.index') }}">
+                                <i class="bi bi-circle"></i><span>Base Item</span>
+                            </a>
+                        @endcan
+                    </li>
+
+
+                    <li>
+                        @can('Sub-Category-index')
+                            <a href="{{ route('subcategory.index') }}">
+                                <i class="bi bi-circle"></i><span>Conversion Item</span>
+                            </a>
+                        @endcan
+                    </li>
+
+                    <li>
+                        @can('Sub-Category-index')
+                            <a href="{{ route('rate.index')}}">
+                                <i class="bi bi-circle"></i><span>Conversion Rate</span>
+                            </a>
+                        @endcan
+                    </li>
+                </ul>
+            </li><!-- End Icons Nav -->
+        @endif
+
 
 
             @if ((auth()->check() && auth()->user()->can('User-index')) || auth()->user()->can('Role-index'))

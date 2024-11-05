@@ -47,11 +47,11 @@
 
 
         <div class="dashboard-header pagetitle">
-            <h1>Category</h1>
+            <h1>Base Item</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Category</li>
+                    <li class="breadcrumb-item">Base Item</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -68,7 +68,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Category</h4>
+                                        <h4 class="text-blue h4">Base Item</h4>
 
                                     </div>
                                 </div>
@@ -77,7 +77,7 @@
                                         @can('Category-create')
                                         @can('price')
                                             <a class="btn btn-primary mb-4 mr-3 "href="{{ route('category.create') }}">Add New
-                                                Category</a>
+                                                Base Item</a>
                                         @endcan
                                         @endcan
                                     </div>
@@ -89,10 +89,10 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Category Name</th>
+                                        <th>Base Item Name</th>
                                         @can('price')
-                                        <th>Base Price</th>
-                                        <th>Margin</th>
+                                        {{-- <th>Base Price</th>
+                                        <th>Margin</th> --}}
                                         @endcan
                                         <th>Action</th>
                                     </tr>
@@ -103,8 +103,8 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $data->name }}</td>
                                             @can('price')
-                                            <td>{{ $data->price }}</td>
-                                            <td>{{ $data->margin }} </td>
+                                            {{-- <td>{{ $data->price }}</td>
+                                            <td>{{ $data->margin }} </td> --}}
                                             @endcan
                                             <td>
                                                 <div class="filter">

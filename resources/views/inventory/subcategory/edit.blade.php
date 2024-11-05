@@ -8,11 +8,11 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Update SubCategory</h1>
+            <h1>Update Conv Item</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item">Update SubCategory</li>
+                    <li class="breadcrumb-item">Update Conv Item</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -23,10 +23,10 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Update SubCategory</h5>
+                                <h5 class="card-title">Update Conv Item</h5>
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <label for="inputName5" class="form-label">Category Name</label>
+                                        <label for="inputName5" class="form-label">Base Item Name</label>
                                         </strong><span class="required-classes">*</span>
                                         <select name="category_id" class="item-select form-select" id="name-input">
                                             <option value="{{ $selected_subcategory->category_id }}">
@@ -46,7 +46,7 @@
                                         </script>
                                     </div><br>
                                     <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Sub Category</label><span
+                                        <label for="inputName5" class="form-label">Conv Item Name</label><span
                                             class="required-classes">*</span>
                                         {{-- <input type="hidden" id="category-id-input" name="category_id"
                                             value="{{ $selected_subcategory->category_id }}"> --}}
@@ -62,12 +62,12 @@
                                             value="{{ $subcategory->weight }}" min="0.001" class="form-control" required step="0.001">
                                     </div> --}}
                                     @can('price')
-                                    <div class="col-md-8 mt-4">
+                                    {{-- <div class="col-md-8 mt-4">
                                         <label for="inputName5" class="form-label">Difference Amt (Gauge)</label><span
                                             class="required-classes"> *</span>
                                         <input type="number" value="{{ $subcategory->difference }}" id="edit-input" min="0" name="diff" class="form-control" required
                                         step="0.001" >
-                                    </div>
+                                    </div> --}}
                                     @endcan
 
                                     {{-- <div class="col-md-8 mt-4">
