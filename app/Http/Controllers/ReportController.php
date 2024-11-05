@@ -59,8 +59,6 @@ class ReportController extends Controller
         $filterCompany = $request->filterCompany;
         $filterCategory = $request->filterCategory;
 
-
-
         $query = PurchaseOrder::join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
             ->join('categories', 'purchase_orders.category', '=', 'categories.id')
             ->leftJoin('inwards', 'purchase_orders.document_number', '=', 'inwards.po_document_number')
@@ -1263,6 +1261,45 @@ public function calculateAverageCost()
         'final_balance_value' => $totalValue,
         'final_profit_loss' => $totalProfitLoss
     ]);
+}
+
+
+public function inventory_report()
+{
+    $companys = 0;
+    return view('reports.inventory_report', compact('companys'));
+}
+
+
+public function get_inventory_report(Request $request)
+{
+
+    $filterTodate = $request->filterTodate;
+    $filterFromdate = $request->filterFromdate;
+
+    $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+    ->join('categories', 'po_items.item_category', '=', 'categories.id')
+    ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate])
+    ->select('po_items.item_category', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+    ->groupBy('po_items.item_category', 'categories.name')
+    ->get();
+
+
+$filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+     ->join('categories', 'so_items.item_category', '=', 'categories.id')
+    ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate])
+    ->select('so_items.item_category', 'categories.name as category_name', DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+    )
+    ->groupBy('so_items.item_category', 'categories.name')
+    ->get();
+  
+
+    $data = [
+        'filteredPOTotal' => $filteredPOTotals,
+        'filteredSOTotal' => $filteredSOTotals,
+    ];
+ 
+    return response()->json($data);
 }
 
 

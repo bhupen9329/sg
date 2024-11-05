@@ -104,44 +104,50 @@
                                 @csrf
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="get_miller_id" class="form-label">From</label><span class="required-classes">*</span>
-                                        <select class="form-select Select-Company" id="get_miller_id" name="po_company_id" onchange="fetchPoNumbers(this)" required>
+                                        <label for="get_miller_id" class="form-label">From</label><span
+                                            class="required-classes">*</span>
+                                        <select class="form-select Select-Company" id="get_miller_id" name="po_company_id"
+                                            onchange="fetchPoNumbers(this)" required>
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    
+
                                     <div class="col-md-6">
-                                        <label for="to_company_id" class="form-label">To</label><span class="required-classes">*</span>
-                                        <select class="form-select Select-Company" id="to_company_id" name="so_company_id" onchange="fetchSalesOrders(this)" required>
+                                        <label for="to_company_id" class="form-label">To</label><span
+                                            class="required-classes">*</span>
+                                        <select class="form-select Select-Company" id="to_company_id" name="so_company_id"
+                                            onchange="fetchSalesOrders(this)" required>
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    
+
 
                                     <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="to_company_id" class="form-label">Vehicle Number</label>
-                                          <input type="text" class="form-control" name="vehicle_number">
+                                        <input type="text" class="form-control" name="vehicle_number">
                                     </div>
                                 </div>
-        
+
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">Dispatch Details</h4>
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
                                 </div>
-        
+
                                 <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table">
                                     <thead>
                                         <tr>
-                                            <th class="table_heading_long">Base Item Name<span class="required-classes">*</span></th>
+                                            <th class="table_heading_long">Base Item Name<span
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
                                             <th class="table_heading_normal">Conv Rate</th>
-                                            <th class="table_heading_normal">Quantity<span class="required-classes">*</span></th>
+                                            <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
+                                            </th>
                                             <th class="table_heading_action">Action</th>
                                         </tr>
                                     </thead>
@@ -152,17 +158,17 @@
                                 <input type="hidden" id="po_item_id">
                                 <input type="hidden" id="so_item_no" name="so_item_no">
                                 <input type="hidden" id="po_item_no" name="po_item_no">
-        
+
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
                                     <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter remarks here..."></textarea>
                                 </div>
-        
+
                                 <div class="text-end mt-5">
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                     <a class="btn btn-secondary" href="{{ route('dispatch.index') }}">Back</a>
                                 </div>
-                     
+
                             </form>
                         </div>
                     </div>
@@ -177,265 +183,286 @@
 
 
 
-<!-- Purchase Order Modal -->
-<div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form method="POST" action="/your-action-url">
-                @csrf
-        
-                <div class="modal-header">
-                    <h5 class="modal-title" id="companyModalLabel">Select Purchase Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="table-responsive">
-                        <table class="table" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>Select</th>
-                                    <th>Date (DD/MM/YY)</th>
-                                    <th>PO Number</th>
-                                    <th>Item Name</th>
-                                    <th>PO Item No.</th>
-                                    <th>Quantity (Q)</th>
-                                    <th>Rest Quantity (Q)</th>
-                                    <th>PO Unit Price</th>
-                                    <th>PO Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Rows will be populated here by JavaScript -->
-                            </tbody>
-                        </table>
+    <!-- Purchase Order Modal -->
+    <div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form method="POST" action="/your-action-url">
+                    @csrf
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="companyModalLabel">Select Purchase Order</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="populateDispatchDetails()">Add to Dispatch</button>
-                </div>
-            </form>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Date (DD/MM/YY)</th>
+                                        <th>PO Number</th>
+                                        <th>Item Name</th>
+                                        <th>PO Item No.</th>
+                                        <th>Quantity (Q)</th>
+                                        <th>Rest Quantity (Q)</th>
+                                        <th>PO Unit Price</th>
+                                        <th>PO Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows will be populated here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="populateDispatchDetails()">Add to
+                            Dispatch</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 
 
-<!-- Sales Order Modal -->
-<div class="modal fade" id="SalescompanyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form method="POST" action="/your-action-url">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="companyModalLabel">Select Sales Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="table-responsive">
-                        <table class="table" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>Select</th>
-                                    <th>Date (DD/MM/YY)</th>
-                                    <th>SO Number</th>
-                                    <th>Item Name</th>
-                                    <th>SO Item No.</th>
-                                    <th>Quantity (Q)</th>
-                                    <th>Rest Quantity (Q)</th>
-                                    <th>SO Unit Price</th>
-                                    <th>SO Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Rows will be populated here by JavaScript -->
-                            </tbody>
-                        </table>
+    <!-- Sales Order Modal -->
+    <div class="modal fade" id="SalescompanyModal" tabindex="-1" aria-labelledby="companyModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form method="POST" action="/your-action-url">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="companyModalLabel">Select Sales Order</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary"  onclick="populateSODispatchDetails()">Add to Dispatch</button>
-                </div>
-            </form>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Date (DD/MM/YY)</th>
+                                        <th>SO Number</th>
+                                        <th>Item Name</th>
+                                        <th>SO Item No.</th>
+                                        <th>Quantity (Q)</th>
+                                        <th>Rest Quantity (Q)</th>
+                                        <th>SO Unit Price</th>
+                                        <th>SO Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows will be populated here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="populateSODispatchDetails()">Add to
+                            Dispatch</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 
-<script>
-    var lastItemId = 1;
+    <script>
+        var lastItemId = 1;
 
-    function addRow(itemName = '', itemId = '', quantity = '', unitPrice = '', subItems = []) {
-        var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
-        var newRow = table.insertRow(table.rows.length);
-        let subItemOptions = '<option readonly>Select Item</option>';
-        subItems.forEach(subItem => {
-            subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
-        });
+        function addRow(itemName = '', itemId = '', quantity = '', unitPrice = '', subItems = []) {
+            var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+            let subItemOptions = '<option readonly>Select Item</option>';
+            subItems.forEach(subItem => {
+                subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
+            });
 
-        newRow.innerHTML = `
+            newRow.innerHTML = `
             <td>${itemName}</td>
             <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
             <td>
-            <select name="sub_cat_id[]" class="form-select select_brand_name">${subItemOptions}</select>
+            <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
         </td>
-            <td><input type="text" name="conv_rate[]" class="form-control"  required /></td>
+            <td><input type="text" name="conv_rate[]"  class="form-control"  required /></td>
             <td><input type="number" name="quantity[]" class="form-control" value="" required /></td>
             <td>
                 <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
             </td>
 
         `;
-        lastItemId++;
-    }
+            lastItemId++;
+        }
 
-    function deleteRow(button) {
-        var row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-    }
+        function deleteRow(button) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            document.getElementById('po_item_id').value = "";
+            document.getElementById('po_item_no').value = "";
+            document.getElementById('so_item_no').value = "";
+            document.getElementById('get_miller_id').value = "";
+            document.getElementById('to_company_id').value = "";
+        }
 
-    // function populateDispatchDetails() {
-    //     const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
-        
-    //     selectedPOs.forEach(po => {
-    //         addRow(po.dataset.itemName, po.dataset.quantity, po.dataset.unitPrice);
-    //     });
-        
-    //     // Close the modal after populating details
-    //     var modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
-    //     modal.hide();
-    // }
-    function populateSODispatchDetails() {
-        const selectedSOs = document.querySelectorAll('.so-checkbox:checked');
+        // function populateDispatchDetails() {
+        //     const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
 
-        selectedSOs.forEach(so => {
-        // Get item name, quantity, and unit price from the checkbox dataset
-        const so_item_no = so.dataset.id;
-        const itemName = so.dataset.itemName;
-        const quantity = so.dataset.quantity;
-        const unitPrice = so.dataset.unitPrice;
-        $('#so_item_no').val(so_item_no);
-        });
-        $('#SalescompanyModal').modal('hide');
-        
-    }
+        //     selectedPOs.forEach(po => {
+        //         addRow(po.dataset.itemName, po.dataset.quantity, po.dataset.unitPrice);
+        //     });
 
-    function populateDispatchDetails() {
-    const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
-    selectedPOs.forEach(po => {
-        // Get item name, quantity, and unit price from the checkbox dataset
-        const itemId = po.dataset.id;
-        const itemName = po.dataset.itemName;
-        const quantity = po.dataset.quantity;
-        const unitPrice = po.dataset.unitPrice;
-        const poItemNo = po.dataset.poItemNo; 
+        //     // Close the modal after populating details
+        //     var modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
+        //     modal.hide();
+        // }
+        function populateSODispatchDetails() {
+            const selectedSOs = document.querySelectorAll('.so-checkbox:checked');
 
-        $('#po_item_id').val(itemId);
-        $('#po_item_no').val(poItemNo);
-        // console.log(`Item ID: ${itemId}.Item Name: ${itemName}, Quantity: ${quantity}, Unit Price: ${unitPrice}`);
+            selectedSOs.forEach(so => {
+                // Get item name, quantity, and unit price from the checkbox dataset
+                const so_item_no = so.dataset.id;
+                const itemName = so.dataset.itemName;
+                const quantity = so.dataset.quantity;
+                const unitPrice = so.dataset.unitPrice;
+                $('#so_item_no').val(so_item_no);
+            });
+            $('#SalescompanyModal').modal('hide');
 
-        // Make an AJAX request to fetch additional item details based on the item name
-        $.ajax({
-            url: '/get-item-details',  // Adjust to the route handling item details
-            method: 'POST',
-            data: {
-                item_name: itemName,
-                item_id: itemId,
-                _token: '{{ csrf_token() }}'  // Include CSRF token for security
-            },
-            success: function(response) {
-                // Assuming `response` contains the detailed data for the item
-                const details = response.item_details;
-                const subitems = response.subItems;
-                // Populate the row with additional details
-                addRow(details.name, details.id, quantity, unitPrice, subitems);
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching item details:", error);
+        }
+
+        function populateDispatchDetails() {
+            let po_item = $('#po_item_id').val().trim();
+
+            if (po_item !== null && po_item !== "") {
+                Swal.fire({
+                    title: 'Dispatch Details',
+                    text: 'Dispatch details have been populated already!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
             }
-        });
-    });
+            const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
+            selectedPOs.forEach(po => {
+                // Get item name, quantity, and unit price from the checkbox dataset
+                const itemId = po.dataset.id;
+                const itemName = po.dataset.itemName;
+                const quantity = po.dataset.quantity;
+                const unitPrice = po.dataset.unitPrice;
+                const poItemNo = po.dataset.poItemNo;
 
-    // Close the modal after populating details
-    const modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
-    modal.hide();
-}
+                $('#po_item_id').val(itemId);
+                $('#po_item_no').val(poItemNo);
+                // console.log(`Item ID: ${itemId}.Item Name: ${itemName}, Quantity: ${quantity}, Unit Price: ${unitPrice}`);
 
-</script>
+                // Make an AJAX request to fetch additional item details based on the item name
+                $.ajax({
+                    url: '/get-item-details', // Adjust to the route handling item details
+                    method: 'POST',
+                    data: {
+                        item_name: itemName,
+                        item_id: itemId,
+                        _token: '{{ csrf_token() }}' // Include CSRF token for security
+                    },
+                    success: function(response) {
+                        // Assuming `response` contains the detailed data for the item
+                        const details = response.item_details;
+                        const subitems = response.subItems;
+                        // Populate the row with additional details
+                        addRow(details.name, details.id, quantity, unitPrice, subitems);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching item details:", error);
+                    }
+                });
+            });
+
+            // Close the modal after populating details
+            const modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
+            modal.hide();
+        }
+    </script>
 
 
 
 
     <script>
+        $(document).ready(function() {
+            $('#get_miller_id').on('change', function() {
+                const selectedCompanyId = $(this).val();
 
-    $(document).ready(function() {
-        $('#get_miller_id').on('change', function() {
-            const selectedCompanyId = $(this).val();
-            
-            if (selectedCompanyId) {
-                // Show the modal
-                $('#companyModal').modal('show');
-                
-                // Optional: Fetch and display data in the modal based on selectedCompanyId
-                // $.ajax({
-                //     url: '/get-company-details', // Adjust this to your route
-                //     type: 'GET',
-                //     data: { company_id: selectedCompanyId },
-                //     success: function(response) {
-                //         $('#companyModal .modal-body').html(response); // Update modal content
-                //     },
-                //     error: function(error) {
-                //         console.error("Error fetching company details:", error);
-                //     }
-                // });
-            }
+                if (selectedCompanyId) {
+                    // Show the modal
+                    $('#companyModal').modal('show');
+
+                    // Optional: Fetch and display data in the modal based on selectedCompanyId
+                    // $.ajax({
+                    //     url: '/get-company-details', // Adjust this to your route
+                    //     type: 'GET',
+                    //     data: { company_id: selectedCompanyId },
+                    //     success: function(response) {
+                    //         $('#companyModal .modal-body').html(response); // Update modal content
+                    //     },
+                    //     error: function(error) {
+                    //         console.error("Error fetching company details:", error);
+                    //     }
+                    // });
+                }
+            });
         });
-    });
 
-    $(document).ready(function() {
-        $('#to_company_id').on('change', function() {
-            const selectedCompanyId = $(this).val();
-            
-            if (selectedCompanyId) {
-                // Show the modal
-                $('#SalescompanyModal').modal('show');
-                
-                // Optional: Fetch and display data in the modal based on selectedCompanyId
-                // $.ajax({
-                //     url: '/get-company-details', // Adjust this to your route
-                //     type: 'GET',
-                //     data: { company_id: selectedCompanyId },
-                //     success: function(response) {
-                //         $('#companyModal .modal-body').html(response); // Update modal content
-                //     },
-                //     error: function(error) {
-                //         console.error("Error fetching company details:", error);
-                //     }
-                // });
-            }
+        $(document).ready(function() {
+            $('#to_company_id').on('change', function() {
+                const selectedCompanyId = $(this).val();
+
+                if (selectedCompanyId) {
+                    // Show the modal
+                    $('#SalescompanyModal').modal('show');
+
+                    // Optional: Fetch and display data in the modal based on selectedCompanyId
+                    // $.ajax({
+                    //     url: '/get-company-details', // Adjust this to your route
+                    //     type: 'GET',
+                    //     data: { company_id: selectedCompanyId },
+                    //     success: function(response) {
+                    //         $('#companyModal .modal-body').html(response); // Update modal content
+                    //     },
+                    //     error: function(error) {
+                    //         console.error("Error fetching company details:", error);
+                    //     }
+                    // });
+                }
+            });
         });
-    });
 
 
-        
+
 
 
         function fetchPoNumbers(companySelect) {
-    const companyId = companySelect.value;
 
-    $.ajax({
-        url: '/get-purchase-orders',  // Ensure this is the correct route
-        method: 'POST',
-        data: { company_id: companyId, _token: '{{ csrf_token() }}' },
-        success: function(response) {
-            // Clear previous rows in the table body
-            const tableBody = $('#dataTable tbody');
-            tableBody.empty();
+            const companyId = companySelect.value;
 
-            // Populate the table with new rows from the response
-            response.purchase_orders.forEach(po => {
-                const row = `
+            $.ajax({
+                url: '/get-purchase-orders', // Ensure this is the correct route
+                method: 'POST',
+                data: {
+                    company_id: companyId,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    // Clear previous rows in the table body
+                    const tableBody = $('#dataTable tbody');
+                    tableBody.empty();
+
+                    // Populate the table with new rows from the response
+                    response.purchase_orders.forEach(po => {
+                        const row = `
                     <tr>
                         <td>
                             <input type="checkbox" class="po-checkbox" 
@@ -443,7 +470,8 @@
                                    data-item-name="${po.name}" 
                                    data-quantity="${po.qty}" 
                                    data-unit-price="${po.unit_price}"
-                                   data-po-item-no="${po.po_item_no}">
+                                   data-po-item-no="${po.po_item_no}"
+                                    onchange="singleCheckboxSelection(this)">
                         </td>
                         <td>${new Date(po.date).toLocaleDateString('en-GB')}</td>
                         <td>${po.document_number}</td>
@@ -454,49 +482,50 @@
                         <td>${po.unit_price}</td>
                         <td>${po.total_price}</td>
                     </tr>`;
-                tableBody.append(row);
+                        tableBody.append(row);
 
-                
+
+                    });
+
+                    // Show the modal after populating the table
+                    $('#companyModal').modal('show');
+                },
+                error: function(xhr) {
+                    console.error('Error fetching purchase orders:', xhr);
+                    alert('An error occurred while fetching purchase orders. Please try again.');
+                }
             });
-
-            // Show the modal after populating the table
-            $('#companyModal').modal('show');
-        },
-        error: function(xhr) {
-            console.error('Error fetching purchase orders:', xhr);
-            alert('An error occurred while fetching purchase orders. Please try again.');
         }
-    });
-}
 
-function fetchSalesOrders(selectElement) {
-    const companyId = selectElement.value;
-    let ItemId = document.getElementById('po_item_id').value;
-    $.ajax({
-        url: '/get-sales-orders',  // Adjust this URL to match your backend route
-        type: 'POST',
-        data: {
-            company_id: companyId,
-            ItemId: ItemId,
-            "_token": "{{ csrf_token() }}"  // CSRF token for security in Laravel
-        },
-        success: function(response) {
-            // Clear previous rows in the table body
-            const tableBody = $('#dataTable tbody');
-            tableBody.empty();
+        function fetchSalesOrders(selectElement) {
+            const companyId = selectElement.value;
+            let ItemId = document.getElementById('po_item_id').value;
+            $.ajax({
+                url: '/get-sales-orders', // Adjust this URL to match your backend route
+                type: 'POST',
+                data: {
+                    company_id: companyId,
+                    ItemId: ItemId,
+                    "_token": "{{ csrf_token() }}" // CSRF token for security in Laravel
+                },
+                success: function(response) {
+                    // Clear previous rows in the table body
+                    const tableBody = $('#dataTable tbody');
+                    tableBody.empty();
 
-            // Check if sales_orders is defined and is an array
-            if (response.salesOrders && Array.isArray(response.salesOrders)) {
-                // Populate the table with new rows from the response
-                response.salesOrders.forEach(so => {
-                    const row = `
+                    // Check if sales_orders is defined and is an array
+                    if (response.salesOrders && Array.isArray(response.salesOrders)) {
+                        // Populate the table with new rows from the response
+                        response.salesOrders.forEach(so => {
+                            const row = `
                         <tr>
                             <td>
                                 <input type="checkbox" class="so-checkbox" 
                                        data-id="${so.so_item_no}" 
                                        data-item-name="${so.so_number}" 
                                        data-quantity="${so.qty}" 
-                                       data-unit-price="${so.unit_price}">
+                                       data-unit-price="${so.unit_price}"
+                                       onchange="singleSOCheckboxSelection(this)">
                             </td>
                             <td>${new Date(so.date).toLocaleDateString('en-GB')}</td>
                             <td>${so.so_number}</td>
@@ -507,177 +536,186 @@ function fetchSalesOrders(selectElement) {
                             <td>${so.unit_price}</td>
                             <td>${so.total_price}</td>
                         </tr>`;
-                    tableBody.append(row);
-                });
+                            tableBody.append(row);
+                        });
 
-                // Show the modal after populating the table
-                $('#SalescompanyModal').modal('show');
-            } else {
-                console.error('No sales orders found or response is not in expected format:', response);
-                alert('No sales orders available for this company.');
-            }
-        },
-        error: function(xhr) {
-            console.error('Error fetching sales orders:', xhr);
-            alert('An error occurred while fetching sales orders. Please try again.');
+                        // Show the modal after populating the table
+                        $('#SalescompanyModal').modal('show');
+                    } else {
+                        console.error('No sales orders found or response is not in expected format:', response);
+                        alert('No sales orders available for this company.');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error fetching sales orders:', xhr);
+                    alert('An error occurred while fetching sales orders. Please try again.');
+                }
+            });
         }
-    });
-}
 
+        function singleCheckboxSelection(selectedCheckbox) {
+            $('.po-checkbox').not(selectedCheckbox).prop('checked', false);
+        }
 
-
+        function singleSOCheckboxSelection(selectedCheckbox) {
+            $('.so-checkbox').not(selectedCheckbox).prop('checked', false);
+        }
 
 
         let selectedPoItems = [];
 
-// Fetch Purchase Order Items and save selection
-function fetchPoItems(element) {
-    const poId = element.value;
-    
-    $.ajax({
-        url: '{{ route("getPoItems") }}',
-        type: 'POST',
-        data: { po_id: poId, _token: '{{ csrf_token() }}' },
-        success: function (response) {
-            $('#po_item').empty().append('<option selected disabled>Select PO Item</option>');
-            
-            response.poItems.forEach(item => {
-                $('#po_item').append(new Option(item.name, item.id));
-            });
+        // Fetch Purchase Order Items and save selection
+        function fetchPoItems(element) {
+            const poId = element.value;
 
-            // Capture selected items to filter SO items later
-            $('#po_item').on('change', function () {
-                selectedPoItems = $(this).val();
+            $.ajax({
+                url: '{{ route('getPoItems') }}',
+                type: 'POST',
+                data: {
+                    po_id: poId,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#po_item').empty().append('<option selected disabled>Select PO Item</option>');
+
+                    response.poItems.forEach(item => {
+                        $('#po_item').append(new Option(item.name, item.id));
+                    });
+
+                    // Capture selected items to filter SO items later
+                    $('#po_item').on('change', function() {
+                        selectedPoItems = $(this).val();
+                    });
+                }
             });
         }
-    });
-}
-    
+
         function fetchPoItems(poSelect) {
             const poId = poSelect.value;
-    
+
             $.ajax({
-                url: '/get-po-items',  // Update to the correct route
+                url: '/get-po-items', // Update to the correct route
                 method: 'POST',
-                data: { po_id: poId, _token: '{{ csrf_token() }}' },
+                data: {
+                    po_id: poId,
+                    _token: '{{ csrf_token() }}'
+                },
                 success: function(response) {
                     let itemOptions = '<option selected disabled>Select PO Item</option>';
                     response.po_items.forEach(item => {
                         itemOptions += `<option value="${item.id}">${item.name}</option>`;
                     });
                     $('#po_item').html(itemOptions);
-                    
+
                 }
             });
         }
 
 
-function fetchSoItems(selectElement) {
-    const salesOrderId = selectElement.value;
+        function fetchSoItems(selectElement) {
+            const salesOrderId = selectElement.value;
 
-    $.ajax({
-        url: '/get-so-items',  // Adjust the URL to match your route
-        type: 'POST',
-        data: {
-            sales_order_id: salesOrderId,
-            "_token": "{{ csrf_token() }}"  // CSRF token for security
-        },
-        success: function (response) {
-            let soItemOptions = '<option selected disabled>Select SO Item</option>';
-            response.soItems.forEach(item => {
-                soItemOptions += `<option value="${item.id}">${item.name}</option>`;
-            });
-            $('#so_item').html(soItemOptions);
-        }
-    });
-}
-
-
-
-function addRowItem() {
-
-    const item_id = document.getElementById('po_item').value
-    $.ajax({
-        url: '/get-item-details',  // Adjust the URL to match your route
-        type: 'POST',
-        data: {
-            item_id: item_id,
-            "_token": "{{ csrf_token() }}"  // CSRF token for security
-        },
-    
-        success: function (response) {
-            
-          
-            if (response && response.items) {
-                const selectedItem = response.items;              
-                
-                
-                    $('#buyer_name_id').val(selectedItem.name); 
-                
-                let itemOptions = '<option selected disabled>Select Subcategory</option>';
-                    response.subItems.forEach(item => {
-                        itemOptions += `<option value="${item.id}">${item.sub_category}</option>`;
+            $.ajax({
+                url: '/get-so-items', // Adjust the URL to match your route
+                type: 'POST',
+                data: {
+                    sales_order_id: salesOrderId,
+                    "_token": "{{ csrf_token() }}" // CSRF token for security
+                },
+                success: function(response) {
+                    let soItemOptions = '<option selected disabled>Select SO Item</option>';
+                    response.soItems.forEach(item => {
+                        soItemOptions += `<option value="${item.id}">${item.name}</option>`;
                     });
-                    $('#brand_name_id').html(itemOptions);
-            } else {
-                console.error("No items found in the response or response structure is incorrect.");
-            }
-        },
-
-
-        
-
-        
-
-    });
-}
-  
-
-
-
-
-function fetchPOItemsRate() {
-
-const item_id = document.getElementById('brand_name_id')
-console.log(item_id);
-$.ajax({
-    url: '/get-po-items-rate',  // Adjust the URL to match your route
-    type: 'POST',
-    data: {
-        item_id: item_id,
-        "_token": "{{ csrf_token() }}"  // CSRF token for security
-    },
-
-    success: function (response) {
-        
-      
-        if (response && response.items) {
-            const selectedItem = response.items;              
-            
-            
-                $('#buyer_name_id').val(selectedItem.name); 
-            
-            let itemOptions = '<option selected disabled>Select Subcategory</option>';
-                response.subItems.forEach(item => {
-                    itemOptions += `<option value="${item.id}">${item.sub_category}</option>`;
-                });
-                $('#brand_name_id').html(itemOptions);
-        } else {
-            console.error("No items found in the response or response structure is incorrect.");
+                    $('#so_item').html(soItemOptions);
+                }
+            });
         }
-    },
 
 
-    
 
-    
+        function addRowItem() {
 
-});
-}
+            const item_id = document.getElementById('po_item').value
+            $.ajax({
+                url: '/get-item-details', // Adjust the URL to match your route
+                type: 'POST',
+                data: {
+                    item_id: item_id,
+                    "_token": "{{ csrf_token() }}" // CSRF token for security
+                },
+
+                success: function(response) {
 
 
+                    if (response && response.items) {
+                        const selectedItem = response.items;
+
+
+                        $('#buyer_name_id').val(selectedItem.name);
+
+                        let itemOptions = '<option selected disabled>Select Subcategory</option>';
+                        response.subItems.forEach(item => {
+                            itemOptions += `<option value="${item.id}">${item.sub_category}</option>`;
+                        });
+                        $('#brand_name_id').html(itemOptions);
+                    } else {
+                        console.error("No items found in the response or response structure is incorrect.");
+                    }
+                },
+
+
+
+
+
+
+            });
+        }
+
+
+
+
+
+        function fetchPOItemsRate() {
+
+            const item_id = document.getElementById('brand_name_id')
+            console.log(item_id);
+            $.ajax({
+                url: '/get-po-items-rate', // Adjust the URL to match your route
+                type: 'POST',
+                data: {
+                    item_id: item_id,
+                    "_token": "{{ csrf_token() }}" // CSRF token for security
+                },
+
+                success: function(response) {
+
+
+                    if (response && response.items) {
+                        const selectedItem = response.items;
+
+
+                        $('#buyer_name_id').val(selectedItem.name);
+
+                        let itemOptions = '<option selected disabled>Select Subcategory</option>';
+                        response.subItems.forEach(item => {
+                            itemOptions += `<option value="${item.id}">${item.sub_category}</option>`;
+                        });
+                        $('#brand_name_id').html(itemOptions);
+                    } else {
+                        console.error("No items found in the response or response structure is incorrect.");
+                    }
+                },
+
+
+
+
+
+
+            });
+        }
     </script>
-    
+
 
     <script>
         function get_selected_type(value) {
@@ -800,34 +838,59 @@ $.ajax({
         }
 
         function get_brand(selectElement) {
-        let so_item_id = selectElement.value;
-        let row = selectElement.parentNode.parentNode;
-        let BrandSelect = row.querySelector('.select_brand_name');
+            let so_item_id = selectElement.value;
+            let row = selectElement.parentNode.parentNode;
+            let BrandSelect = row.querySelector('.select_brand_name');
 
-        $.ajax({
-            url: "{{ url('get_brand_list') }}",
-            method: "POST",
-            data: {
-                so_item_id: so_item_id,
-                "_token": "{{ csrf_token() }}"
-            },
-            success: function(res) {
-                let data = res.brand;
-                if (data) {
-                    let htmldata = '<option value="" disabled selected>Select Brands</option>';
-                    data.forEach(item => {
-                        htmldata += `<option value="${item.id}">${item.brand_name}</option>`;
-                    });
-                    BrandSelect.innerHTML = htmldata;
+            $.ajax({
+                url: "{{ url('get_brand_list') }}",
+                method: "POST",
+                data: {
+                    so_item_id: so_item_id,
+                    "_token": "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    let data = res.brand;
+                    if (data) {
+                        let htmldata = '<option value="" disabled selected>Select Brands</option>';
+                        data.forEach(item => {
+                            htmldata += `<option value="${item.id}">${item.brand_name}</option>`;
+                        });
+                        BrandSelect.innerHTML = htmldata;
+                    }
+                },
+                error: function(error) {
+                    console.error("Error fetching brands:", error);
                 }
-            },
-            error: function(error) {
-                console.error("Error fetching brands:", error);
-            }
-        });
-    }
+            });
+        }
 
-       
+        function get_conv_price(selectElement) {
+    let item_id = selectElement.value;
+    
+    $.ajax({
+        url: "{{ url('get_conv_price') }}",
+        method: "POST",
+        data: {
+            subcategory_item_id: item_id,
+            "_token": "{{ csrf_token() }}",
+        },
+        success: function(response) {
+            // Assuming `conv_rate` is the field that has the conversion rate in your response
+            if (response && response.item_price) {
+                // Find the nearest input field within the same row and set the value
+                $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(response.item_price);
+            } else {
+                $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(0);
+                console.error('Conversion rate not found in response');
+            }
+        },
+        error: function(xhr) {
+            console.error('Error fetching conversion rate:', xhr);
+            alert('An error occurred while fetching the conversion rate. Please try again.');
+        }
+    });
+}
 
         
     </script>

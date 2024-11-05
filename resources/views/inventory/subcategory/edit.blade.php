@@ -7,6 +7,17 @@
                 {{ $message }}
             </div>
         @endif
+        @if (session('msg'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "{{ session('msg') }}",
+                    icon: "error"
+                });
+            });
+        </script>
+    @endif
         <div class="dashboard-header pagetitle">
             <h1>Update Conv Item</h1>
             <nav>
@@ -115,46 +126,46 @@
     </main><!-- End #main -->
 @endsection
 <script>
-    function check_category_name(subcategory_id) {
-        // Get name from input
-        let old_category_id = $('#name-input').val();
-        let old_sub_category_name = $('#sub_category-input').val();
+    // function check_category_name(subcategory_id) {
+    //     // Get name from input
+    //     let old_category_id = $('#name-input').val();
+    //     let old_sub_category_name = $('#sub_category-input').val();
 
-        // Log values for debugging
-        // console.log(old_category_id);
-        // console.log(old_sub_category_name);
+    //     // Log values for debugging
+    //     // console.log(old_category_id);
+    //     // console.log(old_sub_category_name);
 
-        // AJAX request to check for duplicate subcategories
-        $.ajax({
-            url: "{{ url('get_sub_category_name_edit') }}",
-            method: "post",
-            data: {
-                sub_category_id: subcategory_id,
-                category_id: old_category_id,
-                sub_category_name: old_sub_category_name,
-                "_token": "{{ csrf_token() }}",
-            },
-            success: function(res) {
-                // console.log(res);
-                let category_id = res.category_id;
-                let sub_category_name = res.sub_category;
-                // console.log('category_id', category_id);
-                // console.log('sub_category_name', sub_category_name);
+    //     // AJAX request to check for duplicate subcategories
+    //     $.ajax({
+    //         url: "{{ url('get_sub_category_name_edit') }}",
+    //         method: "post",
+    //         data: {
+    //             sub_category_id: subcategory_id,
+    //             category_id: old_category_id,
+    //             sub_category_name: old_sub_category_name,
+    //             "_token": "{{ csrf_token() }}",
+    //         },
+    //         success: function(res) {
+    //             // console.log(res);
+    //             let category_id = res.category_id;
+    //             let sub_category_name = res.sub_category;
+    //             // console.log('category_id', category_id);
+    //             // console.log('sub_category_name', sub_category_name);
 
-                // Alert for duplicate name
-                if (old_category_id == category_id && old_sub_category_name.toLowerCase() ==
-                    sub_category_name.toLowerCase()) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'Duplicate entry found.'
-                    }).then(() => {
-                        resetRow_in_same_data();
-                    });
-                }
-            }
-        });
-    }
+    //             // Alert for duplicate name
+    //             if (old_category_id == category_id && old_sub_category_name.toLowerCase() ==
+    //                 sub_category_name.toLowerCase()) {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Oops!',
+    //                     text: 'Duplicate entry found.'
+    //                 }).then(() => {
+    //                     resetRow_in_same_data();
+    //                 });
+    //             }
+    //         }
+    //     });
+    // }
 
     function resetRow_in_same_data() {
         // Reset input

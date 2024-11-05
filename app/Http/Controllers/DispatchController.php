@@ -9,6 +9,7 @@ use App\Models\SalesOrder;
 use App\Models\PoItem;
 use App\Models\SoItem;
 use App\Models\Category;
+use App\Models\ConvRate;
 use App\Models\SubCategory;
 use App\Models\Dispatch;
 
@@ -152,7 +153,7 @@ foreach ($request->quantity as $index => $quantity) {
     $dispatch->save(); 
     $actual_so_dispatch_qty = ($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity);
     $actual_po_dispatch_qty = ($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity);
-
+// dd( $actual_so_dispatch_qty,  $actual_po_dispatch_qty);
     $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
     $po_item->update(['po_dispatch_rest_qty' => $actual_po_dispatch_qty]);
 
@@ -255,6 +256,12 @@ $po_item->update(['po_dispatch_rest_qty' => $old_po_rest_qty]);
 Dispatch::where('id', $id)->delete();
 return redirect()->route('dispatch.index')->with('delete', 'Dispatch deleted successfully.');
 
+}
+
+public function get_conv_price(Request $request)
+{
+    $cov_rates = ConvRate::where('subcategory_id', $request->subcategory_item_id)->latest()->first();
+    return response($cov_rates);
 }
 
 }

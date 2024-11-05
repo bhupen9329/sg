@@ -155,8 +155,8 @@ class SalesController extends Controller
                 $inventoryTransactionId = $inventoryTransaction->id;
                 $inventoryItemId = $inventoryTransaction->item_id;
 
-            $this->handleLifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
-            $this->handleFifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
+            // $this->handleLifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
+            // $this->handleFifoTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
             // $this->handleAverageTransaction($inventoryItemId, $inventoryTransactionId, $request->date, $valuationcontroller, $request);
 
 
@@ -423,7 +423,7 @@ class SalesController extends Controller
         $gstsetting = GstSetting::all();
         $so_number = $sales_order->so_number;
 
-        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->where('so_items.so_id', $id)->select('categories.*', 'so_items.*', 'so_items.price as price')->get();
+        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->where('so_items.so_item_status', 'Open')->where('so_items.so_id', $id)->where('so_items.so_dispatch_item_status', 'Open')->select('categories.*', 'so_items.*', 'so_items.price as price')->get();
         //   dd( $so_items);
         $data = [
             'company' => $company,
@@ -472,6 +472,7 @@ class SalesController extends Controller
                 $soItem->so_dispatch_rest_qty = $request->qty[$i];
                 $soItem->unit_price = $request->unit_price_[$i];
                 $soItem->price = $request->price[$i];
+                $soItem->so_dispatch_rest_qty = $request->qty[$i];
                 $so_item_available = SoItem::where('so_id', $id)->latest()->first();
 
                 if ($so_item_available) {

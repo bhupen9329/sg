@@ -7,6 +7,17 @@
                 {{ $message }}
             </div>
         @endif
+        @if (session('msg'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "{{ session('msg') }}",
+                    icon: "error"
+                });
+            });
+        </script>
+    @endif
         <div class="dashboard-header pagetitle">
             <h1>Add Conv Item</h1>
             <nav>
@@ -35,7 +46,7 @@
                                     <div class="col-md-8 mt-4">
                                         <label for="inputName5" class="form-label">Conv Item Name</label><span
                                             class="required-classes">*</span>
-                                        <input type="text" id="sub_category-input" onchange="check_category_name()" name="sub_category" class="form-control"
+                                        <input type="text" id="sub_category-input"  name="sub_category" class="form-control"
                                             required>
                                     </div>
                                     {{-- <div class="col-md-8 mt-4">
@@ -63,7 +74,7 @@
                                         </select>
                                     </div> --}}
                                     <div class="text-end mt-3">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                        <button type="submit"  class="btn btn-primary">Submit</button>
                                         <a class="btn btn-secondary" href="{{ route('subcategory.index') }}">Back</a>
                                     </div>
                                 </div>
@@ -77,37 +88,37 @@
     </main><!-- End #main -->
 @endsection
 <script>
-    function check_category_name() {
-        //get name from input
-        let old_category_id = $('#name-input').val();
-        let old_sub_category = $('#sub_category-input').val();
-        // console.log(name);
-        // console.log(sub_category);
-        $.ajax({
-            url: "{{ url('get_sub_category_name') }}",
-            method: "post",
-            data: {
-                category_id: old_category_id,
-                sub_category_name: old_sub_category,
-                "_token": "{{ csrf_token() }}",
-            },
-            success: function(res) {
-                // console.log(res);
-                let category_id = res.category_id;
-                let sub_category_name = res.sub_category;
-                //alert for same name
-                if (old_category_id === category_id && old_sub_category.toLowerCase() === sub_category_name.toLowerCase()) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Opps!',
-                        text: 'Duplicate entry found.'
-                    }).then(() => {
-                        resetRow_in_same_data();
-                    });
-                }
-            }
-        })
-    }
+    // function check_category_name() {
+    //     //get name from input
+    //     let old_category_id = $('#name-input').val();
+    //     let old_sub_category = $('#sub_category-input').val();
+    //     // console.log(name);
+    //     // console.log(sub_category);
+    //     $.ajax({
+    //         url: "{{ url('get_sub_category_name') }}",
+    //         method: "post",
+    //         data: {
+    //             category_id: old_category_id,
+    //             sub_category_name: old_sub_category,
+    //             "_token": "{{ csrf_token() }}",
+    //         },
+    //         success: function(res) {
+    //             // console.log(res);
+    //             let category_id = res.category_id;
+    //             let sub_category_name = res.sub_category;
+    //             //alert for same name
+    //             if (old_category_id === category_id && old_sub_category.toLowerCase() === sub_category_name.toLowerCase()) {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Opps!',
+    //                     text: 'Duplicate entry found.'
+    //                 }).then(() => {
+    //                     resetRow_in_same_data();
+    //                 });
+    //             }
+    //         }
+    //     })
+    // }
 
     function resetRow_in_same_data() {
         // Reset specific input fields in the row

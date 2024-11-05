@@ -385,6 +385,14 @@
                                 </a>
                           
                         </li>
+
+                        <li>
+                        
+                            <a href="{{ route('inventory.report') }}">
+                                <i class="bi bi-circle"></i><span>Inventory Report </span>
+                            </a>
+                      
+                    </li>
  
 
                         {{-- <li>
