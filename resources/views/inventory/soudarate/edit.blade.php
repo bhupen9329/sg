@@ -64,6 +64,12 @@
                                         <input type="text" id="price-input" name="item_price" class="form-control"
                                                value="{{ $item->item_price }}" required>
                                     </div>
+
+                                    <div class="col-md-8 mt-4">
+                                        <label for="remarks" class="form-label">Remarks</label>
+                                        <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter remarks here...">{{ old('remarks', $item->remarks) }}</textarea>
+                                    </div>
+                                    
             
                                     <div class="text-end mt-3">
                                         <button type="submit" class="btn btn-primary">Update</button>
