@@ -73,6 +73,17 @@
                 <div class="pg active"></div>
             </div>
         @endif
+        @if (session('msg'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: "{{ session('msg') }}",
+                        icon: "error"
+                    });
+                });
+            </script>
+        @endif
         <div class="dashboard-header pagetitle">
             <h1>Dispatch Summary</h1>
             <nav>
@@ -96,7 +107,7 @@
                                     <div class="col-md-6"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="get_miller_id" class="form-label">From</label><span class="required-classes">*</span>
                                         <select class="form-select Select-Company" id="get_miller_id" name="po_company_id" onchange="fetchPoNumbers(this)" required>
-                                            <option selected disabled>Select Company</option>
+                                            <option readonly>Select Company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
@@ -107,7 +118,7 @@
                                     <div class="col-md-6"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="to_company_id" class="form-label">To</label><span class="required-classes">*</span>
                                         <select class="form-select Select-Company" id="to_company_id" name="so_company_id" onchange="fetchSalesOrders(this)" required>
-                                            <option selected disabled>Select Company</option>
+                                            <option readonly>Select Company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
@@ -135,8 +146,8 @@
                                     </tbody>
                                 </table>
                                 <input type="hidden" id="po_item_id">
-                                <input type="hidden" id="so_item_no">
-                                <input type="hidden" id="po_item_no">
+                                <input type="hidden" id="so_item_no" name="so_item_no">
+                                <input type="hidden" id="po_item_no" name="po_item_no">
         
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
@@ -251,17 +262,17 @@
 <script>
     var lastItemId = 1;
 
-    function addRow(itemName = '', quantity = '', unitPrice = '', subItems = []) {
-        console.log(subItems);
+    function addRow(itemName = '', itemId = '', quantity = '', unitPrice = '', subItems = []) {
         var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
         var newRow = table.insertRow(table.rows.length);
-        let subItemOptions = '<option selected>Select Item</option>';
+        let subItemOptions = '<option readonly>Select Item</option>';
         subItems.forEach(subItem => {
             subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
         });
 
         newRow.innerHTML = `
-            <td><input type="text" name="selected_buyer_name[]" class="form-control" value="${itemName}" required /></td>
+            <td>${itemName}</td>
+            <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
             <td>
             <select name="sub_cat_id[]" class="form-select select_brand_name">${subItemOptions}</select>
         </td>
@@ -334,7 +345,7 @@
                 const details = response.item_details;
                 const subitems = response.subItems;
                 // Populate the row with additional details
-                addRow(details.name, quantity, unitPrice, subitems);
+                addRow(details.name, details.id, quantity, unitPrice, subitems);
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching item details:", error);
