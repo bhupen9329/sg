@@ -37,6 +37,11 @@ class DispatchController extends Controller
          'subcategories.sub_category as sub_category_name',
          'po_items.po_item_no',
          'so_items.so_item_no',
+         'po_items.qty as po_qty',
+         'so_items.qty as so_qty',
+         'dispatches.id as dispatch_id',
+         'dispatches.created_at as dispatch_date',
+
         )
         ->get();
 
@@ -115,7 +120,7 @@ public function getItemDetails(Request $request)
 
 public function storeDispatch(Request $request)
 {
-//   dd($request);
+
 foreach ($request->quantity as $index => $quantity) {
     $so_item = SoItem::where('so_item_no', $request->so_item_no)->first();
     $po_item = PoItem::where('po_item_no', $request->po_item_no)->first();
@@ -142,6 +147,8 @@ foreach ($request->quantity as $index => $quantity) {
     $dispatch->subcategory_id = $request->sub_cat_id[$index]; // Get the quantity based on index
     $dispatch->dispatched_quantity = $request->quantity[$index];
     $dispatch->conv_rate = $request->conv_rate[$index];
+    $dispatch->vehicle_number = $request->vehicle_number; 
+    $dispatch->remarks = $request->remarks; 
     $dispatch->save(); 
     $actual_so_dispatch_qty = ($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity);
     $actual_po_dispatch_qty = ($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity);
@@ -149,8 +156,105 @@ foreach ($request->quantity as $index => $quantity) {
     $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
     $po_item->update(['po_dispatch_rest_qty' => $actual_po_dispatch_qty]);
 
+    if($actual_so_dispatch_qty == 0){
+        $so_item->update(['so_dispatch_item_status' => 'Close']);
+    }
+    if($actual_po_dispatch_qty == 0){
+        $po_item->update(['po_dispatch_item_status' => 'Close']);
+    }
+
 }
 return redirect()->route('dispatch.index')->with('success', 'Dispatch details saved successfully.');
+}
+
+
+public function editDispatch($id)
+{
+    $disaptch_data = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
+    ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+    ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+    ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+    ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+    ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+    ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+    ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+    ->select('dispatches.*', 'so_items.so_dispatch_rest_qty', 'po_items.po_dispatch_rest_qty', 'po_company.company_name as po_company',
+     'so_company.company_name as so_company',
+     'sales_orders.so_number',
+     'purchase_orders.document_number as po_number',
+     'sales_orders.date as so_date',
+     'purchase_orders.date as po_date',
+     'categories.name as category_name',
+     'subcategories.sub_category as sub_category_name',
+     'po_items.po_item_no',
+     'so_items.so_item_no',
+     'po_items.qty as po_qty',
+     'so_items.qty as so_qty',
+     'dispatches.id as dispatch_id',
+    )
+    ->where('dispatches.id', $id)
+    ->first();
+    // dd($disaptch_data);
+    $sub_items = SubCategory::where('category_id',  $disaptch_data->category_id)->get();
+    return view('dispatch.edit',compact('disaptch_data', 'sub_items'));
+}
+
+public function updateDispatch(Request $request, $id)
+{
+  $old_dispatch = Dispatch::where('id', $id)->first();
+foreach ($request->quantity as $index => $quantity) {
+    $so_item = SoItem::where('id', $old_dispatch->so_item_id)->first();
+    $po_item = PoItem::where('id', $old_dispatch->po_item_id)->first();
+
+    if(($request->quantity[$index] > $so_item->so_dispatch_rest_qty) || ($request->quantity[$index] > $po_item->po_dispatch_rest_qty)){
+        return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
+    }
+
+}
+
+ // Loop through the quantities and sub_cat_ids to save each dispatch entry
+ foreach ($request->quantity as $index => $quantity) {
+    $so_item = SoItem::where('id', $old_dispatch->so_item_id)->first();
+    $po_item = PoItem::where('id', $old_dispatch->po_item_id)->first();
+
+    $old_so_rest_qty = ($old_dispatch->dispatched_quantity + $so_item->so_dispatch_rest_qty);
+    $old_po_rest_qty = ($old_dispatch->dispatched_quantity + $po_item->po_dispatch_rest_qty);
+
+
+    $dispatch = Dispatch::where('id', $id)->first();
+    $dispatch->dispatched_quantity = $request->quantity[$index];
+    $dispatch->conv_rate = $request->conv_rate[$index];
+    $dispatch->vehicle_number = $request->vehicle_number; 
+    $dispatch->remarks = $request->remarks; 
+    $dispatch->save(); 
+
+    $actual_so_dispatch_qty = ($old_so_rest_qty - $dispatch->dispatched_quantity);
+    $actual_po_dispatch_qty = ($old_po_rest_qty - $dispatch->dispatched_quantity);
+
+    $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
+    $po_item->update(['po_dispatch_rest_qty' => $actual_po_dispatch_qty]);
+
+}
+return redirect()->route('dispatch.index')->with('update', 'Dispatch updated successfully.');
+}
+
+public function destroyDispatch($id)
+{
+
+$old_dispatch = Dispatch::where('id', $id)->first();
+
+$so_item = SoItem::where('id', $old_dispatch->so_item_id)->first();
+$po_item = PoItem::where('id', $old_dispatch->po_item_id)->first();
+
+$old_so_rest_qty = ($old_dispatch->dispatched_quantity + $so_item->so_dispatch_rest_qty);
+$old_po_rest_qty = ($old_dispatch->dispatched_quantity + $po_item->po_dispatch_rest_qty);
+
+$so_item->update(['so_dispatch_rest_qty' => $old_so_rest_qty]);
+$po_item->update(['po_dispatch_rest_qty' => $old_po_rest_qty]);
+
+Dispatch::where('id', $id)->delete();
+return redirect()->route('dispatch.index')->with('delete', 'Dispatch deleted successfully.');
+
 }
 
 }

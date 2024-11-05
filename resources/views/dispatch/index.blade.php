@@ -118,56 +118,99 @@
                                   
                                 </div>
                             </div>
-                    
-                                
-                            </div>
-                        
-                            <table class="table table-bordered table-hover table-striped">
+                         <div style="overflow-x: auto">
+                            <table class="table " id="Category_table">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>#</th>
+                                        <th>Date</th>
                                         <th>PO No</th>
                                         <th>PO Item No</th>
+                                        <th>PO Item Name</th>
                                         <th>PO Date</th>     
                                         <th>Buyer Name (Party Name)</th>
+                                  
 
                                         <th>SO No</th>
                                         <th>SO Item No</th>
+                                        <th>SO Item Name</th>
                                         <th>SO Date</th>     
                                         <th>Seller Name (Party Name)</th>
 
+                                        <th>PO Item Quantity</th>
+                                        <th>PO Item Rest Quantity</th>
+                                        <th>SO Item Quantity</th>
+                                        <th>SO Item Rest Quantity</th>
+
                                         <th>Category</th>
-                                        <th>Sub Category</th> 
+                                        <th>Conv Item Name</th> 
                                
                                         <th>Dispatch Convt Rs</th>
                                         <th>Dispatch Qty</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                   @foreach($disaptch_data as $data)
                                   <tr>
                                    <td>{{$loop->iteration}}</td>
-
+                                   <td>{{ date('d-m-Y', strtotime($data->dispatch_date)) }}</td>
                                    <td>{{$data->po_number }}</td>
                                    <td>{{$data->po_item_no }}</td>
+                                   <td>{{$data->category_name }}</td>
                                    <td>{{ date('d-m-Y', strtotime($data->po_date)) }}</td>
                                    <td>{{$data->po_company }}</td>
+                    
 
                                    <td>{{$data->so_number }}</td>
                                    <td>{{$data->so_item_no }}</td>
+                                   <td>{{$data->category_name }}</td>
                                    <td>{{ date('d-m-Y', strtotime($data->so_date)) }}</td>
                                    <td>{{$data->so_company }}</td>
+
+                                   <td>{{$data->po_qty }}</td>
+                                   <td>{{$data->po_dispatch_rest_qty }}</td>
+                                   <td>{{$data->so_qty }}</td>
+                                   <td>{{$data->so_dispatch_rest_qty }}</td>
 
                                    <td>{{$data->category_name }}</td>
                                    <td>{{$data->sub_category_name }}</td>
 
                                    <td>{{$data->conv_rate }}</td>
                                    <td>{{$data->dispatched_quantity }}</td>
+                                   <td>
+                                    <div class="filter">
+                                        <a class="icon" href="#" data-bs-toggle="dropdown"><i
+                                                class="bi bi-three-dots"></i></a>
+                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                      
+                                            <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('dispatch.edit', $data->dispatch_id) }}"><i
+                                                    class="fa-solid fa-pencil"></i>Edit</a>
+                                            
+                                            </li>
+
+                                            <li>
+                                                        <form method="GET"
+                                                            action="{{ route('dispatch.destroy', $data->dispatch_id) }}">
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                class="dropdown-item delete-button">
+                                                                <i class="fa-solid fa-trash"></i> Delete
+                                                            </button>
+                                                        </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
 
                                   </tr>
                                   @endforeach
                                 </tbody>
                             </table>
+                         </div>
+                   
                             
                       
 
@@ -186,6 +229,25 @@
 
 
 
+     <script>
+        $(document).ready(function() {
+            $('#Category_table').DataTable({
+                dom: 'Bfrtip',
+                // Set the default page length
+                pageLength: 50,
+                // Configure the drop down options
+                lengthMenu: [
+                    [10, 20, 50, 100, 150, -1],
+                    ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+                ],
+                // Add to buttons the pageLength option
+                buttons: [
+                    'pageLength', 'csv', 'print'
+                ]
+            });
+        });
+    
+</script>
 
 
 @endsection

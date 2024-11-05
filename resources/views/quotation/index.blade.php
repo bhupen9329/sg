@@ -145,8 +145,9 @@
                                                             <li> <a class="dropdown-item"
                                                                     href="{{ route('quotation.edit', $data->q_id) }}"><i
                                                                         class="fa-regular fa-eye"></i>View/Edit</a></li>
-                                                            <li>
+                                                          
                                                             @endcan
+                                                            <li>
                                                             @if ($data->status != 'sales generated')
                                                                 @can('Quotation-delete')
                                                                     <form method="GET"
