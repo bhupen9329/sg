@@ -258,7 +258,7 @@
                                                                 var cell5 = newRow.insertCell(4);
                                                                 var cell6 = newRow.insertCell(5);
 
-                                                                @if($so_item->qty == $so_item->so_rest_qty)
+                                                                @if(($so_item->qty == $so_item->so_rest_qty) && ($so_item->qty == $so_item->so_dispatch_rest_qty))
 
                                                                 cell1.innerHTML = `
                                                             <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"   class="form-control item-select-${lastItemId}" required>

@@ -62,7 +62,10 @@ class SubCategoryController extends Controller
 
     public function store(Request $request)
     {
-
+          $subcategory_check = SubCategory::where('category_id',$request->category_id)->where('sub_category', $request->sub_category)->first();
+          if($subcategory_check){
+            return redirect()->back()->with('msg', 'Conv Item already exist');
+          }
         $data = [
             'category_id' => $request->category_id,
             'sub_category' => $request->sub_category,
@@ -122,6 +125,10 @@ class SubCategoryController extends Controller
     {
 
         // dd($request);
+        $subcategory_check = SubCategory::where('category_id',$request->category_id)->where('sub_category', $request->sub_category)->first();
+        if($subcategory_check){
+          return redirect()->back()->with('msg', 'Conv Item already exist');
+        }
 
         $data = [
             'category_id' => $request->category_id,

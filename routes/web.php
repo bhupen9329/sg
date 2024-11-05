@@ -275,7 +275,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/report-quotation', [ReportController::class, 'get_quotationso_report'])->name('get_quotation_report');
 
     Route::get('/outward-report', [ReportController::class, 'outward_report'])->name('outward_report');
-    Route::post('/report-outward', [ReportController::class, 'get_outward_report'])->name('get_outward_report');          
+    Route::post('/report-outward', [ReportController::class, 'get_outward_report'])->name('get_outward_report');   
+    Route::post('/report-inventory', [ReportController::class, 'get_inventory_report'])->name('get_inventory_report');   
+
+    
+   
 
     Route::get('/stock-report', [ReportController::class, 'stock_report'])->name('stock_report');
     Route::post('/report-stock', [ReportController::class, 'get_stock_report'])->name('get_stock_report');
@@ -326,6 +330,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/inventory/valuation-data', [ValuationController::class, 'getValuationData'])->name('inventory.getValuationData');
         Route::get('/transaction-details', [ValuationController::class, 'getTransactionDetails'])->name('inventory_valuation.valuation');
         Route::get('/position-report', [ValuationController::class, 'getPositionReport'])->name('position.report');
+        Route::get('/inventory-report', [ReportController::class, 'inventory_report'])->name('inventory.report');
+
         Route::post('/get_position_report_list', [ValuationController::class, 'get_position_report_list'])->name('get_position_report_list.report');
         Route::get('/filter-data', [ValuationController::class, 'filterData'])->name('item_name.filter_data');
 
@@ -353,6 +359,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/dispatch-delete/{id}', [DispatchController::class,'destroyDispatch'])->name('dispatch.destroy');
         Route::get('/dispatch-edit/{id}', [DispatchController::class,'editDispatch'])->name('dispatch.edit');
         Route::post('/dispatch-update/{id}', [DispatchController::class,'updateDispatch'])->name('dispatch.update');
+
+        Route::post('/get_conv_price', [DispatchController::class, 'get_conv_price']);
 
         Route::post('/get-purchase-orders', [DispatchController::class,'getPurchaseOrders']);
         Route::post('/get-po-items', [DispatchController::class,'getPoItems'])->name('getPoItems');

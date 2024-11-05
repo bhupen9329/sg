@@ -137,6 +137,7 @@
                                         <th>PO Price</th>
                                         <th>PO Match Position</th>
                                         <th>PO Item Match Position</th>
+                                        <th>PO Item Dispatch Position</th>
 
                                         <th>Remarks</th>                                      
                                         <th>Action</th>
@@ -158,6 +159,7 @@
                                             <td>{{ $data->price }}</td>
                                             <td>{{ $data->match_position }}</td>
                                             <td>{{ $data->po_item_status }}</td>
+                                            <td>{{ $data->po_dispatch_item_status }}</td>
 
                                             <td>{{ $data->terms_condition ?? 'N/A' }}</td>
                                            

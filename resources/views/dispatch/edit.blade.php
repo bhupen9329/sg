@@ -100,7 +100,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form class="row g-3" method="post" action="{{ route('dispatch.update', $disaptch_data->dispatch_id) }}">
+                            <form class="row g-3" method="post"
+                                action="{{ route('dispatch.update', $disaptch_data->dispatch_id) }}">
                                 @csrf
                                 <div class="row mb-3">
                                     <!-- Company Dropdown (From) -->
@@ -126,7 +127,8 @@
                                     </div>
                                     <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="to_company_id" class="form-label">Vehicle Number</label>
-                                          <input type="text" class="form-control" value="{{ $disaptch_data->vehicle_number }}" name="vehicle_number">
+                                        <input type="text" class="form-control"
+                                            value="{{ $disaptch_data->vehicle_number }}" name="vehicle_number">
                                     </div>
                                 </div>
 
@@ -156,7 +158,8 @@
 
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
-                                    <textarea class="form-control" id="remarks" name="remarks" rows="3" value="{{ $disaptch_data->remarks }}" placeholder="Enter remarks here...">{{ $disaptch_data->remarks }}</textarea>
+                                    <textarea class="form-control" id="remarks" name="remarks" rows="3" value="{{ $disaptch_data->remarks }}"
+                                        placeholder="Enter remarks here...">{{ $disaptch_data->remarks }}</textarea>
                                 </div>
 
                                 <div class="text-end mt-5">
@@ -222,10 +225,10 @@
            
 `;
             cell2.innerHTML = `
-           <select name="sub_cat_id[]" class="form-select select_brand_name">
+           <select name="sub_cat_id[]" class="form-select select_brand_name"  onchange="get_conv_price(this)">
             <option value="{{ $disaptch_data->subcategory_id }}" selected>{{ $disaptch_data->sub_category_name }}</option>
-            @foreach($sub_items as $sub_item)
-            @if($sub_item->id != $disaptch_data->subcategory_id)
+            @foreach ($sub_items as $sub_item)
+            @if ($sub_item->id != $disaptch_data->subcategory_id)
             <option value={{ $sub_item->id }}>{{ $sub_item->sub_category }}</option>
             @endif
             @endforeach
@@ -233,7 +236,7 @@
            
 `;
             cell3.innerHTML = `
-             <td><input type="number" name="conv_rate[]" class="form-control"  value="{{ $disaptch_data->conv_rate }}" min="1" required /></td>
+             <td><input type="number" name="conv_rate[]"  class="form-control"  value="{{ $disaptch_data->conv_rate }}" min="1" required /></td>
            
 `;
             cell4.innerHTML = `
@@ -241,8 +244,8 @@
            
 `;
 
-           
-         
+
+
 
             // Focus the search box when the dropdown is opened
             $('.item-select-' + lastItemId).on('select2:open', function() {
@@ -260,6 +263,34 @@
         document.addEventListener("DOMContentLoaded", function() {
             fetchrow();
         });
+
+        function get_conv_price(selectElement) {
+            let item_id = selectElement.value;
+
+            $.ajax({
+                url: "{{ url('get_conv_price') }}",
+                method: "POST",
+                data: {
+                    subcategory_item_id: item_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    // Assuming `conv_rate` is the field that has the conversion rate in your response
+                    if (response && response.item_price) {
+                        // Find the nearest input field within the same row and set the value
+                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(response
+                            .item_price);
+                    } else {
+                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val('');
+                        console.error('Conversion rate not found in response');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error fetching conversion rate:', xhr);
+                    alert('An error occurred while fetching the conversion rate. Please try again.');
+                }
+            });
+        }
     </script>
 
 @endsection

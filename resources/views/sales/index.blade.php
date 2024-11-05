@@ -97,6 +97,7 @@
                                         <th>SO Price</th>
                                         <th>SO Match Position</th>
                                         <th>SO Item Position</th>
+                                        <th>SO Item Dispatch Position</th>
                                         <th>Remarks</th>
                                         <th>Action</th>
                                     </tr>
@@ -116,6 +117,7 @@
                                             <td>{{ $data->price }}</td>
                                             <td>{{ $data->match_position }}</td>
                                             <td>{{ $data->so_item_status }}</td>
+                                            <td>{{ $data->so_dispatch_item_status }}</td>
                                             <td>{{ $data->terms_condition ?? 'N/A' }}</td>
                                            
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">

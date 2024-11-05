@@ -489,8 +489,7 @@ class PurchaseController extends Controller
             $number_of_days = $date->diffInDays($due_date, false);
         }
 
-        $po_items = PoItem::join('categories', 'po_items.item_category', '=', 'categories.id')->where('po_items.po_id', $id)->where('po_items.po_item_status', 'Open')->select('categories.*', 'po_items.*', 'po_items.price as price')->get();
-        // dd( $po_items);
+        $po_items = PoItem::join('categories', 'po_items.item_category', '=', 'categories.id')->where('po_items.po_id', $id)->where('po_items.po_item_status', 'Open')->where('po_items.po_dispatch_item_status', 'Open')->select('categories.*', 'po_items.*', 'po_items.price as price')->get();
         $data = [
             'company' => $company,
             'category' => $category,
@@ -500,6 +499,8 @@ class PurchaseController extends Controller
             'po_items' => $po_items,
             'category_2' => $category_2
         ];
+
+        // dd($po_items);
 
 
         return view('purchase.edit')->with($data);
@@ -546,6 +547,7 @@ class PurchaseController extends Controller
                     $poItem->po_dispatch_rest_qty = $request->qty[$i];
                     $poItem->unit_price = $request->unit_price_[$i];
                     $poItem->price = $request->price[$i];
+                    $poItem->po_dispatch_rest_qty = $request->qty[$i];
 
                     $po_item_available = PoItem::where('po_id', $id)->latest()->first();
 

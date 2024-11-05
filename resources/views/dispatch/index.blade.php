@@ -103,7 +103,7 @@
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Purchase</h4>
+                                        <h4 class="text-blue h4">Dispatch</h4>
                                     </div>
                                 </div>
 
@@ -123,24 +123,21 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>#</th>
-                                        <th>Date</th>
-                                        <th>PO No</th>
-                                        <th>PO Item No</th>
-                                        <th>PO Item Name</th>
-                                        <th>PO Date</th>     
+                                        <th style="width: 72.8125px;">Date</th>
+
+                                        <th style="width: 84.8125px;">PO Item No</th>
+                                        {{-- <th>PO Item Name</th> --}}
                                         <th>Buyer Name (Party Name)</th>
                                   
 
-                                        <th>SO No</th>
                                         <th>SO Item No</th>
-                                        <th>SO Item Name</th>
-                                        <th>SO Date</th>     
+                                        {{-- <th>SO Item Name</th> --}}
                                         <th>Seller Name (Party Name)</th>
 
-                                        <th>PO Item Quantity</th>
-                                        <th>PO Item Rest Quantity</th>
-                                        <th>SO Item Quantity</th>
-                                        <th>SO Item Rest Quantity</th>
+                                        <th>PO Item Qty</th>
+                                        <th>PO Item Rest Qty</th>
+                                        <th>SO Item Qty</th>
+                                        <th>SO Item Rest Qty</th>
 
                                         <th>Category</th>
                                         <th>Conv Item Name</th> 
@@ -155,17 +152,12 @@
                                   <tr>
                                    <td>{{$loop->iteration}}</td>
                                    <td>{{ date('d-m-Y', strtotime($data->dispatch_date)) }}</td>
-                                   <td>{{$data->po_number }}</td>
                                    <td>{{$data->po_item_no }}</td>
-                                   <td>{{$data->category_name }}</td>
-                                   <td>{{ date('d-m-Y', strtotime($data->po_date)) }}</td>
+                                   {{-- <td>{{$data->category_name }}</td> --}}
                                    <td>{{$data->po_company }}</td>
                     
-
-                                   <td>{{$data->so_number }}</td>
                                    <td>{{$data->so_item_no }}</td>
-                                   <td>{{$data->category_name }}</td>
-                                   <td>{{ date('d-m-Y', strtotime($data->so_date)) }}</td>
+                                   {{-- <td>{{$data->category_name }}</td> --}}
                                    <td>{{$data->so_company }}</td>
 
                                    <td>{{$data->po_qty }}</td>
