@@ -349,6 +349,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
         Route::get('/dispatch_create', [DispatchController::class, 'create'])->name('dispatch.create');
         Route::post('/dispatch-store', [DispatchController::class,'storeDispatch'])->name('dispatch.store');
+        Route::get('/dispatch-delete/{id}', [DispatchController::class,'destroyDispatch'])->name('dispatch.destroy');
+        Route::get('/dispatch-edit/{id}', [DispatchController::class,'editDispatch'])->name('dispatch.edit');
+        Route::post('/dispatch-update/{id}', [DispatchController::class,'updateDispatch'])->name('dispatch.update');
 
         Route::post('/get-purchase-orders', [DispatchController::class,'getPurchaseOrders']);
         Route::post('/get-po-items', [DispatchController::class,'getPoItems'])->name('getPoItems');

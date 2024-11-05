@@ -103,26 +103,30 @@
                             <form class="row g-3" method="post" action="{{ route('dispatch.store') }}">
                                 @csrf
                                 <div class="row mb-3">
-                                    <!-- Company Dropdown (From) -->
-                                    <div class="col-md-6"> <!-- Change this to col-md-6 for equal width -->
+                                    <div class="col-md-6">
                                         <label for="get_miller_id" class="form-label">From</label><span class="required-classes">*</span>
                                         <select class="form-select Select-Company" id="get_miller_id" name="po_company_id" onchange="fetchPoNumbers(this)" required>
-                                            <option readonly>Select Company</option>
+                                            <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                
-                                    <!-- PO Items Dropdown (To) -->
-                                    <div class="col-md-6"> <!-- Change this to col-md-6 for equal width -->
+                                    
+                                    <div class="col-md-6">
                                         <label for="to_company_id" class="form-label">To</label><span class="required-classes">*</span>
                                         <select class="form-select Select-Company" id="to_company_id" name="so_company_id" onchange="fetchSalesOrders(this)" required>
-                                            <option readonly>Select Company</option>
+                                            <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+                                    
+
+                                    <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
+                                        <label for="to_company_id" class="form-label">Vehicle Number</label>
+                                          <input type="text" class="form-control" name="vehicle_number">
                                     </div>
                                 </div>
         
@@ -156,7 +160,7 @@
         
                                 <div class="text-end mt-5">
                                     <button type="submit" class="btn btn-primary">Submit</button>
-                                    <a class="btn btn-secondary" href="#">Back</a>
+                                    <a class="btn btn-secondary" href="{{ route('dispatch.index') }}">Back</a>
                                 </div>
                      
                             </form>

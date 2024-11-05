@@ -11,15 +11,17 @@ class Dispatch extends Model
     protected $table = 'dispatches';
     protected $fillable = [
         'po_company_id',
-        'so_company_id', 
-        'po_id', 
-        'so_id', 
+        'so_company_id',
+        'po_id',
+        'so_id',
         'po_item_id',
-        'so_item_id', 
-        'category_id', 
-        'subcategory_id', 
+        'so_item_id',
+        'category_id',
+        'subcategory_id',
         'dispatched_quantity',
-        'conv_rate', 
+        'conv_rate',
+        'vehicle_number',
+        'remarks'
     ];
     public $timestamps = true; // Add this line
 }

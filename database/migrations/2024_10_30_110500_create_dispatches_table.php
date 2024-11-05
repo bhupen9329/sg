@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('subcategory_id');
             $table->decimal('dispatched_quantity', 10, 2)->nullable();
             $table->decimal('conv_rate', 10, 2)->nullable();
+            $table->string('vehicle_number')->nullable();
+            $table->string('remarks')->nullable();
             $table->timestamps();
 
         });
