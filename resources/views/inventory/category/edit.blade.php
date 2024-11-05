@@ -8,11 +8,11 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Update Category</h1>
+            <h1>Update Base Item</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Update Category</li>
+                    <li class="breadcrumb-item">Update Base Item</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -23,15 +23,15 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Add Category</h5>
+                                <h5 class="card-title">Add Base Item</h5>
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <label for="inputName5" class="form-label">Category Name</label>
+                                        <label for="inputName5" class="form-label">Base Item Name</label>
                                         </strong><span class="required-classes">*</span>
                                         <input type="text" onchange="check_category_name({{$category->id}})" id="name-input" name="name" value="{{ $category->name }}"
                                             class="form-control" required>
                                     </div><br>
-                                    @can('price')
+                                    {{-- @can('price')
                                     <div class="col-md-8 mt-4">
                                         <label for="inputName5" class="form-label">Base Price (Rs/MT)</label><span class="required-classes">*</span>
                                         <input type="number" id="edit-input" name="price"  min="1" value="{{ $category->price }}" required
@@ -43,7 +43,7 @@
                                         <input type="number" id="edit-input" name="margin"  min="1"  value="{{ $category->margin }}" required
                                             class="form-control">
                                     </div>
-                                    @endcan
+                                    @endcan --}}
                                     <div class="text-end mt-3">
                                         @can('Category-edit')
                                         @can('price')

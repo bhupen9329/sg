@@ -8,11 +8,11 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Add SubCategory</h1>
+            <h1>Add Conv Item</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item">Add SubCategory</li>
+                    <li class="breadcrumb-item">Add Conv Item</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -23,17 +23,17 @@
                     <div class="col-lg-12">
                         <div class="card">  
                             <div class="card-body">
-                                <h5 class="card-title">Add SubCategory</h5>
+                                <h5 class="card-title">Add Conv Item</h5>
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <label for="inputName5"  class="form-label">Category Name</label>
+                                        <label for="inputName5"  class="form-label">Base Item Name</label>
                                         </strong><span class="required-classes">*</span>
 
                                         @livewire('category')
 
                                     </div><br>
                                     <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Sub Category</label><span
+                                        <label for="inputName5" class="form-label">Conv Item Name</label><span
                                             class="required-classes">*</span>
                                         <input type="text" id="sub_category-input" onchange="check_category_name()" name="sub_category" class="form-control"
                                             required>
@@ -44,13 +44,13 @@
                                         <input type="number" id="edit-input" min="0" name="weight" class="form-control" required
                                         step="0.001" >
                                     </div> --}}
-
+{{-- 
                                     <div class="col-md-8 mt-4">
                                         <label for="inputName5" class="form-label">Difference Amt (Gauge)</label><span
                                             class="required-classes"> *</span>
                                         <input type="number" id="edit-input" min="0" name="diff" class="form-control" required
                                             >
-                                    </div>
+                                    </div> --}}
 
                                     {{-- <div class="col-md-8 mt-4">
                                         <label for="inputName5" class="form-label">Providers</label><span

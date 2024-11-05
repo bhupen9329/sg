@@ -8,11 +8,11 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Add Category</h1>
+            <h1>Add Base Item</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Add Category</li>
+                    <li class="breadcrumb-item">Add Base Item</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -26,12 +26,12 @@
                                 <h5 class="card-title">Add Category</h5>
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <label for="inputName5" class="form-label">Category Name</label>
+                                        <label for="inputName5" class="form-label">Base Item Name</label>
                                         </strong><span class="required-classes">*</span>
                                         <input type="text" id="name-input" name="name"
                                             onchange="check_category_name()" class="form-control" required>
                                     </div><br>
-                                    <div class="col-md-8 mt-4">
+                                    {{-- <div class="col-md-8 mt-4">
                                         <label for="inputName5" class="form-label">Base Price (Rs/MT)</label><span
                                             class="required-classes">*</span>
                                         <input type="number" id="edit-input" name="price" min="1" class="form-control" required>
@@ -40,7 +40,7 @@
                                         <label for="inputName5" class="form-label">Margin Amt (Rs/MT)</label><span
                                             class="required-classes">*</span>
                                         <input type="number" id="edit-input" name="margin"  min="1" class="form-control" required>
-                                    </div>
+                                    </div> --}}
                                     <div class="text-end mt-3">
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                         <a class="btn btn-secondary" href="{{ route('category.index') }}">Back</a>

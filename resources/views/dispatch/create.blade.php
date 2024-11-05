@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Index - Manual Matching')
+@section('title', 'Index - Dispatch')
 @section('content')
     <style>
 

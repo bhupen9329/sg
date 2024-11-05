@@ -25,6 +25,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ValuationController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\ManualMatching;
+use App\Http\Controllers\SoudaRateController;
 use App\Models\CompanySetting;
 use App\Models\SubCategory;
 use App\Models\Transaction;
@@ -357,6 +358,19 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/get-item-details', [DispatchController::class, 'getItemDetails'])->name('getItemdetails');
         Route::post('/get-so-items-filtered', [DispatchController::class, 'getSoItemsFiltered'])->name('getSoItemsFiltered');
         Route::get('/get-company-purchase-orders', [DispatchController::class, 'getCompanyPurchaseOrders']);
+
+        // .................................................Rate ................................................................................................
+        Route::get('/soudarate', [SoudaRateController::class, 'index'])->name('rate.index');
+        Route::get('/convrate_create', [SoudaRateController::class, 'create'])->name('rate.create');
+        Route::get('/get-subcategories/{category}', [SoudaRateController::class, 'getSubcategories']);
+        Route::post('/convrates-store', [SoudaRateController::class,'store'])->name('rate.store');
+        Route::get('/convrates​-edit/{id}', [SoudaRateController::class, 'edit'])->name('rate.edit');
+        Route::post('/convrates-update/{id}', [SoudaRateController::class,'update'])->name('rate.update');
+        Route::delete('/convrates-delete/{id}', [SoudaRateController::class, 'delete'])->name('rate.delete');
+
+
+
+
 
 
 

@@ -66,7 +66,7 @@ class CategoryController extends Controller
         // dd($data);
         Category::create($data);
 
-        return redirect()->route('category.index')->with('success', 'Category Created Successfully');
+        return redirect()->route('category.index')->with('success', 'Base Item Created Successfully');
     }
     public function edit($id)
     {
@@ -101,7 +101,7 @@ class CategoryController extends Controller
         ];
         // dd($data);
         Category::where('id', $id)->update($data);
-        return redirect()->route('category.index')->with('update', 'Category Updated Successfully');
+        return redirect()->route('category.index')->with('update', 'Base Item Updated Successfully');
 
     }
 
@@ -110,7 +110,7 @@ class CategoryController extends Controller
     public function delete(Request $request, $id)
     {
         Category::where('id', $id)->delete();
-        return redirect()->route('category.index')->with('delete', 'Category Deleted Successfully');
+        return redirect()->route('category.index')->with('delete', 'Base Item Deleted Successfully');
     }
 
     public function get_category_name(Request $request)

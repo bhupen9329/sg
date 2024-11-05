@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Sub Category - Saraswati Globals')
+@section('title', 'Souda Rate - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
         @if ($message = Session::get('success'))
@@ -46,11 +46,11 @@
 
 
         <div class="dashboard-header pagetitle">
-            <h1>Conv Item</h1>
+            <h1>Conv Rate</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Conv Item</li>
+                    <li class="breadcrumb-item">Conv Rate</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -87,7 +87,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Conv Item</h4>
+                                        <h4 class="text-blue h4">Conv Rate</h4>
 
                                     </div>
                                 </div>
@@ -95,9 +95,9 @@
                                     <div class="btn-group">
                                         @can('Sub-Category-create')
                                             @can('price')
-                                                <a class="btn btn-primary mb-4 mr-3 "href="{{ route('subcategory.create') }}">Add
+                                                <a class="btn btn-primary mb-4 mr-3 "href="{{ route('rate.create') }}">Add
                                                     New
-                                                    Conv Item</a>
+                                                    Conv Rate</a>
                                             @endcan
                                         @endcan
 
@@ -109,30 +109,22 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
+                                        <th>Date(DD/MM/YY)</th>
                                         <th>Base Item</th>
-                                        {{-- <th>Provider</th> --}}
                                         <th>Conv Item</th>
-                                        {{-- <th>Weight (KG/FT)</th> --}}
-                                        {{-- <th>Difference Amt (Gauge)</th> --}}
+                                        <th>Conv Rate</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($subcategory as $data)
+                                    @foreach ($convItems as $data)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $data->category_name }}</td>
-                                            {{-- <td>
-                                                <a data-bs-toggle="modal" href="#" class="dropdown-item"
-                                                    data-bs-target="#Modalfor_providers_details"
-                                                    style="text-decoration: underline; color: blue;"
-                                                    onclick="get_providers_details({{ $data->id }})">
-                                                    <strong>{{ $data->totalCount }}</strong>
-                                                </a>
-                                            </td> --}}
+                                            <td>{{ $data->selected_date }}</td>
+                                            <td>{{ $data->name }}</td>                                           
                                             <td>{{ $data->sub_category }}</td>
-                                            {{-- <td>{{ $data->weight }}</td> --}}
-                                            {{-- <td>{{ $data->difference }}</td> --}}
+                                            <td>{{ $data->item_price }}</td>
+                                        
                                             <td>
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
@@ -141,7 +133,7 @@
                                                         <li>
                                                             @can('Sub-Category-view')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('subcategory.edit', $data->id) }}"><i
+                                                                    href="{{ route('rate.edit', $data->id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>Edit</a>
                                                             @endcan
                                                         </li>
@@ -149,7 +141,7 @@
                                                         <li>
                                                             @can('Sub-Category-delete')
                                                                 <form method="POST"
-                                                                    action="{{ route('subcategory.delete', $data->id) }}">
+                                                                    action="{{ route('rate.delete', $data->id) }}">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button type="button" class="dropdown-item delete-button">
