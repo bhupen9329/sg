@@ -677,37 +677,16 @@ class PurchaseController extends Controller
     }
     public function get_received_qty(Request $request)
     {
-        $received_qty_records = PoReceivedQuantity::where('po_id', $request->po_id)->get();
-        $total_qty = PurchaseOrder::where('id', $request->po_id)->value('quantity');
+        // dd($request);
 
-        $balance_qty = $total_qty; // Initialize balance quantity with the total quantity
-        $previous_received_qty_sum = 0; // Initialize sum of previous received quantities
-
-        $rows_data = []; // Array to store data for each row
-
-        foreach ($received_qty_records as $received_qty_record) {
-            $received_qty = $received_qty_record->received_quantity;
-
-            // Calculate balance quantity for the current row
-            $balance_qty -= $received_qty;
-            // Update the sum of previous received quantities for the next iteration
-            $previous_received_qty_sum += $received_qty;
-
-            // Store data for the current row
-            $row_data = [
-                'id' => $received_qty_record->id,
-                'date' => $received_qty_record->created_at,
-                'received_qty' => $received_qty,
-                'balance_qty' => $balance_qty,
-            ];
-
-            // Add row data to the rows_data array
-            $rows_data[] = $row_data;
-        }
+        $Po_data = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+        ->join('categories', 'po_items.item_category', '=', 'categories.id')
+        ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+        ->where('po_items.item_category',$request->get_category_id)
+        ->get();
 
         return response()->json([
-            'total_qty' => $total_qty,
-            'rows_data' => $rows_data
+            'rows_data' => $Po_data
         ]);
     }
 

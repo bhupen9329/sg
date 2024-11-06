@@ -95,6 +95,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/update-partial-received-quantity', [PurchaseController::class, 'update_partial_received_quantity']);
     Route::get('/back', [PurchaseController::class, 'back']);
 
+    Route::post('/get_received_qty', [PurchaseController::class, 'get_received_qty']);
+
     // .................................Warehouse Route Start..................................................
 
     Route::get('/warehouse', [WareHouseController::class, 'index'])->name('warehouse.index');

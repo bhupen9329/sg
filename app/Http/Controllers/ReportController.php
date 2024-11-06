@@ -365,7 +365,7 @@ class ReportController extends Controller
             ->join('companies', 'stock_items.supplier_id', '=', 'companies.id')
             // ->whereBetween('stock_items.created_at', [$filterTodate, $filterFromdate])
             ->orderBy('stock_items.id', 'desc')
-            ->select('categories.*', 'companies.*', 'subcategories.*', 'stock_items.*', 'stock_items.weight as w_weight', );
+            ->select('categories.*', 'companies.*', 'subcategories.*', 'stock_items.*', 'stock_items.weight as w_weight',);
 
 
 
@@ -783,528 +783,548 @@ class ReportController extends Controller
     }
 
     public function calculateLifoReport()
-{
-    
-    $purchases = InventoryTransaction::where('transaction_type', 'purchase')
-        ->orderBy('transaction_date', 'desc')
-        ->get();
+    {
 
-  
-    $issues = InventoryTransaction::where('transaction_type', 'issue')
-        ->orderBy('transaction_date')
-        ->get();
-
-    $inventoryStack = [];
-    $costOfGoodsSold = 0;
+        $purchases = InventoryTransaction::where('transaction_type', 'purchase')
+            ->orderBy('transaction_date', 'desc')
+            ->get();
 
 
-    foreach ($purchases as $purchase) {
-        $inventoryStack[] = [
-            'quantity' => $purchase->quantity,
-            'unit_price' => $purchase->unit_price,
-        ];
-    }
+        $issues = InventoryTransaction::where('transaction_type', 'issue')
+            ->orderBy('transaction_date')
+            ->get();
 
-    foreach ($issues as $issue) {
-        $issueQuantity = $issue->quantity * -1;
-        
-        while ($issueQuantity > 0) {
-            if (empty($inventoryStack)) {
-                throw new \Exception('Not enough inventory to fulfill the issue.');
-            }
+        $inventoryStack = [];
+        $costOfGoodsSold = 0;
 
-            $lastPurchase = array_pop($inventoryStack);
 
-            if ($lastPurchase['quantity'] > $issueQuantity) {
-                
-                $costOfGoodsSold += $issueQuantity * $lastPurchase['unit_price'];
-                $lastPurchase['quantity'] -= $issueQuantity;
-                array_push($inventoryStack, $lastPurchase); 
-                $issueQuantity = 0;
-            } else {
-             
-                $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-                $issueQuantity -= $lastPurchase['quantity'];
-            }
-        }
-    }
-
-    return $costOfGoodsSold;
-}
-
-// public function calculateLIFO()
-// {
-//     $purchases = InventoryTransaction::where('transaction_type', 'purchase')
-//         ->orderBy('transaction_date', 'asc') 
-//         ->get();
-
-//     $issues = InventoryTransaction::where('transaction_type', 'issue')
-//         ->orderBy('transaction_date', 'asc')
-//         ->get();
-
-//     $inventoryStack = []; 
-//     $transactionLogs = []; 
-//     $totalQuantity = 0;
-//     $totalValue = 0;
-
-    
-//     foreach ($purchases as $purchase) {
-//         $inventoryStack[] = [
-//             'quantity' => $purchase->quantity,
-//             'unit_price' => $purchase->unit_price,
-//             'total_value' => $purchase->quantity * $purchase->unit_price,
-//             'transaction_date' => $purchase->transaction_date,
-//         ];
-
-//         $totalQuantity += $purchase->quantity;
-//         $totalValue += $purchase->quantity * $purchase->unit_price;
-
-       
-//         $transactionLogs[] = [
-//             'transaction_type' => 'Purchase',
-//             'quantity' => $purchase->quantity,
-//             'unit_price' => $purchase->unit_price,
-//             'transaction_date' => $purchase->transaction_date,
-//             'balance_qty' => $totalQuantity,
-//             'balance_value' => $totalValue,
-//         ];
-//     }
-
-    
-//     foreach ($issues as $issue) {
-//         $issueQty = abs($issue->quantity); 
-
-        
-//         $logEntry = [
-//             'transaction_type' => 'Issue',
-//             'quantity' => $issueQty,
-//             'transaction_date' => $issue->transaction_date,
-//             'details' => []
-//         ];
-
-//         while ($issueQty > 0 && !empty($inventoryStack)) {
-           
-//             $lastPurchase = array_pop($inventoryStack);
-
-//             if ($lastPurchase['quantity'] > $issueQty) {
-             
-//                 $usedQty = $issueQty;
-//                 $remainingQty = $lastPurchase['quantity'] - $issueQty;
-
-                
-//                 $totalQuantity -= $usedQty;
-//                 $totalValue -= $usedQty * $lastPurchase['unit_price'];
-
-              
-//                 $inventoryStack[] = [
-//                     'quantity' => $remainingQty,
-//                     'unit_price' => $lastPurchase['unit_price'],
-//                     'total_value' => $remainingQty * $lastPurchase['unit_price'],
-//                     'transaction_date' => $lastPurchase['transaction_date'],
-//                 ];
-
-//                 $logEntry['details'][] = [
-//                     'used_qty' => $usedQty,
-//                     'unit_price' => $lastPurchase['unit_price'],
-//                     'remaining_qty' => $remainingQty,
-//                     'remaining_value' => $remainingQty * $lastPurchase['unit_price']
-//                 ];
-
-//                 $issueQty = 0; 
-//             } else {
-               
-//                 $usedQty = $lastPurchase['quantity'];
-
-               
-//                 $totalQuantity -= $usedQty;
-//                 $totalValue -= $usedQty * $lastPurchase['unit_price'];
-
-//                 $logEntry['details'][] = [
-//                     'used_qty' => $usedQty,
-//                     'unit_price' => $lastPurchase['unit_price'],
-//                     'remaining_qty' => 0,
-//                     'remaining_value' => 0
-//                 ];
-
-//                 $issueQty -= $usedQty; 
-//             }
-//         }
-
-       
-//         $transactionLogs[] = [
-//             'transaction_type' => 'Issue',
-//             'quantity' => $logEntry['quantity'],
-//             'transaction_date' => $logEntry['transaction_date'],
-//             'balance_qty' => $totalQuantity,
-//             'balance_value' => $totalValue,
-//             'details' => $logEntry['details'] 
-//         ];
-//     }
-
-   
-//     return response()->json([
-//         'transaction_logs' => $transactionLogs,
-//         'final_balance_qty' => $totalQuantity,
-//         'final_balance_value' => $totalValue
-//     ]);
-// }
-
-public function calculateLIFO()
-{
-    $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-
-    $inventoryStack = [];  // LIFO Stack to hold inventory
-    $transactionLogs = []; // To log each transaction for the report
-    $totalQuantity = 0;
-    $totalValue = 0;
-    $totalProfitLoss = 0;
-
-    foreach ($transactions as $transaction) {
-        if (strtolower($transaction->transaction_type) === 'purchase') {
-            // Add purchase to the inventory stack
+        foreach ($purchases as $purchase) {
             $inventoryStack[] = [
-                'quantity' => $transaction->quantity,
-                'unit_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
+                'quantity' => $purchase->quantity,
+                'unit_price' => $purchase->unit_price,
             ];
+        }
 
-            // Update totals
-            $totalQuantity += $transaction->quantity;
-            $totalValue += $transaction->quantity * $transaction->unit_price;
+        foreach ($issues as $issue) {
+            $issueQuantity = $issue->quantity * -1;
 
-            // Log the purchase transaction
-            $transactionLogs[] = [
-                'transaction_type' => 'Purchase',
-                'quantity' => $transaction->quantity,
-                'unit_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue, // This should now correctly reflect after every purchase
-                'cost_of_goods_sold' => 0,
-                'profit_loss' => 0,
-            ];
+            while ($issueQuantity > 0) {
+                if (empty($inventoryStack)) {
+                    throw new \Exception('Not enough inventory to fulfill the issue.');
+                }
 
-        } elseif (strtolower($transaction->transaction_type) === 'sell') {
-            $sellQty = abs($transaction->quantity); // Quantity sold is positive
-            $costOfGoodsSold = 0; // Track cost for the sale
-            $logEntry = [
-                'transaction_type' => 'Sell',
-                'quantity' => $sellQty,
-                'transaction_date' => $transaction->transaction_date,
-                'selling_price' => $transaction->unit_price,
-                'details' => []
-            ];
+                $lastPurchase = array_pop($inventoryStack);
 
-            // LIFO logic - Sell the most recent purchase first
-            while ($sellQty > 0 && !empty($inventoryStack)) {
-                $lastPurchase = array_pop($inventoryStack); // Get the last batch
+                if ($lastPurchase['quantity'] > $issueQuantity) {
 
-                if ($lastPurchase['quantity'] >= $sellQty) {
-                    // If the last purchase batch can fulfill the sell quantity
-                    $costOfGoodsSold += $sellQty * $lastPurchase['unit_price'];
-                    $totalQuantity -= $sellQty;
-                    $totalValue -= $sellQty * $lastPurchase['unit_price'];
-
-                    // Calculate remaining quantity and value for this batch
-                    $remainingQty = $lastPurchase['quantity'] - $sellQty;
-                    $remainingValue = $remainingQty * $lastPurchase['unit_price'];
-
-                    // Push remaining stock back into the stack if there is any left
-                    if ($remainingQty > 0) {
-                        $inventoryStack[] = [
-                            'quantity' => $remainingQty,
-                            'unit_price' => $lastPurchase['unit_price'],
-                            'transaction_date' => $lastPurchase['transaction_date'],
-                        ];
-                    }
-
-                    $logEntry['details'][] = [
-                        'used_qty' => $sellQty,
-                        'unit_price' => $lastPurchase['unit_price'],
-                        'remaining_qty' => $remainingQty,
-                        'remaining_value' => $remainingValue,
-                    ];
-                    $sellQty = 0; // Sale fully fulfilled
-
+                    $costOfGoodsSold += $issueQuantity * $lastPurchase['unit_price'];
+                    $lastPurchase['quantity'] -= $issueQuantity;
+                    array_push($inventoryStack, $lastPurchase);
+                    $issueQuantity = 0;
                 } else {
-                    // If the last purchase batch can't fulfill the sell quantity
+
                     $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-                    $sellQty -= $lastPurchase['quantity'];
-                    $totalQuantity -= $lastPurchase['quantity'];
-                    $totalValue -= $lastPurchase['quantity'] * $lastPurchase['unit_price'];
-
-                    // No remaining quantity from this batch
-                    $logEntry['details'][] = [
-                        'used_qty' => $lastPurchase['quantity'],
-                        'unit_price' => $lastPurchase['unit_price'],
-                        'remaining_qty' => 0,
-                        'remaining_value' => 0,
-                    ];
+                    $issueQuantity -= $lastPurchase['quantity'];
                 }
             }
-
-            // Calculate profit/loss
-            $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
-            $profitLoss = $totalSaleValue - $costOfGoodsSold;
-            $totalProfitLoss += $profitLoss;
-
-            // Log the sell transaction
-            $transactionLogs[] = [
-                'transaction_type' => 'Sell',
-                'quantity' => abs($transaction->quantity),
-                'selling_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue, // Corrected balance value after sale
-                'cost_of_goods_sold' => $costOfGoodsSold,
-                'profit_loss' => $profitLoss,
-                'total_profit_loss' => $totalProfitLoss,
-                'details' => $logEntry['details'],
-            ];
         }
+
+        return $costOfGoodsSold;
     }
 
-    return view('reports.lifo_report', [
-        'transaction_logs' => $transactionLogs,
-        'final_balance_qty' => $totalQuantity,
-        'final_balance_value' => $totalValue, // Final corrected balance value
-        'final_profit_loss' => $totalProfitLoss,
-    ]);
-}
+    // public function calculateLIFO()
+    // {
+    //     $purchases = InventoryTransaction::where('transaction_type', 'purchase')
+    //         ->orderBy('transaction_date', 'asc') 
+    //         ->get();
+
+    //     $issues = InventoryTransaction::where('transaction_type', 'issue')
+    //         ->orderBy('transaction_date', 'asc')
+    //         ->get();
+
+    //     $inventoryStack = []; 
+    //     $transactionLogs = []; 
+    //     $totalQuantity = 0;
+    //     $totalValue = 0;
 
 
+    //     foreach ($purchases as $purchase) {
+    //         $inventoryStack[] = [
+    //             'quantity' => $purchase->quantity,
+    //             'unit_price' => $purchase->unit_price,
+    //             'total_value' => $purchase->quantity * $purchase->unit_price,
+    //             'transaction_date' => $purchase->transaction_date,
+    //         ];
+
+    //         $totalQuantity += $purchase->quantity;
+    //         $totalValue += $purchase->quantity * $purchase->unit_price;
 
 
+    //         $transactionLogs[] = [
+    //             'transaction_type' => 'Purchase',
+    //             'quantity' => $purchase->quantity,
+    //             'unit_price' => $purchase->unit_price,
+    //             'transaction_date' => $purchase->transaction_date,
+    //             'balance_qty' => $totalQuantity,
+    //             'balance_value' => $totalValue,
+    //         ];
+    //     }
 
 
-
-public function calculateFIFO()
-{
-
-    $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-
-    $inventoryQueue = []; 
-    $transactionLogs = []; 
-    $totalQuantity = 0;
-    $totalValue = 0;
-    $totalProfitLoss = 0;
-
-    foreach ($transactions as $transaction) {
-        if ($transaction->transaction_type === 'purchase') {
- 
-            $inventoryQueue[] = [
-                'quantity' => $transaction->quantity,
-                'unit_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
-            ];
+    //     foreach ($issues as $issue) {
+    //         $issueQty = abs($issue->quantity); 
 
 
-            $totalQuantity += $transaction->quantity;
-            $totalValue += $transaction->quantity * $transaction->unit_price;
+    //         $logEntry = [
+    //             'transaction_type' => 'Issue',
+    //             'quantity' => $issueQty,
+    //             'transaction_date' => $issue->transaction_date,
+    //             'details' => []
+    //         ];
 
-        
-            $transactionLogs[] = [
-                'transaction_type' => 'Purchase',
-                'quantity' => $transaction->quantity,
-                'unit_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue
-            ];
+    //         while ($issueQty > 0 && !empty($inventoryStack)) {
 
-        } elseif ($transaction->transaction_type === 'sell') {
-           
-            $sellQty = abs($transaction->quantity);
-            $sellingPrice = $transaction->unit_price; 
-            $logEntry = [
-                'transaction_type' => 'sell',
-                'quantity' => $sellQty,
-                'transaction_date' => $transaction->transaction_date,
-                'selling_price' => $sellingPrice,
-                'details' => []
-            ];
+    //             $lastPurchase = array_pop($inventoryStack);
 
-            $costOfGoodsSold = 0; 
+    //             if ($lastPurchase['quantity'] > $issueQty) {
 
-           
-            while ($sellQty > 0 && !empty($inventoryQueue)) {
-                $firstPurchase = array_shift($inventoryQueue); 
+    //                 $usedQty = $issueQty;
+    //                 $remainingQty = $lastPurchase['quantity'] - $issueQty;
 
-                if ($firstPurchase['quantity'] >= $sellQty) {
-                  
-                    $remainingQty = $firstPurchase['quantity'] - $sellQty;
 
-                  
-                    $costOfGoodsSold += $sellQty * $firstPurchase['unit_price'];
-                    $totalValue -= $sellQty * $firstPurchase['unit_price']; 
-                    $totalQuantity -= $sellQty; 
+    //                 $totalQuantity -= $usedQty;
+    //                 $totalValue -= $usedQty * $lastPurchase['unit_price'];
 
-                    if ($remainingQty > 0) {
-                      
-                        $inventoryQueue[] = [
-                            'quantity' => $remainingQty,
-                            'unit_price' => $firstPurchase['unit_price'],
-                            'transaction_date' => $firstPurchase['transaction_date'],
+
+    //                 $inventoryStack[] = [
+    //                     'quantity' => $remainingQty,
+    //                     'unit_price' => $lastPurchase['unit_price'],
+    //                     'total_value' => $remainingQty * $lastPurchase['unit_price'],
+    //                     'transaction_date' => $lastPurchase['transaction_date'],
+    //                 ];
+
+    //                 $logEntry['details'][] = [
+    //                     'used_qty' => $usedQty,
+    //                     'unit_price' => $lastPurchase['unit_price'],
+    //                     'remaining_qty' => $remainingQty,
+    //                     'remaining_value' => $remainingQty * $lastPurchase['unit_price']
+    //                 ];
+
+    //                 $issueQty = 0; 
+    //             } else {
+
+    //                 $usedQty = $lastPurchase['quantity'];
+
+
+    //                 $totalQuantity -= $usedQty;
+    //                 $totalValue -= $usedQty * $lastPurchase['unit_price'];
+
+    //                 $logEntry['details'][] = [
+    //                     'used_qty' => $usedQty,
+    //                     'unit_price' => $lastPurchase['unit_price'],
+    //                     'remaining_qty' => 0,
+    //                     'remaining_value' => 0
+    //                 ];
+
+    //                 $issueQty -= $usedQty; 
+    //             }
+    //         }
+
+
+    //         $transactionLogs[] = [
+    //             'transaction_type' => 'Issue',
+    //             'quantity' => $logEntry['quantity'],
+    //             'transaction_date' => $logEntry['transaction_date'],
+    //             'balance_qty' => $totalQuantity,
+    //             'balance_value' => $totalValue,
+    //             'details' => $logEntry['details'] 
+    //         ];
+    //     }
+
+
+    //     return response()->json([
+    //         'transaction_logs' => $transactionLogs,
+    //         'final_balance_qty' => $totalQuantity,
+    //         'final_balance_value' => $totalValue
+    //     ]);
+    // }
+
+    public function calculateLIFO()
+    {
+        $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+
+        $inventoryStack = [];  // LIFO Stack to hold inventory
+        $transactionLogs = []; // To log each transaction for the report
+        $totalQuantity = 0;
+        $totalValue = 0;
+        $totalProfitLoss = 0;
+
+        foreach ($transactions as $transaction) {
+            if (strtolower($transaction->transaction_type) === 'purchase') {
+                // Add purchase to the inventory stack
+                $inventoryStack[] = [
+                    'quantity' => $transaction->quantity,
+                    'unit_price' => $transaction->unit_price,
+                    'transaction_date' => $transaction->transaction_date,
+                ];
+
+                // Update totals
+                $totalQuantity += $transaction->quantity;
+                $totalValue += $transaction->quantity * $transaction->unit_price;
+
+                // Log the purchase transaction
+                $transactionLogs[] = [
+                    'transaction_type' => 'Purchase',
+                    'quantity' => $transaction->quantity,
+                    'unit_price' => $transaction->unit_price,
+                    'transaction_date' => $transaction->transaction_date,
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue, // This should now correctly reflect after every purchase
+                    'cost_of_goods_sold' => 0,
+                    'profit_loss' => 0,
+                ];
+            } elseif (strtolower($transaction->transaction_type) === 'sell') {
+                $sellQty = abs($transaction->quantity); // Quantity sold is positive
+                $costOfGoodsSold = 0; // Track cost for the sale
+                $logEntry = [
+                    'transaction_type' => 'Sell',
+                    'quantity' => $sellQty,
+                    'transaction_date' => $transaction->transaction_date,
+                    'selling_price' => $transaction->unit_price,
+                    'details' => []
+                ];
+
+                // LIFO logic - Sell the most recent purchase first
+                while ($sellQty > 0 && !empty($inventoryStack)) {
+                    $lastPurchase = array_pop($inventoryStack); // Get the last batch
+
+                    if ($lastPurchase['quantity'] >= $sellQty) {
+                        // If the last purchase batch can fulfill the sell quantity
+                        $costOfGoodsSold += $sellQty * $lastPurchase['unit_price'];
+                        $totalQuantity -= $sellQty;
+                        $totalValue -= $sellQty * $lastPurchase['unit_price'];
+
+                        // Calculate remaining quantity and value for this batch
+                        $remainingQty = $lastPurchase['quantity'] - $sellQty;
+                        $remainingValue = $remainingQty * $lastPurchase['unit_price'];
+
+                        // Push remaining stock back into the stack if there is any left
+                        if ($remainingQty > 0) {
+                            $inventoryStack[] = [
+                                'quantity' => $remainingQty,
+                                'unit_price' => $lastPurchase['unit_price'],
+                                'transaction_date' => $lastPurchase['transaction_date'],
+                            ];
+                        }
+
+                        $logEntry['details'][] = [
+                            'used_qty' => $sellQty,
+                            'unit_price' => $lastPurchase['unit_price'],
+                            'remaining_qty' => $remainingQty,
+                            'remaining_value' => $remainingValue,
+                        ];
+                        $sellQty = 0; // Sale fully fulfilled
+
+                    } else {
+                        // If the last purchase batch can't fulfill the sell quantity
+                        $costOfGoodsSold += $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+                        $sellQty -= $lastPurchase['quantity'];
+                        $totalQuantity -= $lastPurchase['quantity'];
+                        $totalValue -= $lastPurchase['quantity'] * $lastPurchase['unit_price'];
+
+                        // No remaining quantity from this batch
+                        $logEntry['details'][] = [
+                            'used_qty' => $lastPurchase['quantity'],
+                            'unit_price' => $lastPurchase['unit_price'],
+                            'remaining_qty' => 0,
+                            'remaining_value' => 0,
                         ];
                     }
-
-                 
-                    $logEntry['details'][] = [
-                        'used_qty' => $sellQty,
-                        'unit_price' => $firstPurchase['unit_price'],
-                        'remaining_qty' => $remainingQty,
-                        'remaining_value' => $remainingQty * $firstPurchase['unit_price'],
-                    ];
-
-                    $sellQty = 0; 
-                } else {
-                
-                    $usedQty = $firstPurchase['quantity'];
-                    $costOfGoodsSold += $usedQty * $firstPurchase['unit_price'];
-                    $totalValue -= $usedQty * $firstPurchase['unit_price'];
-                    $totalQuantity -= $usedQty;
-
-                    $logEntry['details'][] = [
-                        'used_qty' => $usedQty,
-                        'unit_price' => $firstPurchase['unit_price'],
-                        'remaining_qty' => 0,
-                        'remaining_value' => 0,
-                    ];
-
-                    $sellQty -= $usedQty; 
                 }
+
+                // Calculate profit/loss
+                $totalSaleValue = abs($transaction->quantity) * $transaction->unit_price;
+                $profitLoss = $totalSaleValue - $costOfGoodsSold;
+                $totalProfitLoss += $profitLoss;
+
+                // Log the sell transaction
+                $transactionLogs[] = [
+                    'transaction_type' => 'Sell',
+                    'quantity' => abs($transaction->quantity),
+                    'selling_price' => $transaction->unit_price,
+                    'transaction_date' => $transaction->transaction_date,
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue, // Corrected balance value after sale
+                    'cost_of_goods_sold' => $costOfGoodsSold,
+                    'profit_loss' => $profitLoss,
+                    'total_profit_loss' => $totalProfitLoss,
+                    'details' => $logEntry['details'],
+                ];
             }
-
-          
-            $totalSaleValue = $transaction->quantity * $sellingPrice;
-            $profitLoss = $totalSaleValue - $costOfGoodsSold;
-            $totalProfitLoss += $profitLoss;
-
-           
-            $transactionLogs[] = [
-                'transaction_type' => 'sell',
-                'quantity' => $logEntry['quantity'],
-                'transaction_date' => $logEntry['transaction_date'],
-                'selling_price' => $logEntry['selling_price'],
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue,
-                'cost_of_goods_sold' => $costOfGoodsSold,
-                'profit_loss' => $profitLoss,
-                'total_profit_loss' => $totalProfitLoss,
-                'details' => $logEntry['details']
-            ];
         }
+
+        return view('reports.lifo_report', [
+            'transaction_logs' => $transactionLogs,
+            'final_balance_qty' => $totalQuantity,
+            'final_balance_value' => $totalValue, // Final corrected balance value
+            'final_profit_loss' => $totalProfitLoss,
+        ]);
     }
 
-    
-    return response()->json([
-        'transaction_logs' => $transactionLogs,
-        'final_balance_qty' => $totalQuantity,
-        'final_balance_value' => $totalValue,
-        'final_profit_loss' => $totalProfitLoss
-    ]);
-}
 
 
-public function calculateAverageCost()
-{
-    $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
-    $totalQuantity = 0;
-    $totalValue = 0;
-    $totalProfitLoss = 0;
-    $transactionLogs = [];
 
-    foreach ($transactions as $transaction) {
-        if ($transaction->transaction_type === 'purchase') {
-            $totalQuantity += $transaction->quantity;
-            $totalValue += $transaction->quantity * $transaction->unit_price;
-            $averageCost = $totalValue / $totalQuantity;
 
-            $transactionLogs[] = [
-                'transaction_type' => 'Purchase',
-                'quantity' => $transaction->quantity,
-                'unit_price' => $transaction->unit_price,
-                'transaction_date' => $transaction->transaction_date,
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue,
-                'average_cost' => $averageCost
-            ];
-        } elseif ($transaction->transaction_type === 'sell') {
-            $sellQty = abs($transaction->quantity);
-            $sellingPrice = $transaction->unit_price;
-            $costOfGoodsSold = $sellQty * ($totalValue / $totalQuantity);
 
-            $totalQuantity -= $sellQty;
-            $totalValue -= $costOfGoodsSold;
+    public function calculateFIFO()
+    {
 
-            $profitLoss = ($transaction->quantity * $sellingPrice) - $costOfGoodsSold;
-            $totalProfitLoss += $profitLoss;
+        $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
-            $transactionLogs[] = [
-                'transaction_type' => 'Sell',
-                'quantity' => $sellQty,
-                'transaction_date' => $transaction->transaction_date,
-                'selling_price' => $sellingPrice,
-                'balance_qty' => $totalQuantity,
-                'balance_value' => $totalValue,
-                'cost_of_goods_sold' => $costOfGoodsSold,
-                'profit_loss' => $profitLoss,
-                'total_profit_loss' => $totalProfitLoss
-            ];
+        $inventoryQueue = [];
+        $transactionLogs = [];
+        $totalQuantity = 0;
+        $totalValue = 0;
+        $totalProfitLoss = 0;
+
+        foreach ($transactions as $transaction) {
+            if ($transaction->transaction_type === 'purchase') {
+
+                $inventoryQueue[] = [
+                    'quantity' => $transaction->quantity,
+                    'unit_price' => $transaction->unit_price,
+                    'transaction_date' => $transaction->transaction_date,
+                ];
+
+
+                $totalQuantity += $transaction->quantity;
+                $totalValue += $transaction->quantity * $transaction->unit_price;
+
+
+                $transactionLogs[] = [
+                    'transaction_type' => 'Purchase',
+                    'quantity' => $transaction->quantity,
+                    'unit_price' => $transaction->unit_price,
+                    'transaction_date' => $transaction->transaction_date,
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue
+                ];
+            } elseif ($transaction->transaction_type === 'sell') {
+
+                $sellQty = abs($transaction->quantity);
+                $sellingPrice = $transaction->unit_price;
+                $logEntry = [
+                    'transaction_type' => 'sell',
+                    'quantity' => $sellQty,
+                    'transaction_date' => $transaction->transaction_date,
+                    'selling_price' => $sellingPrice,
+                    'details' => []
+                ];
+
+                $costOfGoodsSold = 0;
+
+
+                while ($sellQty > 0 && !empty($inventoryQueue)) {
+                    $firstPurchase = array_shift($inventoryQueue);
+
+                    if ($firstPurchase['quantity'] >= $sellQty) {
+
+                        $remainingQty = $firstPurchase['quantity'] - $sellQty;
+
+
+                        $costOfGoodsSold += $sellQty * $firstPurchase['unit_price'];
+                        $totalValue -= $sellQty * $firstPurchase['unit_price'];
+                        $totalQuantity -= $sellQty;
+
+                        if ($remainingQty > 0) {
+
+                            $inventoryQueue[] = [
+                                'quantity' => $remainingQty,
+                                'unit_price' => $firstPurchase['unit_price'],
+                                'transaction_date' => $firstPurchase['transaction_date'],
+                            ];
+                        }
+
+
+                        $logEntry['details'][] = [
+                            'used_qty' => $sellQty,
+                            'unit_price' => $firstPurchase['unit_price'],
+                            'remaining_qty' => $remainingQty,
+                            'remaining_value' => $remainingQty * $firstPurchase['unit_price'],
+                        ];
+
+                        $sellQty = 0;
+                    } else {
+
+                        $usedQty = $firstPurchase['quantity'];
+                        $costOfGoodsSold += $usedQty * $firstPurchase['unit_price'];
+                        $totalValue -= $usedQty * $firstPurchase['unit_price'];
+                        $totalQuantity -= $usedQty;
+
+                        $logEntry['details'][] = [
+                            'used_qty' => $usedQty,
+                            'unit_price' => $firstPurchase['unit_price'],
+                            'remaining_qty' => 0,
+                            'remaining_value' => 0,
+                        ];
+
+                        $sellQty -= $usedQty;
+                    }
+                }
+
+
+                $totalSaleValue = $transaction->quantity * $sellingPrice;
+                $profitLoss = $totalSaleValue - $costOfGoodsSold;
+                $totalProfitLoss += $profitLoss;
+
+
+                $transactionLogs[] = [
+                    'transaction_type' => 'sell',
+                    'quantity' => $logEntry['quantity'],
+                    'transaction_date' => $logEntry['transaction_date'],
+                    'selling_price' => $logEntry['selling_price'],
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue,
+                    'cost_of_goods_sold' => $costOfGoodsSold,
+                    'profit_loss' => $profitLoss,
+                    'total_profit_loss' => $totalProfitLoss,
+                    'details' => $logEntry['details']
+                ];
+            }
         }
+
+
+        return response()->json([
+            'transaction_logs' => $transactionLogs,
+            'final_balance_qty' => $totalQuantity,
+            'final_balance_value' => $totalValue,
+            'final_profit_loss' => $totalProfitLoss
+        ]);
     }
 
-    return response()->json([
-        'transaction_logs' => $transactionLogs,
-        'final_balance_qty' => $totalQuantity,
-        'final_balance_value' => $totalValue,
-        'final_profit_loss' => $totalProfitLoss
-    ]);
-}
+
+    public function calculateAverageCost()
+    {
+        $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+
+        $totalQuantity = 0;
+        $totalValue = 0;
+        $totalProfitLoss = 0;
+        $transactionLogs = [];
+
+        foreach ($transactions as $transaction) {
+            if ($transaction->transaction_type === 'purchase') {
+                $totalQuantity += $transaction->quantity;
+                $totalValue += $transaction->quantity * $transaction->unit_price;
+                $averageCost = $totalValue / $totalQuantity;
+
+                $transactionLogs[] = [
+                    'transaction_type' => 'Purchase',
+                    'quantity' => $transaction->quantity,
+                    'unit_price' => $transaction->unit_price,
+                    'transaction_date' => $transaction->transaction_date,
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue,
+                    'average_cost' => $averageCost
+                ];
+            } elseif ($transaction->transaction_type === 'sell') {
+                $sellQty = abs($transaction->quantity);
+                $sellingPrice = $transaction->unit_price;
+                $costOfGoodsSold = $sellQty * ($totalValue / $totalQuantity);
+
+                $totalQuantity -= $sellQty;
+                $totalValue -= $costOfGoodsSold;
+
+                $profitLoss = ($transaction->quantity * $sellingPrice) - $costOfGoodsSold;
+                $totalProfitLoss += $profitLoss;
+
+                $transactionLogs[] = [
+                    'transaction_type' => 'Sell',
+                    'quantity' => $sellQty,
+                    'transaction_date' => $transaction->transaction_date,
+                    'selling_price' => $sellingPrice,
+                    'balance_qty' => $totalQuantity,
+                    'balance_value' => $totalValue,
+                    'cost_of_goods_sold' => $costOfGoodsSold,
+                    'profit_loss' => $profitLoss,
+                    'total_profit_loss' => $totalProfitLoss
+                ];
+            }
+        }
+
+        return response()->json([
+            'transaction_logs' => $transactionLogs,
+            'final_balance_qty' => $totalQuantity,
+            'final_balance_value' => $totalValue,
+            'final_profit_loss' => $totalProfitLoss
+        ]);
+    }
 
 
-public function inventory_report()
-{
-    $companys = 0;
-    return view('reports.inventory_report', compact('companys'));
-}
+    public function inventory_report()
+    {
+        $category = Category::all();
+        return view('reports.inventory_report', compact('category'));
+    }
 
 
-public function get_inventory_report(Request $request)
-{
+    public function get_inventory_report(Request $request)
+    {
 
-    $filterTodate = $request->filterTodate;
-    $filterFromdate = $request->filterFromdate;
+        $filterCategory = $request->filterCategory;
+        // dd( $filterCategory);
 
-    $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-    ->join('categories', 'po_items.item_category', '=', 'categories.id')
-    ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate])
-    ->select('po_items.item_category', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
-    ->groupBy('po_items.item_category', 'categories.name')
-    ->get();
-
-
-$filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-     ->join('categories', 'so_items.item_category', '=', 'categories.id')
-    ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate])
-    ->select('so_items.item_category', 'categories.name as category_name', DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
-    )
-    ->groupBy('so_items.item_category', 'categories.name')
-    ->get();
-  
-
-    $data = [
-        'filteredPOTotal' => $filteredPOTotals,
-        'filteredSOTotal' => $filteredSOTotals,
-    ];
- 
-    return response()->json($data);
-}
+        if($filterCategory != 'all'){
+            $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+            ->join('categories', 'po_items.item_category', '=', 'categories.id')
+            ->where('po_items.item_category', $filterCategory)
+            ->select('po_items.item_category', 'purchase_orders.id as po_id', 'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+            ->groupBy('po_items.item_category', 'categories.name', 'purchase_orders.id', 'categories.id')
+            ->get();
 
 
+        $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->join('categories', 'so_items.item_category', '=', 'categories.id')
+            ->where('so_items.item_category', $filterCategory)
+            ->select(
+                'so_items.item_category',
+                'categories.name as category_name',
+                'sales_orders.id as so_id',
+                'categories.id as category_id',
+                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('so_items.item_category', 'categories.name', 'sales_orders.id', 'categories.id')
+            ->get();
+        }else{
+            $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+            ->join('categories', 'po_items.item_category', '=', 'categories.id')
+            ->select('po_items.item_category', 'purchase_orders.id as po_id', 'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+            ->groupBy('po_items.item_category', 'categories.name', 'purchase_orders.id', 'categories.id')
+            ->get();
 
 
+        $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->join('categories', 'so_items.item_category', '=', 'categories.id')
+            ->select(
+                'so_items.item_category',
+                'categories.name as category_name',
+                'sales_orders.id as so_id',
+                'categories.id as category_id',
+                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('so_items.item_category', 'categories.name', 'sales_orders.id', 'categories.id')
+            ->get();
+        }
+
+     
 
 
+        $data = [
+            'filteredPOTotal' => $filteredPOTotals,
+            'filteredSOTotal' => $filteredSOTotals,
+        ];
+
+        return response()->json($data);
+    }
 }

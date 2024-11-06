@@ -145,7 +145,8 @@
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_normal">Conv Rate</th>
+                                            <th class="table_heading_normal">Conv Rate<span
+                                                class="required-classes">*</span></th>
                                             <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
                                             </th>
                                             <th class="table_heading_action">Action</th>
@@ -866,33 +867,32 @@
         }
 
         function get_conv_price(selectElement) {
-    let item_id = selectElement.value;
-    
-    $.ajax({
-        url: "{{ url('get_conv_price') }}",
-        method: "POST",
-        data: {
-            subcategory_item_id: item_id,
-            "_token": "{{ csrf_token() }}",
-        },
-        success: function(response) {
-            // Assuming `conv_rate` is the field that has the conversion rate in your response
-            if (response && response.item_price) {
-                // Find the nearest input field within the same row and set the value
-                $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(response.item_price);
-            } else {
-                $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(0);
-                console.error('Conversion rate not found in response');
-            }
-        },
-        error: function(xhr) {
-            console.error('Error fetching conversion rate:', xhr);
-            alert('An error occurred while fetching the conversion rate. Please try again.');
-        }
-    });
-}
+            let item_id = selectElement.value;
 
-        
+            $.ajax({
+                url: "{{ url('get_conv_price') }}",
+                method: "POST",
+                data: {
+                    subcategory_item_id: item_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    // Assuming `conv_rate` is the field that has the conversion rate in your response
+                    if (response && response.item_price) {
+                        // Find the nearest input field within the same row and set the value
+                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(response
+                            .item_price);
+                    } else {
+                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(0);
+                        console.error('Conversion rate not found in response');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error fetching conversion rate:', xhr);
+                    alert('An error occurred while fetching the conversion rate. Please try again.');
+                }
+            });
+        }
     </script>
 
 

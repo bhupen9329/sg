@@ -7,6 +7,18 @@
                 {{ $message }}
             </div>
         @endif
+
+        @if (session('msg'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "{{ session('msg') }}",
+                    icon: "error"
+                });
+            });
+        </script>
+    @endif
         <div class="dashboard-header pagetitle">
             <h1>Update Base Item</h1>
             <nav>
@@ -28,7 +40,7 @@
                                     <div class="col-md-8">
                                         <label for="inputName5" class="form-label">Base Item Name</label>
                                         </strong><span class="required-classes">*</span>
-                                        <input type="text" onchange="check_category_name({{$category->id}})" id="name-input" name="name" value="{{ $category->name }}"
+                                        <input type="text"  id="name-input" name="name" value="{{ $category->name }}"
                                             class="form-control" required>
                                     </div><br>
                                     {{-- @can('price')
@@ -64,36 +76,36 @@
 @endsection
 
 <script>
-    function check_category_name(category_id) {
-        //get name from input
-        let name = $('#name-input').val();
-        let cat_id = category_id;
-        // console.log(cat_id);
-        $.ajax({
-            url: "{{ url('get_category_name_edit') }}",
-            method: "post",
-            data: {
-                name: name,
-                category_id: category_id,
-                "_token": "{{ csrf_token() }}",
-            },
-            success: function(res) {
-                let category_name = res.name;
-                // console.log(res);
-                // console.log(category_name);
-                //alert for same name
-                if (name.toLowerCase() === category_name.toLowerCase()) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Opps!',
-                        text: 'Duplicate entry found.'
-                    }).then(() => {
-                        resetRow_in_same_data();
-                    });
-                }
-            }
-        })
-    }
+    // function check_category_name(category_id) {
+    //     //get name from input
+    //     let name = $('#name-input').val();
+    //     let cat_id = category_id;
+    //     // console.log(cat_id);
+    //     $.ajax({
+    //         url: "{{ url('get_category_name_edit') }}",
+    //         method: "post",
+    //         data: {
+    //             name: name,
+    //             category_id: category_id,
+    //             "_token": "{{ csrf_token() }}",
+    //         },
+    //         success: function(res) {
+    //             let category_name = res.name;
+    //             // console.log(res);
+    //             // console.log(category_name);
+    //             //alert for same name
+    //             if (name.toLowerCase() === category_name.toLowerCase()) {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Opps!',
+    //                     text: 'Duplicate entry found.'
+    //                 }).then(() => {
+    //                     resetRow_in_same_data();
+    //                 });
+    //             }
+    //         }
+    //     })
+    // }
 
     function resetRow_in_same_data() {
         // Resetinput
