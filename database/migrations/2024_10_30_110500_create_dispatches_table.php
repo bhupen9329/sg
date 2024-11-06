@@ -23,7 +23,11 @@ return new class extends Migration
             $table->string('category_id');
             $table->string('subcategory_id');
             $table->decimal('dispatched_quantity', 10, 2)->nullable();
+            $table->decimal('dispatch_unit_price', 10, 2)->nullable();
             $table->decimal('conv_rate', 10, 2)->nullable();
+            $table->decimal('dispatch_freight', 10, 2)->nullable();
+            $table->decimal('dispatch_other', 10, 2)->nullable();
+            $table->decimal('dispatch_total', 10, 2)->nullable();
             $table->string('vehicle_number')->nullable();
             $table->string('remarks')->nullable();
             $table->timestamps();

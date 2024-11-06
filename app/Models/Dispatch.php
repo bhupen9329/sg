@@ -20,8 +20,13 @@ class Dispatch extends Model
         'subcategory_id',
         'dispatched_quantity',
         'conv_rate',
+        'dispatch_unit_price',
+        'dispatch_freight',
+        'dispatch_other',
+        'dispatch_total',
         'vehicle_number',
-        'remarks'
+        'remarks',
+
     ];
     public $timestamps = true; // Add this line
 }

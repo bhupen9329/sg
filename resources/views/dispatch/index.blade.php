@@ -143,6 +143,7 @@
                                         <th>Conv Item Name</th> 
                                
                                         <th>Dispatch Convt Rs</th>
+                                        <th>Dispatch Total Rs</th>
                                         <th>Dispatch Qty</th>
                                         <th>Action</th>
                                     </tr>
@@ -171,6 +172,7 @@
                                    <td>{{$data->sub_category_name }}</td>
 
                                    <td>{{$data->conv_rate }}</td>
+                                   <td>{{$data->dispatch_total }}</td>
                                    <td>{{$data->dispatched_quantity }}</td>
                                    <td>
                                     <div class="filter">

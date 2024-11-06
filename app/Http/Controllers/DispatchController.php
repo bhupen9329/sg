@@ -190,9 +190,15 @@ class DispatchController extends Controller
             $dispatch->subcategory_id = $request->sub_cat_id[$index]; // Get the quantity based on index
             $dispatch->dispatched_quantity = $request->quantity[$index];
             $dispatch->conv_rate = $request->conv_rate[$index];
+            $dispatch->dispatch_unit_price = $request->dispatch_unit_price[$index];
+            $dispatch->dispatch_freight = $request->dispatch_freight[$index];
+            $dispatch->dispatch_other = $request->dispatch_other[$index];
+            $dispatch->dispatch_total = $request->dispatch_total[$index];
             $dispatch->vehicle_number = $request->vehicle_number;
             $dispatch->remarks = $request->remarks;
             $dispatch->save();
+
+    
             $actual_so_dispatch_qty = ($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity);
             $actual_po_dispatch_qty = ($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity);
 
@@ -252,7 +258,10 @@ class DispatchController extends Controller
             $so_item = SoItem::where('id', $old_dispatch->so_item_id)->first();
             $po_item = PoItem::where('id', $old_dispatch->po_item_id)->first();
 
-            if (($request->quantity[$index] > $so_item->so_dispatch_rest_qty) || ($request->quantity[$index] > $po_item->po_dispatch_rest_qty)) {
+            $old_so_rest_qty_check = ($old_dispatch->dispatched_quantity + $so_item->so_dispatch_rest_qty);
+            $old_po_rest_qty_check = ($old_dispatch->dispatched_quantity + $po_item->po_dispatch_rest_qty);
+
+            if (($request->quantity[$index] > $old_so_rest_qty_check) || ($request->quantity[$index] > $old_po_rest_qty_check)) {
                 return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
             }
         }
@@ -269,6 +278,10 @@ class DispatchController extends Controller
             $dispatch = Dispatch::where('id', $id)->first();
             $dispatch->dispatched_quantity = $request->quantity[$index];
             $dispatch->conv_rate = $request->conv_rate[$index];
+            $dispatch->dispatch_unit_price = $request->dispatch_unit_price[$index];
+            $dispatch->dispatch_freight = $request->dispatch_freight[$index];
+            $dispatch->dispatch_other = $request->dispatch_other[$index];
+            $dispatch->dispatch_total = $request->dispatch_total[$index];
             $dispatch->vehicle_number = $request->vehicle_number;
             $dispatch->remarks = $request->remarks;
             $dispatch->save();

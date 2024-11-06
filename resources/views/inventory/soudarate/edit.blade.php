@@ -59,7 +59,7 @@
                                     </div>
             
                                     <div class="col-md-8 mt-4">
-                                        <label for="price-input" class="form-label">Item Price</label>
+                                        <label for="price-input" class="form-label">Conv Price</label>
                                         <span class="required-classes">*</span>
                                         <input type="text" id="price-input" name="item_price" class="form-control"
                                                value="{{ $item->item_price }}" required>
