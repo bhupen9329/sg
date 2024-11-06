@@ -143,7 +143,11 @@
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
+                                            <th class="table_heading_long">Unit Price</th>
                                             <th class="table_heading_normal">Conv Rate</th>
+                                            <th class="table_heading_long">Freight</th>
+                                            <th class="table_heading_long">Other</th>
+                                            <th class="table_heading_long">Total<span class="required-classes">*</span></th>
                                             <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
                                             </th>
                                         </tr>
@@ -219,6 +223,12 @@
             var cell3 = newRow.insertCell(2);
             var cell4 = newRow.insertCell(3);
 
+            var cell5 = newRow.insertCell(4);
+            var cell6 = newRow.insertCell(5);
+            var cell7 = newRow.insertCell(6);
+            var cell8 = newRow.insertCell(7);
+
+
             cell1.innerHTML = `
              <td>{{ $disaptch_data->category_name }}</td>
             <input type="hidden" name="cat_id[]" class="form-control" value="{{ $disaptch_data->category_id }}" required>
@@ -236,13 +246,30 @@
            
 `;
             cell3.innerHTML = `
-             <td><input type="number" name="conv_rate[]"  class="form-control"  value="{{ $disaptch_data->conv_rate }}" min="1" required /></td>
+             <td><input type="number" name="dispatch_unit_price[]"  class="form-control" onchange="calculateTotal(this)"  value="{{ $disaptch_data->dispatch_unit_price }}" min="1" required readonly/></td>
            
 `;
+
             cell4.innerHTML = `
+             <td><input type="number" name="conv_rate[]"  class="form-control"  value="{{ $disaptch_data->conv_rate }}" oninput="calculateTotal(this)" min="1" required /></td>
+           
+`;
+            cell5.innerHTML = `
+            <td><input type="number" name="dispatch_freight[]" value="{{ $disaptch_data->dispatch_freight }}" class="form-control" oninput="calculateTotal(this)" required /></td>
+           
+`;
+            cell6.innerHTML = `
+            <td><input type="number" name="dispatch_other[]" value="{{ $disaptch_data->dispatch_other }}" class="form-control" oninput="calculateTotal(this)" required /></td>
+`;
+            cell7.innerHTML = `
+            <td><input type="number" name="dispatch_total[]" value="{{ $disaptch_data->dispatch_total }}" class="form-control" readonly required /></td>
+           
+`;
+            cell8.innerHTML = `
              <td><input type="number" name="quantity[]" class="form-control" value="{{ $disaptch_data->dispatched_quantity }}" min="1" required /></td>
            
 `;
+
 
 
 
@@ -256,6 +283,8 @@
             $('#item_sub_category' + lastItemId).on('select2:open', function() {
                 document.querySelector('.select2-search__field').focus();
             });
+
+
 
 
         }
@@ -275,21 +304,36 @@
                     "_token": "{{ csrf_token() }}",
                 },
                 success: function(response) {
-                    // Assuming `conv_rate` is the field that has the conversion rate in your response
+                    const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
+
                     if (response && response.item_price) {
-                        // Find the nearest input field within the same row and set the value
-                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(response
-                            .item_price);
+                        // Set the conversion rate from the response
+                        convRateField.val(response.item_price);
                     } else {
-                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val('');
+                        convRateField.val(0);
                         console.error('Conversion rate not found in response');
                     }
+
+                    // Call calculateTotal with the updated convRateField
+                    calculateTotal(convRateField[0]);
                 },
                 error: function(xhr) {
                     console.error('Error fetching conversion rate:', xhr);
                     alert('An error occurred while fetching the conversion rate. Please try again.');
                 }
             });
+        }
+
+        function calculateTotal(element) {
+            const row = element.closest('tr');
+            const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
+            const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
+            const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
+            const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
+
+            // Calculate total and update the total_amount field
+            const totalAmount = unitPrice + convRate + freight + other;
+            row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
         }
     </script>
 

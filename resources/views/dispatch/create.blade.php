@@ -145,8 +145,11 @@
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_normal">Conv Rate<span
-                                                    class="required-classes">*</span></th>
+                                            <th class="table_heading_long">Unit Price</th>
+                                            <th class="table_heading_normal">Conv Rate</th>
+                                            <th class="table_heading_long">Freight</th>
+                                            <th class="table_heading_long">Other</th>
+                                            <th class="table_heading_long">Total<span class="required-classes">*</span></th>
                                             <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
                                             </th>
                                             <th class="table_heading_action">Action</th>
@@ -156,7 +159,7 @@
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
                                 </table>
-{{-- ............................................................. Purchase Details................................................................  --}}
+                                {{-- ............................................................. Purchase Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Details</h4>
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
@@ -179,7 +182,7 @@
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
                                 </table>
-{{-- ............................................................. Sales Details................................................................  --}}
+                                {{-- ............................................................. Sales Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Details</h4>
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
@@ -331,19 +334,36 @@
             });
 
             newRow.innerHTML = `
-            <td>${itemName}</td>
-            <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
-            <td>
-            <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
-        </td>
-            <td><input type="text" name="conv_rate[]"  class="form-control"  required /></td>
-            <td><input type="number" name="quantity[]" step="0.001" class="form-control" value="" required /></td>
-            <td>
-                <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
-            </td>
+    <td>${itemName}</td>
+    <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
+    <td>
+        <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
+    </td>
+    <td><input type="number" name="dispatch_unit_price[]" value="${unitPrice}" class="form-control" readonly required /></td>
+    <td><input type="number" name="conv_rate[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
+    <td><input type="number" name="dispatch_freight[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
+    <td><input type="number" name="dispatch_other[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
+    <td><input type="number" name="dispatch_total[]" value="${unitPrice}" class="form-control" readonly required /></td>
+    <td><input type="number" name="quantity[]" step="0.001" class="form-control" value="" required /></td>
+    <td>
+        <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
+    </td>
+`;
 
-        `;
+
             lastItemId++;
+        }
+
+        function calculateTotal(element) {
+            const row = element.closest('tr');
+            const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
+            const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
+            const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
+            const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
+
+            // Calculate total and update the total_amount field
+            const totalAmount = unitPrice + convRate + freight + other;
+            row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
         }
 
         function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
@@ -381,16 +401,7 @@
             lastItemId++;
         }
 
-        // function deleteRow(button) {
-        //     var row = button.parentNode.parentNode;
-        //     row.parentNode.removeChild(row);
-        //     document.getElementById('poTable').deleteRow(index);
-        //     document.getElementById('po_item_id').value = "";
-        //     document.getElementById('po_item_no').value = "";
-        //     document.getElementById('so_item_no').value = "";
-        //     document.getElementById('get_miller_id').value = "";
-        //     document.getElementById('to_company_id').value = "";
-        // }
+
 
         function deleteRow(button) {
             // Find the row that was clicked
@@ -419,7 +430,7 @@
 
             document.getElementById('poTable').deleteRow(index);
             document.getElementById('soTable').deleteRow(index);
-          
+
         }
 
         // function populateDispatchDetails() {
@@ -455,7 +466,7 @@
                         const so_item = response.so_items;
                         // Populate the row with additional details
                         SORow(so_item.date, so_item.so_number, so_item.name, so_item.so_item_no,
-                        so_item.qty, so_item.so_dispatch_rest_qty, so_item.unit_price, so_item
+                            so_item.qty, so_item.so_dispatch_rest_qty, so_item.unit_price, so_item
                             .price);
 
                     },
@@ -1016,15 +1027,18 @@
                     "_token": "{{ csrf_token() }}",
                 },
                 success: function(response) {
-                    // Assuming `conv_rate` is the field that has the conversion rate in your response
+                    const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
+
                     if (response && response.item_price) {
-                        // Find the nearest input field within the same row and set the value
-                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(response
-                            .item_price);
+                        // Set the conversion rate from the response
+                        convRateField.val(response.item_price);
                     } else {
-                        $(selectElement).closest('tr').find('input[name="conv_rate[]"]').val(0);
+                        convRateField.val(0);
                         console.error('Conversion rate not found in response');
                     }
+
+                    // Call calculateTotal with the updated convRateField
+                    calculateTotal(convRateField[0]);
                 },
                 error: function(xhr) {
                     console.error('Error fetching conversion rate:', xhr);
