@@ -385,14 +385,14 @@
                                 </a>
                           
                         </li>
-
+{{-- 
                         <li>
                         
                             <a href="{{ route('inventory.report') }}">
                                 <i class="bi bi-circle"></i><span>Inventory Report </span>
                             </a>
                       
-                    </li>
+                    </li> --}}
  
 
                         {{-- <li>
@@ -414,6 +414,14 @@
                     </ul>
                 </li><!-- End Icons Nav -->
             @endif
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('inventory.report') }}">
+                    <i class="fa-solid fa-box"></i>
+
+                    <span>Stocks</span>
+                </a>
+            </li>
 
             @if ((auth()->check() && auth()->user()->can('Category-index')) || auth()->user()->can('Sub-Category-index'))
             <li class="nav-item">

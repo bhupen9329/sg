@@ -146,10 +146,56 @@
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
                                             <th class="table_heading_normal">Conv Rate<span
-                                                class="required-classes">*</span></th>
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
                                             </th>
                                             <th class="table_heading_action">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Rows will be dynamically added here -->
+                                    </tbody>
+                                </table>
+{{-- ............................................................. Purchase Details................................................................  --}}
+                                <div class="row mt-5">
+                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Details</h4>
+                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
+                                </div>
+
+                                <table id="poTable" class="col-md-4 col-sm-4 col-xl-12 table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date (DD/MM/YY)</th>
+                                            <th>PO Number</th>
+                                            <th>Item Name</th>
+                                            <th>PO Item No.</th>
+                                            <th>Quantity (Q)</th>
+                                            <th>Rest Quantity (Q)</th>
+                                            <th>PO Unit Price</th>
+                                            <th>PO Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Rows will be dynamically added here -->
+                                    </tbody>
+                                </table>
+{{-- ............................................................. Sales Details................................................................  --}}
+                                <div class="row mt-5">
+                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Details</h4>
+                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
+                                </div>
+
+                                <table id="soTable" class="col-md-4 col-sm-4 col-xl-12 table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date (DD/MM/YY)</th>
+                                            <th>SO Number</th>
+                                            <th>Item Name</th>
+                                            <th>SO Item No.</th>
+                                            <th>Quantity (Q)</th>
+                                            <th>Rest Quantity (Q)</th>
+                                            <th>SO Unit Price</th>
+                                            <th>SO Price</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -291,7 +337,7 @@
             <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
         </td>
             <td><input type="text" name="conv_rate[]"  class="form-control"  required /></td>
-            <td><input type="number" name="quantity[]" class="form-control" value="" required /></td>
+            <td><input type="number" name="quantity[]" step="0.001" class="form-control" value="" required /></td>
             <td>
                 <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
             </td>
@@ -300,14 +346,80 @@
             lastItemId++;
         }
 
+        function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
+            '', Price = '', ) {
+            var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+            newRow.innerHTML = `
+            <td> ${Date}</td>
+            <td>${poNumber}</td>
+            <td>${ItemName}</td>
+            <td>${poItemNumber}</td>
+            <td>${Quantity}</td>
+            <td>${RestQty}</td>
+            <td>${UnitPrice}</td>
+            <td>${Price}</td>
+           
+        `;
+            lastItemId++;
+        }
+
+        function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
+            '', Price = '', ) {
+            var table = document.getElementById("soTable").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+            newRow.innerHTML = `
+            <td> ${Date}</td>
+            <td>${soNumber}</td>
+            <td>${ItemName}</td>
+            <td>${soItemNumber}</td>
+            <td>${Quantity}</td>
+            <td>${RestQty}</td>
+            <td>${UnitPrice}</td>
+            <td>${Price}</td>
+        `;
+            lastItemId++;
+        }
+
+        // function deleteRow(button) {
+        //     var row = button.parentNode.parentNode;
+        //     row.parentNode.removeChild(row);
+        //     document.getElementById('poTable').deleteRow(index);
+        //     document.getElementById('po_item_id').value = "";
+        //     document.getElementById('po_item_no').value = "";
+        //     document.getElementById('so_item_no').value = "";
+        //     document.getElementById('get_miller_id').value = "";
+        //     document.getElementById('to_company_id').value = "";
+        // }
+
         function deleteRow(button) {
-            var row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
+            // Find the row that was clicked
             document.getElementById('po_item_id').value = "";
             document.getElementById('po_item_no').value = "";
             document.getElementById('so_item_no').value = "";
             document.getElementById('get_miller_id').value = "";
             document.getElementById('to_company_id').value = "";
+            var row = button.parentNode.parentNode;
+
+            // Get the table ID where the row is located
+            var table = row.closest('table');
+
+            // Remove the row from both tables
+            if (table.id === 'myTable') {
+                // Get the index of the row in myTable
+                var index = row.rowIndex;
+
+                // Delete the same row in poTable using the same index
+                document.getElementById('poTable').deleteRow(index);
+                document.getElementById('soTable').deleteRow(index);
+            }
+
+            // Delete the row from myTable
+            row.parentNode.removeChild(row);
+
+            document.getElementById('poTable').deleteRow(index);
+            document.getElementById('soTable').deleteRow(index);
+          
         }
 
         // function populateDispatchDetails() {
@@ -331,6 +443,26 @@
                 const quantity = so.dataset.quantity;
                 const unitPrice = so.dataset.unitPrice;
                 $('#so_item_no').val(so_item_no);
+                $.ajax({
+                    url: '/get-item-details-so', // Adjust to the route handling item details
+                    method: 'POST',
+                    data: {
+                        so_item_no: so_item_no,
+
+                        _token: '{{ csrf_token() }}' // Include CSRF token for security
+                    },
+                    success: function(response) {
+                        const so_item = response.so_items;
+                        // Populate the row with additional details
+                        SORow(so_item.date, so_item.so_number, so_item.name, so_item.so_item_no,
+                        so_item.qty, so_item.so_dispatch_rest_qty, so_item.unit_price, so_item
+                            .price);
+
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching item details:", error);
+                    }
+                });
             });
             $('#SalescompanyModal').modal('hide');
 
@@ -368,14 +500,21 @@
                     data: {
                         item_name: itemName,
                         item_id: itemId,
+                        poItemNo: poItemNo,
+
                         _token: '{{ csrf_token() }}' // Include CSRF token for security
                     },
                     success: function(response) {
                         // Assuming `response` contains the detailed data for the item
                         const details = response.item_details;
                         const subitems = response.subItems;
+                        const po_item = response.po_items;
                         // Populate the row with additional details
                         addRow(details.name, details.id, quantity, unitPrice, subitems);
+                        PORow(po_item.date, po_item.document_number, po_item.name, po_item.po_item_no,
+                            po_item.qty, po_item.po_dispatch_rest_qty, po_item.unit_price, po_item
+                            .price);
+
                     },
                     error: function(xhr, status, error) {
                         console.error("Error fetching item details:", error);

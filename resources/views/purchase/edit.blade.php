@@ -4,7 +4,7 @@
     <main id="main" class="main">
 
         <div class=" dashboard-header pagetitle">
-            <h1>Update Purchase Order</h1>
+            <h1>Purchase Order</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>

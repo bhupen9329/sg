@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Inventory Reports - Saraswati Globals')
+@section('title', 'Stocks - Saraswati Globals')
 @section('content')
     <style>
 
@@ -59,18 +59,18 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Inventory Report</h1>
+            <h1>Stocks</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Inventory Report</li>
+                    <li class="breadcrumb-item">Stocks</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
 
 
         <div class="dashboard-header pagetitle">
-            <h1>Inventory Report </h1>
+            <h1>Stocks </h1>
             <div class="row" style="align-items: flex-end;">
                 <div class="col-md-12 col-sm-12 d-flex justify-content-end">
 
@@ -191,7 +191,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Inventory Report</h4>
+                                        <h4 class="text-blue h4">Stockss</h4>
                                     </div><br>
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
