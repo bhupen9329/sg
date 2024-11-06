@@ -131,16 +131,28 @@ class DispatchController extends Controller
 
     public function getItemDetails(Request $request)
     {
+        // dd($request);
         $itemId = $request->item_id;
-        // dd($itemId);
-
+        $po_items = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
+        ->join('categories', 'categories.id', '=', 'po_items.item_category')
+        ->where('po_item_no', $request->poItemNo)->first();
+        // dd($po_items);
         // Retrieve the item and its sub-items based on the item ID
         $item = Category::where('id', $itemId)->first();
         $subItems = SubCategory::where('category_id', $itemId)->get();
         // dd($subItems);
 
         // Return response with both item and sub-item details
-        return response()->json(['item_details' => $item, 'subItems' => $subItems]);
+        return response()->json(['item_details' => $item, 'subItems' => $subItems, 'po_items' => $po_items]);
+    }
+
+    public function getItemDetailsSO(Request $request)
+    {
+        // dd($request);
+        $so_items = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
+        ->join('categories', 'categories.id', '=', 'so_items.item_category')
+        ->where('so_item_no', $request->so_item_no)->first();
+        return response()->json(['so_items' => $so_items]);
     }
 
 

@@ -21,7 +21,7 @@
     <main id="main" class="main">
 
         <div class=" dashboard-header pagetitle">
-            <h1>Add Sales Order</h1>
+            <h1>Sales Order</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>

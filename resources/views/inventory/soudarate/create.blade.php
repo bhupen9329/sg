@@ -36,17 +36,19 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-md-8">
+                                    <div class="col-md-8 mt-4">
                                         <label for="subCategorySelect" class="form-label">Subcategory</label>
                                         <select id="subCategorySelect" class="form-control" name="subcategory_id">
                                             <option value="">Select a Subcategory</option>
                                         </select>
                                     </div>
-
+                                    <?php
+                                    $currentDate = date('Y-m-d');
+                                     ?>
                                     <div class="col-md-8 mt-4">
                                         <label for="date-input" class="form-label">Select Date</label><span
                                             class="required-classes">*</span>
-                                        <input type="date" id="date-input" name="selected_date" class="form-control"
+                                        <input type="date" id="date-input" name="selected_date" value="{{ $currentDate }}" class="form-control"
                                             required>
                                     </div>
 
