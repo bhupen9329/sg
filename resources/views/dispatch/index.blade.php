@@ -152,11 +152,13 @@
                                   <tr>
                                    <td>{{$loop->iteration}}</td>
                                    <td>{{ date('d-m-Y', strtotime($data->dispatch_date)) }}</td>
-                                   <td>{{$data->po_item_no }}</td>
+                                   <td><a href="{{ route('purchase.edit', ['id' => $data->po_id]) }}">{{$data->po_item_no}}</a></td>
                                    {{-- <td>{{$data->category_name }}</td> --}}
                                    <td>{{$data->po_company }}</td>
+
+                                   <td><a href="{{ route('sales.edit', ['id' => $data->so_id]) }}">{{$data->so_item_no}}</a></td>
                     
-                                   <td>{{$data->so_item_no }}</td>
+                                   {{-- <td>{{$data->so_item_no }}</td> --}}
                                    {{-- <td>{{$data->category_name }}</td> --}}
                                    <td>{{$data->so_company }}</td>
 

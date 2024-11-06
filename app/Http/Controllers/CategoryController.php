@@ -54,8 +54,12 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        $category_check = Category::where('name', $request->name)->first();
+        if($category_check){
+          return redirect()->back()->with('msg', 'Base Item already exist');
+        }
 
-        // dd($request);
+
         $data = [
             'name' => $request->name,
             'price' => $request->price,
@@ -93,6 +97,11 @@ class CategoryController extends Controller
     }
     public function update(Request $request , $id)
     {
+
+        $category_check = Category::where('name', $request->name)->first();
+        if($category_check){
+          return redirect()->back()->with('msg', 'Base Item already exist');
+        }
 
         $data = [
             'name' => $request->name,

@@ -31,6 +31,8 @@ class DispatchController extends Controller
         ->select('dispatches.*', 'so_items.so_dispatch_rest_qty', 'po_items.po_dispatch_rest_qty', 'po_company.company_name as po_company',
          'so_company.company_name as so_company',
          'sales_orders.so_number',
+         'purchase_orders.id as po_id',
+         'sales_orders.id as so_id',
          'purchase_orders.document_number as po_number',
          'sales_orders.date as so_date',
          'purchase_orders.date as po_date',
@@ -123,8 +125,14 @@ public function storeDispatch(Request $request)
 {
 
 foreach ($request->quantity as $index => $quantity) {
+
+
     $so_item = SoItem::where('so_item_no', $request->so_item_no)->first();
     $po_item = PoItem::where('po_item_no', $request->po_item_no)->first();
+
+    if (!$so_item || !$po_item) {
+        return redirect()->back()->with('msg', 'Please select atleast one PO Item or SO Item.');
+    }
 
     if(($request->quantity[$index] > $so_item->so_dispatch_rest_qty) || ($request->quantity[$index] > $po_item->po_dispatch_rest_qty)){
         return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
