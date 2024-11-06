@@ -162,8 +162,8 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Close"style="width:50px"></button>
                     </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered">
+                    <div class="modal-body-so">
+                        <table class="table SO table-bordered">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -305,7 +305,7 @@
 
                         // Check if filteredPOTotal and filteredSOTotal are arrays
                         if (Array.isArray(response.filteredPOTotal) && Array.isArray(response
-                            .filteredSOTotal)) {
+                                .filteredSOTotal)) {
                             // Loop through filteredPOTotal and add rows to the table
                             response.filteredPOTotal.forEach(function(poData, index) {
                                 table.row.add([
@@ -327,8 +327,8 @@
                                     if (data[1] === soData
                                         .category_name) { // Compare category name
                                         data[3] =
-                                            '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_so" class="rest-quantity-link" onclick="get_received_qty_for_report(' +
-                                            soData.po_id + ', ' + soData.rest_quantity + ')">' +
+                                            '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_so" class="rest-quantity-link" onclick="get_received_so_qty_for_report(' +
+                                            soData.category_id + ')">' +
                                             soData.total_quantity + '</a>',
                                             this.data(data).draw(false);
                                         rowFound = true;
@@ -387,15 +387,15 @@
                 success: function(res) {
                     // console.log(res); // Log the response to the console
                     let rowsData = res.rows_data;
-                    let tableBody = document.querySelector('.modal-body table tbody');
+                    let tableBody = document.querySelector('.modal-body table  tbody');
                     tableBody.innerHTML = ''; // Clear existing table rows
 
                     rowsData.forEach((rowData, index) => {
                         // Parse the date string and format it
                         let date = new Date(rowData.date);
-                        let formattedDate = date.toLocaleDateString('en-US', {
+                        let formattedDate = date.toLocaleDateString('en-GB', {
                             day: '2-digit',
-                            month: 'short',
+                            month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
                             year: 'numeric'
                         });
                         let row = `<tr>
@@ -405,6 +405,45 @@
                                     <td>${rowData.document_number}</td>
                                     <td>${rowData.qty}</td>
                                      <td>${rowData.po_dispatch_rest_qty}</td>
+                                </tr>`;
+                        tableBody.insertAdjacentHTML('beforeend', row);
+                    });
+                }
+
+
+            });
+        }
+
+        function get_received_so_qty_for_report(category_id) {
+            let get_category_id = category_id;
+            $.ajax({
+                url: "{{ url('get_received_qty_so') }}",
+                method: "POST",
+                data: {
+                    get_category_id: get_category_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                success: function(res) {
+                    // console.log(res); // Log the response to the console
+                    let rowsData = res.rows_data;
+                    let tableBody = document.querySelector('.modal-body-so table tbody');
+                    tableBody.innerHTML = ''; // Clear existing table rows
+
+                    rowsData.forEach((rowData, index) => {
+                        // Parse the date string and format it
+                        let date = new Date(rowData.date);
+                        let formattedDate = date.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                            year: 'numeric'
+                        });
+                        let row = `<tr>
+                                    <th scope="row">${index + 1}</th>
+                                    <td>${formattedDate}</td>
+                                     <td>${rowData.company_name}</td>
+                                    <td>${rowData.so_number}</td>
+                                    <td>${rowData.qty}</td>
+                                     <td>${rowData.so_dispatch_rest_qty}</td>
                                 </tr>`;
                         tableBody.insertAdjacentHTML('beforeend', row);
                     });

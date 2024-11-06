@@ -1276,11 +1276,12 @@ class ReportController extends Controller
         // dd( $filterCategory);
 
         if($filterCategory != 'all'){
+
             $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
             ->join('categories', 'po_items.item_category', '=', 'categories.id')
             ->where('po_items.item_category', $filterCategory)
-            ->select('po_items.item_category', 'purchase_orders.id as po_id', 'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
-            ->groupBy('po_items.item_category', 'categories.name', 'purchase_orders.id', 'categories.id')
+            ->select('po_items.item_category', 'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+            ->groupBy('po_items.item_category', 'categories.name','categories.id')
             ->get();
 
 
@@ -1290,17 +1291,16 @@ class ReportController extends Controller
             ->select(
                 'so_items.item_category',
                 'categories.name as category_name',
-                'sales_orders.id as so_id',
                 'categories.id as category_id',
                 DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
             )
-            ->groupBy('so_items.item_category', 'categories.name', 'sales_orders.id', 'categories.id')
+            ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
             ->get();
         }else{
             $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
             ->join('categories', 'po_items.item_category', '=', 'categories.id')
-            ->select('po_items.item_category', 'purchase_orders.id as po_id', 'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
-            ->groupBy('po_items.item_category', 'categories.name', 'purchase_orders.id', 'categories.id')
+            ->select('po_items.item_category',  'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+            ->groupBy('po_items.item_category', 'categories.name', 'categories.id')
             ->get();
 
 
@@ -1309,11 +1309,10 @@ class ReportController extends Controller
             ->select(
                 'so_items.item_category',
                 'categories.name as category_name',
-                'sales_orders.id as so_id',
                 'categories.id as category_id',
                 DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
             )
-            ->groupBy('so_items.item_category', 'categories.name', 'sales_orders.id', 'categories.id')
+            ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
             ->get();
         }
 
