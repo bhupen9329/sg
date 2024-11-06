@@ -703,4 +703,19 @@ class SalesController extends Controller
         $salesOrder = SalesOrder::find($so_id);
         return response()->json(['remark' => $salesOrder->remarks]);
     }
+
+    public function get_received_qty_so(Request $request)
+    {
+        // dd($request);
+
+        $So_data = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+        ->join('categories', 'so_items.item_category', '=', 'categories.id')
+        ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
+        ->where('so_items.item_category',$request->get_category_id)
+        ->get();
+
+        return response()->json([
+            'rows_data' => $So_data
+        ]);
+    }
 }

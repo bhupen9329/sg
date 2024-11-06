@@ -131,7 +131,7 @@
                                         <th>PO Item Number</th>
                                         <th>Seller Name(Party Name)</th>
                                         <th>Item Category</th>
-                                        <th>Item Sub-Category</th>
+                                        {{-- <th>Item Sub-Category</th> --}}
                                         <th>Quantity(Q)</th>                                        
                                         <th>PO Unit Price</th>
                                         <th>PO Price</th>
@@ -153,7 +153,7 @@
                                             <td>{{ $data->po_item_no }}</td>
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->category_name }}</td>
-                                            <td>{{ $data->sub_category_name }}</td>
+                                            {{-- <td>{{ $data->sub_category_name }}</td> --}}
                                             <td>{{ $data->qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>

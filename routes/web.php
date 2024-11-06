@@ -91,11 +91,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/po-partial-closed-save', [PurchaseController::class, 'partial_closed_save'])->name('po-partial-closed.save');
     Route::post('/total-closed', [PurchaseController::class, 'total_closed'])->name('total.closed');
     Route::post('/get_received_quantity', [PurchaseController::class, 'get_received_quantity']);
-    Route::post('/get_received_qty', [PurchaseController::class, 'get_received_qty']);
+    // Route::post('/get_received_qty', [PurchaseController::class, 'get_received_qty']);
     Route::post('/update-partial-received-quantity', [PurchaseController::class, 'update_partial_received_quantity']);
     Route::get('/back', [PurchaseController::class, 'back']);
 
     Route::post('/get_received_qty', [PurchaseController::class, 'get_received_qty']);
+    Route::post('/get_received_qty_so', [SalesController::class, 'get_received_qty_so']);
+
+
+    
 
     // .................................Warehouse Route Start..................................................
 
