@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title','Buyser Supliers - Saraswati Globals')
+@section('title','Buyers Suppliers - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
         @if ($message = Session::get('success'))
