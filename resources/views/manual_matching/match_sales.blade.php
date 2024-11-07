@@ -110,14 +110,16 @@
                     <div class="row mb-3">
                         <label for="poDate" class="col-sm-2 col-form-label"><strong>SO Date</strong></label>
                         <div class="col-sm-4">
-                            {{ $salesOrders->date }}
+                            {{-- {{ $salesOrders->date }} --}}
+                            {{ date('d-M-Y', strtotime($salesOrders->date)) }}
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <label for="poDueDate" class="col-sm-2 col-form-label"><strong>SO Due Date</strong></label>
                         <div class="col-sm-4">
-                            {{ $salesOrders->due_date }}
+                            {{-- {{ $salesOrders->due_date }} --}}
+                            {{ date('d-M-Y', strtotime($salesOrders->due_date)) }}
                         </div>
                     </div>
 
@@ -195,7 +197,7 @@
                                 <tbody>
                                     @if ($so_data)
                                         <tr>
-                                            <td>{{ date('d-m-Y', strtotime($so_data->so_date ?? 'N/A')) }}</td>
+                                            <td>{{ date('d-M-Y', strtotime($so_data->so_date ?? 'N/A')) }}</td>
                                             <td>{{ $so_data->so_number }}</td>
                                             <td>{{ $so_data->so_item_no }}</td>
                                             <td>{{ $so_data->supplier_name }}</td>
@@ -270,7 +272,7 @@
                                         <tr>
                                             {{-- @dd($data); --}}
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
+                                            <td>{{ date('d-M-Y', strtotime($data->created_at)) }}</td>
                                             <td>{{ $data->so_number }}</td>
                                             <td>{{ $data->so_item_no }}</td>
                                             <td>{{ $data->so_company_name }}</td>

@@ -144,7 +144,7 @@
                                                 {{-- </a> --}}
                                             </td>
                                             <td>{{ $data->po_item_no }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
+                                            <td>{{ date('d-M-Y', strtotime($data->created_at)) }}</td>
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->name }}</td>
                                             {{-- <td>{{ $data->sub_category }}</td> --}}
@@ -276,7 +276,7 @@
                                                 {{-- </a> --}}
                                             </td>
                                             <td>{{ $data->so_item_no }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>                                         
+                                            <td>{{ date('d-M-Y', strtotime($data->created_at)) }}</td>                                         
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->name }}</td>
                                             {{-- <td>{{ $data->sub_category }}</td> --}}
