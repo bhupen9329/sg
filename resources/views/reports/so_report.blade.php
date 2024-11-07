@@ -56,18 +56,18 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Sales Order Due Report</h1>
+            <h1>Sales Order Report</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Sales Order Due Report</li>
+                    <li class="breadcrumb-item">Sales Order Report</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
 
 
         <div class="dashboard-header pagetitle">
-            <h1>Sales Order Due Report</h1>
+            <h1>Sales Order Report</h1>
             <div class="row" style="align-items: flex-end;">
                 <div class="col-md-12 col-sm-12 d-flex justify-content-end">
 
@@ -79,6 +79,7 @@
                 $('#filterCompany').val(),
                 $('#filterCategory').val(),
                 $('#filterStatus').val()
+               
             )">
                         Apply
                     </button>
@@ -124,6 +125,17 @@
                             @endforeach
                         </select>
                     </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <label for="filterCategory" class="mb-2"><strong>Dispatch Position</strong></label>
+                        <select class="custom-select form-control item_select   " name="category" id="filterstatus"
+                            required>
+                            <option value="Open" selected>Open</option>
+                            <option value="Close">Close</option>
+                          
+                        </select>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -136,7 +148,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Sales Order Due Report</h4>
+                                        <h4 class="text-blue h4">Sales Order Report</h4>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
@@ -156,7 +168,7 @@
                                             <th>SO Quantity</th>
                                             <th>SO Unit Price</th>
                                             <th>Balanced PO Quantity</th>
-                                            <th>SO Position</th>
+                                            <th>SO Dispatch Position</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -234,7 +246,8 @@
 
 
     <script>
-        function filterButton(filterTodate, filterFromdate, filterCompany, filterCategory,) {
+        function filterButton(filterTodate, filterFromdate, filterCompany, filterCategory) {
+            const filterStatus = $('#filterstatus').val();
             $.ajax({
                 type: 'POST',
                 url: 'report-so',
@@ -243,6 +256,7 @@
                     filterFromdate: filterFromdate,
                     filterCompany: filterCompany,
                     filterCategory: filterCategory,
+                    filterStatus : filterStatus,
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {

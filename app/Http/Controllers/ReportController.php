@@ -58,6 +58,7 @@ class ReportController extends Controller
         $filterFromdate = $request->filterFromdate;
         $filterCompany = $request->filterCompany;
         $filterCategory = $request->filterCategory;
+        $filterStatus = $request->filterStatus;
 
         // $query = PurchaseOrder::join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
         //     ->join('categories', 'purchase_orders.category', '=', 'categories.id')
@@ -86,14 +87,24 @@ class ReportController extends Controller
         //     )
         //     ->orderBy('purchase_orders.document_number', 'desc');
 
-        $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-        ->Join('po_items', function ($join) {
-            $join->on('po_items.po_id', '=', 'purchase_orders.id')
-                ->where('po_items.po_dispatch_item_status', '!=', 'Close');
-        })
-        ->Join('categories', 'categories.id', '=', 'po_items.item_category')
-        ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
-  
+        if($filterStatus == 'Open'){
+            $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+            ->Join('po_items', function ($join) {
+                $join->on('po_items.po_id', '=', 'purchase_orders.id')
+                    ->where('po_items.po_dispatch_item_status', '!=', 'Close');
+            })
+            ->Join('categories', 'categories.id', '=', 'po_items.item_category')
+            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
+        }
+        else{
+            $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+            ->Join('po_items', function ($join) {
+                $join->on('po_items.po_id', '=', 'purchase_orders.id')
+                    ->where('po_items.po_dispatch_item_status', '!=', 'Open');
+            })
+            ->Join('categories', 'categories.id', '=', 'po_items.item_category')
+            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
+        }
 
 
         if ($filterCompany != 'all') {
@@ -147,17 +158,28 @@ class ReportController extends Controller
         $filterFromdate = $request->filterFromdate;
         $filterCompany = $request->filterCompany;
         $filterCategory = $request->filterCategory;
+        $filterStatus = $request->filterStatus;
         // dd($filterTodate, $filterFromdate, $filterCompany, $filterCategory);
 
-
+        if($filterStatus == 'Open'){
+            $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+            ->Join('so_items', function ($join) {
+                $join->on('so_items.so_id', '=', 'sales_orders.id')
+                    ->where('so_items.so_dispatch_item_status', '!=', 'Close');
+            })
+            ->Join('categories', 'categories.id', '=', 'so_items.item_category')
+            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
+        }else{
+            $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+            ->Join('so_items', function ($join) {
+                $join->on('so_items.so_id', '=', 'sales_orders.id')
+                    ->where('so_items.so_dispatch_item_status', '!=', 'Open');
+            })
+            ->Join('categories', 'categories.id', '=', 'so_items.item_category')
+            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
+        }
    
-        $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-        ->Join('so_items', function ($join) {
-            $join->on('so_items.so_id', '=', 'sales_orders.id')
-                ->where('so_items.so_dispatch_item_status', '!=', 'Close');
-        })
-        ->Join('categories', 'categories.id', '=', 'so_items.item_category')
-        ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
+
 
         if ($filterCompany != 'all') {
             $query->where('sales_orders.company_id', $filterCompany);
