@@ -148,7 +148,7 @@
                                     {{-- @dd($data); --}}
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->date)) }}</td>
+                                            <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
                                             <td>{{ $data->document_number }}</td>
                                             <td>{{ $data->po_item_no }}</td>
                                             <td>{{ $data->company_name }}</td>
