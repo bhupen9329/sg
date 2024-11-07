@@ -389,7 +389,7 @@
                         <li>
                         
                             <a href="{{ route('po_report') }}">
-                                <i class="bi bi-circle"></i><span>Purchase Pending Report </span>
+                                <i class="bi bi-circle"></i><span>Purchase Report </span>
                             </a>
                       
                     </li>
@@ -398,7 +398,7 @@
                         <li>
         
                                 <a href="{{ route('so_report') }}">
-                                    <i class="bi bi-circle"></i><span>Sales Pending Report</span>
+                                    <i class="bi bi-circle"></i><span>Sales Report</span>
                                 </a>
                     
                         </li>
