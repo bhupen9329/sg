@@ -354,6 +354,18 @@
             lastItemId++;
         }
 
+        function formatDate(dateString) {
+    if (!dateString) return ''; // Return empty string if no date is provided
+    const date = new Date(dateString);
+    
+    // Format date as 'dd-MMM-yyyy'
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+    const month = date.toLocaleString('default', { month: 'short' }); // Get month in short format (e.g., 'Jan', 'Feb')
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+}
+
         function calculateTotal(element) {
             const row = element.closest('tr');
             const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
@@ -368,10 +380,12 @@
 
         function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
             '', Price = '', ) {
+                
             var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
+            const formattedDate = formatDate(Date);
             newRow.innerHTML = `
-            <td> ${Date}</td>
+            <td> ${formattedDate}</td>
             <td>${poNumber}</td>
             <td>${ItemName}</td>
             <td>${poItemNumber}</td>
@@ -383,13 +397,25 @@
         `;
             lastItemId++;
         }
+        function formatDate(dateString) {
+    if (!dateString) return ''; // Return empty string if no date is provided
+    const date = new Date(dateString);
+    
+    // Format date as 'dd-MMM-yyyy'
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+    const month = date.toLocaleString('default', { month: 'short' }); // Get month in short format (e.g., 'Jan', 'Feb')
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+}
 
         function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
             '', Price = '', ) {
             var table = document.getElementById("soTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
+            const formattedDate = formatDate(Date);
             newRow.innerHTML = `
-            <td> ${Date}</td>
+            <td> ${formattedDate}</td>
             <td>${soNumber}</td>
             <td>${ItemName}</td>
             <td>${soItemNumber}</td>
@@ -613,6 +639,11 @@
 
                     // Populate the table with new rows from the response
                     response.purchase_orders.forEach(po => {
+                        const dateObj = new Date(po.date);
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    const month = dateObj.toLocaleString('en-GB', { month: 'short' });
+    const year = dateObj.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
                         const row = `
                     <tr>
                         <td>
@@ -624,7 +655,7 @@
                                    data-po-item-no="${po.po_item_no}"
                                     onchange="singleCheckboxSelection(this)">
                         </td>
-                        <td>${new Date(po.date).toLocaleDateString('en-GB')}</td>
+                        <td>${formattedDate}</td>
                         <td>${po.document_number}</td>
                         <td>${po.name}</td>
                         <td>${po.po_item_no}</td>
@@ -668,7 +699,9 @@
                     if (response.salesOrders && Array.isArray(response.salesOrders)) {
                         // Populate the table with new rows from the response
                         response.salesOrders.forEach(so => {
+                            const formattedDate = formatDate(so.date);
                             const row = `
+                            
                         <tr>
                             <td>
                                 <input type="checkbox" class="so-checkbox" 
@@ -678,7 +711,7 @@
                                        data-unit-price="${so.unit_price}"
                                        onchange="singleSOCheckboxSelection(this)">
                             </td>
-                            <td>${new Date(so.date).toLocaleDateString('en-GB')}</td>
+                            <td>${formattedDate}</td>
                             <td>${so.so_number}</td>
                             <td>${so.name}</td>
                             <td>${so.so_item_no}</td>
