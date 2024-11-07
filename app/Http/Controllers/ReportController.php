@@ -125,7 +125,7 @@ class ReportController extends Controller
                 'po_id' => $filteredData->po_id,
                 'po_document_number' => $filteredData->document_number,
                 'po_item_number' => $filteredData->po_item_no,
-                'date' => date('d-m-Y', strtotime($filteredData->date)),
+                'date' => date('d-M-Y', strtotime($filteredData->date)),
                 'category' => $filteredData->name,
                 'company_name' => $filteredData->company_name,
                 'po_unit_price' => $filteredData->unit_price,
@@ -196,7 +196,7 @@ class ReportController extends Controller
         $data = [];
         foreach ($filteredDatas as $filteredData) {
             $tempData = [
-                'date' => date('d-m-Y', strtotime($filteredData->date)),
+                'date' => date('d-M-Y', strtotime($filteredData->date)),
                 'so_number' => $filteredData->so_number,
                 'so_item_number' => $filteredData->so_item_no,
                 'company_name' => $filteredData->company_name,

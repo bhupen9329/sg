@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Outward Reports - Saraswati Globals')
+@section('title', 'Dispatch Reports - Saraswati Globals')
 @section('content')
     <style>
 
@@ -129,7 +129,7 @@
                             @endforeach
                         </select>
                     </div>
-                  
+
 
                 </div>
             </div>

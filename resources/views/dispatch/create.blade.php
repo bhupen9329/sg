@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Index - Dispatch')
+@section('title', 'Create - Dispatch')
 @section('content')
     <style>
 
