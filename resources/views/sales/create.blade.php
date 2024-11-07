@@ -53,12 +53,12 @@
 
 
                                     </div>
-
+{{-- 
                                     <div class="col-lg-6 text-end pe-5">
                                         <label for="inputEmail3" class="col-sm-6 col-form-label"><strong>SO Number :
                                             </strong>{{ $so_number }}</label>
                                         <input type="hidden" value="{{ $so_number }}" name="so_number">
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label"><strong>Address : -

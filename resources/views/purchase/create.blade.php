@@ -38,10 +38,10 @@
                                         </div>
 
                                     </div>
-                                    <div class="col-lg-6 text-end pe-5">
+                                    {{-- <div class="col-lg-6 text-end pe-5">
                                         <label for="inputEmail3" class="col-sm-6 col-form-label"><strong>PO Number :
                                             </strong>{{ $po_id }}</label>
-                                    </div>
+                                    </div> --}}
 
 
                                 </div>
@@ -332,8 +332,8 @@
 
                                         <input type="hidden" name="company_id"
                                             class="form-control"value="{{ $company->id }}" required>
-                                        <input type="hidden" name="po_id"
-                                            class="form-control"value="{{ $po_id }}" required>
+                                        {{-- <input type="hidden" name="po_id"
+                                            class="form-control"value="{{ $po_id }}" required> --}}
                                         {{-- ..........................................................  --}}
 
                                         <div class="text-end mt-3">

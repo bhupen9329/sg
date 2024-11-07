@@ -82,24 +82,13 @@ class PurchaseController extends Controller
 
     public function create(Request $request)
     {
-        $max_serial_number = PurchaseOrder::orderBy('document_number', 'desc')->first();
-        $year = date('Y');
-        if ($max_serial_number) {
-            $max_serial_number = $max_serial_number->document_number;
-            $last_serial_number = substr($max_serial_number, -4);
-            $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
-        } else {
-            // Default serial number when no records exist
-            $next_serial_number = str_pad(1, 4, '0', STR_PAD_LEFT);
-        }
-        $po_id = 'PO' . $year . $next_serial_number;
+    
         // dd($po_id);
 
         $company = Company::where('id', $request->company_id)->first();
         $custom_due_date = CompanySetting::first();
         $category = Category::all();
         $data = [
-            'po_id' => $po_id,
             'company' => $company,
             'category' => $category,
             'custom_due_date' => $custom_due_date,
@@ -111,9 +100,23 @@ class PurchaseController extends Controller
     public function store(Request $request, ValuationController $valuationcontroller)
     {
         //  dd($request);
+
+        $max_serial_number = PurchaseOrder::orderBy('document_number', 'desc')->first();
+        $year = date('Y');
+        if ($max_serial_number) {
+            $max_serial_number = $max_serial_number->document_number;
+            $last_serial_number = substr($max_serial_number, -4);
+            $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            // Default serial number when no records exist
+            $next_serial_number = str_pad(1, 4, '0', STR_PAD_LEFT);
+        }
+        $po_id = 'PO' . $year . $next_serial_number;
+
+
         $purchaseOrder = new PurchaseOrder();
         $purchaseOrder->supplier_id = $request->company_id;
-        $purchaseOrder->document_number = $request->po_id;
+        $purchaseOrder->document_number = $po_id;
         $purchaseOrder->category = $request->category_id;
         $purchaseOrder->sub_category_id = $request->sub_category_id;
         $purchaseOrder->total_quantity = $request->total_quantity;

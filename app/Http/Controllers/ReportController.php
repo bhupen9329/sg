@@ -59,32 +59,41 @@ class ReportController extends Controller
         $filterCompany = $request->filterCompany;
         $filterCategory = $request->filterCategory;
 
-        $query = PurchaseOrder::join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
-            ->join('categories', 'purchase_orders.category', '=', 'categories.id')
-            ->leftJoin('inwards', 'purchase_orders.document_number', '=', 'inwards.po_document_number')
-            ->leftJoin('inward_items', 'inwards.id', '=', 'inward_items.inward_id')
-            ->select(
-                'purchase_orders.id as po_id',
-                'purchase_orders.date as po_date',
-                'purchase_orders.due_date as due_date',
-                'purchase_orders.document_number',
-                'purchase_orders.quantity',
-                'companies.company_name',
-                'categories.name',
-                DB::raw('(purchase_orders.quantity - SUM(inward_items.weight)) as rest_quantity') // Calculation for rest_quantity
-            )
-            ->where('inwards.status', 'Approved')
-            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate])
-            ->groupBy(
-                'purchase_orders.id',
-                'purchase_orders.date',
-                'purchase_orders.due_date',
-                'purchase_orders.document_number',
-                'purchase_orders.quantity',
-                'companies.company_name',
-                'categories.name'
-            )
-            ->orderBy('purchase_orders.document_number', 'desc');
+        // $query = PurchaseOrder::join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+        //     ->join('categories', 'purchase_orders.category', '=', 'categories.id')
+        //     ->leftJoin('inwards', 'purchase_orders.document_number', '=', 'inwards.po_document_number')
+        //     ->leftJoin('inward_items', 'inwards.id', '=', 'inward_items.inward_id')
+        //     ->select(
+        //         'purchase_orders.id as po_id',
+        //         'purchase_orders.date as po_date',
+        //         'purchase_orders.due_date as due_date',
+        //         'purchase_orders.document_number',
+        //         'purchase_orders.quantity',
+        //         'companies.company_name',
+        //         'categories.name',
+        //         DB::raw('(purchase_orders.quantity - SUM(inward_items.weight)) as rest_quantity') // Calculation for rest_quantity
+        //     )
+        //     ->where('inwards.status', 'Approved')
+        //     ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate])
+        //     ->groupBy(
+        //         'purchase_orders.id',
+        //         'purchase_orders.date',
+        //         'purchase_orders.due_date',
+        //         'purchase_orders.document_number',
+        //         'purchase_orders.quantity',
+        //         'companies.company_name',
+        //         'categories.name'
+        //     )
+        //     ->orderBy('purchase_orders.document_number', 'desc');
+
+        $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+        ->Join('po_items', function ($join) {
+            $join->on('po_items.po_id', '=', 'purchase_orders.id')
+                ->where('po_items.po_dispatch_item_status', '!=', 'Close');
+        })
+        ->Join('categories', 'categories.id', '=', 'po_items.item_category')
+        ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
+  
 
 
         if ($filterCompany != 'all') {
@@ -97,24 +106,25 @@ class ReportController extends Controller
 
 
         $filteredDatas = $query->get();
-        // dd($filteredDatas);
+       
 
         $data = [];
         foreach ($filteredDatas as $filteredData) {
             $tempData = [
                 'po_id' => $filteredData->po_id,
                 'po_document_number' => $filteredData->document_number,
-                'date' => date('m-d-Y', strtotime($filteredData->po_date)),
-                'due_date' => date('m-d-Y', strtotime($filteredData->due_date)),
+                'po_item_number' => $filteredData->po_item_no,
+                'date' => date('d-m-Y', strtotime($filteredData->date)),
+                'category' => $filteredData->name,
                 'company_name' => $filteredData->company_name,
-                'quantity' => $filteredData->quantity,
-                'rest_quantity' => $filteredData->rest_quantity ?? 0,
-                // 'document_number' => '<a href="purchase-edit/' . $filteredData->id . '  ">' . $filteredData->document_number . '</a>',
+                'po_unit_price' => $filteredData->unit_price,
+                'quantity' => $filteredData->qty,
+                'rest_quantity' => $filteredData->po_dispatch_rest_qty ?? 0,
+                'dispatch_status' => $filteredData->po_dispatch_item_status,
             ];
             $data[] = $tempData;
             // dd($data);
         }
-
 
         return response()->json($data);
     }
@@ -140,32 +150,14 @@ class ReportController extends Controller
         // dd($filterTodate, $filterFromdate, $filterCompany, $filterCategory);
 
 
-        $query = SalesOrder::join('companies as company_1', 'company_1.id', '=', 'sales_orders.company_id')
-            ->leftJoin('outwards', 'outwards.id', '=', 'sales_orders.so_number')
-            ->leftJoin('companies as company_2', 'company_2.id', '=', 'outwards.supplier_id')
-            ->join('so_items', 'so_items.sale_id', '=', 'sales_orders.id')
-            ->join('categories', 'so_items.item_category', '=', 'categories.id')
-            ->orderBy('sales_orders.id', 'desc')
-            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate])
-            ->select(
-                'sales_orders.id as sales_id',
-                'categories.name as category_name',
-                'company_1.company_name as company_name',
-                'company_2.virtual_store as virtual_store',
-                'sales_orders.so_number as so_number',
-                'sales_orders.total_quantity as total_quantity',
-                'sales_orders.date as date',
-            )
-            ->groupBy(
-
-                'sales_orders.id',
-                'categories.name',
-                'company_1.company_name',
-                'company_2.virtual_store',
-                'sales_orders.so_number',
-                'sales_orders.total_quantity',
-                'sales_orders.date',
-            );
+   
+        $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+        ->Join('so_items', function ($join) {
+            $join->on('so_items.so_id', '=', 'sales_orders.id')
+                ->where('so_items.so_dispatch_item_status', '!=', 'Close');
+        })
+        ->Join('categories', 'categories.id', '=', 'so_items.item_category')
+        ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
 
         if ($filterCompany != 'all') {
             $query->where('sales_orders.company_id', $filterCompany);
@@ -182,15 +174,19 @@ class ReportController extends Controller
         $data = [];
         foreach ($filteredDatas as $filteredData) {
             $tempData = [
-                'date' => date('m-d-Y', strtotime($filteredData->date)),
+                'date' => date('d-m-Y', strtotime($filteredData->date)),
                 'so_number' => $filteredData->so_number,
+                'so_item_number' => $filteredData->so_item_no,
                 'company_name' => $filteredData->company_name,
-                'rest_qty' => $filteredData->total_quantity,
-                'virtual_store' => $filteredData->virtual_store ?? 'N/A',
-                'total_quantity' => $filteredData->total_quantity,
+                'category' => $filteredData->name,
+                'quantity' => $filteredData->qty,
+                'so_unit_price' => $filteredData->unit_price,
+                'rest_qty' => $filteredData->so_dispatch_rest_qty,
+                'dispatch_status' => $filteredData->so_dispatch_item_status,
             ];
             $data[] = $tempData;
         }
+
         return response()->json($data);
     }
 

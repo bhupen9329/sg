@@ -24,6 +24,12 @@ class Dispatch extends Model
         'dispatch_freight',
         'dispatch_other',
         'dispatch_total',
+        'dispatch_so_unit_price',
+        'dispatch_so_freight',
+        'dispatch_so_other',
+        'dispatch_so_total',
+        'vehicle_number',
+        'receiver_person',
         'vehicle_number',
         'remarks',
 

@@ -70,11 +70,7 @@ class SalesController extends Controller
 
     public function create(Request $request)
     {
-        $year = date('Y');
-        $max_serial_number = SalesOrder::all()->max('so_number');
-        $last_serial_number = substr($max_serial_number, -4);
-        $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
-        $so_number = 'SO' . $year . $next_serial_number;
+
         $company = Company::where('id', $request->company_id)->first();
         $category = Category::all();
         $custom_due_date = CompanySetting::first();
@@ -83,7 +79,7 @@ class SalesController extends Controller
             'company' => $company,
             'category' => $category,
             'gstsetting' => $gstsetting,
-            'so_number' => $so_number,
+           
             'custom_due_date' => $custom_due_date,
         ];
         // dd($data);
@@ -94,6 +90,14 @@ class SalesController extends Controller
 
     public function store(Request $request, ValuationController $valuationcontroller)
     {
+
+
+        $year = date('Y');
+        $max_serial_number = SalesOrder::all()->max('so_number');
+        $last_serial_number = substr($max_serial_number, -4);
+        $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+        $so_number = 'SO' . $year . $next_serial_number;
+
 
         $salesOrder = new SalesOrder();
         $salesOrder->company_id = $request->company_id;
@@ -110,7 +114,7 @@ class SalesController extends Controller
         $salesOrder->status = 'pending';
         $salesOrder->match_position = 'open';
 
-        $salesOrder->so_number = $request->so_number;
+        $salesOrder->so_number = $so_number;
         // $salesOrder->document_file = $request->document_file;
         $salesOrder->document_file = 'uploads/documents/sales/' . $request->so_number . '/' . $request->so_number . '.pdf';
 

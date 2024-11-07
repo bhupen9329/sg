@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Purchase Order Reports - Saraswati Globals')
+@section('title', 'Purchase Order Due Reports - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
         @if ($message = Session::get('success'))
@@ -56,18 +56,18 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Purchase Order Report</h1>
+            <h1>Purchase Order Due Report</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">PO Report</li>
+                    <li class="breadcrumb-item">Purchase Order Due Report</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
 
 
         <div class="dashboard-header pagetitle">
-            <h1>PO Report </h1>
+            <h1>Purchase Order Due Report</h1>
             <div class="row" style="align-items: flex-end;">
                 <div class="col-md-12 col-sm-12 d-flex justify-content-end">
 
@@ -140,7 +140,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">PO Report</h4>
+                                        <h4 class="text-blue h4">Purchase Order Due Report</h4>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
@@ -159,11 +159,15 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Date(MM/DD/YY)​</th>
-                                        <th>Due Date(MM/DD/YY)​</th>
                                         <th>PO No.</th>
-                                        <th>Company.​</th>
-                                        <th>Ordered Quantity (Q)</th>
-                                        <th>Balanced Quantity (Q) </th>
+                                        <th>PO Item No.</th>
+                                        <th>Seller Name(Party Name)​</th>
+                                        <th>Base Item Name​</th>
+                                        <th>PO Quantity</th>
+                                        <th>PO Unit Price</th>
+                                        <th>Balanced PO Quantity</th>
+                                        <th>PO Position</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -311,14 +315,19 @@
                             table.row.add([
                                 index + 1,
                                 data.date,
-                                data.due_date,
                                 data.po_document_number,
+                                data.po_item_number,
                                 data.company_name,
+                                data.category,
                                 data.quantity,
+                                data.po_unit_price,
                                 data.rest_quantity,
+                                data.dispatch_status,
 
                             ]).draw(false);
                         });
+
+      
 
                     } else {
                         console.log("Invalid response format");

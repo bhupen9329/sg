@@ -143,17 +143,88 @@
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_long">Unit Price</th>
                                             <th class="table_heading_normal">Conv Rate</th>
-                                            <th class="table_heading_long">Freight</th>
-                                            <th class="table_heading_long">Other</th>
-                                            <th class="table_heading_long">Total<span class="required-classes">*</span></th>
-                                            <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
+                                            <th class="table_heading_long">PO Unit Price</th>
+                                            
+                                            <th class="table_heading_long">PO Freight</th>
+                                            <th class="table_heading_long">PO Other</th>
+                                            <th class="table_heading_long">Payable Total<span
+                                                class="required-classes">*</span></th>
+                                            <th class="table_heading_long">SO Unit Price</th>
+                                            <th class="table_heading_long">SO Freight</th>
+                                            <th class="table_heading_long">SO Other</th>
+                                            <th class="table_heading_long">Receivable Total<span
+                                                class="required-classes">*</span></th>
+                                            <th class="table_heading_normal">Quantity<span
+                                                    class="required-classes">*</span>
                                             </th>
+                                          
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <!-- Rows will be dynamically added here -->
+                                    </tbody>
+                                </table>
+
+                                <div class="row mt-5">
+                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Details</h4>
+                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
+                                </div>
+
+                                <table class="col-md-4 col-sm-4 col-xl-12 table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date (DD/MM/YY)</th>
+                                            <th>PO Number</th>
+                                            <th>Item Name</th>
+                                            <th>PO Item No.</th>
+                                            <th>Quantity (Q)</th>
+                                            <th>Rest Quantity (Q)</th>
+                                            <th>PO Unit Price</th>
+                                            <th>PO Price</th>
+                                          
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>{{ date('d-M-Y', strtotime($po_item->date )) }}</td>
+                                        <td>{{ $po_item->document_number }}</td>
+                                        <td>{{ $po_item->name }}</td>
+                                        <td>{{ $po_item->po_item_no }}</td>
+                                        <td>{{ $po_item->qty }}</td>
+                                        <td>{{ $po_item->po_dispatch_rest_qty }}</td>
+                                        <td>{{ $po_item->unit_price }}</td>
+                                        <td>{{ $po_item->po_price }}</td>
+                                      </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="row mt-5">
+                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Details</h4>
+                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
+                                </div>
+                                <table class="col-md-4 col-sm-4 col-xl-12 table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date (DD/MM/YY)</th>
+                                            <th>SO Number</th>
+                                            <th>Item Name</th>
+                                            <th>SO Item No.</th>
+                                            <th>Quantity (Q)</th>
+                                            <th>Rest Quantity (Q)</th>
+                                            <th>SO Unit Price</th>
+                                            <th>SO Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <td>{{ date('d-M-Y', strtotime($so_item->date )) }}</td>
+                                        <td>{{ $so_item->so_number }}</td>
+                                        <td>{{ $so_item->name }}</td>
+                                        <td>{{ $so_item->so_item_no }}</td>
+                                        <td>{{ $so_item->qty }}</td>
+                                        <td>{{ $so_item->so_dispatch_rest_qty }}</td>
+                                        <td>{{ $so_item->unit_price }}</td>
+                                        <td>{{ $so_item->so_price }}</td>
                                     </tbody>
                                 </table>
                                 <input type="hidden" id="po_item_id">
@@ -227,7 +298,10 @@
             var cell6 = newRow.insertCell(5);
             var cell7 = newRow.insertCell(6);
             var cell8 = newRow.insertCell(7);
-
+            var cell9 = newRow.insertCell(8);
+            var cell10 = newRow.insertCell(9);
+            var cell11 = newRow.insertCell(10);
+            var cell12 = newRow.insertCell(11);
 
             cell1.innerHTML = `
              <td>{{ $disaptch_data->category_name }}</td>
@@ -245,15 +319,17 @@
             </select>
            
 `;
-            cell3.innerHTML = `
-             <td><input type="number" name="dispatch_unit_price[]"  class="form-control" onchange="calculateTotal(this)"  value="{{ $disaptch_data->dispatch_unit_price }}" min="1" required readonly/></td>
+cell3.innerHTML = `
+             <td><input type="number" name="conv_rate[]"  class="form-control"  value="{{ $disaptch_data->conv_rate }}" oninput="calculateTotal(this)" min="1"  required /></td>
            
 `;
 
             cell4.innerHTML = `
-             <td><input type="number" name="conv_rate[]"  class="form-control"  value="{{ $disaptch_data->conv_rate }}" oninput="calculateTotal(this)" min="1" required /></td>
+             <td><input type="number" name="dispatch_unit_price[]"  class="form-control" onchange="calculateTotal(this)"  value="{{ $disaptch_data->dispatch_unit_price }}" min="1" readonly required /></td>
            
 `;
+
+
             cell5.innerHTML = `
             <td><input type="number" name="dispatch_freight[]" value="{{ $disaptch_data->dispatch_freight }}" class="form-control" oninput="calculateTotal(this)" required /></td>
            
@@ -265,10 +341,36 @@
             <td><input type="number" name="dispatch_total[]" value="{{ $disaptch_data->dispatch_total }}" class="form-control" readonly required /></td>
            
 `;
-            cell8.innerHTML = `
+
+cell8.innerHTML = `
+            <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  value="{{ $disaptch_data->dispatch_so_unit_price }}"  class="form-control" readonly required /></td>
+           
+`;
+
+
+cell9.innerHTML = `
+             <td><input type="number" name="dispatch_so_freight[]" value="{{ $disaptch_data->dispatch_so_freight }}" class="form-control" oninput="calculateTotal(this)" required /></td>
+           
+`;
+
+
+cell10.innerHTML = `
+            <td><input type="number" name="dispatch_so_other[]"  value="{{ $disaptch_data->dispatch_so_other }}" class="form-control" oninput="calculateTotal(this)" required /></td>
+           
+`;
+
+cell11.innerHTML = `
+             <td><input type="number" name="dispatch_so_total[]" value="{{ $disaptch_data->dispatch_so_total }}" class="form-control" readonly required /></td>
+           
+`;
+
+
+            cell12.innerHTML = `
              <td><input type="number" name="quantity[]" class="form-control" value="{{ $disaptch_data->dispatched_quantity }}" min="1" required /></td>
            
 `;
+
+
 
 
 
@@ -331,9 +433,17 @@
             const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
             const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
 
+
+            const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
+            const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
+            const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
+
             // Calculate total and update the total_amount field
             const totalAmount = unitPrice + convRate + freight + other;
+            const totalSoAmount = sounitPrice + convRate + sofreight + soother;
+
             row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+            row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
         }
     </script>
 

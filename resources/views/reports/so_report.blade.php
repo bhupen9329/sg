@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title','Sales Order reports - Saraswati Globals')
+@section('title','Sales Order Due reports - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
         @if ($message = Session::get('success'))
@@ -56,18 +56,18 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Sales Order Report</h1>
+            <h1>Sales Order Due Report</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">SO Report</li>
+                    <li class="breadcrumb-item">Sales Order Due Report</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
 
 
         <div class="dashboard-header pagetitle">
-            <h1>SO Report </h1>
+            <h1>Sales Order Due Report</h1>
             <div class="row" style="align-items: flex-end;">
                 <div class="col-md-12 col-sm-12 d-flex justify-content-end">
 
@@ -136,7 +136,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">SO Report</h4>
+                                        <h4 class="text-blue h4">Sales Order Due Report</h4>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
@@ -150,10 +150,13 @@
                                             <th>#</th>
                                             <th>Date(MM/DD/YY)​</th>
                                             <th>SO No.</th>
-                                            <th>Buyer Name.​</th>
-                                            <th>Total Quantity</th>
-                                            <th>Rest PCs</th>
-                                            <th>Virtual Store</th>
+                                            <th>SO Item No.</th>
+                                            <th>Buyer Name(Party Name)​</th>
+                                            <th>Base Item Name​</th>
+                                            <th>SO Quantity</th>
+                                            <th>SO Unit Price</th>
+                                            <th>Balanced PO Quantity</th>
+                                            <th>SO Position</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -251,10 +254,13 @@
                                 index + 1,
                                 data.date,
                                 data.so_number,
+                                data.so_item_number,
                                 data.company_name,
-                                data.total_quantity,
+                                data.category,
+                                data.quantity,
+                                data.so_unit_price,
                                 data.rest_qty,
-                                data.virtual_store,
+                                data.dispatch_status,
                             ]).draw(false);
                         });
                     } else {

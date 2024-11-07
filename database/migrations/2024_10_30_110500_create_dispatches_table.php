@@ -28,7 +28,12 @@ return new class extends Migration
             $table->decimal('dispatch_freight', 10, 2)->nullable();
             $table->decimal('dispatch_other', 10, 2)->nullable();
             $table->decimal('dispatch_total', 10, 2)->nullable();
+            $table->decimal('dispatch_so_unit_price', 10, 2)->nullable();
+            $table->decimal('dispatch_so_freight', 10, 2)->nullable();
+            $table->decimal('dispatch_so_other', 10, 2)->nullable();
+            $table->decimal('dispatch_so_total', 10, 2)->nullable();
             $table->string('vehicle_number')->nullable();
+            $table->string('receiver_person')->nullable();
             $table->string('remarks')->nullable();
             $table->timestamps();
 

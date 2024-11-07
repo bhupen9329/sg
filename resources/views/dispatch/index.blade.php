@@ -124,27 +124,18 @@
                                     <tr>
                                         <th>#</th>
                                         <th style="width: 72.8125px;">Date</th>
-
+                                        <th style="width: 72.8125px;">Vehicle Number</th>
+                                        <th  style="width: 84.8125px;">From (Party Name)</th>
                                         <th style="width: 84.8125px;">PO Item No</th>
-                                        {{-- <th>PO Item Name</th> --}}
-                                        <th>Buyer Name (Party Name)</th>
-                                  
-
-                                        <th>SO Item No</th>
-                                        {{-- <th>SO Item Name</th> --}}
-                                        <th>Seller Name (Party Name)</th>
-
-                                        <th>PO Item Qty</th>
-                                        <th>PO Item Rest Qty</th>
-                                        <th>SO Item Qty</th>
-                                        <th>SO Item Rest Qty</th>
-
+                                        <th style="width: 84.8125px;">PO Item Unit Price</th>
+                                        <th>Payable Total</th>
                                         <th>Category</th>
                                         <th>Conv Item Name</th> 
-                               
-                                        <th>Dispatch Convt Rs</th>
-                                        <th>Dispatch Total Rs</th>
                                         <th>Dispatch Qty</th>
+                                        <th style="width: 84.8125px;">To (Party Name)</th>
+                                        <th>SO Item No</th>
+                                        <th style="width: 84.8125px;">SO Item Unit Price</th>
+                                        <th>Receivable Total</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -153,27 +144,24 @@
                                   <tr>
                                    <td>{{$loop->iteration}}</td>
                                    <td>{{ date('d-M-Y', strtotime($data->dispatch_date)) }}</td>
-                                   <td><a href="{{ route('purchase.edit', ['id' => $data->po_id]) }}">{{$data->po_item_no}}</a></td>
-                                   {{-- <td>{{$data->category_name }}</td> --}}
+                                   <td>{{$data->vehicle_number ?? 'N/A'}}</td>
                                    <td>{{$data->po_company }}</td>
-
-                                   <td><a href="{{ route('sales.edit', ['id' => $data->so_id]) }}">{{$data->so_item_no}}</a></td>
-                    
-                                   {{-- <td>{{$data->so_item_no }}</td> --}}
-                                   {{-- <td>{{$data->category_name }}</td> --}}
-                                   <td>{{$data->so_company }}</td>
-
-                                   <td>{{$data->po_qty }}</td>
-                                   <td>{{$data->po_dispatch_rest_qty }}</td>
-                                   <td>{{$data->so_qty }}</td>
-                                   <td>{{$data->so_dispatch_rest_qty }}</td>
+                                   <td><a href="{{ route('purchase.edit', ['id' => $data->po_id]) }}">{{$data->po_item_no}}</a></td>
+                                   <td>{{$data->dispatch_unit_price }}</td>
+                                   <td>{{$data->dispatch_total }}</td>
 
                                    <td>{{$data->category_name }}</td>
                                    <td>{{$data->sub_category_name }}</td>
 
-                                   <td>{{$data->conv_rate }}</td>
-                                   <td>{{$data->dispatch_total }}</td>
                                    <td>{{$data->dispatched_quantity }}</td>
+
+                                   <td>{{$data->so_company }}</td>
+
+                                   <td><a href="{{ route('sales.edit', ['id' => $data->so_id]) }}">{{$data->so_item_no}}</a></td>
+                                   <td>{{$data->dispatch_so_unit_price }}</td>
+                                   <td>{{$data->dispatch_so_total }}</td>
+                                   
+                                  
                                    <td>
                                     <div class="filter">
                                         <a class="icon" href="#" data-bs-toggle="dropdown"><i

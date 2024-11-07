@@ -89,7 +89,7 @@
                             <!-- Add Filter Section -->
                             <div class="row mb-4">
 
-                                <div class="col-md-4 col-sm-6">
+                                <div class="col-md-4 col-sm-6" style="margin-top: 7px">
                                     <label for="date_filter" class="form-label">Select Filter</label>
                                     <select class="form-select" id="filterType" name="filterType">
                                         <option value="">Select Filter Type</option>
