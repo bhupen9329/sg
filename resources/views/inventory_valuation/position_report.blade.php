@@ -130,16 +130,16 @@
                     <div>
                         <div class="row mb-4">
 
-                            <div class="col-md-4 col-sm-6">
-                                <label for="date_filter" class="form-label">Select Filter</label>
+                            <div class="col-md-3 col-sm-6" style="margin-top: 7px">
+                                <label for="date_filter" class="form-label"><strong>Select Type</strong></label>
                                 <select class="form-select" id="filterType" name="filterType">
-                                    <option value="">Select Filter Type</option>
+                                    <option value="">Select Type</option>
                                     <option value="weekly">Weekly</option>
                                     <option value="monthly">Monthly</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 col-sm-6">
-                                <label for="date_filter" class="form-label">Item Name</label>
+                            <div class="col-md-3 col-sm-6" style="margin-top: 7px">
+                                <label for="date_filter" class="form-label"><strong>Item Name</strong></label>
                                 <select class="form-select" id="category_filter" name="category">
                                     <option value="">Select Item</option>
                                     @foreach ($categories as $category)
@@ -163,9 +163,7 @@
                                 <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
                                     id="filterFromdate" required>
                             </div>
-                            <div class="col-md-4 col-sm-12 d-flex align-items-end">
-
-                               
+                            <div class="col-md-2 col-sm-12 d-flex align-items-end">
                                 <button class="m-1 btn btn-primary" type="button"
                                     onclick="filterButton(
                                         $('#filterType').val(),  

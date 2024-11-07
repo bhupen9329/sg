@@ -385,23 +385,23 @@
                                 </a>
                           
                         </li>
-{{-- 
+
                         <li>
                         
-                            <a href="{{ route('inventory.report') }}">
-                                <i class="bi bi-circle"></i><span>Inventory Report </span>
+                            <a href="{{ route('po_report') }}">
+                                <i class="bi bi-circle"></i><span>Purchase Pending Report </span>
                             </a>
                       
-                    </li> --}}
+                    </li>
  
 
-                        {{-- <li>
-                             @can('Stock-Transaction-Report')
-                                <a href="{{ route('stock_transaction_report') }}">
-                                    <i class="bi bi-circle"></i><span>Stock Transaction Report</span>
+                        <li>
+        
+                                <a href="{{ route('so_report') }}">
+                                    <i class="bi bi-circle"></i><span>Sales Pending Report</span>
                                 </a>
-                            @endcan
-                        </li> --}}
+                    
+                        </li>
  
                         {{-- <li>
                             @can('Quotation-Execution-Report')

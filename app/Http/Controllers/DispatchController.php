@@ -51,6 +51,7 @@ class DispatchController extends Controller
 
             )
             ->get();
+            // dd($disaptch_data);
 
         return view('dispatch.index', compact('disaptch_data'));
     }
@@ -61,9 +62,10 @@ class DispatchController extends Controller
             ->get();
         // dd($purchase_orders);
         $sales_orders = SalesOrder::all();
-        $companies = Company::all();
-        // dd($purchase_orders);
-        return view('dispatch.create', compact('purchase_orders', 'sales_orders', 'companies'));
+        $companies_po = Company::where('type', 'supplier')->get();
+        $companies_so = Company::where('type', 'buyer')->get();
+     
+        return view('dispatch.create', compact('purchase_orders', 'sales_orders', 'companies_po', 'companies_so'));
     }
 
     public function getPurchaseOrders(Request $request)
@@ -135,8 +137,9 @@ class DispatchController extends Controller
         $itemId = $request->item_id;
         $po_items = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
         ->join('categories', 'categories.id', '=', 'po_items.item_category')
+        ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price')
         ->where('po_item_no', $request->poItemNo)->first();
-        // dd($po_items);
+
         // Retrieve the item and its sub-items based on the item ID
         $item = Category::where('id', $itemId)->first();
         $subItems = SubCategory::where('category_id', $itemId)->get();
@@ -151,6 +154,7 @@ class DispatchController extends Controller
         // dd($request);
         $so_items = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
         ->join('categories', 'categories.id', '=', 'so_items.item_category')
+        ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
         ->where('so_item_no', $request->so_item_no)->first();
         return response()->json(['so_items' => $so_items]);
     }
@@ -195,6 +199,13 @@ class DispatchController extends Controller
             $dispatch->dispatch_other = $request->dispatch_other[$index];
             $dispatch->dispatch_total = $request->dispatch_total[$index];
             $dispatch->vehicle_number = $request->vehicle_number;
+
+            $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price[$index];
+            $dispatch->dispatch_so_freight = $request->dispatch_so_freight[$index];
+            $dispatch->dispatch_so_other = $request->dispatch_so_other[$index];
+            $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
+            $dispatch->receiver_person = $request->receiver_person;
+
             $dispatch->remarks = $request->remarks;
             $dispatch->save();
 
@@ -242,13 +253,28 @@ class DispatchController extends Controller
                 'so_items.so_item_no',
                 'po_items.qty as po_qty',
                 'so_items.qty as so_qty',
+                'po_items.id as po_item_id',
+                'so_items.id as so_item_id',
                 'dispatches.id as dispatch_id',
             )
             ->where('dispatches.id', $id)
             ->first();
         // dd($disaptch_data);
         $sub_items = SubCategory::where('category_id',  $disaptch_data->category_id)->get();
-        return view('dispatch.edit', compact('disaptch_data', 'sub_items'));
+        $so_item = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
+        ->leftjoin('categories', 'so_items.item_category', '=', 'categories.id')
+        ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
+        ->where('so_items.id', $disaptch_data->so_item_id)->first();
+
+
+        $po_item = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
+        ->leftjoin('categories', 'po_items.item_category', '=', 'categories.id')
+        ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price')
+        ->where('po_items.id', $disaptch_data->po_item_id)->first();
+
+        // dd( $so_item,  $po_item);
+
+        return view('dispatch.edit', compact('disaptch_data', 'sub_items', 'so_item', 'po_item'));
     }
 
     public function updateDispatch(Request $request, $id)
@@ -265,7 +291,6 @@ class DispatchController extends Controller
                 return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
             }
         }
-
         // Loop through the quantities and sub_cat_ids to save each dispatch entry
         foreach ($request->quantity as $index => $quantity) {
             $so_item = SoItem::where('id', $old_dispatch->so_item_id)->first();
@@ -282,6 +307,14 @@ class DispatchController extends Controller
             $dispatch->dispatch_freight = $request->dispatch_freight[$index];
             $dispatch->dispatch_other = $request->dispatch_other[$index];
             $dispatch->dispatch_total = $request->dispatch_total[$index];
+
+
+            $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price[$index];
+            $dispatch->dispatch_so_freight = $request->dispatch_so_freight[$index];
+            $dispatch->dispatch_so_other = $request->dispatch_so_other[$index];
+            $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
+            $dispatch->receiver_person = $request->receiver_person;
+            
             $dispatch->vehicle_number = $request->vehicle_number;
             $dispatch->remarks = $request->remarks;
             $dispatch->save();
