@@ -92,7 +92,8 @@
                                         <th>SO Item Number</th>
                                         <th>Buyer Name(Party Name)</th>
                                         <th>Item Category</th>
-                                        <th>Quantity(Q)</th>                                        
+                                        <th>Quantity(Q)</th>   
+                                        <th>Dispatch Rest Quantity(Q)</th>                                       
                                         <th>SO Unit Price</th>
                                         <th>SO Price</th>
                                         <th>SO Match Position</th>
@@ -114,6 +115,7 @@
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->category_name }}</td>
                                             <td>{{ $data->qty }}</td>
+                                            <td>{{ $data->so_dispatch_rest_qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             <td>{{ $data->match_position }}</td>

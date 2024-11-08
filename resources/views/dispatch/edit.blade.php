@@ -145,20 +145,20 @@
                                             <th class="table_heading_long">Conv Item Name</th>
                                             <th class="table_heading_normal">Conv Rate</th>
                                             <th class="table_heading_long">PO Unit Price</th>
-                                            
+
                                             <th class="table_heading_long">PO Freight</th>
-                                            <th class="table_heading_long">PO Other</th>
+                                            <th class="table_heading_long">PO Insurance</th>
                                             <th class="table_heading_long">Payable Total<span
-                                                class="required-classes">*</span></th>
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_long">SO Unit Price</th>
                                             <th class="table_heading_long">SO Freight</th>
-                                            <th class="table_heading_long">SO Other</th>
+                                            <th class="table_heading_long">SO Insurance</th>
                                             <th class="table_heading_long">Receivable Total<span
-                                                class="required-classes">*</span></th>
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_normal">Quantity<span
                                                     class="required-classes">*</span>
                                             </th>
-                                          
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -182,20 +182,20 @@
                                             <th>Rest Quantity (Q)</th>
                                             <th>PO Unit Price</th>
                                             <th>PO Price</th>
-                                          
+
                                         </tr>
                                     </thead>
                                     <tbody>
-                                      <tr>
-                                        <td>{{ date('d-M-Y', strtotime($po_item->date )) }}</td>
-                                        <td>{{ $po_item->document_number }}</td>
-                                        <td>{{ $po_item->name }}</td>
-                                        <td>{{ $po_item->po_item_no }}</td>
-                                        <td>{{ $po_item->qty }}</td>
-                                        <td>{{ $po_item->po_dispatch_rest_qty }}</td>
-                                        <td>{{ $po_item->unit_price }}</td>
-                                        <td>{{ $po_item->po_price }}</td>
-                                      </tr>
+                                        <tr>
+                                            <td>{{ date('d-M-Y', strtotime($po_item->date)) }}</td>
+                                            <td>{{ $po_item->document_number }}</td>
+                                            <td>{{ $po_item->name }}</td>
+                                            <td>{{ $po_item->po_item_no }}</td>
+                                            <td>{{ $po_item->qty }}</td>
+                                            <td>{{ $po_item->po_dispatch_rest_qty }}</td>
+                                            <td>{{ $po_item->unit_price }}</td>
+                                            <td>{{ $po_item->po_price }}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
 
@@ -217,7 +217,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <td>{{ date('d-M-Y', strtotime($so_item->date )) }}</td>
+                                        <td>{{ date('d-M-Y', strtotime($so_item->date)) }}</td>
                                         <td>{{ $so_item->so_number }}</td>
                                         <td>{{ $so_item->name }}</td>
                                         <td>{{ $so_item->so_item_no }}</td>
@@ -319,8 +319,8 @@
             </select>
            
 `;
-cell3.innerHTML = `
-             <td><input type="number" name="conv_rate[]"  class="form-control"  value="{{ $disaptch_data->conv_rate }}" oninput="calculateTotal(this)" min="1"  required /></td>
+            cell3.innerHTML = `
+             <td><input type="number" name="conv_rate[]"  class="form-control"  value="{{ $disaptch_data->conv_rate }}" oninput="calculateTotal(this)"/></td>
            
 `;
 
@@ -342,24 +342,24 @@ cell3.innerHTML = `
            
 `;
 
-cell8.innerHTML = `
+            cell8.innerHTML = `
             <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  value="{{ $disaptch_data->dispatch_so_unit_price }}"  class="form-control" readonly required /></td>
            
 `;
 
 
-cell9.innerHTML = `
+            cell9.innerHTML = `
              <td><input type="number" name="dispatch_so_freight[]" value="{{ $disaptch_data->dispatch_so_freight }}" class="form-control" oninput="calculateTotal(this)" required /></td>
            
 `;
 
 
-cell10.innerHTML = `
+            cell10.innerHTML = `
             <td><input type="number" name="dispatch_so_other[]"  value="{{ $disaptch_data->dispatch_so_other }}" class="form-control" oninput="calculateTotal(this)" required /></td>
            
 `;
 
-cell11.innerHTML = `
+            cell11.innerHTML = `
              <td><input type="number" name="dispatch_so_total[]" value="{{ $disaptch_data->dispatch_so_total }}" class="form-control" readonly required /></td>
            
 `;
@@ -407,10 +407,20 @@ cell11.innerHTML = `
                 },
                 success: function(response) {
                     const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
+                    const convFreightField = $(selectElement).closest('tr').find('input[name="dispatch_freight[]"]');
+                    const convInsuranceField = $(selectElement).closest('tr').find('input[name="dispatch_other[]"]');
+
+                    const convSOFreightField = $(selectElement).closest('tr').find('input[name="dispatch_so_freight[]"]');
+                    const convSOInsuranceField = $(selectElement).closest('tr').find('input[name="dispatch_so_other[]"]');
 
                     if (response && response.item_price) {
                         // Set the conversion rate from the response
                         convRateField.val(response.item_price);
+                        convFreightField.val(response.item_freight);
+                        convInsuranceField.val(response.item_insurance);
+
+                        convSOFreightField.val(response.item_freight);
+                        convSOInsuranceField.val(response.item_insurance);
                     } else {
                         convRateField.val(0);
                         console.error('Conversion rate not found in response');
@@ -432,15 +442,17 @@ cell11.innerHTML = `
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
             const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
             const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
+            const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
 
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
             const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
             const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
+
             // Calculate total and update the total_amount field
-            const totalAmount = unitPrice + convRate + freight + other;
-            const totalSoAmount = sounitPrice + convRate + sofreight + soother;
+            const totalAmount = (unitPrice + convRate + freight + other) * quantity;
+            const totalSoAmount = (sounitPrice + convRate + sofreight + soother) * quantity;
 
             row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
             row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);

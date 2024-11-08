@@ -94,7 +94,7 @@
                 </ol>
             </nav>
         </div><!-- End Page Title -->
-     
+
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
@@ -107,104 +107,142 @@
                                     </div>
                                 </div>
 
-                                
+
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end">
                                     <div class="btn-group">
                                         @can('Inward-create')
-                                            <a href="{{route('dispatch.create')}}" class="btn btn-primary mb-4 mr-3">Add Dispatch</a>
+                                            <a href="{{ route('dispatch.create') }}" class="btn btn-primary mb-4 mr-3">Add
+                                                Dispatch</a>
                                         @endcan
                                     </div>
-                                 
-                                  
+
+
                                 </div>
                             </div>
-                         <div style="overflow-x: auto">
-                            <table class="table " id="Category_table">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>#</th>
-                                        <th style="width: 72.8125px;">Date</th>
-                                        <th style="width: 72.8125px;">Vehicle Number</th>
-                                        <th  style="width: 84.8125px;">From (Party Name)</th>
-                                        <th style="width: 84.8125px;">PO Item No</th>
-                                        <th style="width: 84.8125px;">PO Item Unit Price</th>
-                                        <th>Payable Total</th>
-                                        <th>Category</th>
-                                        <th>Conv Item Name</th> 
-                                        <th>Dispatch Qty</th>
-                                        <th style="width: 84.8125px;">To (Party Name)</th>
-                                        <th>SO Item No</th>
-                                        <th style="width: 84.8125px;">SO Item Unit Price</th>
-                                        <th>Receivable Total</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                  @foreach($disaptch_data as $data)
-                                  <tr>
-                                   <td>{{$loop->iteration}}</td>
-                                   <td>{{ date('d-M-Y', strtotime($data->dispatch_date)) }}</td>
-                                   <td>{{$data->vehicle_number ?? 'N/A'}}</td>
-                                   <td>{{$data->po_company }}</td>
-                                   <td><a href="{{ route('purchase.edit', ['id' => $data->po_id]) }}">{{$data->po_item_no}}</a></td>
-                                   <td>{{$data->dispatch_unit_price }}</td>
-                                   <td>{{$data->dispatch_total }}</td>
+                            <div style="overflow-x: auto">
+                                <table class="table " id="Category_table">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>#</th>
+                                            <th style="width: 72.8125px;">Date</th>
+                                            <th style="width: 72.8125px;">Vehicle Number</th>
+                                            <th style="width: 84.8125px;">From (Party Name)</th>
+                                            <th style="width: 84.8125px;">PO Item No</th>
+                                            <th style="width: 84.8125px;">PO Item Unit Price</th>
+                                            <th>Payable Total</th>
+                                            <th>Category</th>
+                                            <th>Conv Item Name</th>
+                                            <th>Dispatch Qty</th>
+                                            <th style="width: 84.8125px;">To (Party Name)</th>
+                                            <th>SO Item No</th>
+                                            <th style="width: 84.8125px;">SO Item Unit Price</th>
+                                            <th>Receivable Total</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($disaptch_data as $data)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ date('d-M-Y', strtotime($data->dispatch_date)) }}</td>
+                                                <td>{{ $data->vehicle_number ?? 'N/A' }}</td>
+                                                <td>{{ $data->po_company }}</td>
+                                                <td><a
+                                                        href="{{ route('purchase.edit', ['id' => $data->po_id]) }}">{{ $data->po_item_no }}</a>
+                                                </td>
+                                                <td>{{ $data->dispatch_unit_price }}</td>
+                                                <td>
+                                                    <a href="javascript:void(0);" data-bs-toggle="modal" 
+                                                       data-bs-target="#Modalfor_quantity_details_so"
+                                                       onclick="get_received_so_qty_for_report('{{ $data->dispatch_id }}')">
+                                                        {{ $data->dispatch_total }}
+                                                    </a>
+                                                </td>
+                                                
+                                                <td>{{ $data->category_name }}</td>
+                                                <td>{{ $data->sub_category_name }}</td>
 
-                                   <td>{{$data->category_name }}</td>
-                                   <td>{{$data->sub_category_name }}</td>
+                                                <td>{{ $data->dispatched_quantity }}</td>
 
-                                   <td>{{$data->dispatched_quantity }}</td>
+                                                <td>{{ $data->so_company }}</td>
 
-                                   <td>{{$data->so_company }}</td>
+                                                <td><a
+                                                        href="{{ route('sales.edit', ['id' => $data->so_id]) }}">{{ $data->so_item_no }}</a>
+                                                </td>
+                                                <td>{{ $data->dispatch_so_unit_price }}</td>
+                                                <td>{{ $data->dispatch_so_total }}</td>
 
-                                   <td><a href="{{ route('sales.edit', ['id' => $data->so_id]) }}">{{$data->so_item_no}}</a></td>
-                                   <td>{{$data->dispatch_so_unit_price }}</td>
-                                   <td>{{$data->dispatch_so_total }}</td>
-                                   
-                                  
-                                   <td>
-                                    <div class="filter">
-                                        <a class="icon" href="#" data-bs-toggle="dropdown"><i
-                                                class="bi bi-three-dots"></i></a>
-                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                      
-                                            <li>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('dispatch.edit', $data->dispatch_id) }}"><i
-                                                    class="fa-solid fa-pencil"></i>Edit</a>
-                                            
-                                            </li>
 
-                                            <li>
-                                                        <form method="GET"
-                                                            action="{{ route('dispatch.destroy', $data->dispatch_id) }}">
-                                                            @method('DELETE')
-                                                            <button type="button"
-                                                                class="dropdown-item delete-button">
-                                                                <i class="fa-solid fa-trash"></i> Delete
-                                                            </button>
-                                                        </form>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
+                                                <td>
+                                                    <div class="filter">
+                                                        <a class="icon" href="#" data-bs-toggle="dropdown"><i
+                                                                class="bi bi-three-dots"></i></a>
+                                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
 
-                                  </tr>
-                                  @endforeach
-                                </tbody>
-                            </table>
-                         </div>
-                   
-                            
-                      
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('dispatch.edit', $data->dispatch_id) }}"><i
+                                                                        class="fa-solid fa-pencil"></i>Edit</a>
+
+                                                            </li>
+
+                                                            <li>
+                                                                <form method="GET"
+                                                                    action="{{ route('dispatch.destroy', $data->dispatch_id) }}">
+                                                                    @method('DELETE')
+                                                                    <button type="button"
+                                                                        class="dropdown-item delete-button">
+                                                                        <i class="fa-solid fa-trash"></i> Delete
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
 
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-<br><br><br>
-   
+        <br><br><br>
+
+        <div class="modal fade" id="Modalfor_quantity_details_so" tabindex="-1" aria-labelledby="modal3Label"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal3Label">Payable Total Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"style="width:50px"></button>
+                    </div>
+                    <div class="modal-body-so">
+                        <table class="table SO table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
     </main><!-- End #main -->
@@ -213,7 +251,7 @@
 
 
 
-     <script>
+    <script>
         $(document).ready(function() {
             $('#Category_table').DataTable({
                 dom: 'Bfrtip',
@@ -230,8 +268,48 @@
                 ]
             });
         });
-    
-</script>
+    </script>
+
+    <script>
+function get_received_so_qty_for_report(dispatch_id) {
+    $.ajax({
+        url: "{{ url('get_dispatch_payable_total') }}",
+        method: "POST",
+        data: {
+            dispatch_id: dispatch_id,
+            "_token": "{{ csrf_token() }}"
+        },
+        success: function(res) {
+            let rowsData = res.rows_data;
+            let tableBody = document.querySelector('.modal-body-so table tbody');
+            tableBody.innerHTML = ''; // Clear existing table rows
+
+            rowsData.forEach((rowData, index) => {
+                // Parse and format the date
+                let date = new Date(rowData.date);
+                let formattedDate = date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+
+                // Create and insert the table row
+                let row = `<tr>
+                    <th scope="row">${index + 1}</th>
+                    <td>Conv Rate : ${rowData.conv_rate}</td>
+                    <td>Freight Rate : ${rowData.dispatch_freight}</td>
+                    <td>Insurance Rate : ${rowData.dispatch_other}</td>
+                </tr>`;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        },
+        error: function(err) {
+            console.error("An error occurred:", err);
+        }
+    });
+}
+
+    </script>
 
 
 @endsection

@@ -132,7 +132,8 @@
                                         <th>Seller Name(Party Name)</th>
                                         <th>Item Category</th>
                                         {{-- <th>Item Sub-Category</th> --}}
-                                        <th>Quantity(Q)</th>                                        
+                                        <th>Quantity(Q)</th>    
+                                        <th>Dispatch Rest Quantity(Q)</th>                                     
                                         <th>PO Unit Price</th>
                                         <th>PO Price</th>
                                         <th>PO Match Position</th>
@@ -155,6 +156,7 @@
                                             <td>{{ $data->category_name }}</td>
                                             {{-- <td>{{ $data->sub_category_name }}</td> --}}
                                             <td>{{ $data->qty }}</td>
+                                            <td>{{ $data->po_dispatch_rest_qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             <td>{{ $data->match_position }}</td>

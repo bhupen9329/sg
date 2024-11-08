@@ -18,6 +18,8 @@ return new class extends Migration
         $table->unsignedBigInteger('subcategory_id'); 
         $table->date('selected_date'); 
         $table->decimal('item_price', 8, 2); 
+        $table->decimal('item_freight', 8, 2); 
+        $table->decimal('item_insurance', 8, 2); 
         $table->string('remarks')->nullable();
         $table->timestamps();
         });

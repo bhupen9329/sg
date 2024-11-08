@@ -148,14 +148,14 @@
                                             <th class="table_heading_normal">Conv Rate</th>
                                             <th class="table_heading_long">PO Unit Price</th>
                                             <th class="table_heading_long">PO Freight</th>
-                                            <th class="table_heading_long">PO Other</th>
+                                            <th class="table_heading_long">PO Insurance</th>
                                             <th class="table_heading_long">Payable Total<span
-                                                class="required-classes">*</span></th>
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_long">SO Unit Price</th>
                                             <th class="table_heading_long">SO Freight</th>
-                                            <th class="table_heading_long">SO Other</th>
+                                            <th class="table_heading_long">SO Insurance</th>
                                             <th class="table_heading_long">Receivable Total<span
-                                                class="required-classes">*</span></th>
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_normal">Quantity<span
                                                     class="required-classes">*</span>
                                             </th>
@@ -355,8 +355,8 @@
      <td><input type="number" name="dispatch_so_freight[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
     <td><input type="number" name="dispatch_so_other[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
   
-    <td><input type="number" name="dispatch_so_total[]" value="0" class="form-control" readonly required /></td>
-    <td><input type="number" name="quantity[]" step="0.001" class="form-control" value="" required /></td>
+    <td><input type="number" name="dispatch_so_total[]" value="0" id="dispatch_so_total" class="form-control" readonly required /></td>
+    <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="" required /></td>
     <td>
         <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
     </td>
@@ -367,16 +367,18 @@
         }
 
         function formatDate(dateString) {
-    if (!dateString) return ''; // Return empty string if no date is provided
-    const date = new Date(dateString);
-    
-    // Format date as 'dd-MMM-yyyy'
-    const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
-    const month = date.toLocaleString('default', { month: 'short' }); // Get month in short format (e.g., 'Jan', 'Feb')
-    const year = date.getFullYear();
+            if (!dateString) return ''; // Return empty string if no date is provided
+            const date = new Date(dateString);
 
-    return `${day}-${month}-${year}`;
-}
+            // Format date as 'dd-MMM-yyyy'
+            const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+            const month = date.toLocaleString('default', {
+                month: 'short'
+            }); // Get month in short format (e.g., 'Jan', 'Feb')
+            const year = date.getFullYear();
+
+            return `${day}-${month}-${year}`;
+        }
 
         function calculateTotal(element) {
             const row = element.closest('tr');
@@ -384,15 +386,23 @@
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
             const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
             const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
+            const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
 
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
             const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
             const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
-            // Calculate total and update the total_amount field
-            const totalAmount = unitPrice + convRate + freight + other;
-            const totalSoAmount = sounitPrice + convRate + sofreight + soother;
+            let totalAmount = 0;
+            let totalSoAmount = 0;
+
+            if (quantity) {
+                totalAmount = (unitPrice + convRate + freight + other) * quantity;
+                totalSoAmount = (sounitPrice + convRate + sofreight + soother) * quantity;
+            } else {
+                totalAmount = unitPrice + convRate + freight + other;
+                totalSoAmount = sounitPrice + convRate + sofreight + soother;
+            }
 
             row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
             row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
@@ -400,7 +410,7 @@
 
         function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
             '', Price = '', ) {
-                
+
             var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
             const formattedDate = formatDate(Date);
@@ -417,17 +427,20 @@
         `;
             lastItemId++;
         }
-        function formatDate(dateString) {
-    if (!dateString) return ''; // Return empty string if no date is provided
-    const date = new Date(dateString);
-    
-    // Format date as 'dd-MMM-yyyy'
-    const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
-    const month = date.toLocaleString('default', { month: 'short' }); // Get month in short format (e.g., 'Jan', 'Feb')
-    const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`;
-}
+        function formatDate(dateString) {
+            if (!dateString) return ''; // Return empty string if no date is provided
+            const date = new Date(dateString);
+
+            // Format date as 'dd-MMM-yyyy'
+            const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+            const month = date.toLocaleString('default', {
+                month: 'short'
+            }); // Get month in short format (e.g., 'Jan', 'Feb')
+            const year = date.getFullYear();
+
+            return `${day}-${month}-${year}`;
+        }
 
         function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
             '', Price = '', ) {
@@ -514,9 +527,9 @@
                         SORow(so_item.date, so_item.so_number, so_item.name, so_item.so_item_no,
                             so_item.qty, so_item.so_dispatch_rest_qty, so_item.unit_price, so_item
                             .so_price);
-                 
-                            $('#so_unit_price').val(so_item.unit_price);
 
+                        $('#so_unit_price').val(so_item.unit_price);
+                        $('#dispatch_so_total').val(so_item.unit_price);
                     },
                     error: function(xhr, status, error) {
                         console.error("Error fetching item details:", error);
@@ -662,10 +675,12 @@
                     // Populate the table with new rows from the response
                     response.purchase_orders.forEach(po => {
                         const dateObj = new Date(po.date);
-    const day = dateObj.getDate().toString().padStart(2, '0');
-    const month = dateObj.toLocaleString('en-GB', { month: 'short' });
-    const year = dateObj.getFullYear();
-    const formattedDate = `${day}-${month}-${year}`;
+                        const day = dateObj.getDate().toString().padStart(2, '0');
+                        const month = dateObj.toLocaleString('en-GB', {
+                            month: 'short'
+                        });
+                        const year = dateObj.getFullYear();
+                        const formattedDate = `${day}-${month}-${year}`;
                         const row = `
                     <tr>
                         <td>
@@ -1083,10 +1098,22 @@
                 },
                 success: function(response) {
                     const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
+                    const convFreightField = $(selectElement).closest('tr').find('input[name="dispatch_freight[]"]');
+                    const convInsuranceField = $(selectElement).closest('tr').find('input[name="dispatch_other[]"]');
+
+                    const convSOFreightField = $(selectElement).closest('tr').find('input[name="dispatch_so_freight[]"]');
+                    const convSOInsuranceField = $(selectElement).closest('tr').find('input[name="dispatch_so_other[]"]');
+
 
                     if (response && response.item_price) {
                         // Set the conversion rate from the response
                         convRateField.val(response.item_price);
+                        convFreightField.val(response.item_freight);
+                        convInsuranceField.val(response.item_insurance);
+
+                        convSOFreightField.val(response.item_freight);
+                        convSOInsuranceField.val(response.item_insurance);
+
                     } else {
                         convRateField.val(0);
                         console.error('Conversion rate not found in response');

@@ -40,6 +40,8 @@ public function store(Request $request)
         'subcategory_id' => $request->subcategory_id,
         'selected_date' => $request->selected_date,
         'item_price' => $request->item_price,
+        'item_freight' => $request->item_freight,
+        'item_insurance' => $request->item_insurance,
         'remarks' => $request->remarks,
     ]);
 
@@ -66,6 +68,8 @@ public function update(Request $request, $id)
     $item->subcategory_id = $request->subcategory_id;
     $item->selected_date = $request->selected_date;
     $item->item_price = $request->item_price;
+    $item->item_freight = $request->item_freight;
+    $item->item_insurance = $request->item_insurance;
     $item->remarks = $request->remarks;
     
     // dd($item);
