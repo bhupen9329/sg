@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->string('unit_price')->nullable();
             $table->string('price')->nullable();
             $table->string('so_item_status')->default('Open');
-            $table->string('so_dispatch_item_status', 10)->default('Open');
+            $table->string('so_dispatch_item_status')->default('Open');
             $table->timestamps();
         });
     }

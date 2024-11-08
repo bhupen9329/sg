@@ -219,8 +219,13 @@ class DispatchController extends Controller
             if ($actual_so_dispatch_qty == 0) {
                 $so_item->update(['so_dispatch_item_status' => 'Close']);
             }
+            else{
+                $so_item->update(['so_dispatch_item_status' => 'Partial Pending']);
+            }
             if ($actual_po_dispatch_qty == 0) {
                 $po_item->update(['po_dispatch_item_status' => 'Close']);
+            }else{
+                $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
             }
         }
         return redirect()->route('dispatch.index')->with('success', 'Dispatch details saved successfully.');
@@ -324,6 +329,18 @@ class DispatchController extends Controller
 
             $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
             $po_item->update(['po_dispatch_rest_qty' => $actual_po_dispatch_qty]);
+
+            if ($actual_so_dispatch_qty == 0) {
+                $so_item->update(['so_dispatch_item_status' => 'Close']);
+            }
+            else{
+                $so_item->update(['so_dispatch_item_status' => 'Partial Pending']);
+            }
+            if ($actual_po_dispatch_qty == 0) {
+                $po_item->update(['po_dispatch_item_status' => 'Close']);
+            }else{
+                $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
+            }
         }
         return redirect()->route('dispatch.index')->with('update', 'Dispatch updated successfully.');
     }
@@ -342,6 +359,18 @@ class DispatchController extends Controller
         $so_item->update(['so_dispatch_rest_qty' => $old_so_rest_qty]);
         $po_item->update(['po_dispatch_rest_qty' => $old_po_rest_qty]);
 
+        if ($old_so_rest_qty < $so_item->qty) {
+            $so_item->update(['so_dispatch_item_status' => 'Partial Pending']);
+        }
+        else{
+            $so_item->update(['so_dispatch_item_status' => 'Open']);
+        }
+        if ($old_po_rest_qty < $po_item->qty) {
+            $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
+        }else{
+            $po_item->update(['po_dispatch_item_status' => 'Open']);
+        }
+
         Dispatch::where('id', $id)->delete();
         return redirect()->route('dispatch.index')->with('delete', 'Dispatch deleted successfully.');
     }
@@ -350,5 +379,18 @@ class DispatchController extends Controller
     {
         $cov_rates = ConvRate::where('subcategory_id', $request->subcategory_item_id)->latest()->first();
         return response($cov_rates);
+    }
+
+    public function get_dispatch_payable_total(Request $request)
+    {
+        // $So_data = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+        // ->join('categories', 'so_items.item_category', '=', 'categories.id')
+        // ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
+        // ->where('so_items.item_category',$request->get_category_id)
+        // ->get();
+$dispatch_data = Dispatch::where('id', $request->dispatch_id)->first();
+        return response()->json([
+            'rows_data' => $dispatch_data
+        ]);
     }
 }

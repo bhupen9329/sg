@@ -378,6 +378,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/get-so-items-filtered', [DispatchController::class, 'getSoItemsFiltered'])->name('getSoItemsFiltered');
         Route::get('/get-company-purchase-orders', [DispatchController::class, 'getCompanyPurchaseOrders']);
 
+        Route::post('/get_dispatch_payable_total', [DispatchController::class, 'get_dispatch_payable_total']);
+
+
         // .................................................Rate ................................................................................................
         Route::get('/soudarate', [SoudaRateController::class, 'index'])->name('rate.index');
         Route::get('/convrate_create', [SoudaRateController::class, 'create'])->name('rate.create');
