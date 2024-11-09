@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('dispatches', function (Blueprint $table) {
           
             $table->id();
+            $table->string('date');
             $table->string('po_company_id');
             $table->string('so_company_id');
             $table->string('po_id');

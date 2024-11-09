@@ -455,6 +455,16 @@
                             </a>
                         @endcan
                     </li>
+
+                    <li>
+               
+                            <a href="{{ route('freight_rate.index')}}">
+                                <i class="bi bi-circle"></i><span>Freight Rate</span>
+                            </a>
+                           
+
+                      
+                    </li>
                 </ul>
             </li><!-- End Icons Nav -->
         @endif

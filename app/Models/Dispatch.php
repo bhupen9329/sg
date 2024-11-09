@@ -10,6 +10,7 @@ class Dispatch extends Model
     use HasFactory;
     protected $table = 'dispatches';
     protected $fillable = [
+        'date',
         'po_company_id',
         'so_company_id',
         'po_id',

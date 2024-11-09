@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\ConvRate;
 use App\Models\SubCategory;
 use App\Models\Dispatch;
+use App\Models\FreightRate;
 
 class DispatchController extends Controller
 {
@@ -143,10 +144,11 @@ class DispatchController extends Controller
         // Retrieve the item and its sub-items based on the item ID
         $item = Category::where('id', $itemId)->first();
         $subItems = SubCategory::where('category_id', $itemId)->get();
+        $freight_insurance = FreightRate::latest()->first();
         // dd($subItems);
 
         // Return response with both item and sub-item details
-        return response()->json(['item_details' => $item, 'subItems' => $subItems, 'po_items' => $po_items]);
+        return response()->json(['item_details' => $item, 'subItems' => $subItems, 'po_items' => $po_items, 'freight' =>  $freight_insurance->freight_rate, 'insurance' =>  $freight_insurance->insurance_rate,]);
     }
 
     public function getItemDetailsSO(Request $request)
@@ -156,7 +158,11 @@ class DispatchController extends Controller
         ->join('categories', 'categories.id', '=', 'so_items.item_category')
         ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
         ->where('so_item_no', $request->so_item_no)->first();
-        return response()->json(['so_items' => $so_items]);
+
+        $freight_insurance = FreightRate::latest()->first();
+
+
+        return response()->json(['so_items' => $so_items, 'freight_insurance' => $freight_insurance]);
     }
 
 
@@ -184,6 +190,7 @@ class DispatchController extends Controller
             $po_item = PoItem::where('po_item_no', $request->po_item_no)->first();
 
             $dispatch = new Dispatch();
+            $dispatch->date = $request->date;
             $dispatch->po_company_id = $request->po_company_id;
             $dispatch->so_company_id = $request->so_company_id;
             $dispatch->po_id = $po_item->po_id;
@@ -306,6 +313,8 @@ class DispatchController extends Controller
 
 
             $dispatch = Dispatch::where('id', $id)->first();
+
+            $dispatch->date = $request->date;
             $dispatch->dispatched_quantity = $request->quantity[$index];
             $dispatch->conv_rate = $request->conv_rate[$index];
             $dispatch->dispatch_unit_price = $request->dispatch_unit_price[$index];
@@ -383,14 +392,13 @@ class DispatchController extends Controller
 
     public function get_dispatch_payable_total(Request $request)
     {
-        // $So_data = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-        // ->join('categories', 'so_items.item_category', '=', 'categories.id')
-        // ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
-        // ->where('so_items.item_category',$request->get_category_id)
-        // ->get();
+
 $dispatch_data = Dispatch::where('id', $request->dispatch_id)->first();
-        return response()->json([
-            'rows_data' => $dispatch_data
-        ]);
+// dd($dispatch_data);
+return response($dispatch_data);
+        // return response()->json([
+        //     'rows_data' => $dispatch_data
+        // ]);
+       
     }
 }
