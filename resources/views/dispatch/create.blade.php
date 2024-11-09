@@ -365,10 +365,12 @@
      
    <input type="hidden" name="conv_rate[]" id="conv_rate" value="0" class="form-control" oninput="calculateTotal(this)" required />
     <td><input type="number" name="dispatch_unit_price[]" class="form-control"  value="${unit_price}"  readonly required /></td>
+    <input type="hidden" name="dispatch_unit_price_actual[]" class="form-control"  value="${unitPrice}"  readonly required />
         <input type="hidden" name="dispatch_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
     <input type="hidden" name="dispatch_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
     
      <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
+    <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="" required /></td>
     <input type="hidden" name="dispatch_so_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
     <input type="hidden" name="dispatch_so_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
@@ -401,6 +403,8 @@
         function calculateTotal(element) {
             const row = element.closest('tr');
             const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
+            const unitPriceActual = parseFloat(row.querySelector('input[name="dispatch_unit_price_actual[]"]').value) || 0;
+
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
 
             const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
@@ -408,41 +412,45 @@
             const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
+            const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]').value) || 0;
+
             const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
             const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
             const insuranceStatus  = row.querySelector('select[name="insurance_status[]"]').value;
+ 
             // Calculate the total values for PO and SO based on the quantity
-
-
-
-            if (quantity) {
-                // Multiply only the total (not unit price)
-
-                if (insuranceStatus === 'yes') {
-                    totalAmount = (unitPrice) * quantity;
-                    totalSoAmount = (sounitPrice) * quantity;
-                } else {
-                    totalAmount = (unitPrice - other) * quantity;
-                    totalSoAmount = (sounitPrice - other) * quantity;
-                }
-
-                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
-                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
-            } else {
 
                 let totalPOUnitPrice = 0;
                 let totalSOUnitPrice = 0;
 
                 if (insuranceStatus === 'yes') {
-                    totalPOUnitPrice = unitPrice + convRate + freight + other;
-                  totalSOUnitPrice = sounitPrice + convRate + freight + other;
+                    totalPOUnitPrice = unitPriceActual + convRate + freight + other;
+                    console.log(totalPOUnitPrice);
+                    totalSOUnitPrice = sounitPriceActual + convRate + freight + other;
                 } else {
-                   totalPOUnitPrice = unitPrice + convRate + freight;
-                  totalSOUnitPrice = sounitPrice + convRate + freight;
+                   totalPOUnitPrice = unitPriceActual + convRate + freight;
+                   totalSOUnitPrice = sounitPriceActual + convRate + freight;
                 }
 
-                console.log(totalPOUnitPrice);
+       
+                row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
+                row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
+
+            if (quantity) {
+                // Multiply only the total (not unit price)
+
+                if (insuranceStatus === 'yes') {
+                    totalAmount = (totalPOUnitPrice) * quantity;
+                    totalSoAmount = (totalSOUnitPrice) * quantity;
+                } else {
+                    totalAmount = (totalPOUnitPrice) * quantity;
+                    totalSoAmount = (totalSOUnitPrice) * quantity;
+                }
+
+                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
+            } else {
 
                 let totalAmount = 0;
                 let totalSoAmount = 0;
@@ -450,12 +458,11 @@
                 totalAmount = totalPOUnitPrice; // If no quantity, just use the unit price
                 totalSoAmount = totalSOUnitPrice;
 
-                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
-                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
 
                 // Ensure unit prices remain unchanged
-                row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
-                row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
+                   
+                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
             }
 
             // Update the total fields without affecting unit price
@@ -603,6 +610,8 @@
 
 
                         $('#so_unit_price').val(total_so_unit_price);
+                        $('#so_unit_price_actual').val(so_item.unit_price);
+
                         $('#dispatch_so_total').val(total_so_unit_price);
                     },
                     error: function(xhr, status, error) {
@@ -1174,26 +1183,10 @@
                 },
                 success: function(response) {
                     const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
-                    const convFreightField = $(selectElement).closest('tr').find(
-                        'input[name="dispatch_freight[]"]');
-                    const convInsuranceField = $(selectElement).closest('tr').find(
-                        'input[name="dispatch_other[]"]');
-
-                    const convSOFreightField = $(selectElement).closest('tr').find(
-                        'input[name="dispatch_so_freight[]"]');
-                    const convSOInsuranceField = $(selectElement).closest('tr').find(
-                        'input[name="dispatch_so_other[]"]');
-
 
                     if (response && response.item_price) {
                         // Set the conversion rate from the response
                         convRateField.val(response.item_price);
-                        convFreightField.val(response.item_freight);
-                        convInsuranceField.val(response.item_insurance);
-
-                        convSOFreightField.val(response.item_freight);
-                        convSOInsuranceField.val(response.item_insurance);
-
                     } else {
                         convRateField.val(0);
                         console.error('Conversion rate not found in response');

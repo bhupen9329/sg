@@ -71,12 +71,6 @@ class DispatchController extends Controller
 
     public function getPurchaseOrders(Request $request)
     {
-        // $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-        // ->leftJoin('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
-        // ->leftJoin('categories', 'categories.id', '=', 'po_items.item_category')
-        // ->where('purchase_orders.supplier_id', $request->company_id)
-        // ->get();
-        // dd($purchaseOrders);
 
         $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
             ->Join('po_items', function ($join) {
@@ -169,6 +163,7 @@ class DispatchController extends Controller
     public function storeDispatch(Request $request)
     {
 
+
         foreach ($request->quantity as $index => $quantity) {
 
 
@@ -201,15 +196,23 @@ class DispatchController extends Controller
             $dispatch->subcategory_id = $request->sub_cat_id[$index]; // Get the quantity based on index
             $dispatch->dispatched_quantity = $request->quantity[$index];
             $dispatch->conv_rate = $request->conv_rate[$index];
-            $dispatch->dispatch_unit_price = $request->dispatch_unit_price[$index];
+            $dispatch->dispatch_unit_price = $request->dispatch_unit_price_actual[$index];
             $dispatch->dispatch_freight = $request->dispatch_freight[$index];
-            $dispatch->dispatch_other = $request->dispatch_other[$index];
+
+            if ($request->insurance_status[$index] == 'yes') {
+                $dispatch->dispatch_other = $request->dispatch_other[$index];
+                $dispatch->dispatch_so_other = $request->dispatch_so_other[$index];
+            }else{
+                $dispatch->dispatch_other = 0;
+                $dispatch->dispatch_so_other = 0;
+            }
+            
             $dispatch->dispatch_total = $request->dispatch_total[$index];
             $dispatch->vehicle_number = $request->vehicle_number;
 
-            $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price[$index];
+            $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price_actual[$index];
             $dispatch->dispatch_so_freight = $request->dispatch_so_freight[$index];
-            $dispatch->dispatch_so_other = $request->dispatch_so_other[$index];
+           
             $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
             $dispatch->receiver_person = $request->receiver_person;
 
@@ -271,8 +274,16 @@ class DispatchController extends Controller
             )
             ->where('dispatches.id', $id)
             ->first();
+
+            $freight_insurance = FreightRate::latest()->first();
+
+            $dispatch_po_price = ($disaptch_data->dispatch_unit_price + $disaptch_data->conv_rate + $disaptch_data->dispatch_freight + $disaptch_data->dispatch_other);
+            $dispatch_so_price = ($disaptch_data->dispatch_so_unit_price + $disaptch_data->conv_rate + $disaptch_data->dispatch_freight + $disaptch_data->dispatch_other);
+
         // dd($disaptch_data);
         $sub_items = SubCategory::where('category_id',  $disaptch_data->category_id)->get();
+
+
         $so_item = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
         ->leftjoin('categories', 'so_items.item_category', '=', 'categories.id')
         ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
@@ -286,11 +297,13 @@ class DispatchController extends Controller
 
         // dd( $so_item,  $po_item);
 
-        return view('dispatch.edit', compact('disaptch_data', 'sub_items', 'so_item', 'po_item'));
+        return view('dispatch.edit', compact('disaptch_data', 'sub_items', 'so_item', 'po_item', 'dispatch_po_price', 'dispatch_so_price', 'freight_insurance'));
     }
 
     public function updateDispatch(Request $request, $id)
     {
+
+        // dd($request);
         $old_dispatch = Dispatch::where('id', $id)->first();
         foreach ($request->quantity as $index => $quantity) {
             $so_item = SoItem::where('id', $old_dispatch->so_item_id)->first();
@@ -317,15 +330,23 @@ class DispatchController extends Controller
             $dispatch->date = $request->date;
             $dispatch->dispatched_quantity = $request->quantity[$index];
             $dispatch->conv_rate = $request->conv_rate[$index];
-            $dispatch->dispatch_unit_price = $request->dispatch_unit_price[$index];
+            $dispatch->dispatch_unit_price = $request->dispatch_unit_price_actual[$index];
             $dispatch->dispatch_freight = $request->dispatch_freight[$index];
-            $dispatch->dispatch_other = $request->dispatch_other[$index];
+          
             $dispatch->dispatch_total = $request->dispatch_total[$index];
 
 
-            $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price[$index];
+            $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price_actual[$index];
             $dispatch->dispatch_so_freight = $request->dispatch_so_freight[$index];
-            $dispatch->dispatch_so_other = $request->dispatch_so_other[$index];
+            if ($request->insurance_status[$index] == 'yes') {
+                // dd($request->dispatch_so_other_actual[$index]);
+                $dispatch->dispatch_other = $request->dispatch_so_other_actual[$index];
+                $dispatch->dispatch_so_other = $request->dispatch_so_other_actual[$index];
+            }else{
+                $dispatch->dispatch_other = 0;
+                $dispatch->dispatch_so_other = 0;
+            }
+           
             $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
             $dispatch->receiver_person = $request->receiver_person;
             
