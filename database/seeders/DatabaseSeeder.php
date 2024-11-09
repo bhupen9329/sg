@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             BuyerSupplierSeeder::class,
             WareHouseSeeder::class,
             SubCategorySeeder::class,
+            FreightTableSeeder::class,
+
             // InventoryTransactionSeeder::class,
             
    

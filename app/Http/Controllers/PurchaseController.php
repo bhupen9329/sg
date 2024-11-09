@@ -518,7 +518,7 @@ class PurchaseController extends Controller
         $data = [
             'date' => $request->date,
             'due_date' => $request->due_date,
-            'remark' =>  $request->remarks,
+            'remark' =>  $request->remark,
             'total_quantity' => $request->total_quantity,
             'total_amount' => $request->total_amount,
             'total_price' => $request->total_price,
@@ -526,7 +526,7 @@ class PurchaseController extends Controller
         PurchaseOrder::where('id', $id)->update($data);
 
         $po_item = PoItem::where('po_id', $id)
-            ->whereColumn('qty', '=', 'po_rest_qty')->get();
+            ->whereColumn('qty', '=', 'po_rest_qty')->whereColumn('qty', '=', 'po_dispatch_rest_qty')->get();
 
         foreach ($po_item as $po_items) {
             InventoryTransaction::where('po_item_id', $po_items->id)->delete();
@@ -534,6 +534,7 @@ class PurchaseController extends Controller
 
         PoItem::where('po_id', $id)
             ->whereColumn('qty', '=', 'po_rest_qty')
+            ->whereColumn('qty', '=', 'po_dispatch_rest_qty')
             ->delete();
 
 

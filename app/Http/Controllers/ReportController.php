@@ -1406,6 +1406,7 @@ class ReportController extends Controller
             }
             
             $filteredData = $query->get();
+            
             $data = [];
             foreach ($filteredData as $filteredData) {
                 $tempData = [
@@ -1423,6 +1424,7 @@ class ReportController extends Controller
                     'dispatch_id' => $filteredData->dispatch_id, 
                 ];
                 $data[] = $tempData;
+                // dd( $data);
             }
             return response()->json($data);
     }

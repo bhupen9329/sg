@@ -434,6 +434,7 @@ class DispatchController extends Controller
             'conv_rate' => $dispatch_data->conv_rate ?? 0,
             'dispatch_freight' => $dispatch_data->dispatch_freight ?? 0,
             'dispatch_other' => $dispatch_data->dispatch_other ?? 0,
+            'dispatched_quantity' => $dispatch_data->dispatched_quantity ?? 0,
         ]);
     }
     
