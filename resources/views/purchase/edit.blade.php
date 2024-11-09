@@ -413,7 +413,7 @@
                                         <div class="row">
                                             <div class="col-sm-4">
                                                 <label for="inputEmail3" class="col-sm-4 col-form-label"><strong>Remarks</strong></label>
-                                                <textarea class="form-control" name="remark" value={{ $po_data->remark }} placeholder="Terms & Conditions" id="floatingTextarea"
+                                                <textarea class="form-control" name="remark" value={{ $po_data->remark }} placeholder="Remarks" id="floatingTextarea"
                                                     style="height: 100px;">{{ $po_data->remark }}</textarea>
                                             </div>
 

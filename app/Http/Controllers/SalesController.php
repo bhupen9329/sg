@@ -458,12 +458,12 @@ class SalesController extends Controller
             'total_price' => $request->total_price,
         ];
         SalesOrder::where('id', $id)->update($data);
-        $so_item = SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->get();
+        $so_item = SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->whereColumn('qty', '=', 'so_dispatch_rest_qty')->get();
         foreach ($so_item as $so_items) {
             InventoryTransaction::where('so_item_id', $so_items->id)->delete();
         }
 
-        SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->delete();
+        SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->whereColumn('qty', '=', 'so_dispatch_rest_qty')->delete();
 
         if ($id) {
             if(isset($request->unit_price_) >  0){
@@ -499,7 +499,6 @@ class SalesController extends Controller
       
                 $companyName = Company::find($sales_order->company_id)->company_name;
                 // dd($subcategoryName);
-
 
                 $inventoryTransaction = new InventoryTransaction();
                 $inventoryTransaction->so_item_id = $newSoItemId;

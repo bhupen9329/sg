@@ -169,7 +169,7 @@
                                                 <td><a
                                                         href="{{ route('sales.edit', ['id' => $data->so_id]) }}">{{ $data->so_item_no }}</a>
                                                 </td>
-                                                <td>{{   $data->dispatch_so_unit_price}}</td>
+                                                <td>{{ $data->dispatch_so_unit_price }}</td>
                                                 <td>
                                                     <a href="javascript:void(0);" data-bs-toggle="modal"
                                                         data-bs-target="#Modalfor_quantity_details_po"
@@ -234,6 +234,10 @@
                             aria-label="Close"style="width:50px"></button>
                     </div>
                     <div class="modal-body-so">
+                        <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched Qty</strong> : <span
+                                id="so_add_qty"></span></h6>
+                        <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Payable Total</strong> : <span
+                                id="so_add_total_qty"></span></h6>
                         <table class="table SO table-bordered">
                             <thead>
                                 <tr>
@@ -257,14 +261,16 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        
-                        <h5 class="modal-title" id="modal3Label">Payable Total Details</h5>
-                        
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+
+                        <h5 class="modal-title" id="modal3Label">Receivable Total Details</h5>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body-po">
-                        <h6 class="text-end py-3"><strong>PO Quantity</strong> : <span id="add_total_qty"></span></h6>
+                        <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched Qty</strong> : <span
+                                id="add_qty"></span></h6>
+                        <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Receivable Total</strong> : <span
+                                id="add_total_qty"></span></h6>
                         <table class="table SO table-bordered">
                             <thead>
                                 <tr>
@@ -325,6 +331,9 @@
                     // Check if the required properties exist in the response
                     if (res) {
                         // Create rows according to the table structure
+                        $('#so_add_qty').html(res.dispatched_quantity);
+                        $('#so_add_total_qty').html(res.dispatch_so_total);
+
                         let rows = [
 
                             `<tr>
@@ -346,7 +355,16 @@
                         <th scope="row">4</th>
                         <td>Insurance Rate</td>
                         <td>${res.dispatch_other ?? 0}</td>
-                    </tr>`
+                    </tr>`,
+
+                            `<tr>
+                        <th scope="row"></th>
+                        <td><strong>Total</strong></td>
+       <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
+                    </tr>`,
+
+
+
                         ];
 
                         // Insert all rows into the table body
@@ -362,62 +380,68 @@
         }
     </script>
     <script>
-      function get_received_po_qty_for_report(dispatch_id) {
-    $.ajax({
-        url: "{{ url('get_dispatch_so_unit_price') }}",
-        method: "POST",
-        data: {
-            dispatch_id: dispatch_id,
-            "_token": "{{ csrf_token() }}"
-        },
-        success: function(res) {
-            // Clear existing table rows
-            let tableBody = document.querySelector('.modal-body-po table tbody');
-            tableBody.innerHTML = '';
+        function get_received_po_qty_for_report(dispatch_id) {
+            $.ajax({
+                url: "{{ url('get_dispatch_so_unit_price') }}",
+                method: "POST",
+                data: {
+                    dispatch_id: dispatch_id,
+                    "_token": "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    // Clear existing table rows
+                    let tableBody = document.querySelector('.modal-body-po table tbody');
+                    tableBody.innerHTML = '';
 
-            // Set total quantity in the span element
-            $('#add_total_qty').html(res.total_qty);
+                    // Set total quantity in the span element
+                    $('#add_total_qty').html(res.total_qty);
+                    $('#add_qty').html(res.dispatched_quantity);
 
-            // Check if the required properties exist in the response
-            if (res) {
-                // Create rows according to the table structure
-                let rows = [
-                    `<tr>
+
+                    // Check if the required properties exist in the response
+                    if (res) {
+                        // Create rows according to the table structure
+                        let rows = [
+                            `<tr>
                         <th scope="row">1</th>
                         <td>PO Unit Rate</td>
                         <td>${res.dispatch_unit_price ?? 0}</td>
                     </tr>`,
-                    `<tr>
+                            `<tr>
                         <th scope="row">2</th>
                         <td>Conv Rate</td>
                         <td>${res.conv_rate ?? 0}</td>
                     </tr>`,
-                    `<tr>
+                            `<tr>
                         <th scope="row">3</th>
                         <td>Freight Rate</td>
                         <td>${res.dispatch_freight ?? 0}</td>
                     </tr>`,
-                    `<tr>
+                            `<tr>
                         <th scope="row">4</th>
                         <td>Insurance Rate</td>
                         <td>${res.dispatch_other ?? 0}</td>
-                    </tr>`
-                ];
+                    </tr>`,
+                            `<tr>
+                        <th scope="row"></th>
+                        <td><strong>Total</strong></td>
+       <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
+                    </tr>`,
+                        ];
 
-                // Insert all rows into the table body
-                rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
-            } else {
-                console.error("Dispatch data not found in response");
-            }
-        },
-        error: function(err) {
-            console.error("An error occurred:", err);
+                        // Insert all rows into the table body
+                        rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+                    } else {
+                        console.error("Dispatch data not found in response");
+                    }
+                },
+                error: function(err) {
+                    console.error("An error occurred:", err);
+                }
+            });
         }
-    });
-}
-
     </script>
-     <script>
+    <script>
         $(document).ready(function() {
             $('.table.dataTable').removeClass('no-footer');
         });
