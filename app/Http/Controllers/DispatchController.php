@@ -52,7 +52,7 @@ class DispatchController extends Controller
 
             )
             ->get();
-            // dd($disaptch_data);
+        // dd($disaptch_data);
 
         return view('dispatch.index', compact('disaptch_data'));
     }
@@ -65,7 +65,7 @@ class DispatchController extends Controller
         $sales_orders = SalesOrder::all();
         $companies_po = Company::where('type', 'supplier')->get();
         $companies_so = Company::where('type', 'buyer')->get();
-     
+
         return view('dispatch.create', compact('purchase_orders', 'sales_orders', 'companies_po', 'companies_so'));
     }
 
@@ -131,9 +131,9 @@ class DispatchController extends Controller
         // dd($request);
         $itemId = $request->item_id;
         $po_items = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
-        ->join('categories', 'categories.id', '=', 'po_items.item_category')
-        ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price')
-        ->where('po_item_no', $request->poItemNo)->first();
+            ->join('categories', 'categories.id', '=', 'po_items.item_category')
+            ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price')
+            ->where('po_item_no', $request->poItemNo)->first();
 
         // Retrieve the item and its sub-items based on the item ID
         $item = Category::where('id', $itemId)->first();
@@ -149,9 +149,9 @@ class DispatchController extends Controller
     {
         // dd($request);
         $so_items = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
-        ->join('categories', 'categories.id', '=', 'so_items.item_category')
-        ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
-        ->where('so_item_no', $request->so_item_no)->first();
+            ->join('categories', 'categories.id', '=', 'so_items.item_category')
+            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
+            ->where('so_item_no', $request->so_item_no)->first();
 
         $freight_insurance = FreightRate::latest()->first();
 
@@ -219,7 +219,7 @@ class DispatchController extends Controller
             $dispatch->remarks = $request->remarks;
             $dispatch->save();
 
-    
+
             $actual_so_dispatch_qty = ($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity);
             $actual_po_dispatch_qty = ($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity);
 
@@ -228,13 +228,12 @@ class DispatchController extends Controller
 
             if ($actual_so_dispatch_qty == 0) {
                 $so_item->update(['so_dispatch_item_status' => 'Close']);
-            }
-            else{
+            } else {
                 $so_item->update(['so_dispatch_item_status' => 'Partial Pending']);
             }
             if ($actual_po_dispatch_qty == 0) {
                 $po_item->update(['po_dispatch_item_status' => 'Close']);
-            }else{
+            } else {
                 $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
             }
         }
@@ -285,15 +284,15 @@ class DispatchController extends Controller
 
 
         $so_item = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
-        ->leftjoin('categories', 'so_items.item_category', '=', 'categories.id')
-        ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
-        ->where('so_items.id', $disaptch_data->so_item_id)->first();
+            ->leftjoin('categories', 'so_items.item_category', '=', 'categories.id')
+            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
+            ->where('so_items.id', $disaptch_data->so_item_id)->first();
 
 
         $po_item = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
-        ->leftjoin('categories', 'po_items.item_category', '=', 'categories.id')
-        ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price')
-        ->where('po_items.id', $disaptch_data->po_item_id)->first();
+            ->leftjoin('categories', 'po_items.item_category', '=', 'categories.id')
+            ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price')
+            ->where('po_items.id', $disaptch_data->po_item_id)->first();
 
         // dd( $so_item,  $po_item);
 
@@ -349,7 +348,7 @@ class DispatchController extends Controller
            
             $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
             $dispatch->receiver_person = $request->receiver_person;
-            
+
             $dispatch->vehicle_number = $request->vehicle_number;
             $dispatch->remarks = $request->remarks;
             $dispatch->save();
@@ -362,13 +361,12 @@ class DispatchController extends Controller
 
             if ($actual_so_dispatch_qty == 0) {
                 $so_item->update(['so_dispatch_item_status' => 'Close']);
-            }
-            else{
+            } else {
                 $so_item->update(['so_dispatch_item_status' => 'Partial Pending']);
             }
             if ($actual_po_dispatch_qty == 0) {
                 $po_item->update(['po_dispatch_item_status' => 'Close']);
-            }else{
+            } else {
                 $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
             }
         }
@@ -391,13 +389,12 @@ class DispatchController extends Controller
 
         if ($old_so_rest_qty < $so_item->qty) {
             $so_item->update(['so_dispatch_item_status' => 'Partial Pending']);
-        }
-        else{
+        } else {
             $so_item->update(['so_dispatch_item_status' => 'Open']);
         }
         if ($old_po_rest_qty < $po_item->qty) {
             $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
-        }else{
+        } else {
             $po_item->update(['po_dispatch_item_status' => 'Open']);
         }
 
@@ -414,12 +411,30 @@ class DispatchController extends Controller
     public function get_dispatch_payable_total(Request $request)
     {
 
-$dispatch_data = Dispatch::where('id', $request->dispatch_id)->first();
-// dd($dispatch_data);
-return response($dispatch_data);
+        $dispatch_data = Dispatch::where('id', $request->dispatch_id)->first();
+        // dd($dispatch_data);
+        return response($dispatch_data);
         // return response()->json([
         //     'rows_data' => $dispatch_data
         // ]);
-       
+
     }
+    public function get_dispatch_so_unit_price(Request $request)
+    {
+        // Fetch the dispatch data based on the given dispatch ID
+        $dispatch_data = Dispatch::where('id', $request->dispatch_id)->first();
+    
+        // Get the total quantity from the 'dispatch_total' field
+        $totalQty = $dispatch_data->dispatch_total ?? 0; // Use null coalescing operator to handle null cases
+    
+        // Return the data as a structured JSON response
+        return response()->json([
+            'total_qty' => $totalQty,
+            'dispatch_unit_price' => $dispatch_data->dispatch_unit_price ?? 0,
+            'conv_rate' => $dispatch_data->conv_rate ?? 0,
+            'dispatch_freight' => $dispatch_data->dispatch_freight ?? 0,
+            'dispatch_other' => $dispatch_data->dispatch_other ?? 0,
+        ]);
+    }
+    
 }

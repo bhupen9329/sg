@@ -383,6 +383,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get-company-purchase-orders', [DispatchController::class, 'getCompanyPurchaseOrders']);
 
     Route::post('/get_dispatch_payable_total', [DispatchController::class, 'get_dispatch_payable_total']);
+    Route::post('/get_dispatch_so_unit_price', [DispatchController::class, 'get_dispatch_so_unit_price']);
 
 
     // .................................................Rate ................................................................................................
