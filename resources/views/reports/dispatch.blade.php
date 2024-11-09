@@ -174,7 +174,64 @@
                             </div>
 
                             <!-- End Table with stripped rows -->
+                            <div class="modal fade" id="Modalfor_quantity_details_so" tabindex="-1" aria-labelledby="modal3Label"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal3Label">Payable Total Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"style="width:50px"></button>
+                    </div>
+                    <div class="modal-body-so">
+                        <table class="table SO table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <div class="modal fade" id="Modalfor_quantity_details_po" tabindex="-1" aria-labelledby="modal3Label"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    
+                    <h5 class="modal-title" id="modal3Label">Payable Total Details</h5>
+                    
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body-po">
+                    <h6 class="text-end py-3"><strong>PO Quantity</strong> : <span id="add_total_qty"></span></h6>
+                    <table class="table SO table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
                         </div>
                     </div>
                 </div>
@@ -274,13 +331,21 @@
                                 data.so_company,
                                 data.created_at,
                                 data.category_name,
-                                data.sub_category_name,
+                                data.sub_category_name ?? 'N/A',
                                 data.dispatched_quantity,
                                 data.vehicle_number ?? 'N/A',
                                 data.po_item_no,
-                                data.dispatch_total,
+                                `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                                data-bs-target="#Modalfor_quantity_details_so" 
+                                onclick="get_received_so_qty_for_report('${data.dispatch_id}')">
+                                ${data.dispatch_total}
+                            </a>`,
                                 data.so_item_no,
-                                data.dispatch_so_total,
+                                `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                                data-bs-target="#Modalfor_quantity_details_po" 
+                                onclick="get_received_po_qty_for_report('${data.dispatch_id}')">
+                                ${data.dispatch_total ?? 'N/A'}
+                            </a>`,
                             ]).draw(false);
                         });
                     } else {
@@ -306,15 +371,112 @@
             $('.table.dataTable').removeClass('no-footer');
         });
     </script>
+     <script>
+        function get_received_so_qty_for_report(dispatch_id) {
+            $.ajax({
+                url: "{{ url('get_dispatch_payable_total') }}",
+                method: "POST",
+                data: {
+                    dispatch_id: dispatch_id,
+                    "_token": "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    let tableBody = document.querySelector('.modal-body-so table tbody');
+                    tableBody.innerHTML = ''; // Clear existing table rows
+
+                    // Check if the required properties exist in the response
+                    if (res) {
+                        // Create rows according to the table structure
+                        let rows = [
+
+                            `<tr>
+                        <th scope="row">1</th>
+                        <td>PO Unit Rate</td>
+                        <td>${res.dispatch_unit_price ?? 0}</td>
+                    </tr>`,
+                            `<tr>
+                        <th scope="row">2</th>
+                        <td>Conv Rate</td>
+                        <td>${res.conv_rate ?? 0}</td>
+                    </tr>`,
+                            `<tr>
+                        <th scope="row">3</th>
+                        <td>Freight Rate</td>
+                        <td>${res.dispatch_freight ?? 0}</td>
+                    </tr>`,
+                            `<tr>
+                        <th scope="row">4</th>
+                        <td>Insurance Rate</td>
+                        <td>${res.dispatch_other ?? 0}</td>
+                    </tr>`
+                        ];
+
+                        // Insert all rows into the table body
+                        rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+                    } else {
+                        console.error("Dispatch data not found in response");
+                    }
+                },
+                error: function(err) {
+                    console.error("An error occurred:", err);
+                }
+            });
+        }
+    </script>
+        <script>
+            function get_received_po_qty_for_report(dispatch_id) {
+          $.ajax({
+              url: "{{ url('get_dispatch_so_unit_price') }}",
+              method: "POST",
+              data: {
+                  dispatch_id: dispatch_id,
+                  "_token": "{{ csrf_token() }}"
+              },
+              success: function(res) {
+                  // Clear existing table rows
+                  let tableBody = document.querySelector('.modal-body-po table tbody');
+                  tableBody.innerHTML = '';
+      
+                  // Set total quantity in the span element
+                  $('#add_total_qty').html(res.total_qty);
+      
+                  // Check if the required properties exist in the response
+                  if (res) {
+                      // Create rows according to the table structure
+                      let rows = [
+                          `<tr>
+                              <th scope="row">1</th>
+                              <td>PO Unit Rate</td>
+                              <td>${res.dispatch_unit_price ?? 0}</td>
+                          </tr>`,
+                          `<tr>
+                              <th scope="row">2</th>
+                              <td>Conv Rate</td>
+                              <td>${res.conv_rate ?? 0}</td>
+                          </tr>`,
+                          `<tr>
+                              <th scope="row">3</th>
+                              <td>Freight Rate</td>
+                              <td>${res.dispatch_freight ?? 0}</td>
+                          </tr>`,
+                          `<tr>
+                              <th scope="row">4</th>
+                              <td>Insurance Rate</td>
+                              <td>${res.dispatch_other ?? 0}</td>
+                          </tr>`
+                      ];
+      
+                      // Insert all rows into the table body
+                      rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+                  } else {
+                      console.error("Dispatch data not found in response");
+                  }
+              },
+              error: function(err) {
+                  console.error("An error occurred:", err);
+              }
+          });
+      }
+      
+          </script>
 @endsection
-data.po_company,
-data.so_company,
-data.created_at,
-data.category_name,
-data.sub_category_name,
-data.dispatched_quantity,
-data.vehicle_number,
-data.po_item_no,
-data.dispatch_total,
-data.po_item_no,
-data.dispatch_so_total,

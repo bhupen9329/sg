@@ -1372,6 +1372,7 @@ class ReportController extends Controller
         ->select(
             'dispatches.*',
             'dispatches.created_at',
+            'dispatches.id as dispatch_id',
             'so_items.so_dispatch_rest_qty',
             'po_items.po_dispatch_rest_qty',
             'po_company.company_name as po_company',
@@ -1419,6 +1420,7 @@ class ReportController extends Controller
                     'dispatch_total' => $filteredData->dispatch_total, 
                     'so_item_no' => $filteredData->so_item_no, 
                     'dispatch_so_total' => $filteredData->dispatch_so_total, 
+                    'dispatch_id' => $filteredData->dispatch_id, 
                 ];
                 $data[] = $tempData;
             }
