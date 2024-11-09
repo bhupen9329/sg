@@ -436,7 +436,7 @@
                                 `<a href="javascript:void(0);" data-bs-toggle="modal" 
                                 data-bs-target="#Modalfor_quantity_details_po" 
                                 onclick="get_received_po_qty_for_report('${data.dispatch_id}')">
-                                ${data.dispatch_total ?? 'N/A'}
+                                ${data.dispatch_so_total ?? 'N/A'}
                             </a>`,
                             ]).draw(false);
                         });
@@ -463,185 +463,134 @@
             $('.table.dataTable').removeClass('no-footer');
         });
     </script>
-    <script>
-        function get_received_so_qty_for_report(dispatch_id) {
-            $.ajax({
-                url: "{{ url('get_dispatch_payable_total') }}",
-                method: "POST",
-                data: {
-                    dispatch_id: dispatch_id,
-                    "_token": "{{ csrf_token() }}"
-                },
-                success: function(res) {
-                    let tableBody = document.querySelector('.modal-body-so table tbody');
-                    tableBody.innerHTML = ''; // Clear existing table rows
 
-                    // Check if the required properties exist in the response
-                    if (res) {
-                        // Create rows according to the table structure
-                        $('#so_add_qty').html(res.dispatched_quantity);
-                        $('#so_add_total_qty').html(res.dispatch_so_total);
+<script>
+    function get_received_so_qty_for_report(dispatch_id) {
+        $.ajax({
+            url: "{{ url('get_dispatch_payable_total') }}",
+            method: "POST",
+            data: {
+                dispatch_id: dispatch_id,
+                "_token": "{{ csrf_token() }}"
+            },
+            success: function(res) {
+                let tableBody = document.querySelector('.modal-body-so table tbody');
+                tableBody.innerHTML = ''; // Clear existing table rows
 
-                        let rows = [
+                // Check if the required properties exist in the response
+                if (res) {
+                    // Create rows according to the table structure
+                    $('#so_add_qty').html(res.dispatched_quantity);
+                    $('#so_add_total_qty').html(res.dispatch_total);
 
-                            `<tr>
+                    
+                    let rows = [
+
+                        `<tr>
                     <th scope="row">1</th>
                     <td>PO Unit Rate</td>
                     <td>${res.dispatch_unit_price ?? 0}</td>
                 </tr>`,
-                            `<tr>
+                        `<tr>
                     <th scope="row">2</th>
                     <td>Conv Rate</td>
                     <td>${res.conv_rate ?? 0}</td>
                 </tr>`,
-                            `<tr>
+                        `<tr>
                     <th scope="row">3</th>
                     <td>Freight Rate</td>
                     <td>${res.dispatch_freight ?? 0}</td>
                 </tr>`,
-                            `<tr>
+                        `<tr>
                     <th scope="row">4</th>
                     <td>Insurance Rate</td>
                     <td>${res.dispatch_other ?? 0}</td>
                 </tr>`,
 
-                            `<tr>
+                `<tr>
                     <th scope="row"></th>
                     <td><strong>Total</strong></td>
    <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
                 </tr>`,
 
 
+            
+                    ];
 
-                        ];
-
-                        // Insert all rows into the table body
-                        rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
-                    } else {
-                        console.error("Dispatch data not found in response");
-                    }
-                },
-                error: function(err) {
-                    console.error("An error occurred:", err);
+                    // Insert all rows into the table body
+                    rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+                } else {
+                    console.error("Dispatch data not found in response");
                 }
-            });
+            },
+            error: function(err) {
+                console.error("An error occurred:", err);
+            }
+        });
+    }
+</script>
+<script>
+  function get_received_po_qty_for_report(dispatch_id) {
+$.ajax({
+    url: "{{ url('get_dispatch_so_unit_price') }}",
+    method: "POST",
+    data: {
+        dispatch_id: dispatch_id,
+        "_token": "{{ csrf_token() }}"
+    },
+    success: function(res) {
+        // Clear existing table rows
+        let tableBody = document.querySelector('.modal-body-po table tbody');
+        tableBody.innerHTML = '';
+
+        // Set total quantity in the span element
+        $('#add_total_qty').html(res.total_qty);
+        $('#add_qty').html(res.dispatched_quantity);
+
+
+        // Check if the required properties exist in the response
+        if (res) {
+            // Create rows according to the table structure
+            let rows = [
+                `<tr>
+                    <th scope="row">1</th>
+                    <td>SO Unit Rate</td>
+                    <td>${res.dispatch_so_unit_price ?? 0}</td>
+                </tr>`,
+                `<tr>
+                    <th scope="row">2</th>
+                    <td>Conv Rate</td>
+                    <td>${res.conv_rate ?? 0}</td>
+                </tr>`,
+                `<tr>
+                    <th scope="row">3</th>
+                    <td>Freight Rate</td>
+                    <td>${res.dispatch_freight ?? 0}</td>
+                </tr>`,
+                `<tr>
+                    <th scope="row">4</th>
+                    <td>Insurance Rate</td>
+                    <td>${res.dispatch_other ?? 0}</td>
+                </tr>`,
+                `<tr>
+                    <th scope="row"></th>
+                    <td><strong>Total</strong></td>
+   <td><strong>${(parseFloat(res.dispatch_so_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
+                </tr>`,
+            ];
+
+            // Insert all rows into the table body
+            rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+        } else {
+            console.error("Dispatch data not found in response");
         }
-    </script>
-    {{-- <script>
-        function get_received_po_qty_for_report(dispatch_id) {
-            $.ajax({
-                url: "{{ url('get_dispatch_so_unit_price') }}",
-                method: "POST",
-                data: {
-                    dispatch_id: dispatch_id,
-                    "_token": "{{ csrf_token() }}"
-                },
-                success: function(res) {
-                    // Clear existing table rows
-                    let tableBody = document.querySelector('.modal-body-po table tbody');
-                    tableBody.innerHTML = '';
+    },
+    error: function(err) {
+        console.error("An error occurred:", err);
+    }
+});
+}
 
-                    // Set total quantity in the span element
-                    $('#add_total_qty').html(res.total_qty);
-
-                    // Check if the required properties exist in the response
-                    if (res) {
-                        // Create rows according to the table structure
-                        let rows = [
-                            `<tr>
-                              <th scope="row">1</th>
-                              <td>PO Unit Rate</td>
-                              <td>${res.dispatch_unit_price ?? 0}</td>
-                          </tr>`,
-                            `<tr>
-                              <th scope="row">2</th>
-                              <td>Conv Rate</td>
-                              <td>${res.conv_rate ?? 0}</td>
-                          </tr>`,
-                            `<tr>
-                              <th scope="row">3</th>
-                              <td>Freight Rate</td>
-                              <td>${res.dispatch_freight ?? 0}</td>
-                          </tr>`,
-                            `<tr>
-                              <th scope="row">4</th>
-                              <td>Insurance Rate</td>
-                              <td>${res.dispatch_other ?? 0}</td>
-                          </tr>`
-                        ];
-
-                        // Insert all rows into the table body
-                        rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
-                    } else {
-                        console.error("Dispatch data not found in response");
-                    }
-                },
-                error: function(err) {
-                    console.error("An error occurred:", err);
-                }
-            });
-        }
-    </script> --}}
-    <script>
-        function get_received_po_qty_for_report(dispatch_id) {
-            $.ajax({
-                url: "{{ url('get_dispatch_so_unit_price') }}",
-                method: "POST",
-                data: {
-                    dispatch_id: dispatch_id,
-                    "_token": "{{ csrf_token() }}"
-                },
-                success: function(res) {
-                    // Clear existing table rows
-                    let tableBody = document.querySelector('.modal-body-po table tbody');
-                    tableBody.innerHTML = '';
-
-                    // Set total quantity in the span element
-                    $('#add_total_qty').html(res.total_qty);
-                    $('#add_qty').html(res.dispatched_quantity);
-
-
-                    // Check if the required properties exist in the response
-                    if (res) {
-                        // Create rows according to the table structure
-                        let rows = [
-                            `<tr>
-                        <th scope="row">1</th>
-                        <td>PO Unit Rate</td>
-                        <td>${res.dispatch_unit_price ?? 0}</td>
-                    </tr>`,
-                            `<tr>
-                        <th scope="row">2</th>
-                        <td>Conv Rate</td>
-                        <td>${res.conv_rate ?? 0}</td>
-                    </tr>`,
-                            `<tr>
-                        <th scope="row">3</th>
-                        <td>Freight Rate</td>
-                        <td>${res.dispatch_freight ?? 0}</td>
-                    </tr>`,
-                            `<tr>
-                        <th scope="row">4</th>
-                        <td>Insurance Rate</td>
-                        <td>${res.dispatch_other ?? 0}</td>
-                    </tr>`,
-                            `<tr>
-                        <th scope="row"></th>
-                        <td><strong>Total</strong></td>
-       <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
-                    </tr>`,
-                        ];
-
-                        // Insert all rows into the table body
-                        rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
-                    } else {
-                        console.error("Dispatch data not found in response");
-                    }
-                },
-                error: function(err) {
-                    console.error("An error occurred:", err);
-                }
-            });
-        }
-    </script>
+</script>
+   
 @endsection
