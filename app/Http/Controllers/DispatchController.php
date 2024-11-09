@@ -425,12 +425,12 @@ class DispatchController extends Controller
         $dispatch_data = Dispatch::where('id', $request->dispatch_id)->first();
     
         // Get the total quantity from the 'dispatch_total' field
-        $totalQty = $dispatch_data->dispatch_total ?? 0; // Use null coalescing operator to handle null cases
+        $totalQty = $dispatch_data->dispatch_so_total ?? 0; // Use null coalescing operator to handle null cases
     
         // Return the data as a structured JSON response
         return response()->json([
             'total_qty' => $totalQty,
-            'dispatch_unit_price' => $dispatch_data->dispatch_unit_price ?? 0,
+            'dispatch_so_unit_price' => $dispatch_data->dispatch_so_unit_price ?? 0,
             'conv_rate' => $dispatch_data->conv_rate ?? 0,
             'dispatch_freight' => $dispatch_data->dispatch_freight ?? 0,
             'dispatch_other' => $dispatch_data->dispatch_other ?? 0,
