@@ -313,6 +313,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/calculate_average', [ReportController::class, 'calculateAverageCost'])->name('inventory.average');
 
 
+    Route::get('/dispatch-report', [ReportController::class, 'dispatch_report'])->name('dispatch_report');
+    Route::post('/dispatch-report-get', [ReportController::class, 'get_dispatch_report'])->name('dispatch_report_get');
+
     // .........................................Transactions.............................................
     Route::get('/stock_transaction', [TransactionController::class, 'index'])->name('stock_transaction.index');
 

@@ -402,6 +402,13 @@
                                 </a>
                     
                         </li>
+                        <li>
+        
+                                <a href="{{ route('dispatch_report') }}">
+                                    <i class="bi bi-circle"></i><span>Dispatch Report</span>
+                                </a>
+                    
+                        </li>
  
                         {{-- <li>
                             @can('Quotation-Execution-Report')

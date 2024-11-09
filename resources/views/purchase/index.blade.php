@@ -163,7 +163,7 @@
                                             <td>{{ $data->po_item_status }}</td>
                                             <td>{{ $data->po_dispatch_item_status }}</td>
 
-                                            <td>{{ $data->terms_condition ?? 'N/A' }}</td>
+                                            <td>{{ $data->remark ?? 'N/A' }}</td>
                                            
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">
