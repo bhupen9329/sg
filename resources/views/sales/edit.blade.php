@@ -484,8 +484,8 @@
                                             <div class="col-sm-4">
                                                 <label for="inputEmail3" class="col-sm-4 col-form-label"><strong>Terms &
                                                         Conditions</strong></label>
-                                                <textarea class="form-control" name="terms_condition" placeholder="Terms & Conditions" id="floatingTextarea"
-                                                    style="height: 100px;"></textarea>
+                                                <textarea class="form-control" name="terms_condition"  value="{{ $sales_order->terms_condition }}" placeholder="Terms & Conditions" id="floatingTextarea"
+                                                    style="height: 100px;">{{ $sales_order->terms_condition }}</textarea>
                                             </div>
 
 

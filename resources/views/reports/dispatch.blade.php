@@ -59,18 +59,18 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Outward Report</h1>
+            <h1>Dispatch Report</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Outward Report</li>
+                    <li class="breadcrumb-item">Dispatch Report</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
 
 
         <div class="dashboard-header pagetitle">
-            <h1>Outward Report </h1>
+            <h1>Dispatch Report </h1>
             <div class="row" style="align-items: flex-end;">
                 <div class="col-md-12 col-sm-12 d-flex justify-content-end">
 
@@ -79,9 +79,8 @@
                         onclick="filterButton(
                 $('#filterTodate').val(),
                 $('#filterFromdate').val(),
+                $('#filterItem_name').val(),
                 $('#filterCompany').val(),
-                $('#filterCategory').val(),
-
             )">
                         Apply
                     </button>
@@ -109,26 +108,26 @@
                     </div>
 
                     <div class="col-md-2 col-sm-12">
-                        <label for="filterCompany" class="mb-2"><strong>Company</strong></label>
-                        <select class="custom-select form-control company-select" name="company_id" id="filterCompany"
+                        <label for="filterItem_name" class="mb-2"><strong>Item Name</strong></label>
+                        <select class="custom-select form-control company-select" name="company_id" id="filterItem_name"
                             required>
                             <option value="all" selected>All</option>
-                            @foreach ($companys as $company)
-                                <option value="{{ $company->id }}">{{ $company->company_name }}</option>
+                            @foreach ($category as $data)
+                                <option value="{{ $data->id }}">{{ $data->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-sm-12">
+                        <label for="filterItem_name" class="mb-2"><strong>Company </strong></label>
+                        <select class="custom-select form-control company-select" name="company" id="filterCompany"
+                            required>
+                            <option value="all" selected>All</option>
+                            @foreach ($company as $data)
+                                <option value="{{ $data->id }}">{{ $data->company_name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="col-md-2 col-sm-12">
-                        <label for="filterCategory" class="mb-2"><strong>Category</strong></label>
-                        <select class="custom-select form-control category-select" name="category" id="filterCategory"
-                            required>
-                            <option value="all" selected>All</option>
-                            @foreach ($Categorys as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
 
 
                 </div>
@@ -143,31 +142,37 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Outward Report</h4>
+                                        <h4 class="text-blue h4">Dispatch Report</h4>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
                                 </div>
                             </div>
                             <!-- Table with stripped rows -->
-                            <table class="table " id="Category_table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Date(MM/DD/YY)​</th>
-                                        <th>Outward No.</th>
-                                        <th>SO Number</th>
-                                        <th>Buyer</th>
-                                        <th>Virtual Store</th>
-                                        <th>Category Name</th>
-                                        <th>Total quantity (Q)​</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div style="overflow-x: scroll">
+                                <table class="table " id="Category_table">
+                                    <thead>
+                                        <tr>
+                                            <th>So No.</th>
+                                            <th>Form</th>
+                                            <th> To</th>
+                                            <th>Dispatch date</th>
+                                            <th>Item Name</th>
+                                            <th>Con Item Name</th>
+                                            <th>Quantity</th>
+                                            <th>Vehicle Number</th>
+                                            <th>PO Item No.</th>
+                                            <th>Payable total</th>
+                                            <th>SO Item No.</th>
+                                            <th>Receivable Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
+
                             <!-- End Table with stripped rows -->
 
                         </div>
@@ -202,7 +207,7 @@
                     {
                         extend: 'csv',
                         text: 'CSV',
-                        title: 'Saraswati Globals (Outward  Report)',
+                        title: 'Saraswati Globals (Dispatch  Report)',
 
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
@@ -211,7 +216,7 @@
                     {
                         extend: 'print',
                         text: 'PRINT',
-                        title: 'Saraswati Globals (Outward   Report)',
+                        title: 'Saraswati Globals (Dispatch   Report)',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6, 7, ],
                         },
@@ -247,15 +252,15 @@
 
 
     <script>
-        function filterButton(filterTodate, filterFromdate, filterCompany, filterCategory) {
+        function filterButton(filterTodate, filterFromdate, filterItem_name,filterCompany) {
             $.ajax({
                 type: 'POST',
-                url: 'report-outward',
+                url: '/dispatch-report-get',
                 data: {
                     filterTodate: filterTodate,
                     filterFromdate: filterFromdate,
+                    filterItem_name: filterItem_name,
                     filterCompany: filterCompany,
-                    filterCategory: filterCategory,
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {
@@ -265,14 +270,17 @@
                         response.forEach(function(data, index) {
                             table.row.add([
                                 index + 1,
-                                data.date,
-                                data.outward_number,
-                                data.so_number ?? 'N/A',
-                                data.company_name,
-                                data.virtual_store,
+                                data.po_company,
+                                data.so_company,
+                                data.created_at,
                                 data.category_name,
-                                data.total_quantity,
-                                data.status
+                                data.sub_category_name,
+                                data.dispatched_quantity,
+                                data.vehicle_number ?? 'N/A',
+                                data.po_item_no,
+                                data.dispatch_total,
+                                data.so_item_no,
+                                data.dispatch_so_total,
                             ]).draw(false);
                         });
                     } else {
@@ -299,3 +307,14 @@
         });
     </script>
 @endsection
+data.po_company,
+data.so_company,
+data.created_at,
+data.category_name,
+data.sub_category_name,
+data.dispatched_quantity,
+data.vehicle_number,
+data.po_item_no,
+data.dispatch_total,
+data.po_item_no,
+data.dispatch_so_total,

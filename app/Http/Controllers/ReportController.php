@@ -6,6 +6,7 @@ use App\Livewire\Warehouse;
 use App\Models\Ageing;
 use App\Models\Category;
 use App\Models\Company;
+use App\Models\Dispatch;
 use App\Models\Inward;
 use App\Models\Outward;
 use App\Models\Quotation;
@@ -1343,5 +1344,84 @@ class ReportController extends Controller
         ];
 
         return response()->json($data);
+    }
+
+    public function dispatch_report()
+    {
+       $company =  Company::all();
+       $category = Category::all();
+
+        return view('reports.dispatch',compact('company','category'));
+    }
+
+    public function get_dispatch_report(Request $request)
+    {
+        $filterTodate = $request->filterTodate;
+        $filterFromdate = $request->filterFromdate;
+        $filterItem_name = $request ->filterItem_name;
+        $filterCompany = $request->filterCompany;
+
+        $query =  Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
+        ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+        ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+        ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+        ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+        ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+        ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+        ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+        ->select(
+            'dispatches.*',
+            'dispatches.created_at',
+            'so_items.so_dispatch_rest_qty',
+            'po_items.po_dispatch_rest_qty',
+            'po_company.company_name as po_company',
+            'so_company.company_name as so_company',
+            'sales_orders.so_number',
+            'purchase_orders.id as po_id',
+            'sales_orders.id as so_id',
+            'purchase_orders.document_number as po_number',
+            'sales_orders.date as so_date',
+            'purchase_orders.date as po_date',
+            'categories.name as category_name',
+            'subcategories.sub_category as sub_category_name',
+            'po_items.po_item_no',
+            'so_items.so_item_no',
+            'po_items.qty as po_qty',
+            'so_items.qty as so_qty',
+            'dispatches.id as dispatch_id',
+            'dispatches.created_at as dispatch_date',
+
+        )
+            ->whereBetween('dispatches.created_at', [$filterTodate, $filterFromdate]);
+
+            if ($filterItem_name && $filterItem_name != 'all') {
+                $query->where('dispatches.category_id', $filterItem_name);
+            }
+            if ($filterCompany && $filterCompany != 'all') {
+                $query->where(function ($q) use ($filterCompany) {
+                    $q->where('dispatches.po_company_id', $filterCompany)
+                      ->orWhere('dispatches.so_company_id', $filterCompany);
+                });
+            }
+            
+            $filteredData = $query->get();
+            $data = [];
+            foreach ($filteredData as $filteredData) {
+                $tempData = [
+                    'po_company'=>$filteredData->po_company,
+                    'so_company' => $filteredData->so_company,
+                    'created_at' => date('d-M-Y', strtotime($filteredData->created_at)),
+                    'category_name' => $filteredData->category_name, 
+                    'sub_category_name' => $filteredData->sub_category_name, 
+                    'dispatched_quantity' => $filteredData->dispatched_quantity, 
+                    'vehicle_number' => $filteredData->vehicle_number, 
+                    'po_item_no' => $filteredData->po_item_no, 
+                    'dispatch_total' => $filteredData->dispatch_total, 
+                    'so_item_no' => $filteredData->so_item_no, 
+                    'dispatch_so_total' => $filteredData->dispatch_so_total, 
+                ];
+                $data[] = $tempData;
+            }
+            return response()->json($data);
     }
 }
