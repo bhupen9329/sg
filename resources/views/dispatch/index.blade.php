@@ -144,7 +144,7 @@
                                         @foreach ($disaptch_data as $data)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ date('d-M-Y', strtotime($data->dispatch_date)) }}</td>
+                                                <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
                                                 <td>{{ $data->vehicle_number ?? 'N/A' }}</td>
                                                 <td>{{ $data->po_company }}</td>
                                                 <td><a
@@ -280,34 +280,49 @@ function get_received_so_qty_for_report(dispatch_id) {
             "_token": "{{ csrf_token() }}"
         },
         success: function(res) {
-            let rowsData = res.rows_data;
             let tableBody = document.querySelector('.modal-body-so table tbody');
             tableBody.innerHTML = ''; // Clear existing table rows
 
-            rowsData.forEach((rowData, index) => {
-                // Parse and format the date
-                let date = new Date(rowData.date);
-                let formattedDate = date.toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
+            // Check if the required properties exist in the response
+            if (res) {
+                // Create rows according to the table structure
+                let rows = [
 
-                // Create and insert the table row
-                let row = `<tr>
-                    <th scope="row">${index + 1}</th>
-                    <td>Conv Rate : ${rowData.conv_rate}</td>
-                    <td>Freight Rate : ${rowData.dispatch_freight}</td>
-                    <td>Insurance Rate : ${rowData.dispatch_other}</td>
-                </tr>`;
-                tableBody.insertAdjacentHTML('beforeend', row);
-            });
+                `<tr>
+                        <th scope="row">1</th>
+                        <td>PO Unit Rate</td>
+                        <td>${res.dispatch_unit_price ?? 0}</td>
+                    </tr>`,
+                    `<tr>
+                        <th scope="row">2</th>
+                        <td>Conv Rate</td>
+                        <td>${res.conv_rate ?? 0}</td>
+                    </tr>`,
+                    `<tr>
+                        <th scope="row">3</th>
+                        <td>Freight Rate</td>
+                        <td>${res.dispatch_freight ?? 0}</td>
+                    </tr>`,
+                    `<tr>
+                        <th scope="row">4</th>
+                        <td>Insurance Rate</td>
+                        <td>${res.dispatch_other ?? 0}</td>
+                    </tr>`
+                ];
+
+                // Insert all rows into the table body
+                rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+            } else {
+                console.error("Dispatch data not found in response");
+            }
         },
         error: function(err) {
             console.error("An error occurred:", err);
         }
     });
 }
+
+
 
     </script>
 

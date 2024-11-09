@@ -24,6 +24,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ValuationController;
 use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\FreightRateController;
 use App\Http\Controllers\ManualMatching;
 use App\Http\Controllers\SoudaRateController;
 use App\Models\CompanySetting;
@@ -99,7 +100,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get_received_qty_so', [SalesController::class, 'get_received_qty_so']);
 
 
-    
+
 
     // .................................Warehouse Route Start..................................................
 
@@ -111,7 +112,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/warehouse-update/{id}', [WareHouseController::class, 'update'])->name('warehouse.update');
     Route::delete('/warehouse-delete/{id}', [WareHouseController::class, 'delete'])->name('warehouse.destroy');
     Route::post('/get_city_list', [WareHouseController::class, 'get_city_list'])->name('get_city_list');
- 
+
 
     // ............................................ Company Email............................................
     Route::get('/email', [EmailSettingController::class, 'index'])->name('email.create');
@@ -203,7 +204,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get_email_details', [QuotationController::class, 'get_email_details'])->name('get_email_details');
     Route::post('/send_email', [QuotationController::class, 'send_email'])->name('quotation.send_email');
 
- 
+
     // ............................................ Inward............................................
     Route::get('/inward', [InwardController::class, 'index'])->name('inward.index');
     Route::post('/inward-create', [InwardController::class, 'create'])->name('inward.create');
@@ -219,9 +220,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get_po_number_for_supplier', [InwardController::class, 'get_po_number_for_supplier']);
     Route::post('/get_current_quantity_list_form_po', [InwardController::class, 'current_quantity_form_po']);
 
- 
 
- 
+
+
     // ............................................ Outward............................................
     Route::get('/outward', [OutwardController::class, 'index'])->name('outward.index');
     Route::post('/outward-create', [OutwardController::class, 'create'])->name('outward.create');
@@ -265,7 +266,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 
- 
+
 
     //...............................................Reports............................................................................
     Route::get('/po-report', [ReportController::class, 'po_report'])->name('po_report');
@@ -281,15 +282,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/report-quotation', [ReportController::class, 'get_quotationso_report'])->name('get_quotation_report');
 
     Route::get('/outward-report', [ReportController::class, 'outward_report'])->name('outward_report');
-    Route::post('/report-outward', [ReportController::class, 'get_outward_report'])->name('get_outward_report');   
-    Route::post('/report-inventory', [ReportController::class, 'get_inventory_report'])->name('get_inventory_report');   
+    Route::post('/report-outward', [ReportController::class, 'get_outward_report'])->name('get_outward_report');
+    Route::post('/report-inventory', [ReportController::class, 'get_inventory_report'])->name('get_inventory_report');
 
-    
-   
+
+
 
     Route::get('/stock-report', [ReportController::class, 'stock_report'])->name('stock_report');
     Route::post('/report-stock', [ReportController::class, 'get_stock_report'])->name('get_stock_report');
- 
+
 
     Route::get('/top-selling-report', [ReportController::class, 'top_selling_report'])->name('top_selling_report');
     Route::post('/report-top_selling', [ReportController::class, 'get_top_selling_report'])->name('get_top_selling_report');
@@ -304,11 +305,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ageing-report', [ReportController::class, 'ageing_report'])->name('ageing_report');
     Route::post('/ageing-report-get', [ReportController::class, 'get_ageing_report'])->name('ageing_report_get');
 
-    
+
 
     Route::get('/lifo-report', [ReportController::class, 'lifo_report'])->name('lifo_report');
-    
-  
+
+
     Route::get('/calculate_fifo', [ReportController::class, 'calculateFIFO'])->name('inventory.fifo');
     Route::get('/calculate_average', [ReportController::class, 'calculateAverageCost'])->name('inventory.average');
 
@@ -322,82 +323,79 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/subcategory-import', [SubCategoryController::class, 'import'])->name('subcategory_import');
 
 
-        //...............................................Inventory Valuation............................................................................
+    //...............................................Inventory Valuation............................................................................
 
-        Route::get('/inventory_valuation', [ValuationController::class, 'index'])->name('inventory_valuation.index');
-        Route::get('/calculate_lifo', [ValuationController::class, 'calculateLIFO'])->name('inventory.lifo');
-        Route::get('/show_lifo_report/{id}/{item_id}', [ValuationController::class, 'showLIFOReport'])->name('show.lifo');
-        Route::get('/show_fifo_report/{id}/{item_id}', [ValuationController::class, 'showFifoReport'])->name('show.fifo');
-        Route::get('/show_average_report/{id}/{item_id}', [ValuationController::class, 'showAverageReport'])->name('show.average');
-        Route::post('/store_inventory', [ValuationController::class, 'store_inventory'])->name('store_inventory');
-        Route::get('/inventory/filter', [ValuationController::class, 'filter'])->name('inventory.filter');
-        // Route::get('/valuation', [ValuationController::class, 'valuation'])->name('inventory.valuation');
-        Route::post('/inventory_valuation/get_inventory_list', [ValuationController::class, 'get_inventory_list'])->name('get_inventory_list');
-        Route::post('/inventory/valuation-data', [ValuationController::class, 'getValuationData'])->name('inventory.getValuationData');
-        Route::get('/transaction-details', [ValuationController::class, 'getTransactionDetails'])->name('inventory_valuation.valuation');
-        Route::get('/position-report', [ValuationController::class, 'getPositionReport'])->name('position.report');
-        Route::get('/inventory-report', [ReportController::class, 'inventory_report'])->name('inventory.report');
+    Route::get('/inventory_valuation', [ValuationController::class, 'index'])->name('inventory_valuation.index');
+    Route::get('/calculate_lifo', [ValuationController::class, 'calculateLIFO'])->name('inventory.lifo');
+    Route::get('/show_lifo_report/{id}/{item_id}', [ValuationController::class, 'showLIFOReport'])->name('show.lifo');
+    Route::get('/show_fifo_report/{id}/{item_id}', [ValuationController::class, 'showFifoReport'])->name('show.fifo');
+    Route::get('/show_average_report/{id}/{item_id}', [ValuationController::class, 'showAverageReport'])->name('show.average');
+    Route::post('/store_inventory', [ValuationController::class, 'store_inventory'])->name('store_inventory');
+    Route::get('/inventory/filter', [ValuationController::class, 'filter'])->name('inventory.filter');
+    // Route::get('/valuation', [ValuationController::class, 'valuation'])->name('inventory.valuation');
+    Route::post('/inventory_valuation/get_inventory_list', [ValuationController::class, 'get_inventory_list'])->name('get_inventory_list');
+    Route::post('/inventory/valuation-data', [ValuationController::class, 'getValuationData'])->name('inventory.getValuationData');
+    Route::get('/transaction-details', [ValuationController::class, 'getTransactionDetails'])->name('inventory_valuation.valuation');
+    Route::get('/position-report', [ValuationController::class, 'getPositionReport'])->name('position.report');
+    Route::get('/inventory-report', [ReportController::class, 'inventory_report'])->name('inventory.report');
 
-        Route::post('/get_position_report_list', [ValuationController::class, 'get_position_report_list'])->name('get_position_report_list.report');
-        Route::get('/filter-data', [ValuationController::class, 'filterData'])->name('item_name.filter_data');
-
-
-        // .................................................................................................................................................
-        Route::get('/manual_matching', [ManualMatching::class, 'index'])->name('manual.matching');
-        Route::get('/view_all', [ManualMatching::class, 'view_all'])->name('view.all');
-
-        Route::post('/show_purchases', [ManualMatching::class, 'showOpenPurchases'])->name('show.purchases');
-        // Route::get('/get_buyer_list', [YourControllerName::class, 'get_buyer_list'])->name('get.buyer.list');
-        Route::post('/match_inventory', [ManualMatching::class, 'match_inventory'])->name('match.inventory');
-        Route::post('/purchasesellmatch', [ManualMatching::class, 'storePurSellMatch'])->name('purchasesellmatch.store');
-        Route::post('/purchasesellmatchbuyer', [ManualMatching::class, 'storePurSellMatchBuyer'])->name('purchasesellmatch.store.buyer');
-        Route::get('/match_purchase/{id}', [ManualMatching::class, 'match_purchase'])->name('match.purchase');
-        Route::get('/match_sales/{id}', [ManualMatching::class, 'match_sales'])->name('match.sales');
-        Route::post('/transaction_revert', [ManualMatching::class, 'transaction_revert'])->name('transaction_revert');
+    Route::post('/get_position_report_list', [ValuationController::class, 'get_position_report_list'])->name('get_position_report_list.report');
+    Route::get('/filter-data', [ValuationController::class, 'filterData'])->name('item_name.filter_data');
 
 
+    // .................................................................................................................................................
+    Route::get('/manual_matching', [ManualMatching::class, 'index'])->name('manual.matching');
+    Route::get('/view_all', [ManualMatching::class, 'view_all'])->name('view.all');
 
-        // .................................................................................................................................................
-
-        Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
-        Route::get('/dispatch_create', [DispatchController::class, 'create'])->name('dispatch.create');
-        Route::post('/dispatch-store', [DispatchController::class,'storeDispatch'])->name('dispatch.store');
-        Route::get('/dispatch-delete/{id}', [DispatchController::class,'destroyDispatch'])->name('dispatch.destroy');
-        Route::get('/dispatch-edit/{id}', [DispatchController::class,'editDispatch'])->name('dispatch.edit');
-        Route::post('/dispatch-update/{id}', [DispatchController::class,'updateDispatch'])->name('dispatch.update');
-
-        Route::post('/get_conv_price', [DispatchController::class, 'get_conv_price']);
-
-        Route::post('/get-purchase-orders', [DispatchController::class,'getPurchaseOrders']);
-        Route::post('/get-po-items', [DispatchController::class,'getPoItems'])->name('getPoItems');
-        Route::post('/get-sales-orders', [DispatchController::class, 'getSalesOrders'])->name('getSalesOrders');
-        Route::post('/get-so-items', [DispatchController::class, 'getSoItems'])->name('getSoItems');
-        Route::post('/get-item-details', [DispatchController::class, 'getItemDetails'])->name('getItemdetails');
-        Route::post('/get-item-details-so', [DispatchController::class, 'getItemDetailsSO'])->name('getItemdetailsSO');
-
-        Route::post('/get-so-items-filtered', [DispatchController::class, 'getSoItemsFiltered'])->name('getSoItemsFiltered');
-        Route::get('/get-company-purchase-orders', [DispatchController::class, 'getCompanyPurchaseOrders']);
-
-        Route::post('/get_dispatch_payable_total', [DispatchController::class, 'get_dispatch_payable_total']);
-
-
-        // .................................................Rate ................................................................................................
-        Route::get('/soudarate', [SoudaRateController::class, 'index'])->name('rate.index');
-        Route::get('/convrate_create', [SoudaRateController::class, 'create'])->name('rate.create');
-        Route::get('/get-subcategories/{category}', [SoudaRateController::class, 'getSubcategories']);
-        Route::post('/convrates-store', [SoudaRateController::class,'store'])->name('rate.store');
-        Route::get('/convrates​-edit/{id}', [SoudaRateController::class, 'edit'])->name('rate.edit');
-        Route::post('/convrates-update/{id}', [SoudaRateController::class,'update'])->name('rate.update');
-        Route::delete('/convrates-delete/{id}', [SoudaRateController::class, 'delete'])->name('rate.delete');
+    Route::post('/show_purchases', [ManualMatching::class, 'showOpenPurchases'])->name('show.purchases');
+    // Route::get('/get_buyer_list', [YourControllerName::class, 'get_buyer_list'])->name('get.buyer.list');
+    Route::post('/match_inventory', [ManualMatching::class, 'match_inventory'])->name('match.inventory');
+    Route::post('/purchasesellmatch', [ManualMatching::class, 'storePurSellMatch'])->name('purchasesellmatch.store');
+    Route::post('/purchasesellmatchbuyer', [ManualMatching::class, 'storePurSellMatchBuyer'])->name('purchasesellmatch.store.buyer');
+    Route::get('/match_purchase/{id}', [ManualMatching::class, 'match_purchase'])->name('match.purchase');
+    Route::get('/match_sales/{id}', [ManualMatching::class, 'match_sales'])->name('match.sales');
+    Route::post('/transaction_revert', [ManualMatching::class, 'transaction_revert'])->name('transaction_revert');
 
 
 
+    // .................................................................................................................................................
+
+    Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
+    Route::get('/dispatch_create', [DispatchController::class, 'create'])->name('dispatch.create');
+    Route::post('/dispatch-store', [DispatchController::class, 'storeDispatch'])->name('dispatch.store');
+    Route::get('/dispatch-delete/{id}', [DispatchController::class, 'destroyDispatch'])->name('dispatch.destroy');
+    Route::get('/dispatch-edit/{id}', [DispatchController::class, 'editDispatch'])->name('dispatch.edit');
+    Route::post('/dispatch-update/{id}', [DispatchController::class, 'updateDispatch'])->name('dispatch.update');
+
+    Route::post('/get_conv_price', [DispatchController::class, 'get_conv_price']);
+
+    Route::post('/get-purchase-orders', [DispatchController::class, 'getPurchaseOrders']);
+    Route::post('/get-po-items', [DispatchController::class, 'getPoItems'])->name('getPoItems');
+    Route::post('/get-sales-orders', [DispatchController::class, 'getSalesOrders'])->name('getSalesOrders');
+    Route::post('/get-so-items', [DispatchController::class, 'getSoItems'])->name('getSoItems');
+    Route::post('/get-item-details', [DispatchController::class, 'getItemDetails'])->name('getItemdetails');
+    Route::post('/get-item-details-so', [DispatchController::class, 'getItemDetailsSO'])->name('getItemdetailsSO');
+
+    Route::post('/get-so-items-filtered', [DispatchController::class, 'getSoItemsFiltered'])->name('getSoItemsFiltered');
+    Route::get('/get-company-purchase-orders', [DispatchController::class, 'getCompanyPurchaseOrders']);
+
+    Route::post('/get_dispatch_payable_total', [DispatchController::class, 'get_dispatch_payable_total']);
 
 
+    // .................................................Rate ................................................................................................
+    Route::get('/soudarate', [SoudaRateController::class, 'index'])->name('rate.index');
+    Route::get('/convrate_create', [SoudaRateController::class, 'create'])->name('rate.create');
+    Route::get('/get-subcategories/{category}', [SoudaRateController::class, 'getSubcategories']);
+    Route::post('/convrates-store', [SoudaRateController::class, 'store'])->name('rate.store');
+    Route::get('/convrates​-edit/{id}', [SoudaRateController::class, 'edit'])->name('rate.edit');
+    Route::post('/convrates-update/{id}', [SoudaRateController::class, 'update'])->name('rate.update');
+    Route::delete('/convrates-delete/{id}', [SoudaRateController::class, 'delete'])->name('rate.delete');
 
-
-
+    // .................................................Freight................................................................................................
+    Route::get('/freight_rate', [FreightRateController::class, 'index'])->name('freight_rate.index');
+    Route::get('/freight_rate_create', [FreightRateController::class, 'create'])->name('freight_rate.create');
+    Route::post('/freight_rate-store', [FreightRateController::class, 'store'])->name('freight_rate.store');
+    Route::get('/freight_rate​-edit/{id}', [FreightRateController::class, 'edit'])->name('freight_rate.edit');
+    Route::post('/freight_rate-update/{id}', [FreightRateController::class, 'update'])->name('freight_rate.update');
+    Route::delete('/freight_rate-delete/{id}', [FreightRateController::class, 'delete'])->name('freight_rate.delete');
 });
-
-
-

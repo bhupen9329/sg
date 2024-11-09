@@ -130,6 +130,12 @@
                                         <input type="text" class="form-control"
                                             value="{{ $disaptch_data->vehicle_number }}" name="vehicle_number">
                                     </div>
+                                    
+                                    <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
+                                        <label for="to_company_id" class="form-label">Dispatch Date<span
+                                            class="required-classes">*</span></label>
+                                        <input type="date" class="form-control" name="date" value="{{$disaptch_data->date }}" required>
+                                    </div>
                                 </div>
 
                                 <div class="row mt-5">

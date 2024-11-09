@@ -132,6 +132,16 @@
                                         <label for="to_company_id" class="form-label">Vehicle Number</label>
                                         <input type="text" class="form-control" name="vehicle_number">
                                     </div>
+
+                                    <?php
+                                    $currentDate = date('Y-m-d');
+                                     ?>
+
+                                    <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
+                                        <label for="to_company_id" class="form-label">Dispatch Date<span
+                                            class="required-classes">*</span></label>
+                                        <input type="date" class="form-control" name="date" value="{{$currentDate}}" required>
+                                    </div>
                                 </div>
 
                                 <div class="row mt-5">
@@ -145,20 +155,16 @@
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_normal">Conv Rate</th>
+                                            <th class="table_heading_long">Insurance</th>
                                             <th class="table_heading_long">PO Unit Price</th>
-                                            <th class="table_heading_long">PO Freight</th>
-                                            <th class="table_heading_long">PO Insurance</th>
+                                            <th class="table_heading_long">SO Unit Price</th>
+                                            <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
+                                            </th>
                                             <th class="table_heading_long">Payable Total<span
                                                     class="required-classes">*</span></th>
-                                            <th class="table_heading_long">SO Unit Price</th>
-                                            <th class="table_heading_long">SO Freight</th>
-                                            <th class="table_heading_long">SO Insurance</th>
                                             <th class="table_heading_long">Receivable Total<span
                                                     class="required-classes">*</span></th>
-                                            <th class="table_heading_normal">Quantity<span
-                                                    class="required-classes">*</span>
-                                            </th>
+
                                             <th class="table_heading_action">Action</th>
                                         </tr>
                                     </thead>
@@ -332,7 +338,8 @@
     <script>
         var lastItemId = 1;
 
-        function addRow(itemName = '', itemId = '', quantity = '', unitPrice = '', subItems = []) {
+        function addRow(itemName = '', itemId = '', quantity = '', unitPrice = '', subItems = [], freight = '', insurance =
+            '', ) {
             var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
             let subItemOptions = '<option readonly>Select Item</option>';
@@ -340,23 +347,34 @@
                 subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
             });
 
+            const unit_price = (parseFloat(unitPrice) + parseFloat(freight) + parseFloat(insurance));
+
             newRow.innerHTML = `
     <td>${itemName}</td>
     <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
     <td>
         <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
     </td>
-    <td><input type="number" name="conv_rate[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
-    <td><input type="number" name="dispatch_unit_price[]" class="form-control"  value="${unitPrice}"  readonly required /></td>
-        <td><input type="number" name="dispatch_freight[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
-    <td><input type="number" name="dispatch_other[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
-      <td><input type="number" name="dispatch_total[]" value="${unitPrice}" class="form-control" readonly required /></td>
-    <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
-     <td><input type="number" name="dispatch_so_freight[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
-    <td><input type="number" name="dispatch_so_other[]" value="0" class="form-control" oninput="calculateTotal(this)" required /></td>
-  
+        <td>
+        <select name="insurance_status[]" onchange="calculateTotal(this)" class="form-select insurance_status">
+            <option value="yes" selected>Yes</option>
+            <option value="no">No</option>
+            </select>
+    </td>
+
+     
+   <input type="hidden" name="conv_rate[]" id="conv_rate" value="0" class="form-control" oninput="calculateTotal(this)" required />
+    <td><input type="number" name="dispatch_unit_price[]" class="form-control"  value="${unit_price}"  readonly required /></td>
+        <input type="hidden" name="dispatch_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
+    <input type="hidden" name="dispatch_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
+    
+     <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
+        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="" required /></td>
+    <input type="hidden" name="dispatch_so_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
+    <input type="hidden" name="dispatch_so_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
+      <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
     <td><input type="number" name="dispatch_so_total[]" value="0" id="dispatch_so_total" class="form-control" readonly required /></td>
-    <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="" required /></td>
+ 
     <td>
         <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
     </td>
@@ -384,29 +402,67 @@
             const row = element.closest('tr');
             const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
+
             const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
             const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
             const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
-
 
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
             const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
             const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
-            let totalAmount = 0;
-            let totalSoAmount = 0;
+            const insuranceStatus  = row.querySelector('select[name="insurance_status[]"]').value;
+            // Calculate the total values for PO and SO based on the quantity
+
+
 
             if (quantity) {
-                totalAmount = (unitPrice + convRate + freight + other) * quantity;
-                totalSoAmount = (sounitPrice + convRate + sofreight + soother) * quantity;
+                // Multiply only the total (not unit price)
+
+                if (insuranceStatus === 'yes') {
+                    totalAmount = (unitPrice) * quantity;
+                    totalSoAmount = (sounitPrice) * quantity;
+                } else {
+                    totalAmount = (unitPrice - other) * quantity;
+                    totalSoAmount = (sounitPrice - other) * quantity;
+                }
+
+                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
             } else {
-                totalAmount = unitPrice + convRate + freight + other;
-                totalSoAmount = sounitPrice + convRate + sofreight + soother;
+
+                let totalPOUnitPrice = 0;
+                let totalSOUnitPrice = 0;
+
+                if (insuranceStatus === 'yes') {
+                    totalPOUnitPrice = unitPrice + convRate + freight + other;
+                  totalSOUnitPrice = sounitPrice + convRate + freight + other;
+                } else {
+                   totalPOUnitPrice = unitPrice + convRate + freight;
+                  totalSOUnitPrice = sounitPrice + convRate + freight;
+                }
+
+                console.log(totalPOUnitPrice);
+
+                let totalAmount = 0;
+                let totalSoAmount = 0;
+
+                totalAmount = totalPOUnitPrice; // If no quantity, just use the unit price
+                totalSoAmount = totalSOUnitPrice;
+
+                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
+
+                // Ensure unit prices remain unchanged
+                row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
+                row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
             }
 
-            row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
-            row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
+            // Update the total fields without affecting unit price
+
         }
+
+
 
         function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
             '', Price = '', ) {
@@ -523,13 +579,31 @@
                     },
                     success: function(response) {
                         const so_item = response.so_items;
+                        const freight_insurance = response.freight_insurance;
                         // Populate the row with additional details
                         SORow(so_item.date, so_item.so_number, so_item.name, so_item.so_item_no,
                             so_item.qty, so_item.so_dispatch_rest_qty, so_item.unit_price, so_item
-                            .so_price);
+                            .so_price, freight_insurance.freight_rate, freight_insurance
+                            .insurance_rate);
 
-                        $('#so_unit_price').val(so_item.unit_price);
-                        $('#dispatch_so_total').val(so_item.unit_price);
+                        let total_so_unit_price = 0;
+                        const convRate = document.getElementById('conv_rate').value || 0;
+
+                        if (convRate == 0) {
+                            total_so_unit_price = (parseFloat(so_item.unit_price) + parseFloat(
+                                freight_insurance.freight_rate) + parseFloat(freight_insurance
+                                .insurance_rate));
+                        } else {
+                            total_so_unit_price = (parseFloat(so_item.unit_price) + parseFloat(
+                                freight_insurance.freight_rate) + parseFloat(freight_insurance
+                                .insurance_rate + parseFloat(convRate)));
+                        }
+
+
+
+
+                        $('#so_unit_price').val(total_so_unit_price);
+                        $('#dispatch_so_total').val(total_so_unit_price);
                     },
                     error: function(xhr, status, error) {
                         console.error("Error fetching item details:", error);
@@ -573,7 +647,6 @@
                         item_name: itemName,
                         item_id: itemId,
                         poItemNo: poItemNo,
-
                         _token: '{{ csrf_token() }}' // Include CSRF token for security
                     },
                     success: function(response) {
@@ -581,8 +654,11 @@
                         const details = response.item_details;
                         const subitems = response.subItems;
                         const po_item = response.po_items;
+                        const freight = response.freight;
+                        const insurance = response.insurance;
                         // Populate the row with additional details
-                        addRow(details.name, details.id, quantity, unitPrice, subitems);
+                        addRow(details.name, details.id, quantity, unitPrice, subitems, freight,
+                            insurance);
                         PORow(po_item.date, po_item.document_number, po_item.name, po_item.po_item_no,
                             po_item.qty, po_item.po_dispatch_rest_qty, po_item.unit_price, po_item
                             .po_price);
@@ -1098,11 +1174,15 @@
                 },
                 success: function(response) {
                     const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
-                    const convFreightField = $(selectElement).closest('tr').find('input[name="dispatch_freight[]"]');
-                    const convInsuranceField = $(selectElement).closest('tr').find('input[name="dispatch_other[]"]');
+                    const convFreightField = $(selectElement).closest('tr').find(
+                        'input[name="dispatch_freight[]"]');
+                    const convInsuranceField = $(selectElement).closest('tr').find(
+                        'input[name="dispatch_other[]"]');
 
-                    const convSOFreightField = $(selectElement).closest('tr').find('input[name="dispatch_so_freight[]"]');
-                    const convSOInsuranceField = $(selectElement).closest('tr').find('input[name="dispatch_so_other[]"]');
+                    const convSOFreightField = $(selectElement).closest('tr').find(
+                        'input[name="dispatch_so_freight[]"]');
+                    const convSOInsuranceField = $(selectElement).closest('tr').find(
+                        'input[name="dispatch_so_other[]"]');
 
 
                     if (response && response.item_price) {
