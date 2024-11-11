@@ -91,7 +91,7 @@
             <div class="page-header">
                 <div class="row">
                     <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterTodate"><strong>From Date</strong></label>
+                        <label for="filterTodate"><strong>Dispatch From Date</strong></label>
                         <?php
                         $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
                         ?>
@@ -99,7 +99,7 @@
                             id="filterTodate" required>
                     </div>
                     <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterFromdate"><strong>To Date</strong></label>
+                        <label for="filterFromdate"><strong>Dispatch To Date</strong></label>
                         <?php
                         $lastDayOfMonth = (new DateTime('last day of this month'))->format('Y-m-d');
                         ?>

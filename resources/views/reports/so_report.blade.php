@@ -130,7 +130,9 @@
                         <label for="filterCategory" class="mb-2"><strong>Dispatch Position</strong></label>
                         <select class="custom-select form-control item_select   " name="category" id="filterstatus"
                             required>
-                            <option value="Open" selected>Open</option>
+                            <option value="Open">Open</option>
+                            <option value="Partial Pending">Partial Pending</option>
+                            <option value="Not Close" selected>Not Close</option>
                             <option value="Close">Close</option>
                           
                         </select>

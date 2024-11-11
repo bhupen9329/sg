@@ -110,6 +110,26 @@
                             </div>
                         </div><!-- End Revenue Card -->
 
+                        <div class="dashboard-card-3">
+                            <div class="card info-card revenue-card buyer-card">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Buyers & Suppliers</h5>
+
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-truck"></i>
+
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $company_count }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div><!-- End Revenue Card -->
 
                      
                         <!-- Customers Card -->
@@ -201,44 +221,110 @@
 
                 </div><!-- End Customers Card -->
 
+                
+        <!-- Modal  -->
+        <div class="modal fade" id="Modalfor_quantity_details" tabindex="-1" aria-labelledby="modal3Label"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal3Label">Purchase Quantity - History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"style="width:50px"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Party Name</th>
+                                <th scope="col">PO Number</th>
+                                <th scope="col">Total Qty</th>
+                                <th scope="col">Rest Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                {{-- <div class="col-lg-12">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="Modalfor_quantity_details_so" tabindex="-1" aria-labelledby="modal3Label"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal3Label">Sales Order Quantity - History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"style="width:50px"></button>
+                </div>
+                <div class="modal-body-so">
+                    <table class="table SO table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Party Name</th>
+                                <th scope="col">SO Number</th>
+                                <th scope="col">Total Qty</th>
+                                <th scope="col">Rest Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+                <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Low Stock​ </h5>
+                            <h5 class="card-title">Stock​ </h5>
 
                             <!-- Table with stripped rows -->
                             <div class="dashboard_dataTables_wrapper_low">
                                 <table class="table datatable">
                                     <thead>
                                         <tr>
-                                            <th>WareHouse</th>
-                                            <th>Category</th>
-                                            <th>Sub Category</th>
-                                            <th>Weight(kg)</th>
-                                            <th>Approx Weight(kg)</th>
-                                            <th>PCs</th>
+                                            <th>Base Item</th>
+                                            <th>Total PO Qty</th>
+                                            <th>Total SO Qty</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($low_stock_items as $stocks)
-                                        <?php
-                                           $actual_weight = ($stocks->weight*$stocks->piece*$stocks->length); 
-                                           $formatted_weight = number_format($actual_weight, 3, '.', '');
-                                           $formatted_weight_si = number_format($stocks->si_weight, 3, '.', '');
-
-                                        ?>
+                                        @foreach ($mergedTotals as $total)
                                             <tr>
-                                                <td>{{ $stocks->warehouse_title }}</td>
-                                                <td>{{ $stocks->name }}</td>
-                                                <td>{{ $stocks->sub_category }}</td>
-                                                <td>{{  $formatted_weight_si }}</td>
-                                                <td>{{ $formatted_weight }}</td>
-                                                <td>{{ $stocks->piece }}</td>
+                                                <td>{{ $total['category_name'] }}</td>
+                                                <td>
+                                                    <a href="#" style="text-decoration: underline; color: blue;" 
+                                                       data-bs-toggle="modal" 
+                                                       data-bs-target="#Modalfor_quantity_details" 
+                                                       class="rest-quantity-link" 
+                                                       onclick="get_received_qty_for_report({{ $total['category_id'] }})">
+                                                        {{ $total['po_total_quantity'] }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="#" style="text-decoration: underline; color: blue;" 
+                                                       data-bs-toggle="modal" 
+                                                       data-bs-target="#Modalfor_quantity_details_so" 
+                                                       class="rest-quantity-link" 
+                                                       onclick="get_received_so_qty_for_report({{ $total['category_id'] }})">
+                                                        {{ $total['so_total_quantity'] }}
+                                                    </a>
+                                                </td>
                                             </tr>
                                         @endforeach
-                                       
                                     </tbody>
+                                    
                                 </table>
                             </div>
                             <!-- End Table with stripped rows -->
@@ -247,7 +333,7 @@
 
                     </div>
 
-                </div> --}}
+                </div> 
 
                 {{-- <div class="col-lg-12">
                     <div class="card">
@@ -369,5 +455,85 @@
                 });
             }
         </script>
+
+<script>
+    function get_received_qty_for_report(category_id) {
+        let get_category_id = category_id;
+        $.ajax({
+            url: "{{ url('get_received_qty') }}",
+            method: "POST",
+            data: {
+                get_category_id: get_category_id,
+                "_token": "{{ csrf_token() }}",
+            },
+            success: function(res) {
+                // console.log(res); // Log the response to the console
+                let rowsData = res.rows_data;
+                let tableBody = document.querySelector('.modal-body table  tbody');
+                tableBody.innerHTML = ''; // Clear existing table rows
+
+                rowsData.forEach((rowData, index) => {
+                    // Parse the date string and format it
+                    let date = new Date(rowData.date);
+                    let formattedDate = date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                        year: 'numeric'
+                    });
+                    let row = `<tr>
+                                <th scope="row">${index + 1}</th>
+                                <td>${formattedDate}</td>
+                                 <td>${rowData.company_name}</td>
+                                <td>${rowData.document_number}</td>
+                                <td>${rowData.qty}</td>
+                                 <td>${rowData.po_dispatch_rest_qty}</td>
+                            </tr>`;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+
+
+        });
+    }
+
+    function get_received_so_qty_for_report(category_id) {
+        let get_category_id = category_id;
+        $.ajax({
+            url: "{{ url('get_received_qty_so') }}",
+            method: "POST",
+            data: {
+                get_category_id: get_category_id,
+                "_token": "{{ csrf_token() }}",
+            },
+            success: function(res) {
+                // console.log(res); // Log the response to the console
+                let rowsData = res.rows_data;
+                let tableBody = document.querySelector('.modal-body-so table tbody');
+                tableBody.innerHTML = ''; // Clear existing table rows
+
+                rowsData.forEach((rowData, index) => {
+                    // Parse the date string and format it
+                    let date = new Date(rowData.date);
+                    let formattedDate = date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                        year: 'numeric'
+                    });
+                    let row = `<tr>
+                                <th scope="row">${index + 1}</th>
+                                <td>${formattedDate}</td>
+                                 <td>${rowData.company_name}</td>
+                                <td>${rowData.so_number}</td>
+                                <td>${rowData.qty}</td>
+                                 <td>${rowData.so_dispatch_rest_qty}</td>
+                            </tr>`;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+
+
+        });
+    }
+</script>
     </main><!-- End #main -->
 @endsection
