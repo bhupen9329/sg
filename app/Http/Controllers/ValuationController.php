@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\View;
 
 
 
+
 class ValuationController extends Controller
 {
     public function index()
@@ -1038,8 +1039,6 @@ class ValuationController extends Controller
             // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
             // Get all transactions up to and including the specific transaction_date
-          
-
 
             $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
             ->where('item_id', $item_id)
@@ -2635,55 +2634,120 @@ class ValuationController extends Controller
     }
    
 
-    public function getPositionReport()
-    {
-        $categories = Category::all();
-        // $avgData = $this->calculateAverage();
-        $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-        // dd( $inventory_transaction);
+//     public function getPositionReport()
+//     {
+//         $categories = Category::all();
+//         // $avgData = $this->calculateAverage();
+//         $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+//         // dd( $inventory_transaction);
     
-        $lifo_transaction = [];
-        $fifo_transaction = [];
-        $avg_transaction = [];
+//         $lifo_transaction = [];
+//         $fifo_transaction = [];
+//         $avg_transaction = [];
 
   
-        $lifoData = '';
-        $fifoData = '';
-        $avgData = '';
-// Initialize an empty array to store counters for each item_id
-$itemCounters = [];
+//         $lifoData = '';
+//         $fifoData = '';
+//         $avgData = '';
+// // Initialize an empty array to store counters for each item_id
+// $itemCounters = [];
 
 
-foreach ($inventory_transaction as $data) {
-    // Check if an $i counter already exists for this item_id
-    if (!isset($itemCounters[$data->item_id])) {
-        $itemCounters[$data->item_id] = 1; // Start a new counter for this item_id
-    }
+// foreach ($inventory_transaction as $data) {
+//     // Check if an $i counter already exists for this item_id
+//     if (!isset($itemCounters[$data->item_id])) {
+//         $itemCounters[$data->item_id] = 1; // Start a new counter for this item_id
+//     }
     
-    // Use the item-specific counter in the function calls
-    $lifoData = $this->calculateLIFO($data->id, $data->item_id, $itemCounters[$data->item_id]);
-    $fifoData = $this->calculateFIFO($data->id, $data->item_id, $itemCounters[$data->item_id]);
-
-    $avgData = $this->calculateAverage($data->id, $data->item_id, $itemCounters[$data->item_id]);
-
-
-    // Push only the last element if it exists
-    if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
-        $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
-    }
+//     // Use the item-specific counter in the function calls
+//     $lifoData = $this->calculateLIFO($data->id, $data->item_id, $itemCounters[$data->item_id]);
+//     $fifoData = $this->calculateFIFO($data->id, $data->item_id, $itemCounters[$data->item_id]);
+//     $avgData = $this->calculateAverage($data->id, $data->item_id, $itemCounters[$data->item_id]);
+//     // Push only the last element if it exists
+//     if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
+//         $lifo_transaction[] = end($lifoData['transaction_logs']); // Get the last transaction log
+//     }
     
-    if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
-        $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
-    }
+//     if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
+//         $fifo_transaction[] = end($fifoData['transaction_logs']); // Get the last transaction log
+//     }
         
-    if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
-        $avg_transaction[] = end($avgData['transaction_logs']); // Get the last transaction log
+//     if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
+//         $avg_transaction[] = end($avgData['transaction_logs']); // Get the last transaction log
+//     }
+//     // Increment the counter for this specific item_id
+//     $itemCounters[$data->item_id]++;
+// }
+//         return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction', 'avg_transaction'));
+//     }
+
+public function getPositionReport()
+{
+    $categories = Category::all();
+    $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+    
+    $lifo_transaction = [];
+    $fifo_transaction = [];
+    $avg_transaction = [];
+
+    $lifoData = '';
+    $fifoData = '';
+    $avgData = '';
+
+    // Initialize an empty array to store the latest entry per date for each item_id
+    $latestEntriesByDate = [];
+
+    foreach ($inventory_transaction as $data) {
+        // Initialize the item-specific counter if it doesn't exist
+        if (!isset($latestEntriesByDate[$data->item_id])) {
+            $latestEntriesByDate[$data->item_id] = [];
+        }
+        
+        // Process LIFO, FIFO, and Average calculations
+        $lifoData = $this->calculateLIFO($data->id, $data->item_id);
+        $fifoData = $this->calculateFIFO($data->id, $data->item_id);
+        $avgData = $this->calculateAverage($data->id, $data->item_id);
+
+        // Convert transaction_date to a Carbon instance and format it
+        $transactionDate = Carbon::parse($data->transaction_date)->format('Y-m-d');
+
+        // Check for the latest entry by date for LIFO
+        if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
+            $latestLifoEntry = end($lifoData['transaction_logs']);
+            $latestEntriesByDate[$data->item_id][$transactionDate]['lifo'] = $latestLifoEntry;
+        }
+        
+        // Check for the latest entry by date for FIFO
+        if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
+            $latestFifoEntry = end($fifoData['transaction_logs']);
+            $latestEntriesByDate[$data->item_id][$transactionDate]['fifo'] = $latestFifoEntry;
+        }
+
+        // Check for the latest entry by date for Average
+        if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
+            $latestAvgEntry = end($avgData['transaction_logs']);
+            $latestEntriesByDate[$data->item_id][$transactionDate]['avg'] = $latestAvgEntry;
+        }
     }
-    // Increment the counter for this specific item_id
-    $itemCounters[$data->item_id]++;
+
+    // Flatten the latest entries by date for each type
+    foreach ($latestEntriesByDate as $itemId => $entriesByDate) {
+        foreach ($entriesByDate as $date => $entry) {
+            if (isset($entry['lifo'])) {
+                $lifo_transaction[] = $entry['lifo'];
+            }
+            if (isset($entry['fifo'])) {
+                $fifo_transaction[] = $entry['fifo'];
+            }
+            if (isset($entry['avg'])) {
+                $avg_transaction[] = $entry['avg'];
+            }
+        }
+    }
+
+    return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction', 'avg_transaction'));
 }
-        return view('inventory_valuation.position_report', compact('categories', 'inventory_transaction', 'lifoData', 'fifoData', 'avgData', 'lifo_transaction', 'fifo_transaction', 'avg_transaction'));
-    }
+
     
 
 
@@ -2842,13 +2906,6 @@ foreach ($inventory_transaction as $data) {
         $toDate = $request->input('to_date');
         $fromDate = $request->input('from_date');
         $categoryName = $request->input('category'); // Get the selected category name
-        // Start the query on the InventoryTransaction model
-        // $filterType = $request->input('filterType');
-        // $toDate = $request->input('to_date');
-        // $fromDate = $request->input('from_date');
-        // $categoryName = $request->input('category');
-        // dd( $filterType);
-   
         
         // Start the query on the InventoryTransaction model
         if($toDate && $fromDate){
@@ -2859,44 +2916,75 @@ foreach ($inventory_transaction as $data) {
             $sevenDaysAgo = Carbon::now()->subDays(7);
             $query = InventoryTransaction::where('transaction_date', '>=', $sevenDaysAgo);
         }
-        
-        // Filter by date range if provided
-        // if ($toDate) {
-        //     $query->where('transaction_date', '<=', $toDate);
-        // }
-        // if ($fromDate) {
-        //     $query->where('transaction_date', '>=', $fromDate);
-        // }
-        
-        // Filter by category if provided
         if ($categoryName) {
             $query->where('item_id', $categoryName);
         }
 
         
         // Fetch the filtered inventory transactions
-        $inventory_transaction = $query->get();
-        
-        // dd($inventory_transaction );
-        // dd($inventory_transaction);
+        $inventory_transaction = $query->orderBy('transaction_date', 'asc')->get();
+   
 
-        // Uncomment the dd statement to debug
-        // dd($inventory_transaction);
-
-        // Calculate LIFO, FIFO, and Average data
-        $lifoData = $this->calculateLIFO();
-        $fifoData = $this->calculateFIFO();
-        $avgData = $this->calculateAverage();
-// dd( $avgData);
-        // Return the data as a JSON response
+        $lifo_transaction = [];
+        $fifo_transaction = [];
+        $avg_transaction = [];
+        $latestEntriesByDate = [];
+    
+        // Process each transaction entry
+        foreach ($inventory_transaction as $data) {
+            // Initialize the item-specific counter if it doesn't exist
+            if (!isset($latestEntriesByDate[$data->item_id])) {
+                $latestEntriesByDate[$data->item_id] = [];
+            }
+    
+            // Format the transaction date
+            $transactionDate = Carbon::parse($data->transaction_date)->format('Y-m-d');
+    
+            // Calculate LIFO, FIFO, and Average data for the current entry
+            $lifoData = $this->calculateLIFO($data->id, $data->item_id);
+            $fifoData = $this->calculateFIFO($data->id, $data->item_id);
+            $avgData = $this->calculateAverage($data->id, $data->item_id);
+    
+            // Store the latest entry by date for each valuation method
+            if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
+                $latestLifoEntry = end($lifoData['transaction_logs']);
+                $latestEntriesByDate[$data->item_id][$transactionDate]['lifo'] = $latestLifoEntry;
+            }
+            
+            if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
+                $latestFifoEntry = end($fifoData['transaction_logs']);
+                $latestEntriesByDate[$data->item_id][$transactionDate]['fifo'] = $latestFifoEntry;
+            }
+    
+            if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
+                $latestAvgEntry = end($avgData['transaction_logs']);
+                $latestEntriesByDate[$data->item_id][$transactionDate]['avg'] = $latestAvgEntry;
+            }
+        }
+    
+        // Flatten the latest entries for each item_id and date
+        foreach ($latestEntriesByDate as $itemId => $entriesByDate) {
+            foreach ($entriesByDate as $date => $entry) {
+                if (isset($entry['lifo'])) {
+                    $lifo_transaction[] = $entry['lifo'];
+                }
+                if (isset($entry['fifo'])) {
+                    $fifo_transaction[] = $entry['fifo'];
+                }
+                if (isset($entry['avg'])) {
+                    $avg_transaction[] = $entry['avg'];
+                }
+            }
+        }
+    
         return response()->json([
-            'inventory_transaction' => $inventory_transaction, // Change this to 'data' to match your frontend code
-            'lifo_transaction' => $lifoData['transaction_logs'],
-            'fifo_transaction' => $fifoData['transaction_logs'],
-            'avg_transaction' => $avgData['transaction_logs'],
+            'inventory_transaction' => $inventory_transaction, // Filtered data
+            'lifo_transaction' => $lifo_transaction,
+            'fifo_transaction' => $fifo_transaction,
+            'avg_transaction' => $avg_transaction,
         ]);
-
     }
+    
 
 
 

@@ -136,8 +136,8 @@
                                         <th>Dispatch Rest Quantity(Q)</th>                                     
                                         <th>PO Unit Price</th>
                                         <th>PO Price</th>
-                                        <th>PO Match Position</th>
-                                        <th>PO Item Match Position</th>
+                                        {{-- <th>PO Match Position</th>
+                                        <th>PO Item Match Position</th> --}}
                                         <th>PO Item Dispatch Position</th>
 
                                         <th>Remarks</th>                                      
@@ -159,8 +159,8 @@
                                             <td>{{ $data->po_dispatch_rest_qty }}</td>
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
-                                            <td>{{ $data->match_position }}</td>
-                                            <td>{{ $data->po_item_status }}</td>
+                                            {{-- <td>{{ $data->match_position }}</td>
+                                            <td>{{ $data->po_item_status }}</td> --}}
                                             <td>{{ $data->po_dispatch_item_status }}</td>
 
                                             <td>{{ $data->remark ?? 'N/A' }}</td>
