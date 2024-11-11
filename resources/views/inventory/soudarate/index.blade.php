@@ -135,7 +135,7 @@
                                                         <li>
                                                             @can('Sub-Category-view')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('rate.edit', $data->id) }}"><i
+                                                                    href="{{ route('rate.edit', $data->conv_id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>Edit</a>
                                                             @endcan
                                                         </li>
@@ -143,7 +143,7 @@
                                                         <li>
                                                             @can('Sub-Category-delete')
                                                                 <form method="POST"
-                                                                    action="{{ route('rate.delete', $data->id) }}">
+                                                                    action="{{ route('rate.delete', $data->conv_id) }}">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button type="button" class="dropdown-item delete-button">
