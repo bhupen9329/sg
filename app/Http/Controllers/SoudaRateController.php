@@ -13,6 +13,7 @@ class SoudaRateController extends Controller
     {
         $convItems = ConvRate::join('subcategories','subcategories.id','=','conv_rates.subcategory_id')
                                 ->join('categories','categories.id','=','conv_rates.category_id')
+                                ->select('categories.*', 'subcategories.*', 'conv_rates.*', 'conv_rates.id as conv_id')
                                 ->orderBy('conv_rates.selected_date', 'desc')->get();
         // dd($convItems);
         return view('inventory.soudarate.index',compact('convItems'));
@@ -49,7 +50,7 @@ public function store(Request $request)
 
 public function edit($id)
 {
-    $item = ConvRate::find($id)->first();
+    $item = ConvRate::where('id', $id)->first();
     $categories = Category::all();
     $subcategories = SubCategory::all();
    return view('inventory.soudarate.edit',compact('item','categories','subcategories'));
