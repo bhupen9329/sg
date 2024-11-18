@@ -88,22 +88,6 @@
 
             <div class="page-header">
                 <div class="row">
-                    {{-- <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterTodate"><strong>From Date</strong></label>
-                        <?php
-                        $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
-                        ?>
-                        <input type="date" class="form-control" value="<?php echo $firstDayOfMonth; ?>" name="to_date"
-                            id="filterTodate" required>
-                    </div>
-                    <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterFromdate"><strong>To Date</strong></label>
-                        <?php
-                        $lastDayOfMonth = (new DateTime('last day of this month'))->format('Y-m-d');
-                        ?>
-                        <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
-                            id="filterFromdate" required>
-                    </div> --}}
 
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCategory" class="mb-2"><strong>Base Item</strong></label>
@@ -290,74 +274,77 @@
 
 
     <script>
-        function filterButton(filterCategory) {
-            $.ajax({
-                type: 'POST',
-                url: 'report-inventory',
-                data: {
-                    filterCategory: filterCategory,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    if (response) {
-                        var table = $('#Category_table').DataTable();
-                        table.clear().draw();
+    function filterButton(filterCategory) {
+    $.ajax({
+        type: 'POST',
+        url: 'report-inventory',
+        data: {
+            filterCategory: filterCategory,
+            _token: "{{ csrf_token() }}"
+        },
+        success: function(response) {
+            if (response) {
+                var table = $('#Category_table').DataTable();
+                table.clear().draw();
 
-                        // Check if filteredPOTotal and filteredSOTotal are arrays
-                        if (Array.isArray(response.filteredPOTotal) && Array.isArray(response
-                                .filteredSOTotal)) {
-                            // Loop through filteredPOTotal and add rows to the table
-                            response.filteredPOTotal.forEach(function(poData, index) {
-                                table.row.add([
-                                    index + 1,
-                                    poData.category_name,
-                                    '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details" class="rest-quantity-link" onclick="get_received_qty_for_report(' +
-                                    poData.category_id + ')">' + poData.total_quantity + '</a>',
-                                    ''
+                // Initialize a map to handle merging of PO and SO data
+                var categoryMap = {};
 
-                                ]).draw(false);
-                            });
-
-                            // Loop through filteredSOTotal and add rows to the table
-                            response.filteredSOTotal.forEach(function(soData, index) {
-                                // Find a matching row by category name to update the SO Quantity, if it exists
-                                var rowFound = false;
-                                table.rows().every(function(rowIdx, tableLoop, rowLoop) {
-                                    var data = this.data();
-                                    if (data[1] === soData
-                                        .category_name) { // Compare category name
-                                        data[3] =
-                                            '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_so" class="rest-quantity-link" onclick="get_received_so_qty_for_report(' +
-                                            soData.category_id + ')">' +
-                                            soData.total_quantity + '</a>',
-                                            this.data(data).draw(false);
-                                        rowFound = true;
-                                        return false; // Break out of loop
-                                    }
-                                });
-
-                                // If no matching PO row found, add new row with SO data
-                                if (!rowFound) {
-                                    table.row.add([
-                                        table.rows().count() + 1,
-                                        soData.category_name, // SO Category Name
-                                        '', // Placeholder for PO Quantity
-                                        soData.total_quantity // SO Total Quantity
-                                    ]).draw(false);
-                                }
-                            });
-                        } else {
-                            console.error("Invalid or empty response data received.");
-                        }
-                    } else {
-                        console.error("Invalid or empty response received.");
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX request failed:", status, error);
+                // Process PO totals
+                if (Array.isArray(response.filteredPOTotal)) {
+                    response.filteredPOTotal.forEach(function(poData) {
+                        categoryMap[poData.category_name] = {
+                            poQuantity: poData.total_quantity,
+                            soQuantity: "N/A",
+                            poCategoryId: poData.category_id,
+                            soCategoryId: null
+                        };
+                    });
                 }
-            });
+
+                // Process SO totals
+                if (Array.isArray(response.filteredSOTotal)) {
+                    response.filteredSOTotal.forEach(function(soData) {
+                        if (categoryMap[soData.category_name]) {
+                            // Update existing entry with SO data
+                            categoryMap[soData.category_name].soQuantity = soData.total_quantity;
+                            categoryMap[soData.category_name].soCategoryId = soData.category_id;
+                        } else {
+                            // Add new entry for SO data
+                            categoryMap[soData.category_name] = {
+                                poQuantity: "N/A",
+                                soQuantity: soData.total_quantity,
+                                poCategoryId: null,
+                                soCategoryId: soData.category_id
+                            };
+                        }
+                    });
+                }
+
+                // Add rows to the table
+                Object.keys(categoryMap).forEach(function(categoryName, index) {
+                    var data = categoryMap[categoryName];
+                    table.row.add([
+                        index + 1,
+                        categoryName,
+                        data.poQuantity !== "N/A" ?
+                        '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details" class="rest-quantity-link" onclick="get_received_qty_for_report(' +
+                        data.poCategoryId + ')">' + data.poQuantity + '</a>' : "N/A",
+                        data.soQuantity !== "N/A" ?
+                        '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_so" class="rest-quantity-link" onclick="get_received_so_qty_for_report(' +
+                        data.soCategoryId + ')">' + data.soQuantity + '</a>' : "N/A"
+                    ]).draw(false);
+                });
+            } else {
+                console.error("Invalid or empty response received.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX request failed:", status, error);
         }
+    });
+}
+
 
 
         $('#resetButton').click(function() {

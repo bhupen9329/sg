@@ -87,6 +87,7 @@ class ManualMatching extends Controller
                 'purchase_orders.close_date',
                 'purchase_orders.created_at',
                 'purchase_orders.updated_at',
+                'purchase_orders.po_user_id',
 
                 'purchase_orders.total_amount',
 
@@ -158,6 +159,7 @@ class ManualMatching extends Controller
                 'sales_orders.match_position',
                 'sales_orders.created_at',
                 'sales_orders.updated_at',
+                'sales_orders.so_user_id',
 
                 'so_items.id',
                 'so_items.so_id',

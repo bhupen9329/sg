@@ -17,13 +17,20 @@ class UsersSeeder extends Seeder
     public function run(): void
     {
         $admin = User::create([
-            'name' => 'Admin',
+            'name' => 'Pankaj Agrawal',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('12345678')
         ]);
-        $stock_manager = User::create([
-            'name' => 'Store Manager',
-            'email' => 'sm@gmail.com',
+
+        $madan = User::create([
+            'name' => 'Madan',
+            'email' => 'madan@gmail.com',
+            'password' => Hash::make('12345678')
+        ]);
+
+        $aashish = User::create([
+            'name' => 'Aashish',
+            'email' => 'aashish@gmail.com',
             'password' => Hash::make('12345678')
         ]);
 
@@ -31,7 +38,9 @@ class UsersSeeder extends Seeder
         $adminRole = Role::where('name', 'Admin')->first();
         $admin->assignRole($adminRole);
         
-        $stock_managerRole = Role::where('name', 'SM')->first();
-        $stock_manager->assignRole($stock_managerRole);
+        $EmployeeRole = Role::where('name', 'Employee')->first();
+        
+        $madan->assignRole($EmployeeRole);
+        $aashish->assignRole($EmployeeRole);
     }
 }

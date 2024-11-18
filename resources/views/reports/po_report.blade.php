@@ -79,6 +79,8 @@
                 $('#filterCompany').val(),  
                 $('#filterCategory').val(),
                 $('#filterstatus').val(),
+                $('#filteruser').val(),
+
             )">
                         Apply
                     </button>
@@ -129,16 +131,29 @@
                     </div>
 
                     <div class="col-md-2 col-sm-12">
-                        <label for="filterCategory" class="mb-2"><strong>Dispatch Position</strong></label>
+                        <label for="filterCategory" class="mb-2"><strong>Dispatch Status</strong></label>
                         <select class="custom-select form-control item_select   " name="category" id="filterstatus"
                             required>
-                            <option value="Open">Open</option>
+                            <option value="all">All</option>
                             <option value="Partial Pending">Partial Pending</option>
                             <option value="Not Close" selected>Not Close</option>
                             <option value="Close">Close</option>
-                          
+
                         </select>
                     </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <label for="filterCategory" class="mb-2"><strong>Purchase Person</strong></label>
+                        <select class="custom-select form-control item_select" name="filteruser" id="filteruser" required>
+                            <option value="all">All</option>
+                            @foreach ($user as $users)
+                                <option value="{{ $users->id }}">{{ $users->name }}</option>
+                            @endforeach
+
+                        </select>
+                    </div>
+
+
 
                 </div>
 
@@ -176,16 +191,33 @@
                                         <th>PO Item No.</th>
                                         <th>Seller Name(Party Name)​</th>
                                         <th>Base Item Name​</th>
-                                        <th>PO Quantity</th>
                                         <th>PO Unit Price</th>
+                                        <th>PO Quantity</th>
                                         <th>Balanced PO Quantity</th>
-                                        <th>PO Dispatch Position</th>
+                                        <th>Dispatched Quantity</th>
+                                        <th>PO Dispatch Status</th>
+                                        <th>PO Person</th>
 
                                     </tr>
                                 </thead>
                                 <tbody>
 
                                 </tbody>
+                                <tfoot id="">
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align:center;"><strong>Grand Total:</strong></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align:left; font-weight: bold;" id="totalPoUnitPrice">0</td>
+                                        <td style="text-align:left; font-weight: bold;" id="totalPoQty">0</td>
+                                        <td style="text-align:left; font-weight: bold;" id="totalBalancedQty">0</td>
+                                        <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tfoot>
                             </table>
                             <!-- End Table with stripped rows -->
 
@@ -309,7 +341,9 @@
             const filterCompany = $('#filterCompany').val();
             const filterCategory = $('#filterCategory').val();
             const filterStatus = $('#filterstatus').val();
-            
+
+            const filterUser = $('#filteruser').val();
+
 
             $.ajax({
                 type: 'POST',
@@ -320,6 +354,8 @@
                     filterCompany: filterCompany,
                     filterCategory: filterCategory,
                     filterStatus: filterStatus,
+                    filterUser: filterUser,
+
 
                     _token: "{{ csrf_token() }}"
                 },
@@ -328,7 +364,26 @@
                     if (Array.isArray(response)) {
                         var table = $('#Category_table').DataTable();
                         table.clear().draw();
+
+                        var totalPOUnitPrice = 0;
+                        var totalPOQty = 0;
+                        var totalBalancedQty = 0;
+                        var totalDispatchedQty = 0;
+
                         response.forEach(function(data, index) {
+
+
+
+                            const dispatched_qty = (data.quantity - data.rest_quantity)
+                        .toLocaleString();
+
+                            totalPOUnitPrice += parseFloat(data.po_unit_price) || 0;
+                            totalPOQty += parseFloat(data.quantity) || 0;
+
+                            totalBalancedQty += parseFloat(data.rest_quantity) || 0;
+                            totalDispatchedQty += parseFloat(dispatched_qty) || 0;
+
+
                             table.row.add([
                                 index + 1,
                                 data.date,
@@ -336,15 +391,22 @@
                                 data.po_item_number,
                                 data.company_name,
                                 data.category,
-                                data.quantity,
                                 data.po_unit_price,
+                                data.quantity,
                                 data.rest_quantity,
+                                dispatched_qty,
                                 data.dispatch_status,
+                                data.user_name,
 
                             ]).draw(false);
                         });
 
-      
+                        $('#totalPoUnitPrice').text(totalPOUnitPrice.toFixed(2));
+                        $('#totalPoQty').text(totalPOQty.toFixed(2));
+                        $('#totalBalancedQty').text(totalBalancedQty.toFixed(2));
+                        $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
+
+
 
                     } else {
                         console.log("Invalid response format");

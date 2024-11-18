@@ -87,6 +87,20 @@
                                     </div>
                                 </div>
 
+                                <div class="row mb-3">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label"><strong>
+                                            Purchase Person</strong><span class="required-classes">*</span></label>
+                                    <div class="col-sm-4 mt-1">
+                                        <select name="user_id" class="form-select" required>
+                                            @foreach ($user as $user_data)
+                                                <option value="{{ $user_data->id }}">{{ $user_data->name }}</option>
+                                            @endforeach
+                                        </select>
+
+
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                         <br><br>

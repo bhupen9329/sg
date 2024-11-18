@@ -402,4 +402,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/freight_rate​-edit/{id}', [FreightRateController::class, 'edit'])->name('freight_rate.edit');
     Route::post('/freight_rate-update/{id}', [FreightRateController::class, 'update'])->name('freight_rate.update');
     Route::delete('/freight_rate-delete/{id}', [FreightRateController::class, 'delete'])->name('freight_rate.delete');
+    Route::delete('/freight_rate-delete/{id}', [FreightRateController::class, 'delete'])->name('freight_rate.delete');
+
+
+    Route::get('/get_received_qty_so_item_wise', [HomeController::class, 'getReceivedQtySoItemWise']);
+    Route::get('/get_received_qty_po_item_wise', [HomeController::class, 'getReceivedQtyPoItemWise']);
+
+    Route::post('/get_so_qty', [HomeController::class, 'get_so_item']);
+    Route::post('/get_po_qty', [HomeController::class, 'get_po_item']);
+
+
+
+
+    
+
 });

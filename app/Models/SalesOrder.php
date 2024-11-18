@@ -24,7 +24,7 @@ class SalesOrder extends Model
         'total_price',
         'match_position',
         'rest_quantity',
-        // 'remarks',
+        'so_user_id',
     ];
     
     public $timestamps = true;

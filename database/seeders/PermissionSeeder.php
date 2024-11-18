@@ -148,7 +148,7 @@ class PermissionSeeder extends Seeder
 
 
         $admin = Role::create(['name' => 'Admin']);
-        $stock_manager = Role::create(['name' => 'SM']);
+        $employee = Role::create(['name' => 'Employee']);
 
         $admin->givePermissionTo([
 
@@ -266,15 +266,24 @@ class PermissionSeeder extends Seeder
 
         ]);
 
-        $stock_manager->givePermissionTo([
+        $employee->givePermissionTo([
 
-            'Inward-index',
-            'Inward-view',
-            'Inward-create',
-            'Inward-edit',
-            'Inward-approve',
-            'Inward-delete',
-            'Inward-Credit-Note',
+            'Purchase-index',
+            'Purchase-view',
+            'Purchase-create',
+            'Purchase-edit',
+            'Purchase-close',
+            'Purchase-delete',
+
+
+
+            'Sales-index',
+            'Sales-view',
+            'Sales-create',
+            'Sales-edit',
+            'Sales-close',
+            'Sales-delete',
+       
         ]);
     }
 }

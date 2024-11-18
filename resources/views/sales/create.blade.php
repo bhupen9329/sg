@@ -53,7 +53,7 @@
 
 
                                     </div>
-{{-- 
+                                    {{-- 
                                     <div class="col-lg-6 text-end pe-5">
                                         <label for="inputEmail3" class="col-sm-6 col-form-label"><strong>SO Number :
                                             </strong>{{ $so_number }}</label>
@@ -117,6 +117,20 @@
                                     </div>
                                 </div>
 
+                                <div class="row mb-3">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label"><strong>
+                                            Sales Person  </strong><span class="required-classes">*</span></label>
+                                    <div class="col-sm-4 mt-1">
+                                        <select name="user_id" class="form-select" required>
+                                            @foreach ($user as $user_data)
+                                                <option value="{{ $user_data->id }}">{{ $user_data->name }}</option>
+                                            @endforeach
+                                        </select>
+
+
+                                    </div>
+                                </div>
+
 
 
                                 {{-- <div class="row mb-8">
@@ -161,7 +175,7 @@
                             </div>
                         </div>
 
-<br><br>
+                        <br><br>
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="card">
@@ -195,8 +209,8 @@
                                                                         }
                                                                     </style>
 
-                                                                    <th class="smaller-font" style="width: 25%;">Item Category <span
-                                                                            class="required-classes">*</span>
+                                                                    <th class="smaller-font" style="width: 25%;">Item
+                                                                        Category <span class="required-classes">*</span>
                                                                     </th>
                                                                     <th class="smaller-font">Quantity(Q) <span
                                                                             class="required-classes">*</span></th>
@@ -217,23 +231,19 @@
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
                                                                             name="total_quantity"
-                                                                            id="overall_total_quantity"
-                                                                            required
-                                                                            readonly>
+                                                                            id="overall_total_quantity" required readonly>
                                                                     </th>
                                                                     <th>
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
                                                                             name="total_amount" id="overall_total_amount"
-                                                                           required
-                                                                            readonly>
+                                                                            required readonly>
                                                                     </th>
                                                                     <th>
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
                                                                             name="total_price" id="overall_total_price"
-                                                                           required
-                                                                            readonly>
+                                                                            required readonly>
                                                                     </th>
                                                                 </tr>
                                                             </tfoot>
@@ -264,9 +274,9 @@
                                                             $('.item-select-' + lastItemId).select2();
 
                                                             // cell2.innerHTML = `
-                                                            // <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}"  required>
-                                                            //     <option value="" selected>Select Subcategory</option>
-                                                            // </select>`;
+        // <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}"  required>
+        //     <option value="" selected>Select Subcategory</option>
+        // </select>`;
                                                             // $('.subcategory-select').select2();
 
                                                             cell2.innerHTML =
@@ -405,7 +415,7 @@
 
                                         </div>
 
-                                      
+
                                         {{-- ..........................................................  --}}
 
                                         <div class="text-end mt-3">
@@ -447,249 +457,249 @@
         }
     </script>
 
- 
-<script>
-    function calculatePrice(rowId) {
-        var qty = document.getElementById(`qty_${rowId}`).value;
-        var unitPrice = document.getElementById(`unit_price${rowId}`).value;
-        var priceField = document.getElementById(`price_${rowId}`);
 
-        if (qty && unitPrice) {
-            var totalPrice = qty * unitPrice;
-            priceField.value = totalPrice.toFixed(2); // Display the calculated price
-        } else {
-            priceField.value = ''; // Clear if values are missing
-        }
-        updateOveralltotal_quantity();
-        updateOveralloverall_total_amount();
-        updateOveralltotal_price();
-    }
+    <script>
+        function calculatePrice(rowId) {
+            var qty = document.getElementById(`qty_${rowId}`).value;
+            var unitPrice = document.getElementById(`unit_price${rowId}`).value;
+            var priceField = document.getElementById(`price_${rowId}`);
 
-
-    function updateOveralltotal_quantity() {
-        const weightInputs = document.querySelectorAll('[id^="qty_"]');
-
-        let overallTotalWeight = 0;
-        weightInputs.forEach(input => {
-            const weight = parseFloat(input.value) || 0;
-            overallTotalWeight += weight;
-        });
-        const overallTotalWeightInput_2 = document.getElementById('overall_total_quantity');
-        // console.log(overallTotalWeightInput_2.value);
-
-        // Update the overall total weight input box
-        overallTotalWeightInput_2.value = overallTotalWeight.toFixed(3);
-    }
-
-    function updateOveralloverall_total_amount() {
-        const weightInputs = document.querySelectorAll('[id^="unit_price"]');
-
-        let overallTotalWeight = 0;
-        weightInputs.forEach(input => {
-            const weight = parseFloat(input.value) || 0;
-            overallTotalWeight += weight;
-        });
-        const overallTotaloverall_total_amount = document.getElementById('overall_total_amount');
-        // console.log(overallTotalWeightInput_2.value);
-
-        // Update the overall total weight input box
-        overallTotaloverall_total_amount.value = overallTotalWeight.toFixed(2);
-    }
-
-    function updateOveralltotal_price() {
-        const weightInputs = document.querySelectorAll('[id^="price"]');
-
-        let overallTotalWeight = 0;
-        weightInputs.forEach(input => {
-            const weight = parseFloat(input.value) || 0;
-            overallTotalWeight += weight;
-        });
-        const overallTotalWeightInput_2 = document.getElementById('overall_total_price');
-        // console.log(overallTotalWeightInput_2.value);
-
-        // Update the overall total weight input box
-        overallTotalWeightInput_2.value = overallTotalWeight.toFixed(3);
-    }
-
-
-    $(document).ready(function() {
-        $('.virtual_sotre').select2();
-        $('#addRowBtn').show();
-
-    });
-
-
-
-
-    document.addEventListener("DOMContentLoaded", function() {
-        calculateGrandTotalOnInput();
-
-    });
-
-    document.getElementById("freight").addEventListener("input", calculateGrandTotalOnInput);
-    document.getElementById("additional_charges").addEventListener("input", calculateGrandTotalOnInput);
-    document.getElementById("loading").addEventListener("input", calculateGrandTotalOnInput);
-
-
-    // function calculateTotal(lastItemId) {
-    //     console.log(lastItemId);
-
-    // }
-
-
-    function calculateTotal(lastItemId) {
-        var table = document.getElementById("myTable");
-        var rows = table.getElementsByTagName("tr");
-
-        var subtotal = 0;
-        var totalSGST = 0;
-        var totalCGST = 0;
-        var totalIGST = 0;
-        var type = document.getElementById('selected_type').value;
-        // console.log(type);
-
-        for (var i = 1; i < rows.length; i++) {
-            var row = rows[i];
-            var price = parseFloat(row.cells[7].getElementsByTagName("input")[0].value) || 0;
-            var gstInput = row.cells[8].getElementsByTagName("select")[0];
-            var totalInput = row.cells[9].getElementsByTagName("input")[0];
-            let igstInput = row.querySelector('.igst-value');
-            let cgstInput = row.querySelector('.cgst-value');
-            let sgstInput = row.querySelector('.sgst-value');
-
-            var gst_percent = parseFloat(gstInput.value) || 0;
-
-            // Calculate total before tax
-            var totalBeforeTax = weight * price;
-            subtotal += totalBeforeTax;
-            totalInput.value = totalBeforeTax.toFixed(2);
-
-            // Calculate SGST, CGST, or IGST based on state
-            var sgst = 0,
-                cgst = 0,
-                igst = 0;
-            if (type === 'state_gst') {
-                var gst_half = gst_percent / 2;
-                sgst = totalBeforeTax * gst_half / 100;
-                cgst = totalBeforeTax * gst_half / 100;
-                // if (cgst - Math.floor(cgst) > 0.5) {
-                //     cgst = Math.ceil(cgst);
-                // } else {
-                //     cgst = Math.floor(cgst);
-                // }
-
-                // if (sgst - Math.floor(sgst) > 0.5) {
-                //     sgst = Math.ceil(sgst);
-                // } else {
-                //     sgst = Math.floor(sgst);
-                // }
-
-                sgstInput.value = sgst.toFixed(2);
-                cgstInput.value = cgst.toFixed(2);
-                totalSGST += sgst;
-                totalCGST += cgst;
+            if (qty && unitPrice) {
+                var totalPrice = qty * unitPrice;
+                priceField.value = totalPrice.toFixed(2); // Display the calculated price
             } else {
-                igst = totalBeforeTax * gst_percent / 100;
+                priceField.value = ''; // Clear if values are missing
+            }
+            updateOveralltotal_quantity();
+            updateOveralloverall_total_amount();
+            updateOveralltotal_price();
+        }
 
-                // if (igst - Math.floor(igst) > 0.5) {
-                //     igst = Math.ceil(igst);
-                // } else {
-                //     igst = Math.floor(igst);
 
-                // }
-                igstInput.value = igst.toFixed(2);
-                totalIGST += igst;
+        function updateOveralltotal_quantity() {
+            const weightInputs = document.querySelectorAll('[id^="qty_"]');
+
+            let overallTotalWeight = 0;
+            weightInputs.forEach(input => {
+                const weight = parseFloat(input.value) || 0;
+                overallTotalWeight += weight;
+            });
+            const overallTotalWeightInput_2 = document.getElementById('overall_total_quantity');
+            // console.log(overallTotalWeightInput_2.value);
+
+            // Update the overall total weight input box
+            overallTotalWeightInput_2.value = overallTotalWeight.toFixed(3);
+        }
+
+        function updateOveralloverall_total_amount() {
+            const weightInputs = document.querySelectorAll('[id^="unit_price"]');
+
+            let overallTotalWeight = 0;
+            weightInputs.forEach(input => {
+                const weight = parseFloat(input.value) || 0;
+                overallTotalWeight += weight;
+            });
+            const overallTotaloverall_total_amount = document.getElementById('overall_total_amount');
+            // console.log(overallTotalWeightInput_2.value);
+
+            // Update the overall total weight input box
+            overallTotaloverall_total_amount.value = overallTotalWeight.toFixed(2);
+        }
+
+        function updateOveralltotal_price() {
+            const weightInputs = document.querySelectorAll('[id^="price"]');
+
+            let overallTotalWeight = 0;
+            weightInputs.forEach(input => {
+                const weight = parseFloat(input.value) || 0;
+                overallTotalWeight += weight;
+            });
+            const overallTotalWeightInput_2 = document.getElementById('overall_total_price');
+            // console.log(overallTotalWeightInput_2.value);
+
+            // Update the overall total weight input box
+            overallTotalWeightInput_2.value = overallTotalWeight.toFixed(3);
+        }
+
+
+        $(document).ready(function() {
+            $('.virtual_sotre').select2();
+            $('#addRowBtn').show();
+
+        });
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            calculateGrandTotalOnInput();
+
+        });
+
+        document.getElementById("freight").addEventListener("input", calculateGrandTotalOnInput);
+        document.getElementById("additional_charges").addEventListener("input", calculateGrandTotalOnInput);
+        document.getElementById("loading").addEventListener("input", calculateGrandTotalOnInput);
+
+
+        // function calculateTotal(lastItemId) {
+        //     console.log(lastItemId);
+
+        // }
+
+
+        function calculateTotal(lastItemId) {
+            var table = document.getElementById("myTable");
+            var rows = table.getElementsByTagName("tr");
+
+            var subtotal = 0;
+            var totalSGST = 0;
+            var totalCGST = 0;
+            var totalIGST = 0;
+            var type = document.getElementById('selected_type').value;
+            // console.log(type);
+
+            for (var i = 1; i < rows.length; i++) {
+                var row = rows[i];
+                var price = parseFloat(row.cells[7].getElementsByTagName("input")[0].value) || 0;
+                var gstInput = row.cells[8].getElementsByTagName("select")[0];
+                var totalInput = row.cells[9].getElementsByTagName("input")[0];
+                let igstInput = row.querySelector('.igst-value');
+                let cgstInput = row.querySelector('.cgst-value');
+                let sgstInput = row.querySelector('.sgst-value');
+
+                var gst_percent = parseFloat(gstInput.value) || 0;
+
+                // Calculate total before tax
+                var totalBeforeTax = weight * price;
+                subtotal += totalBeforeTax;
+                totalInput.value = totalBeforeTax.toFixed(2);
+
+                // Calculate SGST, CGST, or IGST based on state
+                var sgst = 0,
+                    cgst = 0,
+                    igst = 0;
+                if (type === 'state_gst') {
+                    var gst_half = gst_percent / 2;
+                    sgst = totalBeforeTax * gst_half / 100;
+                    cgst = totalBeforeTax * gst_half / 100;
+                    // if (cgst - Math.floor(cgst) > 0.5) {
+                    //     cgst = Math.ceil(cgst);
+                    // } else {
+                    //     cgst = Math.floor(cgst);
+                    // }
+
+                    // if (sgst - Math.floor(sgst) > 0.5) {
+                    //     sgst = Math.ceil(sgst);
+                    // } else {
+                    //     sgst = Math.floor(sgst);
+                    // }
+
+                    sgstInput.value = sgst.toFixed(2);
+                    cgstInput.value = cgst.toFixed(2);
+                    totalSGST += sgst;
+                    totalCGST += cgst;
+                } else {
+                    igst = totalBeforeTax * gst_percent / 100;
+
+                    // if (igst - Math.floor(igst) > 0.5) {
+                    //     igst = Math.ceil(igst);
+                    // } else {
+                    //     igst = Math.floor(igst);
+
+                    // }
+                    igstInput.value = igst.toFixed(2);
+                    totalIGST += igst;
+                }
+
             }
 
+            // Set total SGST, CGST, IGST to respective input fields
+            if (type === 'state_gst') {
+                document.getElementById("totalSGST").value = totalSGST;
+                document.getElementById("totalCGST").value = totalCGST;
+            } else {
+                document.getElementById("totalIGST").value = totalIGST;
+            }
+
+            // Set subtotal to the input field with ID "material_value"
+            document.getElementById("material_value").value = subtotal.toFixed(2);
+
+            // Calculate grand total after updating the subtotal
+            calculateGrandTotal(subtotal);
+            // updateOverallTotaGST();
         }
 
-        // Set total SGST, CGST, IGST to respective input fields
-        if (type === 'state_gst') {
-            document.getElementById("totalSGST").value = totalSGST;
-            document.getElementById("totalCGST").value = totalCGST;
-        } else {
-            document.getElementById("totalIGST").value = totalIGST;
+        function calculateGrandTotalOnInput() {
+            var subtotal = parseFloat(document.getElementById("material_value").value) || 0;
+            calculateGrandTotal(subtotal);
         }
 
-        // Set subtotal to the input field with ID "material_value"
-        document.getElementById("material_value").value = subtotal.toFixed(2);
+        function calculateGrandTotal(subtotal) {
+            var totalSGST = parseFloat(document.getElementById("totalSGST").value) || 0;
+            var totalCGST = parseFloat(document.getElementById("totalCGST").value) || 0;
+            var totalIGST = parseFloat(document.getElementById("totalIGST").value) || 0;
+            var freight = parseFloat(document.getElementById("freight").value) || 0;
+            var additional_charges = parseFloat(document.getElementById("additional_charges").value) || 0;
+            var loading = parseFloat(document.getElementById("loading").value) || 0;
+            var other_gst = 18;
 
-        // Calculate grand total after updating the subtotal
-        calculateGrandTotal(subtotal);
-        // updateOverallTotaGST();
-    }
+            var freight_gst = freight * (other_gst / 100);
+            var additional_charges_gst = additional_charges * (other_gst / 100);
+            var loading_gst = loading * (other_gst / 100);
+            var total_other_gst = freight_gst + additional_charges_gst + loading_gst;
+            var totalWithoutTax = subtotal + freight + additional_charges + loading;
 
-    function calculateGrandTotalOnInput() {
-        var subtotal = parseFloat(document.getElementById("material_value").value) || 0;
-        calculateGrandTotal(subtotal);
-    }
+            var totalTax = 0;
+            if (totalSGST || totalCGST) {
 
-    function calculateGrandTotal(subtotal) {
-        var totalSGST = parseFloat(document.getElementById("totalSGST").value) || 0;
-        var totalCGST = parseFloat(document.getElementById("totalCGST").value) || 0;
-        var totalIGST = parseFloat(document.getElementById("totalIGST").value) || 0;
-        var freight = parseFloat(document.getElementById("freight").value) || 0;
-        var additional_charges = parseFloat(document.getElementById("additional_charges").value) || 0;
-        var loading = parseFloat(document.getElementById("loading").value) || 0;
-        var other_gst = 18;
-
-        var freight_gst = freight * (other_gst / 100);
-        var additional_charges_gst = additional_charges * (other_gst / 100);
-        var loading_gst = loading * (other_gst / 100);
-        var total_other_gst = freight_gst + additional_charges_gst + loading_gst;
-        var totalWithoutTax = subtotal + freight + additional_charges + loading;
-
-        var totalTax = 0;
-        if (totalSGST || totalCGST) {
-
-            var grand_total_cgst = totalCGST + (total_other_gst / 2);
-            // if (grand_total_cgst - Math.floor(grand_total_cgst) > 0.5) {
-            //     grand_total_cgst = Math.ceil(grand_total_cgst);
-            // } else {
-            //     grand_total_cgst = Math.floor(grand_total_cgst);
-            // }
-            document.getElementById("grandcgst").value = grand_total_cgst.toFixed(2);
-            document.getElementById("grandsgst").value = grand_total_cgst.toFixed(2);
+                var grand_total_cgst = totalCGST + (total_other_gst / 2);
+                // if (grand_total_cgst - Math.floor(grand_total_cgst) > 0.5) {
+                //     grand_total_cgst = Math.ceil(grand_total_cgst);
+                // } else {
+                //     grand_total_cgst = Math.floor(grand_total_cgst);
+                // }
+                document.getElementById("grandcgst").value = grand_total_cgst.toFixed(2);
+                document.getElementById("grandsgst").value = grand_total_cgst.toFixed(2);
 
 
-            totalSGST += total_other_gst / 2;
-            totalCGST += total_other_gst / 2;
+                totalSGST += total_other_gst / 2;
+                totalCGST += total_other_gst / 2;
 
-            // if (totalSGST - Math.floor(totalSGST) > 0.5) {
-            //     totalSGST = Math.ceil(totalSGST);
-            // } else {
-            //     totalSGST = Math.floor(totalSGST);
-            //     totalCGST = Math.floor(totalSGST);
-            // }
-            totalTax = totalSGST + totalCGST;
-        } else if (totalIGST) {
-            var grand_total_igst = totalIGST + total_other_gst;
-            // if (grand_total_igst - Math.floor(grand_total_igst) > 0.5) {
-            //     grand_total_igst = Math.ceil(grand_total_igst);
-            // } else {
-            //     grand_total_igst = Math.floor(grand_total_igst);
-            // }
-            document.getElementById("grandigst").value = grand_total_igst.toFixed(2);
+                // if (totalSGST - Math.floor(totalSGST) > 0.5) {
+                //     totalSGST = Math.ceil(totalSGST);
+                // } else {
+                //     totalSGST = Math.floor(totalSGST);
+                //     totalCGST = Math.floor(totalSGST);
+                // }
+                totalTax = totalSGST + totalCGST;
+            } else if (totalIGST) {
+                var grand_total_igst = totalIGST + total_other_gst;
+                // if (grand_total_igst - Math.floor(grand_total_igst) > 0.5) {
+                //     grand_total_igst = Math.ceil(grand_total_igst);
+                // } else {
+                //     grand_total_igst = Math.floor(grand_total_igst);
+                // }
+                document.getElementById("grandigst").value = grand_total_igst.toFixed(2);
 
-            totalIGST += total_other_gst;
-            // if (totalIGST - Math.floor(totalIGST) > 0.5) {
-            //     totalIGST = Math.ceil(totalIGST);
-            // } else {
-            //     totalIGST = Math.floor(totalIGST);
-            // }
-            totalTax = totalIGST;
+                totalIGST += total_other_gst;
+                // if (totalIGST - Math.floor(totalIGST) > 0.5) {
+                //     totalIGST = Math.ceil(totalIGST);
+                // } else {
+                //     totalIGST = Math.floor(totalIGST);
+                // }
+                totalTax = totalIGST;
+
+            }
+
+            var grandTotal = totalWithoutTax + totalTax;
+            grandTotal_round = Math.round(grandTotal);
+            document.getElementById("grandTotal").value = grandTotal_round.toFixed(0);
+            // document.getElementById("grandTotal").value = grandTotal.toFixed(2);
+
+            // Update the GST values back to their respective HTML elements
 
         }
-
-        var grandTotal = totalWithoutTax + totalTax;
-        grandTotal_round = Math.round(grandTotal);
-        document.getElementById("grandTotal").value = grandTotal_round.toFixed(0);
-        // document.getElementById("grandTotal").value = grandTotal.toFixed(2);
-
-        // Update the GST values back to their respective HTML elements
-
-    }
-</script>
+    </script>
 
 
     <script>
@@ -804,7 +814,7 @@
 
         function resetRow_in_same_data(lastItemId) {
 
-            $(`#item_id${lastItemId}`).val('').trigger('change');  
+            $(`#item_id${lastItemId}`).val('').trigger('change');
         }
 
         function resetRow_in(lastItemId) {

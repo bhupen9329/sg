@@ -34,6 +34,7 @@ class PurchaseOrder extends Model
         'rest_quantity',
         'total_amount',
         'total_price',
+        'po_user_id',
     ];
     public $timestamps = true;
 }

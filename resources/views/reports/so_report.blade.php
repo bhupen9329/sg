@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title','Sales Order Due reports - Saraswati Globals')
+@section('title', 'Sales Order Due reports - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
         @if ($message = Session::get('success'))
@@ -78,7 +78,6 @@
                 $('#filterFromdate').val(),
                 $('#filterCompany').val(),
                 $('#filterCategory').val(),
-                $('#filterStatus').val()
                
             )">
                         Apply
@@ -94,14 +93,16 @@
                         <?php
                         $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
                         ?>
-                        <input type="date" class="form-control"  max="" value="<?php echo $firstDayOfMonth; ?>"  name="to_date" id="filterTodate" required>
+                        <input type="date" class="form-control" max="" value="<?php echo $firstDayOfMonth; ?>" name="to_date"
+                            id="filterTodate" required>
                     </div>
                     <div class="col-md-3 col-sm-12" style="margin-top: 7px">
                         <label for="filterFromdate"><strong>To Date</strong></label>
                         <?php
                         $lastDayOfMonth = (new DateTime('last day of this month'))->format('Y-m-d');
                         ?>
-                        <input type="date" class="form-control"  value="<?php echo $lastDayOfMonth; ?>"   name="from_date" id="filterFromdate" required>
+                        <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
+                            id="filterFromdate" required>
                     </div>
 
                     <div class="col-md-2 col-sm-12">
@@ -127,14 +128,26 @@
                     </div>
 
                     <div class="col-md-2 col-sm-12">
-                        <label for="filterCategory" class="mb-2"><strong>Dispatch Position</strong></label>
+                        <label for="filterCategory" class="mb-2"><strong>Dispatch Status</strong></label>
                         <select class="custom-select form-control item_select   " name="category" id="filterstatus"
                             required>
+                            <option value="all">All</option>
                             <option value="Open">Open</option>
                             <option value="Partial Pending">Partial Pending</option>
                             <option value="Not Close" selected>Not Close</option>
                             <option value="Close">Close</option>
-                          
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <label for="filterCategory" class="mb-2"><strong>Sales Person</strong></label>
+                        <select class="custom-select form-control item_select" name="filteruser" id="filteruser" required>
+                            <option value="all">All</option>
+                            @foreach ($user as $users)
+                                <option value="{{ $users->id }}">{{ $users->name }}</option>
+                            @endforeach
+
                         </select>
                     </div>
 
@@ -167,15 +180,32 @@
                                             <th>SO Item No.</th>
                                             <th>Buyer Name(Party Name)​</th>
                                             <th>Base Item Name​</th>
-                                            <th>SO Quantity</th>
                                             <th>SO Unit Price</th>
-                                            <th>Balanced PO Quantity</th>
-                                            <th>SO Dispatch Position</th>
+                                            <th>SO Quantity</th>
+                                            <th>Balanced SO Quantity</th>
+                                            <th>Dispatched Quantity</th>
+                                            <th>SO Dispatch Status</th>
+                                            <th>Sales Person</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="text-align:center;"><strong>Grand Total:</strong></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalSOUnitPrice">0</td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalSOQty">0</td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalRestQty">0</td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
+                                            <td colspan="2"></td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                             <!-- End Table with stripped rows -->
@@ -195,9 +225,9 @@
             var table = $('#Category_table').DataTable({
                 dom: 'Bfrtip',
                 lengthMenu: [
-            [10, 20, 50, 100, 150, -1],
-            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
-        ],
+                    [10, 20, 50, 100, 150, -1],
+                    ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+                ],
                 buttons: [
                     'pageLength',
                     {
@@ -214,7 +244,7 @@
                         text: 'PRINT',
                         title: 'Saraswati Globals (SO Report)',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 12, 13, 14, 15,],
+                            columns: [0, 1, 2, 3, 4, 5, 6, 12, 13, 14, 15, ],
                         },
                         customize: function(win) {
                             $(win.document.body).find('table')
@@ -247,53 +277,81 @@
 
 
 
-    <script>
-        function filterButton(filterTodate, filterFromdate, filterCompany, filterCategory) {
-            const filterStatus = $('#filterstatus').val();
-            $.ajax({
-                type: 'POST',
-                url: 'report-so',
-                data: {
-                    filterTodate: filterTodate,
-                    filterFromdate: filterFromdate,
-                    filterCompany: filterCompany,
-                    filterCategory: filterCategory,
-                    filterStatus : filterStatus,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    if (response && Array.isArray(response)) {
-                        var table = $('#Category_table').DataTable();
-                        table.clear().draw();
-                        response.forEach(function(data, index) {
-                            table.row.add([
-                                index + 1,
-                                data.date,
-                                data.so_number,
-                                data.so_item_number,
-                                data.company_name,
-                                data.category,
-                                data.quantity,
-                                data.so_unit_price,
-                                data.rest_qty,
-                                data.dispatch_status,
-                            ]).draw(false);
-                        });
-                    } else {
-                        console.error("Invalid or empty response received.");
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX request failed:", status, error);
-                }
-            });
-        }
+<script>
+    function filterButton(filterTodate, filterFromdate, filterCompany, filterCategory) {
+        const filterStatus = $('#filterstatus').val();
+        const filteruser = $('#filteruser').val();
+        
+        $.ajax({
+            type: 'POST',
+            url: 'report-so',
+            data: {
+                filterTodate: filterTodate,
+                filterFromdate: filterFromdate,
+                filterCompany: filterCompany,
+                filterCategory: filterCategory,
+                filterStatus: filterStatus,
+                filteruser: filteruser,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (response && Array.isArray(response)) {
+                    var table = $('#Category_table').DataTable();
+                    table.clear().draw();
 
-        $('#resetButton').click(function() {
-            // Reload the page to reset filters
-            location.reload();
+                    // Initialize total variables
+                    var totalSOUnitPrice = 0;
+                    var totalSOQty = 0;
+                    var totalRestQty = 0;
+                    var totalDispatchedQty = 0;
+
+                    response.forEach(function(data, index) {
+                        // Calculate dispatched quantity
+                        const dispatched_qty = (data.quantity - data.rest_qty).toLocaleString();
+
+                        // Update totals
+                        totalSOUnitPrice += parseFloat(data.so_unit_price) || 0;
+                        totalSOQty += parseFloat(data.quantity) || 0;
+                        totalRestQty += parseFloat(data.rest_qty) || 0;
+                        totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
+
+                        // Add row to DataTable
+                        table.row.add([
+                            index + 1,
+                            data.date,
+                            data.so_number,
+                            data.so_item_number,
+                            data.company_name,
+                            data.category,
+                            data.so_unit_price,
+                            data.quantity,
+                            data.rest_qty,
+                            dispatched_qty,
+                            data.dispatch_status,
+                            data.user_name,
+                        ]).draw(false);
+                    });
+
+                    // Update grand totals in the footer
+                    $('#totalSOUnitPrice').text(totalSOUnitPrice.toFixed(2));
+                    $('#totalSOQty').text(totalSOQty.toFixed(2));
+                    $('#totalRestQty').text(totalRestQty.toFixed(2));
+                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
+                } else {
+                    console.error("Invalid or empty response received.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed:", status, error);
+            }
         });
-    </script>
+    }
+
+    $('#resetButton').click(function() {
+        // Reload the page to reset filters
+        location.reload();
+    });
+</script>
 
 
 
@@ -305,11 +363,11 @@
 
 
         $(document).ready(function() {
-                    $('.custom-select').select2();
-                    // Focus the search box when the subcategory dropdown is opened
-                    $('.custom-select').on('select2:open', function() {
-                        document.querySelector('.select2-search__field').focus();
-                    });
-                });
+            $('.custom-select').select2();
+            // Focus the search box when the subcategory dropdown is opened
+            $('.custom-select').on('select2:open', function() {
+                document.querySelector('.select2-search__field').focus();
+            });
+        });
     </script>
 @endsection
