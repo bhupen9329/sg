@@ -24,9 +24,10 @@ return new class extends Migration {
             $table->string('rest_quantity', 200)->nullable();
             $table->string('total_amount', 200)->nullable();
             $table->string('total_price', 200)->nullable();
-
             $table->string('status', 200)->nullable();
             $table->string('match_position', 100)->default('open');
+            $table->string('so_user_id', 200);
+
             $table->timestamps();
         });
     }

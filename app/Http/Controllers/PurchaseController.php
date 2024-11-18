@@ -28,6 +28,9 @@ use App\Models\AverageTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Http\Controllers\ValuationController;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 
 class PurchaseController extends Controller
 {
@@ -47,12 +50,30 @@ class PurchaseController extends Controller
     {
 
 
+        $user = Auth::user(); // Get the authenticated user
 
-        $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-            ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
-            ->join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'categories.name as category_name')
-            ->get();
+        // Retrieve all roles assigned to the user
+        $roles = $user->getRoleNames();
+
+        if ( $roles->contains('Admin')) {
+            $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+                ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
+                ->join('categories', 'categories.id', '=', 'po_items.item_category')
+                ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
+                ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'categories.name as category_name', 'users.*')
+                ->get();
+            // dd( $po_data);
+        } else {
+            // Non-admin users ke liye sirf unhi ke PO dikhayein
+            $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+                ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
+                ->join('categories', 'categories.id', '=', 'po_items.item_category')
+                ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
+                ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'categories.name as category_name', 'users.*')
+                ->where('purchase_orders.po_user_id', $user->id)->get();
+        }
+
+
 
         // dd($po_data);
 
@@ -82,16 +103,18 @@ class PurchaseController extends Controller
 
     public function create(Request $request)
     {
-    
+
         // dd($po_id);
 
         $company = Company::where('id', $request->company_id)->first();
         $custom_due_date = CompanySetting::first();
         $category = Category::all();
+        $user = User::all();
         $data = [
             'company' => $company,
             'category' => $category,
             'custom_due_date' => $custom_due_date,
+            'user' =>  $user,
         ];
         // dd($data);
         return view('purchase.create')->with($data);
@@ -129,6 +152,7 @@ class PurchaseController extends Controller
         $purchaseOrder->due_date = $request->due_date;
         $purchaseOrder->status = 'Open';
         $purchaseOrder->match_position = 'open';
+        $purchaseOrder->po_user_id = $request->user_id;
 
 
         // Save Purchase Order
@@ -188,7 +212,7 @@ class PurchaseController extends Controller
                     $last_stack = LifoTransactionStack::where('lifo_transaction_id', $last_lifo_transaction->id)->get();
                     $last_used = LifoTransactionUsedQty::where('lifo_transaction_id', $last_lifo_transaction->id)->get();
 
-                    if( $last_lifo_transaction->stock_bal_value > 0){
+                    if ($last_lifo_transaction->stock_bal_value > 0) {
                         $lifoTransaction = new LifoTransaction();
                         $lifoTransaction->inventory_transaction_id = $inventoryTransactionId;
                         $lifoTransaction->stock_bal_qty = $transactions->quantity + $last_lifo_transaction->stock_bal_qty;
@@ -205,9 +229,9 @@ class PurchaseController extends Controller
                         $lifoTransaction->profit_loss = 0;
                         if ($lifoTransaction->profit_loss > 0) {
                             $lifoTransaction->status = 'Profit';
-                        } elseif($lifoTransaction->profit_loss < 0) {
+                        } elseif ($lifoTransaction->profit_loss < 0) {
                             $lifoTransaction->status = 'Loss';
-                        }else{
+                        } else {
                             $lifoTransaction->status = 'N/A';
                         }
 
@@ -216,12 +240,12 @@ class PurchaseController extends Controller
                         $lifoTransaction->save();
 
                         $stack_data = [
-                          'lifo_transaction_id' =>  $lifoTransaction->id,
-                          'inventory_transaction_id' => $inventoryTransactionId,
-                          'purchase_date' => $request->date,
-                          'lifo_transaction_stacks_bal_qty' => $transactions->quantity,
-                          'lifo_transaction_stacks_bal_unit_price' => $transactions->unit_price,
-                          'lifo_transaction_stacks_bal_value' => ($transactions->unit_price *  $transactions->quantity)
+                            'lifo_transaction_id' =>  $lifoTransaction->id,
+                            'inventory_transaction_id' => $inventoryTransactionId,
+                            'purchase_date' => $request->date,
+                            'lifo_transaction_stacks_bal_qty' => $transactions->quantity,
+                            'lifo_transaction_stacks_bal_unit_price' => $transactions->unit_price,
+                            'lifo_transaction_stacks_bal_value' => ($transactions->unit_price *  $transactions->quantity)
                         ];
 
                         LifoTransactionStack::create($stack_data);
@@ -244,16 +268,15 @@ class PurchaseController extends Controller
                         $lifoTransaction->profit_loss = 0;
                         if ($lifoTransaction->profit_loss > 0) {
                             $lifoTransaction->status = 'Profit';
-                        } elseif($lifoTransaction->profit_loss < 0) {
+                        } elseif ($lifoTransaction->profit_loss < 0) {
                             $lifoTransaction->status = 'Loss';
-                        }else{
+                        } else {
                             $lifoTransaction->status = 'N/A';
                         }
 
                         $lifoTransaction->item_id = $inventoryItemId;
                         $lifoTransaction->stock_position = 'Long';
                         $lifoTransaction->save();
-                    
                     }
                 }
             }
@@ -485,6 +508,7 @@ class PurchaseController extends Controller
         $po_number = $po_data->document_number;
 
         $category_2 = Category::all();
+        $user = User::all();
 
         if ($po_data->due_date != null) {
             $due_date = Carbon::parse($po_data->due_date);
@@ -500,7 +524,8 @@ class PurchaseController extends Controller
             'number_of_days' => $number_of_days,
             'po_data' => $po_data,
             'po_items' => $po_items,
-            'category_2' => $category_2
+            'category_2' => $category_2,
+            'user' =>  $user,
         ];
 
         // dd($po_items);
@@ -522,6 +547,7 @@ class PurchaseController extends Controller
             'total_quantity' => $request->total_quantity,
             'total_amount' => $request->total_amount,
             'total_price' => $request->total_price,
+            'po_user_id' => $request->user_id,
         ];
         PurchaseOrder::where('id', $id)->update($data);
 
@@ -684,10 +710,10 @@ class PurchaseController extends Controller
         // dd($request);
 
         $Po_data = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-        ->join('categories', 'po_items.item_category', '=', 'categories.id')
-        ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
-        ->where('po_items.item_category',$request->get_category_id)
-        ->get();
+            ->join('categories', 'po_items.item_category', '=', 'categories.id')
+            ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+            ->where('po_items.item_category', $request->get_category_id)
+            ->get();
 
         return response()->json([
             'rows_data' => $Po_data

@@ -138,9 +138,10 @@
                                         <th>PO Price</th>
                                         {{-- <th>PO Match Position</th>
                                         <th>PO Item Match Position</th> --}}
-                                        <th>PO Item Dispatch Position</th>
+                                        <th>PO Item Dispatch Status</th>
 
-                                        <th>Remarks</th>                                      
+                                        <th>Remarks</th>   
+                                        <th>Purchase Person</th>                                   
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -156,7 +157,11 @@
                                             <td>{{ $data->category_name }}</td>
                                             {{-- <td>{{ $data->sub_category_name }}</td> --}}
                                             <td>{{ $data->qty }}</td>
-                                            <td>{{ $data->po_dispatch_rest_qty }}</td>
+                                            @if( $data->po_dispatch_rest_qty != 0)
+                                            <td style="background-color: red">{{ $data->po_dispatch_rest_qty }}</td>
+                                            @else
+                                            <td style="background-color: rgb(0, 255, 42)">{{ $data->po_dispatch_rest_qty }}</td>
+                                            @endif
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             {{-- <td>{{ $data->match_position }}</td>
@@ -164,6 +169,8 @@
                                             <td>{{ $data->po_dispatch_item_status }}</td>
 
                                             <td>{{ $data->remark ?? 'N/A' }}</td>
+                                            <td>{{ $data->name ?? 'N/A' }}</td>
+
                                            
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">

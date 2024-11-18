@@ -18,6 +18,7 @@ use App\Models\SubCategory;
 use App\Models\Transaction;
 use App\Models\WareHouseModel;
 use App\Models\InventoryTransaction;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use DateTime;
@@ -48,8 +49,9 @@ class ReportController extends Controller
     {
         $companys = Company::where('type', 'supplier')->get();
         $Categorys = Category::all();
+        $user = User::all();
 
-        return view('reports.po_report', compact('companys', 'Categorys'));
+        return view('reports.po_report', compact('companys', 'Categorys', 'user'));
     }
 
 
@@ -60,47 +62,45 @@ class ReportController extends Controller
         $filterCompany = $request->filterCompany;
         $filterCategory = $request->filterCategory;
         $filterStatus = $request->filterStatus;
+        $filteruser = $request->filterUser;
 
-        if($filterStatus == 'Not Close'){
-            $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-            ->Join('po_items', function ($join) {
-                $join->on('po_items.po_id', '=', 'purchase_orders.id')
-                    ->where('po_items.po_dispatch_item_status', '!=', 'Close');
-            })
-            ->Join('categories', 'categories.id', '=', 'po_items.item_category')
+        $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+            ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
+            ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
+            ->join('categories', 'categories.id', '=', 'po_items.item_category')
+            ->select(
+                'purchase_orders.po_user_id',
+                'purchase_orders.id as po_id',
+                'purchase_orders.document_number',
+                'purchase_orders.date',
+                'po_items.po_item_no',
+                'po_items.qty',
+                'po_items.unit_price',
+                'po_items.po_dispatch_rest_qty',
+                'po_items.po_dispatch_item_status',
+                'companies.company_name',
+                'categories.name as category_name',
+                'users.name as user_name'
+            )
             ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
-        }
-        else if($filterStatus == 'Open'){
-            $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-            ->Join('po_items', function ($join) {
-                $join->on('po_items.po_id', '=', 'purchase_orders.id')
-                    ->where('po_items.po_dispatch_item_status', '=', 'Open');
-            })
-            ->Join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
-        }
-        else if($filterStatus == 'Close'){
-            $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-            ->Join('po_items', function ($join) {
-                $join->on('po_items.po_id', '=', 'purchase_orders.id')
-                    ->where('po_items.po_dispatch_item_status', '=', 'Close');
-            })
-            ->Join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
-        }
-        
-        else{
-            $query = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-            ->Join('po_items', function ($join) {
-                $join->on('po_items.po_id', '=', 'purchase_orders.id')
-                    ->where('po_items.po_dispatch_item_status', '=', 'Partial Pending');
-            })
-            ->Join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
+
+        if ($filterStatus != 'all') {
+
+            if ($filterStatus == 'Not Close') {
+                $query->where('po_items.po_dispatch_item_status', '!=', 'Close');
+            } elseif ($filterStatus == 'Open') {
+                $query->where('po_items.po_dispatch_item_status', '=', 'Open');
+            } elseif ($filterStatus == 'Close') {
+                $query->where('po_items.po_dispatch_item_status', '=', 'Close');
+            } else {
+                $query->where('po_items.po_dispatch_item_status', '=', 'Partial Pending');
+            }
         }
 
 
-
+        if ($filteruser != 'all') {
+            $query->where('purchase_orders.po_user_id', $filteruser);
+        }
 
         if ($filterCompany != 'all') {
             $query->where('companies.id', $filterCompany);
@@ -110,9 +110,7 @@ class ReportController extends Controller
             $query->where('categories.id', $filterCategory);
         }
 
-
         $filteredDatas = $query->get();
-       
 
         $data = [];
         foreach ($filteredDatas as $filteredData) {
@@ -121,80 +119,76 @@ class ReportController extends Controller
                 'po_document_number' => $filteredData->document_number,
                 'po_item_number' => $filteredData->po_item_no,
                 'date' => date('d-M-Y', strtotime($filteredData->date)),
-                'category' => $filteredData->name,
+                'category' => $filteredData->category_name,
                 'company_name' => $filteredData->company_name,
+                'user_name' => $filteredData->user_name,
                 'po_unit_price' => $filteredData->unit_price,
                 'quantity' => $filteredData->qty,
                 'rest_quantity' => $filteredData->po_dispatch_rest_qty ?? 0,
                 'dispatch_status' => $filteredData->po_dispatch_item_status,
             ];
             $data[] = $tempData;
-            // dd($data);
         }
 
         return response()->json($data);
     }
+
 
     // SO Report
     public function so_report()
     {
         $companys = Company::where('type', 'buyer')->get();
         $Categorys = Category::all();
+        $user = User::all();
 
         // dd($sales_order);
-        return view('reports.so_report', compact('companys', 'Categorys'));
+        return view('reports.so_report', compact('companys', 'Categorys', 'user'));
     }
 
 
     public function get_so_report(Request $request)
     {
-
         $filterTodate = $request->filterTodate;
         $filterFromdate = $request->filterFromdate;
         $filterCompany = $request->filterCompany;
         $filterCategory = $request->filterCategory;
         $filterStatus = $request->filterStatus;
-        // dd($filterTodate, $filterFromdate, $filterCompany, $filterCategory);
+        $filteruser = $request->filteruser;
+        // dd($filterTodate,  $filterFromdate, $filterCompany, $filterCategory, $filterStatus, $filteruser);
 
-        if($filterStatus == 'Not Close'){
-            $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-            ->Join('so_items', function ($join) {
-                $join->on('so_items.so_id', '=', 'sales_orders.id')
-                    ->where('so_items.so_dispatch_item_status', '!=', 'Close');
-            })
-            ->Join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
-        }
-        else if($filterStatus == 'Open'){
-            $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-            ->Join('so_items', function ($join) {
-                $join->on('so_items.so_id', '=', 'sales_orders.id')
-                    ->where('so_items.so_dispatch_item_status', '=', 'Open');
-            })
-            ->Join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
-        }
-        else if($filterStatus == 'Close'){
-            $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-            ->Join('so_items', function ($join) {
-                $join->on('so_items.so_id', '=', 'sales_orders.id')
-                    ->where('so_items.so_dispatch_item_status', '=', 'Close');
-            })
-            ->Join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
-        }
-        
-        else{
-            $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
-            ->Join('so_items', function ($join) {
-                $join->on('so_items.so_id', '=', 'sales_orders.id')
-                    ->where('so_items.so_dispatch_item_status', '=', 'Partial Pending');
-            })
-            ->Join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
-        }
-   
 
+        $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
+            ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
+            ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
+            ->join('categories', 'categories.id', '=', 'so_items.item_category')
+            ->select(
+                'sales_orders.so_user_id',
+                'sales_orders.date',
+                'sales_orders.so_number',
+                'so_items.so_item_no',
+                'companies.company_name',
+                'categories.name as category_name',
+                'so_items.qty',
+                'so_items.unit_price',
+                'so_items.so_dispatch_rest_qty',
+                'so_items.so_dispatch_item_status',
+                'users.name as user_name'
+            )
+            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
+
+            
+        if ($filterStatus != 'all') {
+
+        if ($filterStatus == 'Not Close') {
+            $query->where('so_items.so_dispatch_item_status', '!=', 'Close');
+        } elseif ($filterStatus == 'Open') {
+            $query->where('so_items.so_dispatch_item_status', '=', 'Open');
+        } elseif ($filterStatus == 'Close') {
+            $query->where('so_items.so_dispatch_item_status', '=', 'Close');
+        } else {
+            $query->where('so_items.so_dispatch_item_status', '=', 'Partial Pending');
+        }
+    }
 
         if ($filterCompany != 'all') {
             $query->where('sales_orders.company_id', $filterCompany);
@@ -203,11 +197,12 @@ class ReportController extends Controller
         if ($filterCategory != 'all') {
             $query->where('so_items.item_category', $filterCategory);
         }
-
-
+        if ($filteruser != 'all') {
+            $query->where('sales_orders.so_user_id', $filteruser);
+        }
 
         $filteredDatas = $query->get();
-        // dd($filteredDatas);
+
         $data = [];
         foreach ($filteredDatas as $filteredData) {
             $tempData = [
@@ -215,17 +210,19 @@ class ReportController extends Controller
                 'so_number' => $filteredData->so_number,
                 'so_item_number' => $filteredData->so_item_no,
                 'company_name' => $filteredData->company_name,
-                'category' => $filteredData->name,
+                'category' => $filteredData->category_name,
                 'quantity' => $filteredData->qty,
                 'so_unit_price' => $filteredData->unit_price,
                 'rest_qty' => $filteredData->so_dispatch_rest_qty,
                 'dispatch_status' => $filteredData->so_dispatch_item_status,
+                'user_name' => $filteredData->user_name,
             ];
             $data[] = $tempData;
         }
 
         return response()->json($data);
     }
+
 
     // Quotationso Report
     public function quotationso_report()
@@ -1308,47 +1305,47 @@ class ReportController extends Controller
         $filterCategory = $request->filterCategory;
         // dd( $filterCategory);
 
-        if($filterCategory != 'all'){
+        if ($filterCategory != 'all') {
             $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-            ->join('categories', 'po_items.item_category', '=', 'categories.id')
-            ->where('po_items.item_category', $filterCategory)
-            ->select('po_items.item_category', 'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
-            ->groupBy('po_items.item_category', 'categories.name','categories.id')
-            ->get();
+                ->join('categories', 'po_items.item_category', '=', 'categories.id')
+                ->where('po_items.item_category', $filterCategory)
+                ->select('po_items.item_category', 'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+                ->groupBy('po_items.item_category', 'categories.name', 'categories.id')
+                ->get();
 
 
-        $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-            ->join('categories', 'so_items.item_category', '=', 'categories.id')
-            ->where('so_items.item_category', $filterCategory)
-            ->select(
-                'so_items.item_category',
-                'categories.name as category_name',
-                'categories.id as category_id',
-                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
-            )
-            ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
-            ->get();
-        }else{
+            $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+                ->join('categories', 'so_items.item_category', '=', 'categories.id')
+                ->where('so_items.item_category', $filterCategory)
+                ->select(
+                    'so_items.item_category',
+                    'categories.name as category_name',
+                    'categories.id as category_id',
+                    DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+                )
+                ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
+                ->get();
+        } else {
             $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-            ->join('categories', 'po_items.item_category', '=', 'categories.id')
-            ->select('po_items.item_category',  'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
-            ->groupBy('po_items.item_category', 'categories.name', 'categories.id')
-            ->get();
+                ->join('categories', 'po_items.item_category', '=', 'categories.id')
+                ->select('po_items.item_category',  'categories.id as category_id', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+                ->groupBy('po_items.item_category', 'categories.name', 'categories.id')
+                ->get();
 
 
-        $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-            ->join('categories', 'so_items.item_category', '=', 'categories.id')
-            ->select(
-                'so_items.item_category',
-                'categories.name as category_name',
-                'categories.id as category_id',
-                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
-            )
-            ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
-            ->get();
+            $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+                ->join('categories', 'so_items.item_category', '=', 'categories.id')
+                ->select(
+                    'so_items.item_category',
+                    'categories.name as category_name',
+                    'categories.id as category_id',
+                    DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+                )
+                ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
+                ->get();
         }
 
-     
+
 
 
         $data = [
@@ -1361,84 +1358,84 @@ class ReportController extends Controller
 
     public function dispatch_report()
     {
-       $company =  Company::all();
-       $category = Category::all();
+        $company =  Company::all();
+        $category = Category::all();
 
-        return view('reports.dispatch',compact('company','category'));
+        return view('reports.dispatch', compact('company', 'category'));
     }
 
     public function get_dispatch_report(Request $request)
     {
         $filterTodate = $request->filterTodate;
         $filterFromdate = $request->filterFromdate;
-        $filterItem_name = $request ->filterItem_name;
+        $filterItem_name = $request->filterItem_name;
         $filterCompany = $request->filterCompany;
 
         $query =  Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
-        ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
-        ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
-        ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
-        ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
-        ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
-        ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
-        ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
-        ->select(
-            'dispatches.*',
-            'dispatches.created_at',
-            'dispatches.id as dispatch_id',
-            'so_items.so_dispatch_rest_qty',
-            'po_items.po_dispatch_rest_qty',
-            'po_company.company_name as po_company',
-            'so_company.company_name as so_company',
-            'sales_orders.so_number',
-            'purchase_orders.id as po_id',
-            'sales_orders.id as so_id',
-            'purchase_orders.document_number as po_number',
-            'sales_orders.date as so_date',
-            'purchase_orders.date as po_date',
-            'categories.name as category_name',
-            'subcategories.sub_category as sub_category_name',
-            'po_items.po_item_no',
-            'so_items.so_item_no',
-            'po_items.qty as po_qty',
-            'so_items.qty as so_qty',
-            'dispatches.id as dispatch_id',
-            'dispatches.created_at as dispatch_date',
+            ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+            ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+            ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+            ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+            ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+            ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+            ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+            ->select(
+                'dispatches.*',
+                'dispatches.created_at',
+                'dispatches.id as dispatch_id',
+                'so_items.so_dispatch_rest_qty',
+                'po_items.po_dispatch_rest_qty',
+                'po_company.company_name as po_company',
+                'so_company.company_name as so_company',
+                'sales_orders.so_number',
+                'purchase_orders.id as po_id',
+                'sales_orders.id as so_id',
+                'purchase_orders.document_number as po_number',
+                'sales_orders.date as so_date',
+                'purchase_orders.date as po_date',
+                'categories.name as category_name',
+                'subcategories.sub_category as sub_category_name',
+                'po_items.po_item_no',
+                'so_items.so_item_no',
+                'po_items.qty as po_qty',
+                'so_items.qty as so_qty',
+                'dispatches.id as dispatch_id',
+                'dispatches.created_at as dispatch_date',
 
-        )
+            )
             ->whereBetween('dispatches.date', [$filterTodate, $filterFromdate]);
 
-            if ($filterItem_name && $filterItem_name != 'all') {
-                $query->where('dispatches.category_id', $filterItem_name);
-            }
-            if ($filterCompany && $filterCompany != 'all') {
-                $query->where(function ($q) use ($filterCompany) {
-                    $q->where('dispatches.po_company_id', $filterCompany)
-                      ->orWhere('dispatches.so_company_id', $filterCompany);
-                });
-            }
-            
-            $filteredData = $query->get();
-            
-            $data = [];
-            foreach ($filteredData as $filteredData) {
-                $tempData = [
-                    'po_company'=>$filteredData->po_company,
-                    'so_company' => $filteredData->so_company,
-                    'created_at' => date('d-M-Y', strtotime($filteredData->created_at)),
-                    'category_name' => $filteredData->category_name, 
-                    'sub_category_name' => $filteredData->sub_category_name, 
-                    'dispatched_quantity' => $filteredData->dispatched_quantity, 
-                    'vehicle_number' => $filteredData->vehicle_number, 
-                    'po_item_no' => $filteredData->po_item_no, 
-                    'dispatch_total' => $filteredData->dispatch_total, 
-                    'so_item_no' => $filteredData->so_item_no, 
-                    'dispatch_so_total' => $filteredData->dispatch_so_total, 
-                    'dispatch_id' => $filteredData->dispatch_id, 
-                ];
-                $data[] = $tempData;
-                // dd( $data);
-            }
-            return response()->json($data);
+        if ($filterItem_name && $filterItem_name != 'all') {
+            $query->where('dispatches.category_id', $filterItem_name);
+        }
+        if ($filterCompany && $filterCompany != 'all') {
+            $query->where(function ($q) use ($filterCompany) {
+                $q->where('dispatches.po_company_id', $filterCompany)
+                    ->orWhere('dispatches.so_company_id', $filterCompany);
+            });
+        }
+
+        $filteredData = $query->get();
+
+        $data = [];
+        foreach ($filteredData as $filteredData) {
+            $tempData = [
+                'po_company' => $filteredData->po_company,
+                'so_company' => $filteredData->so_company,
+                'created_at' => date('d-M-Y', strtotime($filteredData->created_at)),
+                'category_name' => $filteredData->category_name,
+                'sub_category_name' => $filteredData->sub_category_name,
+                'dispatched_quantity' => $filteredData->dispatched_quantity,
+                'vehicle_number' => $filteredData->vehicle_number,
+                'po_item_no' => $filteredData->po_item_no,
+                'dispatch_total' => $filteredData->dispatch_total,
+                'so_item_no' => $filteredData->so_item_no,
+                'dispatch_so_total' => $filteredData->dispatch_so_total,
+                'dispatch_id' => $filteredData->dispatch_id,
+            ];
+            $data[] = $tempData;
+            // dd( $data);
+        }
+        return response()->json($data);
     }
 }

@@ -153,7 +153,7 @@
                                 <table class="table " id="Category_table">
                                     <thead>
                                         <tr>
-                                            <th>So No.</th>
+                                            {{-- <th>So No.</th>
                                             <th>Form</th>
                                             <th> To</th>
                                             <th>Dispatch date</th>
@@ -164,12 +164,42 @@
                                             <th>PO Item No.</th>
                                             <th>Payable total</th>
                                             <th>SO Item No.</th>
+                                            <th>Receivable Total</th> --}}
+
+                                            <th>#</th>
+                                            <th style="width: 72.8125px;">Date</th>
+                                            <th style="width: 72.8125px;">Vehicle Number</th>
+                                            <th style="width: 84.8125px;">From (Party Name)</th>
+                                            <th style="width: 84.8125px;">PO Item No</th>
+                                            <th>Payable Total</th>
+                                            <th>Category</th>
+                                            <th>Conv Item Name</th>
+                                            <th>Dispatch Qty</th>
+                                            <th style="width: 84.8125px;">To (Party Name)</th>
+                                            <th>SO Item No</th>
                                             <th>Receivable Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="text-align:center;"><strong>Grand Total:</strong></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalDispatchTotal">0</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalDispatchSoTotal">0</td>
+                                        </tr>
+                                    </tfoot>
+                                    
                                 </table>
                             </div>
 
@@ -400,61 +430,84 @@
 
 
 
-    <script>
-        function filterButton(filterTodate, filterFromdate, filterItem_name, filterCompany) {
-            $.ajax({
-                type: 'POST',
-                url: '/dispatch-report-get',
-                data: {
-                    filterTodate: filterTodate,
-                    filterFromdate: filterFromdate,
-                    filterItem_name: filterItem_name,
-                    filterCompany: filterCompany,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    if (response && Array.isArray(response)) {
-                        var table = $('#Category_table').DataTable();
-                        table.clear().draw();
-                        response.forEach(function(data, index) {
-                            table.row.add([
-                                index + 1,
-                                data.po_company,
-                                data.so_company,
-                                data.created_at,
-                                data.category_name,
-                                data.sub_category_name ?? 'N/A',
-                                data.dispatched_quantity,
-                                data.vehicle_number ?? 'N/A',
-                                data.po_item_no,
-                                `<a href="javascript:void(0);" data-bs-toggle="modal" 
-                                data-bs-target="#Modalfor_quantity_details_so" 
-                                onclick="get_received_so_qty_for_report('${data.dispatch_id}')">
-                                ${data.dispatch_total}
-                            </a>`,
-                                data.so_item_no,
-                                `<a href="javascript:void(0);" data-bs-toggle="modal" 
-                                data-bs-target="#Modalfor_quantity_details_po" 
-                                onclick="get_received_po_qty_for_report('${data.dispatch_id}')">
-                                ${data.dispatch_so_total ?? 'N/A'}
-                            </a>`,
-                            ]).draw(false);
-                        });
-                    } else {
-                        console.error("Invalid or empty response received.");
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX request failed:", status, error);
-                }
-            });
-        }
+<script>
+    function filterButton(filterTodate, filterFromdate, filterItem_name, filterCompany) {
+        $.ajax({
+            type: 'POST',
+            url: '/dispatch-report-get',
+            data: {
+                filterTodate: filterTodate,
+                filterFromdate: filterFromdate,
+                filterItem_name: filterItem_name,
+                filterCompany: filterCompany,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (response && Array.isArray(response)) {
+                    var table = $('#Category_table').DataTable();
+                    table.clear().draw();
 
-        $('#resetButton').click(function() {
-            // Reload the page to reset filters
-            location.reload();
+                    // Initialize total variables
+                    var totalDispatchTotal = 0;
+                    var totalDispatchSoTotal = 0;
+                    var totalDispatchedQty = 0;
+
+                    response.forEach(function(data, index) {
+                        const dispatchTotal = parseFloat(data.dispatch_total) || 0;
+                        const dispatchSoTotal = parseFloat(data.dispatch_so_total) || 0;
+                        const dispatchedQty = parseFloat(data.dispatched_quantity) || 0;
+
+                        // Update grand totals
+                        totalDispatchTotal += dispatchTotal;
+                        totalDispatchSoTotal += dispatchSoTotal;
+                        totalDispatchedQty += dispatchedQty;
+
+                        // Add row to the table
+                        table.row.add([
+                            index + 1,
+                            data.created_at,
+                            data.vehicle_number ?? 'N/A',
+                            data.po_company,
+                            data.po_item_no,
+                            `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                               data-bs-target="#Modalfor_quantity_details_so" 
+                               onclick="get_received_so_qty_for_report('${data.dispatch_id}')">
+                               ${dispatchTotal}
+                            </a>`,
+                            data.category_name,
+                            data.sub_category_name ?? 'N/A',
+                            dispatchedQty,
+                            data.so_company,
+                            data.so_item_no,
+                            `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                               data-bs-target="#Modalfor_quantity_details_po" 
+                               onclick="get_received_po_qty_for_report('${data.dispatch_id}')">
+                               ${dispatchSoTotal ?? 'N/A'}
+                            </a>`,
+                        ]).draw(false);
+                    });
+
+                    // Update grand totals in the footer
+                    $('#totalDispatchTotal').text(totalDispatchTotal.toFixed(2));
+                    $('#totalDispatchSoTotal').text(totalDispatchSoTotal.toFixed(2));
+                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
+
+                } else {
+                    console.error("Invalid or empty response received.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed:", status, error);
+            }
         });
-    </script>
+    }
+
+    $('#resetButton').click(function() {
+        // Reload the page to reset filters
+        location.reload();
+    });
+</script>
+
 
 
 

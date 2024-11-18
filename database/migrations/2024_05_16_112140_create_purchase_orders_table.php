@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string('rest_quantity', 200)->nullable();
             $table->string('total_amount', 200)->nullable();
             $table->string('total_price', 200)->nullable();
+            $table->string('po_user_id', 200);
             $table->timestamps();
         });
     }
