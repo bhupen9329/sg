@@ -351,26 +351,27 @@
                                         </td>
 
                                         <!--Balance -->
+                              
                                         <td>
-                                            @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                            @foreach (($log['inventory_stack']) as $stack)
                                                 {{ $stack['transaction_date'] }}<br>
                                                 <hr>
                                             @endforeach
                                         </td>
                                         <td>
-                                            @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                            @foreach (($log['inventory_stack']) as $stack)
                                                 {{ number_format($stack['quantity'], 2) }}<br>
                                                 <hr>
                                             @endforeach
                                         </td>
                                         <td>
-                                            @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                            @foreach (($log['inventory_stack']) as $stack)
                                                 {{ number_format($stack['unit_price'], 2) }}<br>
                                                 <hr>
                                             @endforeach
                                         </td>
                                         <td>
-                                            @foreach (array_reverse($log['inventory_stack']) as $stack)
+                                            @foreach (($log['inventory_stack']) as $stack)
                                                 {{ number_format($stack['quantity'] * $stack['unit_price'], 2) }}<br>
                                                 <hr>
                                             @endforeach
