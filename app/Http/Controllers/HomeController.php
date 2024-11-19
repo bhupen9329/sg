@@ -21,7 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\ValuationController; 
+use App\Http\Controllers\ValuationController;
 
 
 class HomeController extends Controller
@@ -53,19 +53,19 @@ class HomeController extends Controller
     {
         $user_count = User::count();
         $role_count = Role::count();
-    
+
         $sales_order = SoItem::sum('so_dispatch_rest_qty');
         $purchase_order = PoItem::sum('po_dispatch_rest_qty');
-    
+
         $company_count = Company::all()->count();
         $my_notes = MyNote::latest()->first();
         $base_price = Category::get();
         $CompanySetting_data = CompanySetting::first();
         $threshold_value = (int)$CompanySetting_data->threshold_value;
-    
+
         $categories = Category::all();
         $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-        
+
         $lifo_transaction = [];
         $fifo_transaction = [];
         $avg_transaction = [];
@@ -74,16 +74,16 @@ class HomeController extends Controller
         $lifoData = '';
         $fifoData = '';
         $avgData = '';
-    
+
         // Instantiate the ValuationController
         $valuationController = app(ValuationController::class);
-    
+
         foreach ($inventory_transaction as $data) {
             // Process LIFO, FIFO, and Average calculations using the ValuationController methods
             $lifoData = $valuationController->calculateLIFO($data->id, $data->item_id);
             $fifoData = $valuationController->calculateFIFO($data->id, $data->item_id);
             $avgData = $valuationController->calculateAverage($data->id, $data->item_id);
-    
+
             // Get the latest transaction logs for each valuation method
             if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
                 $latestEntriesByDate[$data->item_id]['lifo'] = end($lifoData['transaction_logs']);
@@ -95,7 +95,7 @@ class HomeController extends Controller
                 $latestEntriesByDate[$data->item_id]['avg'] = end($avgData['transaction_logs']);
             }
         }
-    
+
         // Collect the latest transactions for LIFO, FIFO, and Average
         foreach ($latestEntriesByDate as $itemId => $entry) {
             if (isset($entry['lifo'])) {
@@ -108,88 +108,152 @@ class HomeController extends Controller
                 $avg_transaction[] = $entry['avg'];
             }
         }
-    
+
         $sales_order_due_date = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
             ->select(
+                'users.name',
                 'sales_orders.id as so_id',
                 'sales_orders.so_number',
                 'sales_orders.due_date',
                 DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
             )
-            ->groupBy('sales_orders.id', 'sales_orders.so_number', 'sales_orders.due_date')
+            ->groupBy('sales_orders.id', 'sales_orders.so_number', 'sales_orders.due_date',   'users.name',)
             ->get();
-    
+
         $purchase_order_due_date = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+            ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
             ->select(
+                'users.name',
                 'purchase_orders.id as po_id',
                 'purchase_orders.document_number',
                 'purchase_orders.due_date',
                 DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
             )
-            ->groupBy('purchase_orders.id', 'purchase_orders.document_number', 'purchase_orders.due_date')
+            ->groupBy('purchase_orders.id', 'purchase_orders.document_number', 'purchase_orders.due_date',   'users.name',)
             ->get();
-    
+
         $virtual_store = StockItem::sum('weight');
         $outward_data = Outward::where('bill_status', 'bill pending')->count();
-    
+
         // Get PO and SO totals
         $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-        ->join('categories', 'po_items.item_category', '=', 'categories.id')
-        ->select(
-            'po_items.item_category',
-            'categories.id as category_id',
-            'categories.name as category_name',
-            DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
-        )
-        ->groupBy('po_items.item_category', 'categories.name', 'categories.id')
-        ->get();
-    
-    $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-        ->join('categories', 'so_items.item_category', '=', 'categories.id')
-        ->select(
-            'so_items.item_category',
-            'categories.name as category_name',
-            'categories.id as category_id',
-            DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
-        )
-        ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
-        ->get();
-    
-    $mergedTotals = $filteredPOTotals->map(function ($po) use ($filteredSOTotals) {
-        // Find the corresponding SO data by category_id
-        $so = $filteredSOTotals->firstWhere('category_id', $po->category_id);
-    
-        // Determine PO and SO total quantities
-        $poQuantity = $po->total_quantity;
-        $soQuantity = $so ? $so->total_quantity : ''; // Use N/A if no SO data found
-    
-        // If no PO data exists, mark PO as N/A
-        if (!$poQuantity) {
-            $poQuantity = '';
-        }
-    
-        return [
-            'category_name' => $po->category_name,
-            'category_id' => $po->category_id,
-            'po_total_quantity' => $poQuantity,
-            'so_total_quantity' => $soQuantity,
-        ];
-    });
-    
-    // Optionally, you could merge missing categories from filteredSOTotals as well
-    $filteredSOTotals->each(function ($so) use ($mergedTotals) {
-        // If there's no corresponding PO data for this SO category, add a row with N/A for PO quantity
-        if (!$mergedTotals->contains('category_id', $so->category_id)) {
-            $mergedTotals->push([
-                'category_name' => $so->category_name,
-                'category_id' => $so->category_id,
-                'po_total_quantity' => '', // Set PO as N/A if no PO data exists
-                'so_total_quantity' => $so->total_quantity,
-            ]);
-        }
-    });
-    
-    
+            ->join('categories', 'po_items.item_category', '=', 'categories.id')
+            ->select(
+                'po_items.item_category',
+                'categories.id as category_id',
+                'categories.name as category_name',
+                DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('po_items.item_category', 'categories.name', 'categories.id')
+            ->get();
+
+        $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->join('categories', 'so_items.item_category', '=', 'categories.id')
+            ->select(
+                'so_items.item_category',
+                'categories.name as category_name',
+                'categories.id as category_id',
+                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
+            ->get();
+
+        $mergedTotals = $filteredPOTotals->map(function ($po) use ($filteredSOTotals) {
+            // Find the corresponding SO data by category_id
+            $so = $filteredSOTotals->firstWhere('category_id', $po->category_id);
+
+            // Determine PO and SO total quantities
+            $poQuantity = $po->total_quantity;
+            $soQuantity = $so ? $so->total_quantity : ''; // Use N/A if no SO data found
+
+            // If no PO data exists, mark PO as N/A
+            if (!$poQuantity) {
+                $poQuantity = '';
+            }
+
+            return [
+                'category_name' => $po->category_name,
+                'category_id' => $po->category_id,
+                'po_total_quantity' => $poQuantity,
+                'so_total_quantity' => $soQuantity,
+            ];
+        });
+
+        // Optionally, you could merge missing categories from filteredSOTotals as well
+        $filteredSOTotals->each(function ($so) use ($mergedTotals) {
+            // If there's no corresponding PO data for this SO category, add a row with N/A for PO quantity
+            if (!$mergedTotals->contains('category_id', $so->category_id)) {
+                $mergedTotals->push([
+                    'category_name' => $so->category_name,
+                    'category_id' => $so->category_id,
+                    'po_total_quantity' => '', // Set PO as N/A if no PO data exists
+                    'so_total_quantity' => $so->total_quantity,
+                ]);
+            }
+        });
+
+
+
+      // Process Purchase Orders (PO) Totals
+$filteredPOTotalsPartyWise = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+->join('categories', 'po_items.item_category', '=', 'categories.id')
+->select(
+    'companies.company_name as company_name',
+    'purchase_orders.supplier_id as party_id',
+    DB::raw('GROUP_CONCAT(DISTINCT categories.name SEPARATOR ", ") as category_names'),
+    DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
+)
+->groupBy('purchase_orders.supplier_id', 'companies.company_name')
+->get();
+
+// Process Sales Orders (SO) Totals
+$filteredSOTotalsPartyWise = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+->join('companies', 'sales_orders.company_id', '=', 'companies.id')
+->join('categories', 'so_items.item_category', '=', 'categories.id')
+->select(
+    'companies.company_name',
+    'sales_orders.company_id as party_id',
+    DB::raw('GROUP_CONCAT(DISTINCT categories.name SEPARATOR ", ") as category_names'),
+    DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+)
+->groupBy('sales_orders.company_id', 'companies.company_name')
+->get();
+
+// Merge PO and SO Totals
+$mergedTotalsPartyWise = $filteredPOTotalsPartyWise->map(function ($po) use ($filteredSOTotalsPartyWise) {
+// Find the corresponding SO data by party_id (supplier_id or company_id)
+$so = $filteredSOTotalsPartyWise->first(function ($so) use ($po) {
+    return $so->party_id === $po->party_id;
+});
+
+return [
+    'party_id' => $po->party_id,
+    'company_name' => $po->company_name,
+    'category_names' => $po->category_names,
+    'po_total_quantity' => $po->total_quantity ?: '',
+    'so_total_quantity' => $so ? $so->total_quantity : '',
+];
+});
+
+// Add Missing SO Data if No Matching PO Exists
+$filteredSOTotalsPartyWise->each(function ($so) use ($mergedTotalsPartyWise) {
+if (!$mergedTotalsPartyWise->contains(function ($merged) use ($so) {
+    return $merged['party_id'] === $so->party_id;
+})) {
+    $mergedTotalsPartyWise->push([
+        'party_id' => $so->party_id,
+        'company_name' => $so->company_name,
+        'category_names' => $so->category_names,
+        'po_total_quantity' => '',
+        'so_total_quantity' => $so->total_quantity,
+    ]);
+}
+});
+
+
+
         return view('index', compact(
             'sales_order',
             'purchase_order',
@@ -198,6 +262,7 @@ class HomeController extends Controller
             'virtual_store',
             'company_count',
             'mergedTotals',
+            'mergedTotalsPartyWise',
             'sales_order_due_date',
             'purchase_order_due_date',
 
@@ -206,11 +271,13 @@ class HomeController extends Controller
             'lifo_transaction',
             'fifo_transaction',
             'avg_transaction',
-            'lifoData', 'fifoData', 'avgData',
+            'lifoData',
+            'fifoData',
+            'avgData',
         ));
     }
 
-    
+
 
     public function save_notes(Request $request)
     {
@@ -248,12 +315,12 @@ class HomeController extends Controller
     public function getReceivedQtySoItemWise()
     {
         $so_items = DB::table('so_items')
-        ->join('categories', 'categories.id', '=', 'so_items.item_category') // Join with categories table
-        ->select('categories.name', DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
-        ->groupBy('categories.name') // Group by category name
-        ->get();
-    
-    
+            ->join('categories', 'categories.id', '=', 'so_items.item_category') // Join with categories table
+            ->select('categories.name', DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
+            ->groupBy('categories.name') // Group by category name
+            ->get();
+
+
         return response()->json([
             'data' => $so_items
         ]);
@@ -262,18 +329,18 @@ class HomeController extends Controller
     public function getReceivedQtyPoItemWise()
     {
         $po_items = DB::table('po_items')
-        ->join('categories', 'categories.id', '=', 'po_items.item_category') // Join with categories table
-        ->select('categories.name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
-        ->groupBy('categories.name') // Group by category name
-        ->get();
-    
-    
+            ->join('categories', 'categories.id', '=', 'po_items.item_category') // Join with categories table
+            ->select('categories.name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
+            ->groupBy('categories.name') // Group by category name
+            ->get();
+
+
         return response()->json([
             'data' => $po_items
         ]);
     }
 
-    
+
     public function get_so_item(Request $request)
     {
         $so_items = SoItem::join('categories', 'categories.id', '=', 'so_items.item_category')->where('so_id', $request->SoId)->get();
@@ -282,7 +349,7 @@ class HomeController extends Controller
         ]);
     }
 
-        
+
     public function get_po_item(Request $request)
     {
         $po_items = PoItem::join('categories', 'categories.id', '=', 'po_items.item_category')->where('po_id', $request->PoId)->get();
@@ -290,6 +357,4 @@ class HomeController extends Controller
             'data' => $po_items
         ]);
     }
-    
-    
 }

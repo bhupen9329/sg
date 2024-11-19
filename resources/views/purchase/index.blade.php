@@ -132,22 +132,22 @@
                                         <th>Seller Name(Party Name)</th>
                                         <th>Item Category</th>
                                         {{-- <th>Item Sub-Category</th> --}}
-                                        <th>Quantity(Q)</th>    
-                                        <th>Dispatch Rest Quantity(Q)</th>                                     
+                                        <th>Quantity(Q)</th>
+                                        <th>Dispatch Rest Quantity(Q)</th>
                                         <th>PO Unit Price</th>
                                         <th>PO Price</th>
                                         {{-- <th>PO Match Position</th>
                                         <th>PO Item Match Position</th> --}}
                                         <th>PO Item Dispatch Status</th>
 
-                                        <th>Remarks</th>   
-                                        <th>Purchase Person</th>                                   
+                                        <th>Remarks</th>
+                                        <th>Purchase Person</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($po_data as $data)
-                                    {{-- @dd($data); --}}
+                                        {{-- @dd($data); --}}
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
@@ -157,11 +157,16 @@
                                             <td>{{ $data->category_name }}</td>
                                             {{-- <td>{{ $data->sub_category_name }}</td> --}}
                                             <td>{{ $data->qty }}</td>
-                                            @if( $data->po_dispatch_rest_qty != 0)
-                                            <td style="background-color: red">{{ $data->po_dispatch_rest_qty }}</td>
+
+                                            @if ($data->po_dispatch_rest_qty == $data->qty)
+                                                <td>{{ $data->po_dispatch_rest_qty }}</td>
+                                                @elseif($data->po_dispatch_rest_qty == 0)
+                                                <td style="background-color: #15ff00">{{ $data->po_dispatch_rest_qty }}</td>
                                             @else
-                                            <td style="background-color: rgb(0, 255, 42)">{{ $data->po_dispatch_rest_qty }}</td>
+                                                <td style="background-color: #FFBF00">{{ $data->po_dispatch_rest_qty }}
+                                                </td>
                                             @endif
+
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
                                             {{-- <td>{{ $data->match_position }}</td>
@@ -171,12 +176,12 @@
                                             <td>{{ $data->remark ?? 'N/A' }}</td>
                                             <td>{{ $data->name ?? 'N/A' }}</td>
 
-                                           
+
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
                                                             class="bi bi-three-dots"></i></a>
-                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                                         {{-- <li> <a class="dropdown-item"
                                                                 href="{{ route('buyers.show', $data->id) }}"><i
                                                                     class="fa-regular fa-eye"></i> </a></li> --}}
@@ -235,7 +240,7 @@
                                                         </li> --}}
 
 
-                                                    </ul> 
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>
@@ -618,7 +623,7 @@
                         text: 'CSV',
                         title: 'Saraswati Globals (Purchase Orders Details)',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8,],
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, ],
                         }
                     },
                     {

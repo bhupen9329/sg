@@ -269,174 +269,65 @@
                 </div>
             </div>
 
-            {{-- .................................................................................................................................... --}}
-            <div class="row">
 
-
-                <div class="col-lg-6 px-2 py-4 ">
-                    <div class="row dashboard-container">
-                        <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Due Sales Order Date</h5>
-
-                                    <!-- Table with stripped rows -->
-                                    <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sales Order</th>
-                                                    <th>Total Rest Quantity</th>
-                                                    <th>Due SO Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($sales_order_due_date as $data)
-                                                    <tr>
-                                                        <td>{{ $data['so_number'] }}</td>
-                                                        <td>
-                                                            <a href="#"
-                                                                style="text-decoration: underline; color: blue;"
-                                                                data-bs-toggle="modal" data-bs-target="#so_items"
-                                                                class="rest-quantity-link"
-                                                                onclick="get_so_items_for_report({{ $data['so_id'] }})">
-                                                                {{ $data['total_quantity'] }}
-                                                            </a>
-                                                        </td>
-
-                                                        <td>{{ date('d-M-Y', strtotime($data['due_date'])) }}</td>
-
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-
-                                        </table>
-                                    </div>
-                                    <!-- End Table with stripped rows -->
-
-                                </div>
-
-                            </div>
-
+            <div class="modal fade" id="Modalfor_quantity_details_so_party_wise" tabindex="-1" aria-labelledby="modal3Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal3Label">Sales Order Item </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"style="width:50px"></button>
                         </div>
+                        <div class="modal-body-so-item-party-wise">
+                            <table class="table SO table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Base Item</th>
+                                        <th scope="col">Quantity</th>
 
-                    </div>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                </div>
-
-                <div class="col-lg-6 px-2 py-4 ">
-                    <div class="row dashboard-container">
-                        <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Due Purchase Order Date</h5>
-
-                                    <!-- Table with stripped rows -->
-                                    <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
-                                            <thead>
-                                                <tr>
-                                                    <th>Purchase Order</th>
-                                                    <th>Total Rest Quantity</th>
-                                                    <th>Due PO Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($purchase_order_due_date as $data)
-                                                    <tr>
-                                                        <td>{{ $data['document_number'] }}</td>
-                                                        <td>
-                                                            <a href="#"
-                                                                style="text-decoration: underline; color: blue;"
-                                                                data-bs-toggle="modal" data-bs-target="#po_items"
-                                                                class="rest-quantity-link"
-                                                                onclick="get_po_items_for_report({{ $data['po_id'] }})">
-
-                                                                {{ $data['total_quantity'] }}
-                                                            </a>
-                                                        </td>
-                                                        <td>{{ date('d-M-Y', strtotime($data['due_date'])) }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-
-                                        </table>
-                                    </div>
-                                    <!-- End Table with stripped rows -->
-
-                                </div>
-
-                            </div>
-
+                                </tbody>
+                            </table>
                         </div>
-
                     </div>
-
                 </div>
             </div>
 
+            <div class="modal fade" id="Modalfor_quantity_details_po_party_wise" tabindex="-1" aria-labelledby="modal3Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal3Label">Purchase Order Item </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"style="width:50px"></button>
+                        </div>
+                        <div class="modal-body-po-item-party-wise">
+                            <table class="table PO table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Base Item</th>
+                                        <th scope="col">Quantity</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- .................................................................................................................................... --}}
 
             <div class="row">
-                <div class="col-lg-6 px-2 py-4 ">
-                    <div class="row dashboard-container">
-                        <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Stock Party Wise​ </h5>
-
-                                    <!-- Table with stripped rows -->
-                                    <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
-                                            <thead>
-                                                <tr>
-                                                    <th>Base Item</th>
-                                                    <th>Total SO Qty</th>
-                                                    <th>Total PO Qty</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($mergedTotals as $total)
-                                                    <tr>
-                                                        <td>{{ $total['category_name'] }}</td>
-                                                        <td>
-                                                            <a href="#"
-                                                                style="text-decoration: underline; color: blue;"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#Modalfor_quantity_details_so"
-                                                                class="rest-quantity-link"
-                                                                onclick="get_received_so_qty_for_report({{ $total['category_id'] }})">
-                                                                {{ $total['so_total_quantity'] }}
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <a href="#"
-                                                                style="text-decoration: underline; color: blue;"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#Modalfor_quantity_details"
-                                                                class="rest-quantity-link"
-                                                                onclick="get_received_qty_for_report({{ $total['category_id'] }})">
-                                                                {{ $total['po_total_quantity'] }}
-                                                            </a>
-                                                        </td>
-                                                   
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-
-                                        </table>
-                                    </div>
-                                    <!-- End Table with stripped rows -->
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-                <div class="col-lg-6 px-2 py-4 ">
+                <div class="col-lg- px-2 py-4 ">
                     <div class="row dashboard-container">
                         <div class="col-lg-12">
                             <div class="card">
@@ -445,7 +336,7 @@
 
                                     <!-- Table with stripped rows -->
                                     <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
+                                        <table class="table">
                                             <thead>
                                                 <tr>
                                                     <th style="padding: 8px;">Date</th>
@@ -550,6 +441,249 @@
 
                 </div>
             </div>
+
+
+            <div class="row">
+
+
+                <div class="col-lg-6 px-2 py-4 ">
+                    <div class="row dashboard-container">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Due Sales Order Date</h5>
+
+                                    <!-- Table with stripped rows -->
+                                    <div class="dashboard_dataTables_wrapper_low">
+                                        <table class="table datatable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Due SO Date</th>
+                                                    <th>Sales Order</th>
+                                                    <th>Total Rest Quantity</th>
+                                                    <th>Sales Person</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($sales_order_due_date as $data)
+                                                    <tr>
+                                                        
+                                                        <td>{{ date('d-M-Y', strtotime($data['due_date'])) }}</td>
+                                                        <td>{{ $data['so_number'] }}</td>
+                                                        <td>
+                                                            <a href="#"
+                                                                style="text-decoration: underline; color: blue;"
+                                                                data-bs-toggle="modal" data-bs-target="#so_items"
+                                                                class="rest-quantity-link"
+                                                                onclick="get_so_items_for_report({{ $data['so_id'] }})">
+                                                                {{ $data['total_quantity'] }}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{ $data['name'] }}</td>
+
+
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                    <!-- End Table with stripped rows -->
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 px-2 py-4 ">
+                    <div class="row dashboard-container">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Due Purchase Order Date</h5>
+
+                                    <!-- Table with stripped rows -->
+                                    <div class="dashboard_dataTables_wrapper_low">
+                                        <table class="table datatable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Due PO Date</th>
+                                                    <th>Purchase Order</th>
+                                                    <th>Total Rest Quantity</th>
+                                                    <th>Purchase Person</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($purchase_order_due_date as $data)
+                                                    <tr>
+                                                        <td>{{ date('d-M-Y', strtotime($data['due_date'])) }}</td>
+                                                        <td>{{ $data['document_number'] }}</td>
+                                                        <td>
+                                                            <a href="#"
+                                                                style="text-decoration: underline; color: blue;"
+                                                                data-bs-toggle="modal" data-bs-target="#po_items"
+                                                                class="rest-quantity-link"
+                                                                onclick="get_po_items_for_report({{ $data['po_id'] }})">
+
+                                                                {{ $data['total_quantity'] }}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{ $data['name'] }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                    <!-- End Table with stripped rows -->
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-6 px-2 py-4 ">
+                    <div class="row dashboard-container">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Stock Item Wise​ </h5>
+
+                                    <!-- Table with stripped rows -->
+                                    <div class="dashboard_dataTables_wrapper_low">
+                                        <table class="table datatable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Base Item</th>
+                                                    <th>Total SO Qty</th>
+                                                    <th>Total PO Qty</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($mergedTotals as $total)
+                                                    <tr>
+                                                        <td>{{ $total['category_name'] }}</td>
+                                                        <td>
+                                                            <a href="#"
+                                                                style="text-decoration: underline; color: blue;"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#Modalfor_quantity_details_so"
+                                                                class="rest-quantity-link"
+                                                                onclick="get_received_so_qty_for_report({{ $total['category_id'] }})">
+                                                                {{ $total['so_total_quantity'] }}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="#"
+                                                                style="text-decoration: underline; color: blue;"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#Modalfor_quantity_details"
+                                                                class="rest-quantity-link"
+                                                                onclick="get_received_qty_for_report({{ $total['category_id'] }})">
+                                                                {{ $total['po_total_quantity'] }}
+                                                            </a>
+                                                        </td>
+                                                   
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                    <!-- End Table with stripped rows -->
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 px-2 py-4 ">
+                    <div class="row dashboard-container">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Stock Party Wise​ </h5>
+
+                                    <!-- Table with stripped rows -->
+                                    <div class="dashboard_dataTables_wrapper_low">
+                                        <table class="table datatable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Party Name</th>
+                                                    <th>Total SO Qty</th>
+                                                    <th>Total PO Qty</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($mergedTotalsPartyWise as $total)
+                                                    <tr>
+                                                        <td>{{ $total['company_name'] }}</td>
+                                                        <td>
+                                                            <a href="#"
+                                                                style="text-decoration: underline; color: blue;"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#Modalfor_quantity_details_so_party_wise"
+                                                                class="rest-quantity-link"
+                                                                onclick="get_received_so_qty_for_party_wise_report({{ $total['party_id'] }})">
+                                                                {{ $total['so_total_quantity'] }}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="#"
+                                                                style="text-decoration: underline; color: blue;"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#Modalfor_quantity_details_po_party_wise"
+                                                                class="rest-quantity-link"
+                                                                onclick="get_received_qty_for_party_wise_report({{ $total['party_id'] }})">
+                                                                {{ $total['po_total_quantity'] }}
+                                                            </a>
+                                                        </td>
+                                                   
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                    <!-- End Table with stripped rows -->
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+        
+
+                
+
+                
+            </div>
+
+       
+
+            
 
         </section>
 
@@ -796,6 +930,86 @@
                     }
                 });
             }
+
+
+            function get_received_so_qty_for_party_wise_report(company_id) {
+
+                let CompanyId = company_id;
+                $.ajax({
+                    url: "{{ url('get_received_qty_party_wise') }}",
+                    method: "POST",
+                    data: {
+                        company_id: CompanyId,
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    success: function(res) {
+                        // console.log(res); // Log the response to the console
+                        let rowsData = res.rows_data;
+                        let tableBody = document.querySelector('.modal-body-so-item-party-wise table  tbody');
+                        tableBody.innerHTML = ''; // Clear existing table rows
+
+                        rowsData.forEach((rowData, index) => {
+                            // Parse the date string and format it
+                            let date = new Date(rowData.date);
+                            let formattedDate = date.toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                                year: 'numeric'
+                            });
+                            let row = `<tr>
+                                <th scope="row">${index + 1}</th>
+                                 <td>${rowData.category_name}</td>
+                                <td>${rowData.total_quantity}</td>
+                            </tr>`;
+                            tableBody.insertAdjacentHTML('beforeend', row);
+                        });
+                    }
+
+
+                });
+            }
+
+            function get_received_qty_for_party_wise_report(company_id) {
+                let CompanyId = company_id;
+                $.ajax({
+                    url: "{{ url('get_received_qty_po_party_wise') }}",
+                    method: "POST",
+                    data: {
+                        company_id: CompanyId,
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    success: function(res) {
+                        // console.log(res); // Log the response to the console
+                        let rowsData = res.rows_data;
+                        let tableBody = document.querySelector('.modal-body-po-item-party-wise table  tbody');
+                        tableBody.innerHTML = ''; // Clear existing table rows
+
+                        rowsData.forEach((rowData, index) => {
+                            // Parse the date string and format it
+                            let date = new Date(rowData.date);
+                            let formattedDate = date.toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                                year: 'numeric'
+                            });
+                            let row = `<tr>
+                                <th scope="row">${index + 1}</th>
+                                 <td>${rowData.category_name}</td>
+                                <td>${rowData.total_quantity}</td>
+                            </tr>`;
+                            tableBody.insertAdjacentHTML('beforeend', row);
+                        });
+                    }
+
+
+                });
+            }
+
+            
+   
+
+
+         
         </script>
     </main><!-- End #main -->
 @endsection

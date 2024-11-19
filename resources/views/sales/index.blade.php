@@ -92,8 +92,8 @@
                                         <th>SO Item Number</th>
                                         <th>Buyer Name(Party Name)</th>
                                         <th>Item Category</th>
-                                        <th>Quantity(Q)</th>   
-                                        <th>Dispatch Rest Quantity(Q)</th>                                       
+                                        <th>Quantity(Q)</th>
+                                        <th>Dispatch Rest Quantity(Q)</th>
                                         <th>SO Unit Price</th>
                                         <th>SO Price</th>
                                         {{-- <th>SO Match Position</th>
@@ -106,7 +106,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($sales_order as $data)
-                                    {{-- @dd($data); --}}
+                                        {{-- @dd($data); --}}
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
@@ -116,25 +116,27 @@
                                             <td>{{ $data->company_name }}</td>
                                             <td>{{ $data->category_name }}</td>
                                             <td>{{ $data->qty }}</td>
-                                            @if( $data->so_dispatch_rest_qty != 0)
-                                            <td style="background-color: red">{{ $data->so_dispatch_rest_qty }}</td>
+                                            @if ($data->so_dispatch_rest_qty == $data->qty)
+                                                <td>{{ $data->so_dispatch_rest_qty }}</td>
+                                                @elseif($data->so_dispatch_rest_qty == 0)
+                                                <td style="background-color: #15ff00">{{ $data->po_dispatch_rest_qty }}</td>
                                             @else
-                                            <td style="background-color: rgb(0, 255, 42)">{{ $data->so_dispatch_rest_qty }}</td>
+                                            <td style="background-color: #FFBF00">{{ $data->so_dispatch_rest_qty }}</td>
                                             @endif
                                             <td>{{ $data->unit_price }}</td>
                                             <td>{{ $data->price }}</td>
-                              
+
                                             <td>{{ $data->so_dispatch_item_status }}</td>
                                             <td>{{ $data->terms_condition ?? 'N/A' }}</td>
                                             <td>{{ $data->name ?? 'N/A' }}</td>
 
-                                           
+
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
                                                             class="bi bi-three-dots"></i></a>
                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                  
+
                                                         <li>
                                                             @can('Company-edit')
                                                                 <a class="dropdown-item"
@@ -258,8 +260,8 @@
                             <label for="company_id11" class="mb-2">Select Buyer Company<span
                                     class="required-classes">*</span></label>
                             <div class="col-lg-12">
-                                <select class="  form-select Buyer-Company-select" name="company_id"
-                                    id=" " required>
+                                <select class="  form-select Buyer-Company-select" name="company_id" id=" "
+                                    required>
                                     <option value="" selected disabled>Buyer Company</option>
                                     @foreach ($company as $c_item)
                                         <option value="{{ $c_item->id }}">{{ $c_item->company_name }}</option>
@@ -473,7 +475,7 @@
     <script>
         $(document).ready(function() {
             // Initialize Select2 when the modal is shown
-            
+
 
             // Event listener for when a company is selected
             $('#company_id11').on('change', function() {
@@ -487,7 +489,6 @@
         });
 
         // Function to reset fields
-         
     </script>
     <script>
         $(document).ready(function() {

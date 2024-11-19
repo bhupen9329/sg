@@ -31,8 +31,10 @@ use App\Models\FifoTransaction;
 use App\Models\AverageTransactionUsedQty;
 use App\Models\AverageTransactionStack;
 use App\Models\AverageTransaction;
+use App\Models\PurchaseOrder;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SalesController extends Controller
 {
@@ -57,6 +59,7 @@ class SalesController extends Controller
             ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
             ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
+            ->where('so_items.so_item_status', '!=', 'Close')
             ->select(
                 '*',
                 'sales_orders.id as so_id',
@@ -741,6 +744,48 @@ class SalesController extends Controller
 
         return response()->json([
             'rows_data' => $So_data
+        ]);
+    }
+
+    public function get_received_qty_so_party_wise(Request $request)
+    {
+
+        $so_data = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+        ->join('categories', 'so_items.item_category', '=', 'categories.id')
+        ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
+        ->where('sales_orders.company_id', $request->company_id)
+        ->select(
+            'so_items.item_category',
+            'categories.name as category_name',
+            DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+        )
+        ->groupBy('so_items.item_category', 'categories.name')
+        ->get();
+    
+
+        return response()->json([
+            'rows_data' => $so_data
+        ]);
+    }
+
+    public function get_received_qty_po_party_wise(Request $request)
+    {
+
+        $po_data = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+        ->join('categories', 'po_items.item_category', '=', 'categories.id')
+        ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+        ->where('purchase_orders.supplier_id', $request->company_id)
+        ->select(
+            'po_items.item_category',
+            'categories.name as category_name',
+            DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
+        )
+        ->groupBy('po_items.item_category', 'categories.name')
+        ->get();
+    
+
+        return response()->json([
+            'rows_data' => $po_data
         ]);
     }
 }
