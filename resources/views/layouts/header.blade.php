@@ -422,6 +422,38 @@
                 </li><!-- End Icons Nav -->
             @endif
 
+
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#report-aggregate-nav" data-bs-toggle="collapse"
+                    href="#">
+                    <i class="bi bi-file-text"></i>
+
+                    </i><span>Aggregate Reports</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="report-aggregate-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+
+                    <li>
+                    
+                            <a href="{{ route('company_wise.report') }}">
+                                <i class="bi bi-circle"></i><span>Company Wise Report </span>
+                            </a>
+                      
+                    </li>
+
+                  
+
+                    {{-- <li>
+                        @can('Quotation-Execution-Report')
+                            <a href="{{ route('quotation_execution_report') }}">
+                                <i class="bi bi-circle"></i><span> Quotation Execution Report</span>
+                            </a>
+                        @endcan
+                    </li> --}}
+
+                </ul>
+            </li><!-- End Icons Nav -->
+
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('inventory.report') }}">
                     <i class="fa-solid fa-box"></i>

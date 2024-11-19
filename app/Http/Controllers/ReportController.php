@@ -1438,4 +1438,67 @@ class ReportController extends Controller
         }
         return response()->json($data);
     }
+
+
+    
+    public function company_wise_report()
+    {
+        $company =  Company::all();
+        $category = Category::all();
+
+        return view('reports.company_wise_report', compact('company', 'category'));
+    }
+    public function get_company_wise_report(Request $request)
+    {
+        $filterTodate = $request->filterTodate;
+        $filterFromdate = $request->filterFromdate;
+        $filterCompany = $request->filterCompany;
+    
+        $query = Company::leftJoin('sales_orders', 'companies.id', '=', 'sales_orders.company_id')
+            ->leftJoin('purchase_orders', 'companies.id', '=', 'purchase_orders.supplier_id')
+            ->leftJoin('so_items', 'so_items.so_id', '=', 'sales_orders.id')
+            ->leftJoin('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
+            ->select(
+                'companies.company_name',
+                DB::raw('IFNULL(YEAR(sales_orders.date), YEAR(purchase_orders.date)) as year'),
+                DB::raw('IFNULL(MONTH(sales_orders.date), MONTH(purchase_orders.date)) as month'),
+                DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_rest_qty_po'),
+                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_rest_qty_so')
+            )
+            ->when($filterTodate && $filterFromdate, function ($query) use ($filterTodate, $filterFromdate) {
+                $query->where(function ($q) use ($filterTodate, $filterFromdate) {
+                    $q->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate])
+                        ->orWhereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
+                });
+            })
+            ->when($filterCompany && $filterCompany != 'all', function ($query) use ($filterCompany) {
+                $query->where(function ($q) use ($filterCompany) {
+                    $q->where('sales_orders.company_id', $filterCompany)
+                        ->orWhere('purchase_orders.supplier_id', $filterCompany);
+                });
+            })
+            ->groupBy(
+                'companies.company_name',
+                DB::raw('IFNULL(YEAR(sales_orders.date), YEAR(purchase_orders.date))'),
+                DB::raw('IFNULL(MONTH(sales_orders.date), MONTH(purchase_orders.date))')
+            );
+    
+        $filteredData = $query->get();
+    
+        $data = [];
+        foreach ($filteredData as $item) {
+            $tempData = [
+                'companies' => $item->company_name,
+                'year' => $item->year,
+                'month' => $item->month,
+                'total_rest_qty_so' => $item->total_rest_qty_so ?? 0,
+                'total_rest_qty_po' => $item->total_rest_qty_po ?? 0,
+            ];
+            $data[] = $tempData;
+        }
+    
+        return response()->json($data);
+    }
+    
+    
 }

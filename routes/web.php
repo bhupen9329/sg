@@ -100,6 +100,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get_received_qty_so', [SalesController::class, 'get_received_qty_so']);
 
 
+    Route::post('/get_received_qty_party_wise', [SalesController::class, 'get_received_qty_so_party_wise']);
+    Route::post('/get_received_qty_po_party_wise', [SalesController::class, 'get_received_qty_po_party_wise']);
+
+
+    
+    // Route::post('/get_received_qty_so', [SalesController::class, 'get_received_qty_so']);
+
+
 
 
     // .................................Warehouse Route Start..................................................
@@ -316,6 +324,14 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/dispatch-report', [ReportController::class, 'dispatch_report'])->name('dispatch_report');
     Route::post('/dispatch-report-get', [ReportController::class, 'get_dispatch_report'])->name('dispatch_report_get');
+
+
+        // .........................................Aggregate Report.............................................
+
+    Route::get('/company-wise-report', [ReportController::class, 'company_wise_report'])->name('company_wise.report');
+
+       Route::post('/company-wise-report-get', [ReportController::class, 'get_company_wise_report'])->name('get_company_wise_report');
+
 
     // .........................................Transactions.............................................
     Route::get('/stock_transaction', [TransactionController::class, 'index'])->name('stock_transaction.index');

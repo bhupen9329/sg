@@ -135,6 +135,7 @@
                         <select class="custom-select form-control item_select   " name="category" id="filterstatus"
                             required>
                             <option value="all">All</option>
+                            <option value="Open">Open</option>
                             <option value="Partial Pending">Partial Pending</option>
                             <option value="Not Close" selected>Not Close</option>
                             <option value="Close">Close</option>

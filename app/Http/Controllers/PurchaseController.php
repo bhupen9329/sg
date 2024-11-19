@@ -61,6 +61,7 @@ class PurchaseController extends Controller
                 ->join('categories', 'categories.id', '=', 'po_items.item_category')
                 ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
                 ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'categories.name as category_name', 'users.*')
+                ->where('po_items.po_item_status', '!=', 'Close')
                 ->get();
             // dd( $po_data);
         } else {
@@ -70,10 +71,9 @@ class PurchaseController extends Controller
                 ->join('categories', 'categories.id', '=', 'po_items.item_category')
                 ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
                 ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'categories.name as category_name', 'users.*')
+                ->where('po_items.po_item_status', '!=', 'Close')
                 ->where('purchase_orders.po_user_id', $user->id)->get();
         }
-
-
 
         // dd($po_data);
 
