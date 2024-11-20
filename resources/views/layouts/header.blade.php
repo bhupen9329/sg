@@ -429,7 +429,7 @@
                     href="#">
                     <i class="bi bi-file-text"></i>
 
-                    </i><span>Aggregate Reports</span><i class="bi bi-chevron-down ms-auto"></i>
+                    </i><span>Additional Reports</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul id="report-aggregate-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
 

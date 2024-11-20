@@ -1462,8 +1462,8 @@ class ReportController extends Controller
                 'companies.company_name',
                 DB::raw('IFNULL(YEAR(sales_orders.date), YEAR(purchase_orders.date)) as year'),
                 DB::raw('IFNULL(MONTH(sales_orders.date), MONTH(purchase_orders.date)) as month'),
-                DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_rest_qty_po'),
-                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_rest_qty_so')
+                DB::raw('SUM(po_items.qty) as total_rest_qty_po'),
+                DB::raw('SUM(so_items.qty) as total_rest_qty_so')
             )
             ->when($filterTodate && $filterFromdate, function ($query) use ($filterTodate, $filterFromdate) {
                 $query->where(function ($q) use ($filterTodate, $filterFromdate) {
@@ -1484,6 +1484,7 @@ class ReportController extends Controller
             );
     
         $filteredData = $query->get();
+
     
         $data = [];
         foreach ($filteredData as $item) {
