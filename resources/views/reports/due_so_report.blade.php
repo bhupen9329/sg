@@ -56,26 +56,24 @@
             </div>
         @endif
         <div class="dashboard-header pagetitle">
-            <h1>Sales Order Report</h1>
+            <h1>Due Sales Order Report</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Sales Order Report</li>
+                    <li class="breadcrumb-item">Due Sales Order Report</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
 
 
         <div class="dashboard-header pagetitle">
-            <h1>Sales Order Report</h1>
+            <h1>Due Sales Order Report</h1>
             <div class="row" style="align-items: flex-end;">
                 <div class="col-md-12 col-sm-12 d-flex justify-content-end">
 
 
                     <button class=" m-1 btn btn-primary" type="button"
                         onclick="filterButton(
-                $('#filterTodate').val(),
-                $('#filterFromdate').val(),
                 $('#filterCompany').val(),
                 $('#filterCategory').val(),
                
@@ -88,7 +86,7 @@
 
             <div class="page-header">
                 <div class="row">
-                    <div class="col-md-3 col-sm-12" style="margin-top: 7px">
+                    {{-- <div class="col-md-3 col-sm-12" style="margin-top: 7px">
                         <label for="filterTodate"><strong>From Date</strong></label>
                         <?php
                         $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
@@ -103,7 +101,7 @@
                         ?>
                         <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
                             id="filterFromdate" required>
-                    </div>
+                    </div> --}}
 
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCompany" class="mb-2"><strong>Company</strong></label>
@@ -127,7 +125,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-2 col-sm-12">
+                    {{-- <div class="col-md-2 col-sm-12">
                         <label for="filterCategory" class="mb-2"><strong>Dispatch Status</strong></label>
                         <select class="custom-select form-control item_select   " name="category" id="filterstatus"
                             required>
@@ -149,7 +147,7 @@
                             @endforeach
 
                         </select>
-                    </div>
+                    </div> --}}
 
                 </div>
             </div>
@@ -163,7 +161,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Sales Order Report</h4>
+                                        <h4 class="text-blue h4">Due Sales Order Report</h4>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
@@ -175,12 +173,11 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>SO Date​</th>
+                                            <th>SO Due Date​</th>
                                             <th>SO No.</th>
                                             <th>SO Item No.</th>
                                             <th>Buyer Name(Party Name)​</th>
                                             <th>Base Item Name​</th>
-                                            <th>SO Unit Price</th>
                                             <th>SO Quantity</th>
                                             <th>Balanced SO Quantity</th>
                                             <th>Dispatched Quantity</th>
@@ -199,7 +196,6 @@
                                             <td style="text-align:center;"><strong>Grand Total:</strong></td>
                                             <td></td>
                                             <td></td>
-                                            <td style="text-align:left; font-weight: bold;" id="totalSOUnitPrice">0</td>
                                             <td style="text-align:left; font-weight: bold;" id="totalSOQty">0</td>
                                             <td style="text-align:left; font-weight: bold;" id="totalRestQty">0</td>
                                             <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
@@ -278,90 +274,80 @@
 
 
 <script>
-function filterButton(filterTodate, filterFromdate, filterCompany, filterCategory) {
-    const filterStatus = $('#filterstatus').val();
-    const filteruser = $('#filteruser').val();
-
-    $.ajax({
-        type: 'POST',
-        url: 'report-so',
-        data: {
-            filterTodate: filterTodate,
-            filterFromdate: filterFromdate,
-            filterCompany: filterCompany,
-            filterCategory: filterCategory,
-            filterStatus: filterStatus,
-            filteruser: filteruser,
-            _token: "{{ csrf_token() }}"
-        },
-        success: function (response) {
-            if (response && Array.isArray(response)) {
-                var table = $('#Category_table').DataTable();
-                table.clear().draw();
-
-                // Initialize total variables
-                var totalSOUnitPrice = 0;
-                var totalSOQty = 0;
-                var totalRestQty = 0;
-                var totalDispatchedQty = 0;
-
-                response.forEach(function (data, index) {
-                    // Calculate dispatched quantity
-                    const dispatched_qty = (data.quantity - data.rest_qty).toLocaleString();
-
-                    // Update totals
-                    totalSOUnitPrice += parseFloat(data.so_unit_price) || 0;
-                    totalSOQty += parseFloat(data.quantity) || 0;
-                    totalRestQty += parseFloat(data.rest_qty) || 0;
-                    totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
-
-                    // Add row to DataTable
-                
-                    const rowNode = table.row.add([
-                        index + 1,
-                        data.date,
-                        data.so_number,
-                        data.so_item_number,
-                        data.company_name,
-                        data.category,
-                        data.so_unit_price,
-                        data.quantity,
-                        data.rest_qty,
-                        dispatched_qty,
-                        data.dispatch_status,
-                        data.user_name,
-                    ]).draw(false).node();
-
-                    // Optionally add additional styles to the row or other cells
-                    if(data.rest_qty != 0){
-                        $(rowNode).find('td:eq(8)').css({
-                        'background-color': '#ff3300',
-                        'color': 'black',
-                    });
-                    }else{
-                        $(rowNode).find('td').css({
-                        'background-color': '#15ff00',
-                        'color': 'black',
-                    });
-                    }
-             
-                });
-
-                // Update grand totals in the footer
-                $('#totalSOUnitPrice').text(totalSOUnitPrice.toFixed(2));
-                $('#totalSOQty').text(totalSOQty.toFixed(2));
-                $('#totalRestQty').text(totalRestQty.toFixed(2));
-                $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
-            } else {
-                console.error("Invalid or empty response received.");
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("AJAX request failed:", status, error);
-        }
+     $(document).ready(function () {
+        // Call filterButton on page load with default or initial filter values
+        filterButton(
+            $('#filterTodate').val(),
+            $('#filterFromdate').val(),
+            $('#filterCompany').val(),
+            $('#filterCategory').val()
+        );
     });
-}
+    function filterButton(filterCompany, filterCategory) {
+        const filterStatus = $('#filterstatus').val();
+        const filteruser = $('#filteruser').val();
+        
+        $.ajax({
+            type: 'POST',
+            url: 'get_due_so_report',
+            data: {
+                filterCompany: filterCompany,
+                filterCategory: filterCategory,
+                filterStatus: filterStatus,
+                filteruser: filteruser,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (response && Array.isArray(response)) {
+                    var table = $('#Category_table').DataTable();
+                    table.clear().draw();
 
+                    // Initialize total variables
+                    var totalSOUnitPrice = 0;
+                    var totalSOQty = 0;
+                    var totalRestQty = 0;
+                    var totalDispatchedQty = 0;
+
+                    response.forEach(function(data, index) {
+                        // Calculate dispatched quantity
+                        const dispatched_qty = (data.quantity - data.rest_qty).toLocaleString();
+
+                        // Update totals
+                        totalSOUnitPrice += parseFloat(data.so_unit_price) || 0;
+                        totalSOQty += parseFloat(data.quantity) || 0;
+                        totalRestQty += parseFloat(data.rest_qty) || 0;
+                        totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
+
+                        // Add row to DataTable
+                        table.row.add([
+                            index + 1,
+                            data.date,
+                            data.so_number,
+                            data.so_item_number,
+                            data.company_name,
+                            data.category,
+                            data.quantity,
+                            data.rest_qty,
+                            dispatched_qty,
+                            data.dispatch_status,
+                            data.user_name,
+                        ]).draw(false);
+                    });
+
+                    // Update grand totals in the footer
+                    $('#totalSOUnitPrice').text(totalSOUnitPrice.toFixed(2));
+                    $('#totalSOQty').text(totalSOQty.toFixed(2));
+                    $('#totalRestQty').text(totalRestQty.toFixed(2));
+                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
+                } else {
+                    console.error("Invalid or empty response received.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed:", status, error);
+            }
+        });
+    }
 
     $('#resetButton').click(function() {
         // Reload the page to reset filters
@@ -375,8 +361,6 @@ function filterButton(filterTodate, filterFromdate, filterCompany, filterCategor
         $(document).ready(function() {
             $('.table.dataTable').removeClass('no-footer');
         });
-
-
 
         $(document).ready(function() {
             $('.custom-select').select2();

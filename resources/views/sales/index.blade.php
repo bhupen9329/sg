@@ -143,22 +143,22 @@
                                                 <td style="background-color: #15ff00">{{ $data->terms_condition ?? 'N/A' }}</td>
                                                 <td style="background-color: #15ff00">{{ $data->name ?? 'N/A' }}</td>
                                             @else
-                                                <td style="background-color: #FFBF00">{{ $loop->iteration }}</td>
-                                                <td style="background-color: #FFBF00">{{ date('d-M-Y', strtotime($data->date)) }}</td>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
                                                 {{-- <td>{{ date('d-m-Y', strtotime($data->date))  }}</td> --}}
-                                                <td style="background-color: #FFBF00">{{ $data->so_number }}</td>
-                                                <td style="background-color: #FFBF00">{{ $data->so_item_no }}</td>
-                                                <td style="background-color: #FFBF00">{{ $data->company_name }}</td>
-                                                <td style="background-color: #FFBF00">{{ $data->category_name }}</td>
-                                                <td style="background-color: #FFBF00">{{ $data->qty }}</td>
+                                                <td>{{ $data->so_number }}</td>
+                                                <td>{{ $data->so_item_no }}</td>
+                                                <td>{{ $data->company_name }}</td>
+                                                <td>{{ $data->category_name }}</td>
+                                                <td>{{ $data->qty }}</td>
                                                 <td style="background-color: #ff3300">{{ $data->so_dispatch_rest_qty }}
                                                 </td>
-                                                <td style="background-color: #FFBF00">{{ $data->unit_price }}</td>
-                                                <td style="background-color: #FFBF00">{{ $data->price }}</td>
+                                                <td>{{ $data->unit_price }}</td>
+                                                <td>{{ $data->price }}</td>
 
-                                                <td style="background-color: #FFBF00">{{ $data->so_dispatch_item_status }}</td>
-                                                <td style="background-color: #FFBF00">{{ $data->terms_condition ?? 'N/A' }}</td>
-                                                <td style="background-color: #FFBF00">{{ $data->name ?? 'N/A' }}</td>
+                                                <td>{{ $data->so_dispatch_item_status }}</td>
+                                                <td>{{ $data->terms_condition ?? 'N/A' }}</td>
+                                                <td>{{ $data->name ?? 'N/A' }}</td>
                                             @endif
 
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">

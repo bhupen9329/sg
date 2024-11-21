@@ -480,12 +480,18 @@
 
                                                     <td>{{ date('d-M-Y', strtotime($current_date)) }}</td>
                                                     <td>
-                                                        <a href="#" style="text-decoration: underline; color: blue;"
+                                                        {{-- <a href="" style="text-decoration: underline; color: blue;"
                                                             data-bs-toggle="modal" data-bs-target="#so_items"
                                                             class="rest-quantity-link"
                                                             onclick="get_so_items_for_report({{ $total_sales_order_quantity }})">
                                                             {{ $total_sales_order_quantity }}
-                                                        </a>
+                                                        </a> --}}
+
+                                                        <a href="{{route('due_so_report')}}" style="text-decoration: underline; color: blue;"
+                                                        class="rest-quantity-link"
+                                                       >
+                                                        {{ $total_sales_order_quantity }}
+                                                    </a>
                                                     </td>
 
 
@@ -532,12 +538,17 @@
 
                                                     <td>{{ date('d-M-Y', strtotime($current_date)) }}</td>
                                                     <td>
-                                                        <a href="#" style="text-decoration: underline; color: blue;"
+                                                        {{-- <a href="#" style="text-decoration: underline; color: blue;"
                                                             data-bs-toggle="modal" data-bs-target="#po_items"
                                                             class="rest-quantity-link"
                                                             onclick="get_po_items_for_report({{ $total_purchase_order_quantity }})">
                                                             {{ $total_purchase_order_quantity }}
-                                                        </a>
+                                                        </a> --}}
+
+                                                        <a href="{{route('due_po_report')}}" style="text-decoration: underline; color: blue;"
+                                                        class="rest-quantity-link"
+                                                       >
+                                                       {{ $total_purchase_order_quantity }}
                                                     </td>
 
 

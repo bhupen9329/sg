@@ -178,19 +178,19 @@
                                             <td style="background-color: #15ff00;">{{ $data->remark ?? 'N/A' }}</td>
                                             <td style="background-color: #15ff00;">{{ $data->name ?? 'N/A' }}</td>
                                         @else
-                                            <td style="background-color: #FFBF00;">{{ $loop->iteration }}</td>
-                                            <td style="background-color: #FFBF00;">{{ date('d-M-Y', strtotime($data->date)) }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->document_number }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->po_item_no }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->company_name }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->category_name }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->qty }}</td>
+                                            <td >{{ $loop->iteration }}</td>
+                                            <td >{{ date('d-M-Y', strtotime($data->date)) }}</td>
+                                            <td >{{ $data->document_number }}</td>
+                                            <td >{{ $data->po_item_no }}</td>
+                                            <td>{{ $data->company_name }}</td>
+                                            <td>{{ $data->category_name }}</td>
+                                            <td>{{ $data->qty }}</td>
                                             <td style="background-color: #ff3300;">{{ $data->po_dispatch_rest_qty }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->unit_price }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->price }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->po_dispatch_item_status }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->remark ?? 'N/A' }}</td>
-                                            <td style="background-color: #FFBF00;">{{ $data->name ?? 'N/A' }}</td>
+                                            <td>{{ $data->unit_price }}</td>
+                                            <td>{{ $data->price }}</td>
+                                            <td>{{ $data->po_dispatch_item_status }}</td>
+                                            <td>{{ $data->remark ?? 'N/A' }}</td>
+                                            <td>{{ $data->name ?? 'N/A' }}</td>
                                         @endif
                                         
 
