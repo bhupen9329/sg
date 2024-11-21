@@ -135,12 +135,13 @@
 
                                     <?php
                                     $currentDate = date('Y-m-d');
-                                     ?>
+                                    ?>
 
                                     <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="to_company_id" class="form-label">Dispatch Date<span
-                                            class="required-classes">*</span></label>
-                                        <input type="date" class="form-control" name="date" value="{{$currentDate}}" required>
+                                                class="required-classes">*</span></label>
+                                        <input type="date" class="form-control" name="date"
+                                            value="{{ $currentDate }}" required>
                                     </div>
                                 </div>
 
@@ -154,11 +155,16 @@
                                         <tr>
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
+                                            <th class="table_heading_long">PO NO.<span class="required-classes">*</span>
+                                            </th>
+                                            <th class="table_heading_long">PO Item NO.<span
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
                                             <th class="table_heading_long">Insurance</th>
                                             <th class="table_heading_long">PO Unit Price</th>
                                             <th class="table_heading_long">SO Unit Price</th>
-                                            <th class="table_heading_normal">Quantity<span class="required-classes">*</span>
+                                            <th class="table_heading_normal">Quantity<span
+                                                    class="required-classes">*</span>
                                             </th>
                                             <th class="table_heading_long">Payable Total<span
                                                     class="required-classes">*</span></th>
@@ -338,7 +344,8 @@
     <script>
         var lastItemId = 1;
 
-        function addRow(itemName = '', itemId = '', quantity = '', unitPrice = '', subItems = [], freight = '', insurance =
+        function addRow(itemName = '', po_number = '', po_item_number = '', itemId = '', quantity = '', unitPrice = '',
+            subItems = [], freight = '', insurance =
             '', ) {
             var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
@@ -352,6 +359,8 @@
             newRow.innerHTML = `
     <td>${itemName}</td>
     <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
+    <td>${po_number}</td>
+    <td>${po_item_number}</td>
     <td>
         <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
     </td>
@@ -412,30 +421,31 @@
             const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
-            const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]').value) || 0;
+            const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
+                .value) || 0;
 
             const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
             const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
-            const insuranceStatus  = row.querySelector('select[name="insurance_status[]"]').value;
- 
+            const insuranceStatus = row.querySelector('select[name="insurance_status[]"]').value;
+
             // Calculate the total values for PO and SO based on the quantity
 
-                let totalPOUnitPrice = 0;
-                let totalSOUnitPrice = 0;
+            let totalPOUnitPrice = 0;
+            let totalSOUnitPrice = 0;
 
-                if (insuranceStatus === 'yes') {
-                    totalPOUnitPrice = unitPriceActual + convRate + freight + other;
-                    console.log(totalPOUnitPrice);
-                    totalSOUnitPrice = sounitPriceActual + convRate + freight + other;
-                } else {
-                   totalPOUnitPrice = unitPriceActual + convRate + freight;
-                   totalSOUnitPrice = sounitPriceActual + convRate + freight;
-                }
+            if (insuranceStatus === 'yes') {
+                totalPOUnitPrice = unitPriceActual + convRate + freight + other;
+                console.log(totalPOUnitPrice);
+                totalSOUnitPrice = sounitPriceActual + convRate + freight + other;
+            } else {
+                totalPOUnitPrice = unitPriceActual + convRate + freight;
+                totalSOUnitPrice = sounitPriceActual + convRate + freight;
+            }
 
-       
-                row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
-                row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
+
+            row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
+            row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
 
             if (quantity) {
                 // Multiply only the total (not unit price)
@@ -460,7 +470,7 @@
 
 
                 // Ensure unit prices remain unchanged
-                   
+
                 row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
                 row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
             }
@@ -666,8 +676,10 @@
                         const freight = response.freight;
                         const insurance = response.insurance;
                         // Populate the row with additional details
-                        addRow(details.name, details.id, quantity, unitPrice, subitems, freight,
+                        addRow(details.name, po_item.document_number, po_item.po_item_no, details.id,
+                            quantity, unitPrice, subitems, freight,
                             insurance);
+
                         PORow(po_item.date, po_item.document_number, po_item.name, po_item.po_item_no,
                             po_item.qty, po_item.po_dispatch_rest_qty, po_item.unit_price, po_item
                             .po_price);
@@ -859,9 +871,7 @@
             });
         }
 
-        function singleCheckboxSelection(selectedCheckbox) {
-            $('.po-checkbox').not(selectedCheckbox).prop('checked', false);
-        }
+
 
         function singleSOCheckboxSelection(selectedCheckbox) {
             $('.so-checkbox').not(selectedCheckbox).prop('checked', false);

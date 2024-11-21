@@ -441,6 +441,25 @@
                       
                     </li>
 
+                    <li>
+                    
+                        <a href="{{ route('due_so_report') }}">
+                            <i class="bi bi-circle"></i><span>Due SO Report </span>
+                        </a>
+                  
+                </li>
+
+                <li>
+                    
+                    <a href="{{ route('due_po_report') }}">
+                        <i class="bi bi-circle"></i><span>Due PO Report </span>
+                    </a>
+
+
+
+              
+            </li>
+
                   
 
                     {{-- <li>

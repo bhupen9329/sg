@@ -1453,6 +1453,7 @@ class ReportController extends Controller
         $filterTodate = $request->filterTodate;
         $filterFromdate = $request->filterFromdate;
         $filterCompany = $request->filterCompany;
+
     
         $query = Company::leftJoin('sales_orders', 'companies.id', '=', 'sales_orders.company_id')
             ->leftJoin('purchase_orders', 'companies.id', '=', 'purchase_orders.supplier_id')
@@ -1500,6 +1501,143 @@ class ReportController extends Controller
     
         return response()->json($data);
     }
+
+    public function due_so_report()
+    {
+        $companys =  Company::all();
+        $Categorys = Category::all();
+
+        return view('reports.due_so_report', compact('companys', 'Categorys'));
+    }
+
+    public function get_due_so_report(Request $request)
+    {
+        $filterTodate = $request->filterTodate;
+        $filterFromdate = $request->filterFromdate;
+        $filterCompany = $request->filterCompany;
+        $filterItem_name = $request->filterCategory;
+    
+        $todaysDate = Carbon::today();
+
+        $query = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->join('companies', 'companies.id', '=', 'sales_orders.company_id')
+            ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
+            ->join('categories', 'categories.id', '=', 'so_items.item_category')
+            ->select(
+                'sales_orders.so_user_id',
+                'sales_orders.due_date',
+                'sales_orders.so_number',
+                'so_items.so_item_no',
+                'companies.company_name',
+                'categories.name as category_name',
+                'so_items.qty',
+                'so_items.unit_price',
+                'so_items.so_dispatch_rest_qty',
+                'so_items.so_dispatch_item_status',
+                'users.name as user_name'
+            )
+            ->where('so_items.so_dispatch_rest_qty', '!=', 0)
+            ->whereDate('sales_orders.due_date', '<=', $todaysDate); // Due date ko filter karte hain
+            // dd($query);
+          
+
+            if ($filterCompany && $filterCompany != 'all') {
+                $query->where('companies.id', $filterCompany);
+            }
+
+            if ($filterItem_name && $filterItem_name != 'all') {
+                $query->where('so_items.item_category', $filterItem_name);
+            }
+
+            $filteredData = $query->get();
+            
+ 
+
+        $data = [];
+        foreach ($filteredData as $filteredData) {
+            $tempData = [
+                'date' => date('d-M-Y', strtotime($filteredData->due_date)),
+                'so_number' => $filteredData->so_number,
+                'so_item_number' => $filteredData->so_item_no,
+                'company_name' => $filteredData->company_name,
+                'category' => $filteredData->category_name,
+                'quantity' => $filteredData->qty,
+                'rest_qty' => $filteredData->so_dispatch_rest_qty,
+                'dispatch_status' => $filteredData->so_dispatch_item_status,
+                'user_name' => $filteredData->user_name,
+            ];
+            $data[] = $tempData;
+        }
+    
+        return response()->json($data);
+    }
+
+    public function due_po_report()
+{
+    $companys =  Company::all();
+        $Categorys = Category::all();
+
+    return view('reports.due_po_report',  compact('companys', 'Categorys'));
+}
+
+public function get_due_po_report(Request $request)
+{
+    $filterTodate = $request->filterTodate;
+    $filterFromdate = $request->filterFromdate;
+    $filterCompany = $request->filterCompany;
+    $filterItemName = $request->filterCategory;
+
+    $todaysDate = Carbon::today();
+
+    $query = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+        ->join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+        ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
+        ->join('categories', 'categories.id', '=', 'po_items.item_category')
+        ->select(
+            'purchase_orders.po_user_id',
+            'purchase_orders.due_date',
+            'purchase_orders.document_number as po_number',
+            'po_items.po_item_no',
+            'companies.company_name',
+            'categories.name as category_name',
+            'po_items.qty',
+            'po_items.po_dispatch_rest_qty',
+            'po_items.po_dispatch_item_status',
+            'users.name as user_name'
+        )
+        ->where('po_items.po_dispatch_rest_qty', '!=', 0)
+        ->whereDate('purchase_orders.due_date', '<=', $todaysDate);
+
+    if ($filterCompany && $filterCompany != 'all') {
+        $query->where('companies.id', $filterCompany);
+    }
+
+    if ($filterItemName && $filterItemName != 'all') {
+        $query->where('po_items.item_category', $filterItemName);
+    }
+
+    $filteredData = $query->get();
+
+    $data = [];
+    foreach ($filteredData as $item) {
+        $tempData = [
+            'date' => date('d-M-Y', strtotime($item->due_date)),
+            'po_number' => $item->po_number,
+            'po_item_number' => $item->po_item_no,
+            'company_name' => $item->company_name,
+            'category' => $item->category_name,
+            'quantity' => $item->qty,
+            'rest_qty' => $item->po_dispatch_rest_qty,
+            'dispatch_status' => $item->po_dispatch_item_status,
+            'user_name' => $item->user_name,
+        ];
+        $data[] = $tempData;
+    }
+
+    return response()->json($data);
+}
+
+
     
     
 }

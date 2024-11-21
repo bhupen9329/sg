@@ -20,9 +20,9 @@
                 }
 
                 /* .dashboard_dataTables_wrapper_low {
-                                        height: 600px;
-                                        overflow-y: scroll;
-                                    } */
+                                            height: 600px;
+                                            overflow-y: scroll;
+                                        } */
 
                 .note-toolbar .btn-primary:hover,
                 .note-toolbar .btn-primary:active,
@@ -226,8 +226,10 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">SO Item Number</th>
-                                        <th scope="col">Base Item</th>
+                                        <th scope="col">SO Due Date</th>
+                                        <th scope="col">SO Number</th>
+                                        <th scope="col">Party Name</th>
+                                        <th scope="col">Sales Person</th>
                                         <th scope="col">Rest Quantity</th>
 
                                     </tr>
@@ -254,8 +256,10 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">PO Item Number</th>
-                                        <th scope="col">Base Item</th>
+                                        <th scope="col">PO Due Date</th>
+                                        <th scope="col">PO Number</th>
+                                        <th scope="col">Party Name</th>
+                                        <th scope="col">Purchase Person</th>
                                         <th scope="col">Rest Quantity</th>
 
                                     </tr>
@@ -270,7 +274,8 @@
             </div>
 
 
-            <div class="modal fade" id="Modalfor_quantity_details_so_party_wise" tabindex="-1" aria-labelledby="modal3Label" aria-hidden="true">
+            <div class="modal fade" id="Modalfor_quantity_details_so_party_wise" tabindex="-1"
+                aria-labelledby="modal3Label" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -297,7 +302,8 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="Modalfor_quantity_details_po_party_wise" tabindex="-1" aria-labelledby="modal3Label" aria-hidden="true">
+            <div class="modal fade" id="Modalfor_quantity_details_po_party_wise" tabindex="-1"
+                aria-labelledby="modal3Label" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -359,13 +365,14 @@
                                                                     <td style="padding: 8px;">
                                                                         {{ date('d-M-Y', strtotime($data['transaction_date'])) }}
                                                                     </td>
-                                                                    <td style="padding: 8px;">{{ $data['item_name'] ?? 'N/A' }}</td>
+                                                                    <td style="padding: 8px;">
+                                                                        {{ $data['item_name'] ?? 'N/A' }}</td>
                                                                 @endif
                                                             @endforeach
-        
+
                                                             {{-- <td style="padding: 8px;">{{ $data['transaction_type'] ?? 'N/A' }}</td> --}}
                                                             {{-- <td style="padding: 8px;">{{ $data['quantity'] ?? 'N/A' }}</td> --}}
-        
+
                                                             <!-- LIFO Transactions -->
                                                             @foreach ($lifo_transaction as $lifo_transactions)
                                                                 @if ($data['id'] == $lifo_transactions['transaction_id'] && $data['item_id'] == $lifo_transactions['item_id'])
@@ -380,7 +387,7 @@
                                                                     </td>
                                                                 @endif
                                                             @endforeach
-        
+
                                                             <!-- FIFO Transactions -->
                                                             @foreach ($fifo_transaction as $fifo_transactions)
                                                                 @if ($data['id'] == $fifo_transactions['transaction_id'] && $data['item_id'] == $fifo_transactions['item_id'])
@@ -392,8 +399,8 @@
                                                                     </td>
                                                                 @endif
                                                             @endforeach
-        
-        
+
+
                                                             @foreach ($avg_transaction as $avg_transactions)
                                                                 @if ($data['id'] == $avg_transactions['transaction_id'] && $data['item_id'] == $avg_transactions['item_id'])
                                                                     <td style="padding: 8px;">
@@ -404,9 +411,9 @@
                                                                     </td>
                                                                 @endif
                                                             @endforeach
-        
-        
-        
+
+
+
                                                             <!-- LIFO Manual Match and Netwise -->
                                                             {{-- <td style="padding: 8px;">{{ $lifoData['manual_match'] ?? 'N/A' }}</td> --}}
                                                             {{-- <td style="padding: 8px;">
@@ -421,7 +428,8 @@
                                                 @else
                                                     <!-- No data row -->
                                                     <tr>
-                                                        <td colspan="7" style="padding: 8px; text-align: center;">No data
+                                                        <td colspan="7" style="padding: 8px; text-align: center;">No
+                                                            data
                                                             available</td>
                                                     </tr>
                                                 @endif
@@ -459,31 +467,36 @@
                                             <thead>
                                                 <tr>
                                                     <th>Due SO Date</th>
-                                                    <th>Sales Order</th>
-                                                    <th>Total Rest Quantity</th>
-                                                    <th>Sales Person</th>
+                                                    <th>Total SO Due Quantity</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($sales_order_due_date as $data)
-                                                    <tr>
-                                                        
-                                                        <td>{{ date('d-M-Y', strtotime($data['due_date'])) }}</td>
-                                                        <td>{{ $data['so_number'] }}</td>
-                                                        <td>
-                                                            <a href="#"
-                                                                style="text-decoration: underline; color: blue;"
-                                                                data-bs-toggle="modal" data-bs-target="#so_items"
-                                                                class="rest-quantity-link"
-                                                                onclick="get_so_items_for_report({{ $data['so_id'] }})">
-                                                                {{ $data['total_quantity'] }}
-                                                            </a>
-                                                        </td>
-                                                        <td>{{ $data['name'] }}</td>
+                                                <?php
+                                                $current_date = date('d-M-Y');
+                                                ?>
+
+                                                <tr>
+
+                                                    <td>{{ date('d-M-Y', strtotime($current_date)) }}</td>
+                                                    <td>
+                                                        {{-- <a href="" style="text-decoration: underline; color: blue;"
+                                                            data-bs-toggle="modal" data-bs-target="#so_items"
+                                                            class="rest-quantity-link"
+                                                            onclick="get_so_items_for_report({{ $total_sales_order_quantity }})">
+                                                            {{ $total_sales_order_quantity }}
+                                                        </a> --}}
+
+                                                        <a href="{{route('due_so_report')}}" style="text-decoration: underline; color: blue;"
+                                                        class="rest-quantity-link"
+                                                       >
+                                                        {{ $total_sales_order_quantity }}
+                                                    </a>
+                                                    </td>
 
 
-                                                    </tr>
-                                                @endforeach
+                                                </tr>
+
                                             </tbody>
 
                                         </table>
@@ -513,29 +526,34 @@
                                             <thead>
                                                 <tr>
                                                     <th>Due PO Date</th>
-                                                    <th>Purchase Order</th>
-                                                    <th>Total Rest Quantity</th>
-                                                    <th>Purchase Person</th>
+                                                    <th>Total PO Due Quantity</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($purchase_order_due_date as $data)
-                                                    <tr>
-                                                        <td>{{ date('d-M-Y', strtotime($data['due_date'])) }}</td>
-                                                        <td>{{ $data['document_number'] }}</td>
-                                                        <td>
-                                                            <a href="#"
-                                                                style="text-decoration: underline; color: blue;"
-                                                                data-bs-toggle="modal" data-bs-target="#po_items"
-                                                                class="rest-quantity-link"
-                                                                onclick="get_po_items_for_report({{ $data['po_id'] }})">
+                                                <?php
+                                                $current_date = date('d-M-Y');
+                                                ?>
 
-                                                                {{ $data['total_quantity'] }}
-                                                            </a>
-                                                        </td>
-                                                        <td>{{ $data['name'] }}</td>
-                                                    </tr>
-                                                @endforeach
+                                                <tr>
+
+                                                    <td>{{ date('d-M-Y', strtotime($current_date)) }}</td>
+                                                    <td>
+                                                        {{-- <a href="#" style="text-decoration: underline; color: blue;"
+                                                            data-bs-toggle="modal" data-bs-target="#po_items"
+                                                            class="rest-quantity-link"
+                                                            onclick="get_po_items_for_report({{ $total_purchase_order_quantity }})">
+                                                            {{ $total_purchase_order_quantity }}
+                                                        </a> --}}
+
+                                                        <a href="{{route('due_po_report')}}" style="text-decoration: underline; color: blue;"
+                                                        class="rest-quantity-link"
+                                                       >
+                                                       {{ $total_purchase_order_quantity }}
+                                                    </td>
+
+
+                                                </tr>
+
                                             </tbody>
 
                                         </table>
@@ -596,7 +614,7 @@
                                                                 {{ $total['po_total_quantity'] }}
                                                             </a>
                                                         </td>
-                                                   
+
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -656,7 +674,7 @@
                                                                 {{ $total['po_total_quantity'] }}
                                                             </a>
                                                         </td>
-                                                   
+
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -674,16 +692,16 @@
                     </div>
 
                 </div>
-        
 
-                
 
-                
+
+
+
             </div>
 
-       
 
-            
+
+
 
         </section>
 
@@ -849,18 +867,17 @@
                 });
             }
 
-            function get_so_items_for_report(so_id) {
-                let SoId = so_id;
+            function get_so_items_for_report(current_date) {
+                let CurrentDate = current_date;
                 $.ajax({
                     url: "{{ url('get_so_qty') }}",
                     method: "POST",
                     data: {
-                        SoId: SoId,
+                        CurrentDate: CurrentDate,
                         "_token": "{{ csrf_token() }}",
                     },
                     success: function(res) {
                         // Log the response to the console to check structure
-                        console.log(res);
 
                         // Make sure rows_data exists and is an array
                         let rowsData = res.data; // Ensure this matches the 'data' key in the response
@@ -870,17 +887,19 @@
                         // Loop through the response data and add rows to the table
                         rowsData.forEach((rowData, index) => {
                             // Parse the date string and format it
-                            let date = new Date(rowData.date);
+                            let date = new Date(rowData.due_date);
                             let formattedDate = date.toLocaleDateString('en-GB', {
                                 day: '2-digit',
-                                month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                                month: 'short', // Abbreviated month name
                                 year: 'numeric'
-                            });
+                            }).replace(' ', '');
                             let row = `<tr>
                     <th scope="row">${index + 1}</th>
-                    <td>${rowData.so_item_no}</td>
+                     <td>${formattedDate}</td>
+                    <td>${rowData.so_number}</td>
+                     <td>${rowData.company_name}</td>
                     <td>${rowData.name}</td>
-                    <td>${rowData.so_dispatch_rest_qty}</td>
+                    <td>${rowData.total_quantity}</td>
                 </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
@@ -892,13 +911,13 @@
                 });
             }
 
-            function get_po_items_for_report(po_id) {
-                let PoId = po_id;
+            function get_po_items_for_report(current_date) {
+                let CurrentDate = current_date;
                 $.ajax({
                     url: "{{ url('get_po_qty') }}",
                     method: "POST",
                     data: {
-                        PoId: PoId,
+                        CurrentDate: CurrentDate,
                         "_token": "{{ csrf_token() }}",
                     },
                     success: function(res) {
@@ -909,17 +928,19 @@
                         // Loop through the response data and add rows to the table
                         rowsData.forEach((rowData, index) => {
                             // Parse the date string and format it
-                            let date = new Date(rowData.date);
+                            let date = new Date(rowData.due_date);
                             let formattedDate = date.toLocaleDateString('en-GB', {
                                 day: '2-digit',
-                                month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                                month: 'short', // Abbreviated month name
                                 year: 'numeric'
-                            });
+                            }).replace(' ', '');
                             let row = `<tr>
                     <th scope="row">${index + 1}</th>
-                    <td>${rowData.po_item_no}</td>
+                     <td>${formattedDate}</td>
+                    <td>${rowData.po_number}</td>
+                     <td>${rowData.company_name}</td>
                     <td>${rowData.name}</td>
-                    <td>${rowData.po_dispatch_rest_qty}</td>
+                    <td>${rowData.total_quantity}</td>
                 </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
@@ -1004,12 +1025,6 @@
 
                 });
             }
-
-            
-   
-
-
-         
         </script>
     </main><!-- End #main -->
 @endsection

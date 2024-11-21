@@ -332,6 +332,16 @@ Route::group(['middleware' => ['auth']], function () {
 
        Route::post('/company-wise-report-get', [ReportController::class, 'get_company_wise_report'])->name('get_company_wise_report');
 
+               // .........................................Due Report.............................................
+
+    Route::get('/due_so_report', [ReportController::class, 'due_so_report'])->name('due_so_report');
+
+    Route::post('/get_due_so_report', [ReportController::class, 'get_due_so_report'])->name('get_due_so_report');
+
+    Route::get('/due_po_report', [ReportController::class, 'due_po_report'])->name('due_po_report');
+
+    Route::post('/get_due_po_report', [ReportController::class, 'get_due_po_report'])->name('get_due_po_report');
+
 
     // .........................................Transactions.............................................
     Route::get('/stock_transaction', [TransactionController::class, 'index'])->name('stock_transaction.index');

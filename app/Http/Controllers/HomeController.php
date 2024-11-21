@@ -109,29 +109,20 @@ class HomeController extends Controller
             }
         }
 
-        $sales_order_due_date = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-            ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
-            ->select(
-                'users.name',
-                'sales_orders.id as so_id',
-                'sales_orders.so_number',
-                'sales_orders.due_date',
-                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
-            )
-            ->groupBy('sales_orders.id', 'sales_orders.so_number', 'sales_orders.due_date',   'users.name',)
-            ->get();
 
-        $purchase_order_due_date = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-            ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
-            ->select(
-                'users.name',
-                'purchase_orders.id as po_id',
-                'purchase_orders.document_number',
-                'purchase_orders.due_date',
-                DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
-            )
-            ->groupBy('purchase_orders.id', 'purchase_orders.document_number', 'purchase_orders.due_date',   'users.name',)
-            ->get();
+        $todaysDate = Carbon::today(); // Aaj ki date lete hain
+
+        $total_sales_order_quantity = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->whereDate('sales_orders.due_date', '<=', $todaysDate) // Due date ko filter karte hain
+            ->sum('so_items.so_dispatch_rest_qty'); // Sirf total quantity ka sum nikalte hain
+
+        $total_purchase_order_quantity = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+            ->whereDate('purchase_orders.due_date', '<=', $todaysDate) // Due date ko filter karte hain
+            ->sum('po_items.po_dispatch_rest_qty'); // Sirf total quantity ka sum nikalte hain
+
+        // dd( $total_sales_order_quantity,   $total_purchase_order_quantity);
+
+
 
         $virtual_store = StockItem::sum('weight');
         $outward_data = Outward::where('bill_status', 'bill pending')->count();
@@ -195,62 +186,62 @@ class HomeController extends Controller
 
 
 
-      // Process Purchase Orders (PO) Totals
-$filteredPOTotalsPartyWise = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
-->join('categories', 'po_items.item_category', '=', 'categories.id')
-->select(
-    'companies.company_name as company_name',
-    'purchase_orders.supplier_id as party_id',
-    DB::raw('GROUP_CONCAT(DISTINCT categories.name SEPARATOR ", ") as category_names'),
-    DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
-)
-->groupBy('purchase_orders.supplier_id', 'companies.company_name')
-->get();
+        // Process Purchase Orders (PO) Totals
+        $filteredPOTotalsPartyWise = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+            ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+            ->join('categories', 'po_items.item_category', '=', 'categories.id')
+            ->select(
+                'companies.company_name as company_name',
+                'purchase_orders.supplier_id as party_id',
+                DB::raw('GROUP_CONCAT(DISTINCT categories.name SEPARATOR ", ") as category_names'),
+                DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('purchase_orders.supplier_id', 'companies.company_name')
+            ->get();
 
-// Process Sales Orders (SO) Totals
-$filteredSOTotalsPartyWise = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-->join('companies', 'sales_orders.company_id', '=', 'companies.id')
-->join('categories', 'so_items.item_category', '=', 'categories.id')
-->select(
-    'companies.company_name',
-    'sales_orders.company_id as party_id',
-    DB::raw('GROUP_CONCAT(DISTINCT categories.name SEPARATOR ", ") as category_names'),
-    DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
-)
-->groupBy('sales_orders.company_id', 'companies.company_name')
-->get();
+        // Process Sales Orders (SO) Totals
+        $filteredSOTotalsPartyWise = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
+            ->join('categories', 'so_items.item_category', '=', 'categories.id')
+            ->select(
+                'companies.company_name',
+                'sales_orders.company_id as party_id',
+                DB::raw('GROUP_CONCAT(DISTINCT categories.name SEPARATOR ", ") as category_names'),
+                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('sales_orders.company_id', 'companies.company_name')
+            ->get();
 
-// Merge PO and SO Totals
-$mergedTotalsPartyWise = $filteredPOTotalsPartyWise->map(function ($po) use ($filteredSOTotalsPartyWise) {
-// Find the corresponding SO data by party_id (supplier_id or company_id)
-$so = $filteredSOTotalsPartyWise->first(function ($so) use ($po) {
-    return $so->party_id === $po->party_id;
-});
+        // Merge PO and SO Totals
+        $mergedTotalsPartyWise = $filteredPOTotalsPartyWise->map(function ($po) use ($filteredSOTotalsPartyWise) {
+            // Find the corresponding SO data by party_id (supplier_id or company_id)
+            $so = $filteredSOTotalsPartyWise->first(function ($so) use ($po) {
+                return $so->party_id === $po->party_id;
+            });
 
-return [
-    'party_id' => $po->party_id,
-    'company_name' => $po->company_name,
-    'category_names' => $po->category_names,
-    'po_total_quantity' => $po->total_quantity ?: '',
-    'so_total_quantity' => $so ? $so->total_quantity : '',
-];
-});
+            return [
+                'party_id' => $po->party_id,
+                'company_name' => $po->company_name,
+                'category_names' => $po->category_names,
+                'po_total_quantity' => $po->total_quantity ?: '',
+                'so_total_quantity' => $so ? $so->total_quantity : '',
+            ];
+        });
 
-// Add Missing SO Data if No Matching PO Exists
-$filteredSOTotalsPartyWise->each(function ($so) use ($mergedTotalsPartyWise) {
-if (!$mergedTotalsPartyWise->contains(function ($merged) use ($so) {
-    return $merged['party_id'] === $so->party_id;
-})) {
-    $mergedTotalsPartyWise->push([
-        'party_id' => $so->party_id,
-        'company_name' => $so->company_name,
-        'category_names' => $so->category_names,
-        'po_total_quantity' => '',
-        'so_total_quantity' => $so->total_quantity,
-    ]);
-}
-});
+        // Add Missing SO Data if No Matching PO Exists
+        $filteredSOTotalsPartyWise->each(function ($so) use ($mergedTotalsPartyWise) {
+            if (!$mergedTotalsPartyWise->contains(function ($merged) use ($so) {
+                return $merged['party_id'] === $so->party_id;
+            })) {
+                $mergedTotalsPartyWise->push([
+                    'party_id' => $so->party_id,
+                    'company_name' => $so->company_name,
+                    'category_names' => $so->category_names,
+                    'po_total_quantity' => '',
+                    'so_total_quantity' => $so->total_quantity,
+                ]);
+            }
+        });
 
 
 
@@ -263,8 +254,8 @@ if (!$mergedTotalsPartyWise->contains(function ($merged) use ($so) {
             'company_count',
             'mergedTotals',
             'mergedTotalsPartyWise',
-            'sales_order_due_date',
-            'purchase_order_due_date',
+            'total_sales_order_quantity',
+            'total_purchase_order_quantity',
 
             'categories',
             'inventory_transaction',
@@ -343,18 +334,50 @@ if (!$mergedTotalsPartyWise->contains(function ($merged) use ($so) {
 
     public function get_so_item(Request $request)
     {
-        $so_items = SoItem::join('categories', 'categories.id', '=', 'so_items.item_category')->where('so_id', $request->SoId)->get();
+        $todaysDate = Carbon::today();
+
+        $sales_order_due_date = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
+            ->join('companies', 'companies.id', '=', 'sales_orders.company_id')
+            ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
+            ->select(
+                'companies.company_name',
+                'users.name',
+                'sales_orders.id as so_id',
+                'sales_orders.so_number',
+                'sales_orders.due_date',
+                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+            )
+            ->whereDate('sales_orders.due_date', '<=', $todaysDate) // Due date ko filter karte hain
+            ->groupBy('sales_orders.id', 'sales_orders.so_number', 'sales_orders.due_date', 'users.name',  'companies.company_name')
+            ->get();
+
         return response()->json([
-            'data' => $so_items
+            'data' => $sales_order_due_date
         ]);
     }
 
 
     public function get_po_item(Request $request)
     {
-        $po_items = PoItem::join('categories', 'categories.id', '=', 'po_items.item_category')->where('po_id', $request->PoId)->get();
+        $todaysDate = Carbon::today();
+
+        $purchase_order_due_date = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+            ->join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+            ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
+            ->select(
+                'companies.company_name',
+                'users.name',
+                'purchase_orders.id as po_id',
+                'purchase_orders.document_number as po_number',
+                'purchase_orders.due_date',
+                DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
+            )
+            ->whereDate('purchase_orders.due_date', '<=', $todaysDate) // Due date ko filter karte hain
+            ->groupBy('purchase_orders.id', 'purchase_orders.document_number', 'purchase_orders.due_date', 'users.name', 'companies.company_name')
+            ->get();
+
         return response()->json([
-            'data' => $po_items
+            'data' => $purchase_order_due_date
         ]);
     }
 }
