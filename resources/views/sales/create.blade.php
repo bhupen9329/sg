@@ -273,11 +273,6 @@
                                                             </select>`;
                                                             $('.item-select-' + lastItemId).select2();
 
-                                                            // cell2.innerHTML = `
-        // <select name="item_subcategory[]" onchange="check_same_data('${lastItemId}')" class="form-control smaller-font subcategory-select" style="width:300px"  id="subcategory_${lastItemId}"  required>
-        //     <option value="" selected>Select Subcategory</option>
-        // </select>`;
-                                                            // $('.subcategory-select').select2();
 
                                                             cell2.innerHTML =
                                                                 `

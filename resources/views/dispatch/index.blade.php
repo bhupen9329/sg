@@ -124,7 +124,9 @@
                                     <thead class="thead-dark">
                                         <tr>
                                             <th>#</th>
-                                            <th style="width: 72.8125px;">Date</th>
+                                            <th style="width: 72.8125px;">Dispatch Date</th>
+                                            <th style="width: 72.8125px;">Dispatch Number</th>
+                                
                                             <th style="width: 72.8125px;">Vehicle Number</th>
                                             <th style="width: 84.8125px;">From (Party Name)</th>
                                             <th style="width: 84.8125px;">PO Item No</th>
@@ -145,6 +147,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
+                                                <td>{{ $data->dispatch_number ?? 'N/A' }}</td>
                                                 <td>{{ $data->vehicle_number ?? 'N/A' }}</td>
                                                 <td>{{ $data->po_company }}</td>
                                                 <td><a

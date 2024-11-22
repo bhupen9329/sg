@@ -11,6 +11,7 @@ class Dispatch extends Model
     protected $table = 'dispatches';
     protected $fillable = [
         'date',
+        'dispatch_number',
         'po_company_id',
         'so_company_id',
         'po_id',
