@@ -437,6 +437,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get_so_qty', [HomeController::class, 'get_so_item']);
     Route::post('/get_po_qty', [HomeController::class, 'get_po_item']);
 
+    Route::post('/get-so-unit-price', [DispatchController::class, 'get_so_unit_price']);
+
+
+    
+
 
 
 

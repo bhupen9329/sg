@@ -1516,9 +1516,11 @@ class ReportController extends Controller
         $filterFromdate = $request->filterFromdate;
         $filterCompany = $request->filterCompany;
         $filterItem_name = $request->filterCategory;
+        $filterDue_date = $request->filterDueDate;
+        // dd( $filterDue_date);
+
     
         $todaysDate = Carbon::today();
-
         $query = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
             ->join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('users', 'sales_orders.so_user_id', '=', 'users.id')

@@ -15,6 +15,7 @@ return new class extends Migration
           
             $table->id();
             $table->string('date');
+            $table->string('dispatch_number');
             $table->string('po_company_id');
             $table->string('so_company_id');
             $table->string('po_id');

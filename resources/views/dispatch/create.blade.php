@@ -84,6 +84,8 @@
                 });
             </script>
         @endif
+
+        
         <div class="dashboard-header pagetitle">
             <h1>Dispatch Summary</h1>
             <nav>
@@ -155,13 +157,13 @@
                                         <tr>
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
-                                            <th class="table_heading_long">PO NO.<span class="required-classes">*</span>
-                                            </th>
                                             <th class="table_heading_long">PO Item NO.<span
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
                                             <th class="table_heading_long">Insurance</th>
                                             <th class="table_heading_long">PO Unit Price</th>
+                                            <th class="table_heading_long">SO Item NO.<span
+                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_long">SO Unit Price</th>
                                             <th class="table_heading_normal">Quantity<span
                                                     class="required-classes">*</span>
@@ -225,8 +227,8 @@
                                     </tbody>
                                 </table>
                                 <input type="hidden" id="po_item_id">
-                                <input type="hidden" id="so_item_no" name="so_item_no">
-                                <input type="hidden" id="po_item_no" name="po_item_no">
+                                <input type="hidden" id="so_item_no" name="">
+                                <input type="hidden" id="po_item_no" name="">
 
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
@@ -234,7 +236,7 @@
                                 </div>
 
                                 <div class="text-end mt-5">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" onclick="check_" class="btn btn-primary">Submit</button>
                                     <a class="btn btn-secondary" href="{{ route('dispatch.index') }}">Back</a>
                                 </div>
 
@@ -346,7 +348,9 @@
 
         function addRow(itemName = '', po_number = '', po_item_number = '', itemId = '', quantity = '', unitPrice = '',
             subItems = [], freight = '', insurance =
+            '', qty =
             '', ) {
+
             var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
             let subItemOptions = '<option readonly>Select Item</option>';
@@ -359,8 +363,8 @@
             newRow.innerHTML = `
     <td>${itemName}</td>
     <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
-    <td>${po_number}</td>
-    <td>${po_item_number}</td>
+        <td>${po_item_number}</td>
+          <input type="hidden" name="po_item_number[]" class="form-control" value="${po_item_number}" required>
     <td>
         <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
     </td>
@@ -377,23 +381,60 @@
     <input type="hidden" name="dispatch_unit_price_actual[]" class="form-control"  value="${unitPrice}"  readonly required />
         <input type="hidden" name="dispatch_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
     <input type="hidden" name="dispatch_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
+
+          <td>
+<select name="so_item_no[]" onchange="fetchUnitPrice(this)"  required  class="form-select">
+    <option value="" disabled selected>Select SO Item</option>
+</select>
+
+    </td>
     
      <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
     <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
-        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="" required /></td>
+
+        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="${qty}" required /></td>
     <input type="hidden" name="dispatch_so_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
     <input type="hidden" name="dispatch_so_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
       <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
     <td><input type="number" name="dispatch_so_total[]" value="0" id="dispatch_so_total" class="form-control" readonly required /></td>
  
     <td>
-        <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
-    </td>
+    <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
+        <i class="fas fa-minus-circle"></i>
+    </button>
+</td>
+<td>
+    <button type="button" class="btn btn-success" onclick="cloneRow(this)">
+        <i class="fas fa-copy"></i>
+    </button>
+</td>
+
 `;
 
 
             lastItemId++;
         }
+
+        function cloneRow(button) {
+    const row = button.closest('tr'); // Find the current row
+    const clonedRow = row.cloneNode(true); // Clone the row
+
+    // Retain the values for input fields
+    clonedRow.querySelectorAll('input').forEach(input => {
+        input.value = input.value; // Retain the value in input fields
+    });
+
+    // Retain the selected option for each select dropdown
+    clonedRow.querySelectorAll('select').forEach(select => {
+        const originalSelect = row.querySelector(`select[name="${select.name}"]`); // Find the original select
+        select.value = originalSelect.value; // Set the selected value of the cloned select
+    });
+
+    // Insert the cloned row below the current row
+    row.parentNode.insertBefore(clonedRow, row.nextSibling);
+}
+
+
 
         function formatDate(dateString) {
             if (!dateString) return ''; // Return empty string if no date is provided
@@ -421,6 +462,7 @@
             const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
+
             const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
                 .value) || 0;
 
@@ -436,7 +478,6 @@
 
             if (insuranceStatus === 'yes') {
                 totalPOUnitPrice = unitPriceActual + convRate + freight + other;
-                console.log(totalPOUnitPrice);
                 totalSOUnitPrice = sounitPriceActual + convRate + freight + other;
             } else {
                 totalPOUnitPrice = unitPriceActual + convRate + freight;
@@ -480,24 +521,25 @@
         }
 
 
-
         function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
-            '', Price = '', ) {
-
+            '', Price = '') {
             var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
             const formattedDate = formatDate(Date);
+
             newRow.innerHTML = `
-            <td> ${formattedDate}</td>
-            <td>${poNumber}</td>
-            <td>${ItemName}</td>
-            <td>${poItemNumber}</td>
-            <td>${Quantity}</td>
-            <td>${RestQty}</td>
-            <td>${UnitPrice}</td>
-            <td>${Price}</td>
-           
-        `;
+        <td>${formattedDate}</td>
+        <td>${poNumber}</td>
+        <td>${ItemName}</td>
+        <td>
+            <input type="hidden" name="po_item_no[]" value="${poItemNumber}">
+            ${poItemNumber}
+        </td>
+        <td>${Quantity}</td>
+        <td>${RestQty}</td>
+        <td>${UnitPrice}</td>
+        <td>${Price}</td>
+    `;
             lastItemId++;
         }
 
@@ -537,33 +579,37 @@
 
         function deleteRow(button) {
             // Find the row that was clicked
-            document.getElementById('po_item_id').value = "";
-            document.getElementById('po_item_no').value = "";
-            document.getElementById('so_item_no').value = "";
-            document.getElementById('get_miller_id').value = "";
-            document.getElementById('to_company_id').value = "";
-            var row = button.parentNode.parentNode;
+            const row = button.closest('tr');
 
-            // Get the table ID where the row is located
-            var table = row.closest('table');
+            // Get the item number from the clicked row (for po_item_no)
+            const itemNumber = row.querySelector('[name="po_item_number[]"]').value;
 
-            // Remove the row from both tables
-            if (table.id === 'myTable') {
-                // Get the index of the row in myTable
-                var index = row.rowIndex;
-
-                // Delete the same row in poTable using the same index
-                document.getElementById('poTable').deleteRow(index);
-                document.getElementById('soTable').deleteRow(index);
+            if (!itemNumber) {
+                alert("Item number not found. Cannot delete row.");
+                return;
             }
 
-            // Delete the row from myTable
-            row.parentNode.removeChild(row);
+            // Function to delete a row by item number from the poTable
+            function deleteRowFromPoTable(itemNumber) {
+                const table = document.getElementById('poTable');
+                const rows = table.querySelectorAll('tbody tr');
 
-            document.getElementById('poTable').deleteRow(index);
-            document.getElementById('soTable').deleteRow(index);
+                for (const row of rows) {
+                    const cellItemNumber = row.querySelector('[name="po_item_no"]')?.value;
+                    if (cellItemNumber === itemNumber) {
+                        row.remove(); // Remove the matching row from poTable
+                        break; // Exit after finding and removing the row
+                    }
+                }
+            }
 
+            // Delete the row with the same item number in poTable
+            deleteRowFromPoTable(itemNumber);
+
+            // Also remove the row from the current table (myTable) where the delete button was clicked
+            row.remove();
         }
+
 
         // function populateDispatchDetails() {
         //     const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
@@ -578,60 +624,86 @@
         // }
         function populateSODispatchDetails() {
             const selectedSOs = document.querySelectorAll('.so-checkbox:checked');
+            const rows = document.querySelectorAll('#myTable tbody tr'); // Get all rows in the table
 
+            // Iterate over each row to populate dropdowns
+            rows.forEach(row => {
+                const itemName = row.querySelector('td:first-child').textContent
+                    .trim(); // Get the itemName for the current row
+                const dropdown = row.querySelector(
+                    'select[name="so_item_no[]"]'); // Get the dropdown for the current row
+
+                // Clear existing options
+                dropdown.innerHTML = '<option value="" disabled selected>Select SO Item</option>';
+
+                selectedSOs.forEach(so => {
+                    const so_item_no = so.dataset.id; // Get SO item number
+
+                    // Fetch item details for the SO item
+                    $.ajax({
+                        url: '/get-item-details-so', // Adjust to the route handling item details
+                        method: 'POST',
+                        data: {
+                            so_item_no: so_item_no,
+                            _token: '{{ csrf_token() }}' // Include CSRF token for security
+                        },
+                        success: function(response) {
+                            const so_item = response.so_items;
+
+                            // Check if the SO item matches the itemName for this row
+                            if (so_item.name === itemName) {
+                                // Create an option element
+                                const option =
+                                    `<option value="${so_item.so_item_no}">${so_item.so_item_no} - ${so_item.name}</option>`;
+                                dropdown.insertAdjacentHTML('beforeend', option);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error fetching item details:", error);
+                        }
+                    });
+                });
+            });
+
+            // Keep `SORow` functionality unchanged
             selectedSOs.forEach(so => {
-                // Get item name, quantity, and unit price from the checkbox dataset
-                const so_item_no = so.dataset.id;
-                const itemName = so.dataset.itemName;
-                const quantity = so.dataset.quantity;
-                const unitPrice = so.dataset.unitPrice;
-                $('#so_item_no').val(so_item_no);
+                const so_item_no = so.dataset.id; // Get SO item number
+
                 $.ajax({
                     url: '/get-item-details-so', // Adjust to the route handling item details
                     method: 'POST',
                     data: {
                         so_item_no: so_item_no,
-
                         _token: '{{ csrf_token() }}' // Include CSRF token for security
                     },
                     success: function(response) {
                         const so_item = response.so_items;
-                        const freight_insurance = response.freight_insurance;
-                        // Populate the row with additional details
-                        SORow(so_item.date, so_item.so_number, so_item.name, so_item.so_item_no,
-                            so_item.qty, so_item.so_dispatch_rest_qty, so_item.unit_price, so_item
-                            .so_price, freight_insurance.freight_rate, freight_insurance
-                            .insurance_rate);
 
-                        let total_so_unit_price = 0;
-                        const convRate = document.getElementById('conv_rate').value || 0;
-
-                        if (convRate == 0) {
-                            total_so_unit_price = (parseFloat(so_item.unit_price) + parseFloat(
-                                freight_insurance.freight_rate) + parseFloat(freight_insurance
-                                .insurance_rate));
-                        } else {
-                            total_so_unit_price = (parseFloat(so_item.unit_price) + parseFloat(
-                                freight_insurance.freight_rate) + parseFloat(freight_insurance
-                                .insurance_rate + parseFloat(convRate)));
-                        }
-
-
-
-
-                        $('#so_unit_price').val(total_so_unit_price);
-                        $('#so_unit_price_actual').val(so_item.unit_price);
-
-                        $('#dispatch_so_total').val(total_so_unit_price);
+                        // Original `SORow` call
+                        SORow(
+                            so_item.date,
+                            so_item.so_number,
+                            so_item.name,
+                            so_item.so_item_no,
+                            so_item.qty,
+                            so_item.so_dispatch_rest_qty,
+                            so_item.unit_price,
+                            so_item.so_price,
+                            response.freight_insurance.freight_rate,
+                            response.freight_insurance.insurance_rate
+                        );
                     },
                     error: function(xhr, status, error) {
                         console.error("Error fetching item details:", error);
                     }
                 });
             });
-            $('#SalescompanyModal').modal('hide');
 
+            $('#SalescompanyModal').modal('hide');
         }
+
+
+
 
         function populateDispatchDetails() {
             let po_item = $('#po_item_id').val().trim();
@@ -675,10 +747,11 @@
                         const po_item = response.po_items;
                         const freight = response.freight;
                         const insurance = response.insurance;
+                        const qty = response.po_dispatch_rest_qty;
                         // Populate the row with additional details
                         addRow(details.name, po_item.document_number, po_item.po_item_no, details.id,
                             quantity, unitPrice, subitems, freight,
-                            insurance);
+                            insurance, qty);
 
                         PORow(po_item.date, po_item.document_number, po_item.name, po_item.po_item_no,
                             po_item.qty, po_item.po_dispatch_rest_qty, po_item.unit_price, po_item
@@ -787,7 +860,7 @@
                                    data-quantity="${po.qty}" 
                                    data-unit-price="${po.unit_price}"
                                    data-po-item-no="${po.po_item_no}"
-                                    onchange="singleCheckboxSelection(this)">
+                                   >
                         </td>
                         <td>${formattedDate}</td>
                         <td>${po.document_number}</td>
@@ -815,13 +888,11 @@
 
         function fetchSalesOrders(selectElement) {
             const companyId = selectElement.value;
-            let ItemId = document.getElementById('po_item_id').value;
             $.ajax({
                 url: '/get-sales-orders', // Adjust this URL to match your backend route
                 type: 'POST',
                 data: {
                     company_id: companyId,
-                    ItemId: ItemId,
                     "_token": "{{ csrf_token() }}" // CSRF token for security in Laravel
                 },
                 success: function(response) {
@@ -843,7 +914,7 @@
                                        data-item-name="${so.so_number}" 
                                        data-quantity="${so.qty}" 
                                        data-unit-price="${so.unit_price}"
-                                       onchange="singleSOCheckboxSelection(this)">
+                                      >
                             </td>
                             <td>${formattedDate}</td>
                             <td>${so.so_number}</td>
@@ -869,12 +940,6 @@
                     alert('An error occurred while fetching sales orders. Please try again.');
                 }
             });
-        }
-
-
-
-        function singleSOCheckboxSelection(selectedCheckbox) {
-            $('.so-checkbox').not(selectedCheckbox).prop('checked', false);
         }
 
 
@@ -1076,7 +1141,7 @@
 
                 // Skip iteration if any of the elements do not exist
                 if (!selectbuyer_name_idItemElement || !itemElement || !itemSubCategoryElement) {
-                    continue;
+                    continue;   
                 }
                 const selected_buyer_id = selectbuyer_name_idItemElement.value;
                 const itemId = itemElement.value;
@@ -1210,6 +1275,56 @@
                     alert('An error occurred while fetching the conversion rate. Please try again.');
                 }
             });
+        }
+
+
+
+        function fetchUnitPrice(selectElement) {
+            const soItemNo = selectElement.value; // Get the selected SO item number
+            const row = selectElement.closest('tr'); // Find the current table row
+            const unitPriceField = row.querySelector(
+                'input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
+            const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
+            const QtyFieldValue = QtyField.value; // Get the current quantity value
+
+            if (soItemNo) {
+                $.ajax({
+                    url: '/get-so-unit-price', // Replace with your actual route URL
+                    method: 'POST',
+                    data: {
+                        so_item_no: soItemNo,
+                        _token: '{{ csrf_token() }}' // Include CSRF token for security
+                    },
+                    success: function(response) {
+                    
+                        if (response.success) {
+                            unitPriceField.value = response.unit_price; // Set the unit price
+                            // Check if the returned quantity is less than or equal to the current quantity
+                            if (response.qty <= QtyFieldValue) {
+                                QtyField.value = response
+                                    .qty; // Set the quantity field to the returned quantity
+                                QtyField.setAttribute('max', response
+                                    .qty); // Set the max attribute to the returned quantity
+                            } else {
+                                QtyField.value =
+                                    QtyFieldValue; // Restore the original quantity if it's less than the returned value
+                                QtyField.setAttribute('max',
+                                    QtyFieldValue); // Set the max to the original quantity
+                            }
+                            calculateTotal(selectElement); // Call your function to recalculate totals
+                        } else {
+                            console.error("Failed to fetch unit price:", response.message);
+                            unitPriceField.value = ''; // Clear the field in case of failure
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching unit price:", error);
+                        unitPriceField.value = ''; // Clear the field in case of error
+                    }
+                });
+            } else {
+                unitPriceField.value = ''; // Clear the unit price if no SO item is selected
+            }
         }
     </script>
 
