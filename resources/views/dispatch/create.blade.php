@@ -393,6 +393,8 @@
     <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
 
         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="${qty}" required /></td>
+        <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="${qty}" required />
+        
     <input type="hidden" name="dispatch_so_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
     <input type="hidden" name="dispatch_so_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
       <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
@@ -1285,7 +1287,7 @@
             const unitPriceField = row.querySelector(
                 'input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
             const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
-            const QtyFieldValue = QtyField.value; // Get the current quantity value
+            const QtyFieldValue = row.querySelector('input[name="quantity_po[]"]').value; // Get the current quantity value
 
             if (soItemNo) {
                 $.ajax({
@@ -1296,7 +1298,7 @@
                         _token: '{{ csrf_token() }}' // Include CSRF token for security
                     },
                     success: function(response) {
-                    
+                 
                         if (response.success) {
                             unitPriceField.value = response.unit_price; // Set the unit price
                             // Check if the returned quantity is less than or equal to the current quantity

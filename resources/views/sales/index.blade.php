@@ -87,7 +87,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Date(DD/MM/YY)​</th>
+                                        <th>SO Date​</th>
                                         <th>SO No.</th>
                                         <th>SO Item Number</th>
                                         <th>Buyer Name(Party Name)</th>

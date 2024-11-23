@@ -81,6 +81,7 @@
                 $('#filterFromdate').val(),
                 $('#filterItem_name').val(),
                 $('#filterCompany').val(),
+                $('#filterDispatch').val(),
             )">
                         Apply
                     </button>
@@ -128,6 +129,17 @@
                         </select>
                     </div>
 
+                    <div class="col-md-2 col-sm-12">
+                        <label for="filterItem_name" class="mb-2"><strong>Dispatch Number</strong></label>
+                        <select class="custom-select form-control company-select" name="dispatch_number" id="filterDispatch"
+                            required>
+                            <option value="all" selected>All</option>
+                            @foreach ($dispatch as $data)
+                                <option value="{{ $data->dispatch_number }}">{{ $data->dispatch_number }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
 
 
                 </div>
@@ -167,7 +179,8 @@
                                             <th>Receivable Total</th> --}}
 
                                             <th>#</th>
-                                            <th style="width: 72.8125px;">Date</th>
+                                            <th style="width: 72.8125px;">Dispatch Date</th>
+                                            <th style="width: 72.8125px;">Dispatch Number</th>
                                             <th style="width: 72.8125px;">Vehicle Number</th>
                                             <th style="width: 84.8125px;">From (Party Name)</th>
                                             <th style="width: 84.8125px;">PO Item No</th>
@@ -185,6 +198,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
+                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td style="text-align:center;"><strong>Grand Total:</strong></td>
@@ -431,7 +445,7 @@
 
 
 <script>
-    function filterButton(filterTodate, filterFromdate, filterItem_name, filterCompany) {
+    function filterButton(filterTodate, filterFromdate, filterItem_name, filterCompany, filterDispatch) {
         $.ajax({
             type: 'POST',
             url: '/dispatch-report-get',
@@ -440,6 +454,7 @@
                 filterFromdate: filterFromdate,
                 filterItem_name: filterItem_name,
                 filterCompany: filterCompany,
+                filterDispatch: filterDispatch,
                 _token: "{{ csrf_token() }}"
             },
             success: function(response) {
@@ -465,7 +480,8 @@
                         // Add row to the table
                         table.row.add([
                             index + 1,
-                            data.created_at,
+                            data.disaptch_date,
+                            data.dispatch_number,
                             data.vehicle_number ?? 'N/A',
                             data.po_company,
                             data.po_item_no,

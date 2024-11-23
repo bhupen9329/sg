@@ -45,14 +45,26 @@ class ReportController extends Controller
 
     // PO Reports
 
-    public function po_report()
+    public function po_report($id = null)
     {
+
+       
         $companys = Company::where('type', 'supplier')->get();
         $Categorys = Category::all();
         $user = User::all();
-
-        return view('reports.po_report', compact('companys', 'Categorys', 'user'));
+    
+        // Handle $id if provided
+        $selectedCategory = $id ? Category::find($id) : null;
+    
+        // Check if the category exists when $id is provided
+        if ($id && !$selectedCategory) {
+            return redirect()->back()->with('error', 'The selected category does not exist.');
+        }
+    
+        return view('reports.po_report', compact('companys', 'Categorys', 'user', 'selectedCategory'));
     }
+    
+
 
 
     public function get_po_report(Request $request)
@@ -135,15 +147,23 @@ class ReportController extends Controller
 
 
     // SO Report
-    public function so_report()
+    public function so_report($id = null)
     {
         $companys = Company::where('type', 'buyer')->get();
         $Categorys = Category::all();
         $user = User::all();
-
-        // dd($sales_order);
-        return view('reports.so_report', compact('companys', 'Categorys', 'user'));
+    
+        // Handle $id if provided
+        $selectedCategory = $id ? Category::find($id) : null;
+    
+        // Check if the category exists when $id is provided
+        if ($id && !$selectedCategory) {
+            return redirect()->back()->with('error', 'The selected category does not exist.');
+        }
+    
+        return view('reports.so_report', compact('companys', 'Categorys', 'user', 'selectedCategory'));
     }
+    
 
 
     public function get_so_report(Request $request)
@@ -1360,8 +1380,8 @@ class ReportController extends Controller
     {
         $company =  Company::all();
         $category = Category::all();
-
-        return view('reports.dispatch', compact('company', 'category'));
+        $dispatch = Dispatch::distinct('dispatch_number')->get();
+        return view('reports.dispatch', compact('company', 'category', 'dispatch'));
     }
 
     public function get_dispatch_report(Request $request)
@@ -1370,6 +1390,7 @@ class ReportController extends Controller
         $filterFromdate = $request->filterFromdate;
         $filterItem_name = $request->filterItem_name;
         $filterCompany = $request->filterCompany;
+        $filterDispatch = $request->filterDispatch;
 
         $query =  Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
             ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
@@ -1381,7 +1402,7 @@ class ReportController extends Controller
             ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
             ->select(
                 'dispatches.*',
-                'dispatches.created_at',
+                'dispatches.date as disaptch_date',
                 'dispatches.id as dispatch_id',
                 'so_items.so_dispatch_rest_qty',
                 'po_items.po_dispatch_rest_qty',
@@ -1415,6 +1436,10 @@ class ReportController extends Controller
             });
         }
 
+        if ($filterDispatch && $filterDispatch != 'all') {
+            $query->where('dispatches.dispatch_number', $filterDispatch);
+        }
+
         $filteredData = $query->get();
 
         $data = [];
@@ -1422,7 +1447,7 @@ class ReportController extends Controller
             $tempData = [
                 'po_company' => $filteredData->po_company,
                 'so_company' => $filteredData->so_company,
-                'created_at' => date('d-M-Y', strtotime($filteredData->created_at)),
+                'disaptch_date' => date('d-M-Y', strtotime($filteredData->disaptch_date)),
                 'category_name' => $filteredData->category_name,
                 'sub_category_name' => $filteredData->sub_category_name,
                 'dispatched_quantity' => $filteredData->dispatched_quantity,
@@ -1432,6 +1457,7 @@ class ReportController extends Controller
                 'so_item_no' => $filteredData->so_item_no,
                 'dispatch_so_total' => $filteredData->dispatch_so_total,
                 'dispatch_id' => $filteredData->dispatch_id,
+                'dispatch_number' => $filteredData->dispatch_number,
             ];
             $data[] = $tempData;
             // dd( $data);
@@ -1517,10 +1543,10 @@ class ReportController extends Controller
         $filterCompany = $request->filterCompany;
         $filterItem_name = $request->filterCategory;
         $filterDue_date = $request->filterDueDate;
-        // dd( $filterDue_date);
-
     
         $todaysDate = Carbon::today();
+    
+        // Base Query
         $query = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
             ->join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
@@ -1538,26 +1564,41 @@ class ReportController extends Controller
                 'so_items.so_dispatch_item_status',
                 'users.name as user_name'
             )
-            ->where('so_items.so_dispatch_rest_qty', '!=', 0)
-            ->whereDate('sales_orders.due_date', '<=', $todaysDate); // Due date ko filter karte hain
-            // dd($query);
-          
+            ->where('so_items.so_dispatch_rest_qty', '!=', 0);
+    
+        // Apply Date Filters
 
-            if ($filterCompany && $filterCompany != 'all') {
-                $query->where('companies.id', $filterCompany);
-            }
+        if ($filterCompany && $filterCompany != 'all') {
+            $query->where('companies.id', $filterCompany);
+        }
 
-            if ($filterItem_name && $filterItem_name != 'all') {
-                $query->where('so_items.item_category', $filterItem_name);
-            }
+        if ($filterItem_name && $filterItem_name != 'all') {
+            $query->where('so_items.item_category', $filterItem_name);
+        }
 
-            $filteredData = $query->get();
-            
- 
 
-        $data = [];
-        foreach ($filteredData as $filteredData) {
-            $tempData = [
+        if ($filterDue_date != 'all' && $filterDue_date == 'due_future') {
+            $query->whereDate('sales_orders.due_date', '>=', $todaysDate);
+        }
+    
+        if ($filterDue_date != 'all' && $filterDue_date == 'due_by_today') {
+            $query->whereDate('sales_orders.due_date', '<=', $todaysDate);
+        } 
+        
+        if($filterDue_date != 'all' && $filterDue_date == 'due_today'){
+            $query->whereDate('sales_orders.due_date', '=', $todaysDate); // Default to today's date
+        }
+
+        // if($filterDue_date == 'all'){
+        //     $query->whereDate('sales_orders.due_date', '=', $todaysDate); // Default to today's date
+        // }
+    
+        // Fetch the filtered data
+        $filteredData = $query->get();
+    
+        // Prepare the response data
+        $data = $filteredData->map(function ($filteredData) {
+            return [
                 'date' => date('d-M-Y', strtotime($filteredData->due_date)),
                 'so_number' => $filteredData->so_number,
                 'so_item_number' => $filteredData->so_item_no,
@@ -1568,11 +1609,11 @@ class ReportController extends Controller
                 'dispatch_status' => $filteredData->so_dispatch_item_status,
                 'user_name' => $filteredData->user_name,
             ];
-            $data[] = $tempData;
-        }
+        });
     
         return response()->json($data);
     }
+    
 
     public function due_po_report()
 {
@@ -1588,6 +1629,7 @@ public function get_due_po_report(Request $request)
     $filterFromdate = $request->filterFromdate;
     $filterCompany = $request->filterCompany;
     $filterItemName = $request->filterCategory;
+    $filterDue_date = $request->filterDueDate;
 
     $todaysDate = Carbon::today();
 
@@ -1607,8 +1649,8 @@ public function get_due_po_report(Request $request)
             'po_items.po_dispatch_item_status',
             'users.name as user_name'
         )
-        ->where('po_items.po_dispatch_rest_qty', '!=', 0)
-        ->whereDate('purchase_orders.due_date', '<=', $todaysDate);
+        ->where('po_items.po_dispatch_rest_qty', '!=', 0);
+       
 
     if ($filterCompany && $filterCompany != 'all') {
         $query->where('companies.id', $filterCompany);
@@ -1616,6 +1658,16 @@ public function get_due_po_report(Request $request)
 
     if ($filterItemName && $filterItemName != 'all') {
         $query->where('po_items.item_category', $filterItemName);
+    }
+
+    if ($filterDue_date != 'all') {
+        if ($filterDue_date == 'due_future') {
+            $query->whereDate('purchase_orders.due_date', '>', $todaysDate);
+        } elseif ($filterDue_date == 'due_by_today') {
+            $query->whereDate('purchase_orders.due_date', '<=', $todaysDate);
+        } elseif ($filterDue_date == 'due_today') {
+            $query->whereDate('purchase_orders.due_date', '=', $todaysDate);
+        }
     }
 
     $filteredData = $query->get();

@@ -119,13 +119,16 @@
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCategory" class="mb-2"><strong>Category</strong></label>
                         <select class="custom-select form-control" name="category" id="filterCategory" required>
-                            <option value="" disabled>Select Category</option>
-                            <option value="all" selected>All</option>
+                            <option value="all" {{ is_null($selectedCategory) ? 'selected' : '' }}>All</option>
                             @foreach ($Categorys as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" 
+                                    {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
+                    
 
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCategory" class="mb-2"><strong>Dispatch Status</strong></label>
@@ -278,6 +281,17 @@
 
 
 <script>
+
+$(document).ready(function () {
+        // Call filterButton on page load with default or initial filter values
+        filterButton(
+               $('#filterTodate').val(),
+                $('#filterFromdate').val(),
+                $('#filterCompany').val(),
+                $('#filterCategory').val(),
+        );
+    });
+
 function filterButton(filterTodate, filterFromdate, filterCompany, filterCategory) {
     const filterStatus = $('#filterstatus').val();
     const filteruser = $('#filteruser').val();
