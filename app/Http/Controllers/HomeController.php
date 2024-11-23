@@ -309,6 +309,7 @@ class HomeController extends Controller
             ->join('categories', 'categories.id', '=', 'so_items.item_category') // Join with categories table
             ->select('categories.name', DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
+            ->where('so_items.so_dispatch_rest_qty', '!=', 0)
             ->get();
 
 
@@ -323,6 +324,7 @@ class HomeController extends Controller
             ->join('categories', 'categories.id', '=', 'po_items.item_category') // Join with categories table
             ->select('categories.name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
+            ->where('po_items.po_dispatch_rest_qty', '!=', 0)
             ->get();
 
 

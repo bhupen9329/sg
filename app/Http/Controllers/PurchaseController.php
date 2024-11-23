@@ -713,6 +713,7 @@ class PurchaseController extends Controller
             ->join('categories', 'po_items.item_category', '=', 'categories.id')
             ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
             ->where('po_items.item_category', $request->get_category_id)
+            ->where('po_items.po_dispatch_rest_qty', '!=', 0)
             ->get();
 
         return response()->json([

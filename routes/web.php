@@ -277,11 +277,16 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     //...............................................Reports............................................................................
-    Route::get('/po-report', [ReportController::class, 'po_report'])->name('po_report');
+    Route::get('/po-report/{id?}', [ReportController::class, 'po_report'])->name('po_report');
+
+    Route::post('po-report/report-po', [ReportController::class, 'get_po_report'])->name('get_po_report');
     Route::post('/report-po', [ReportController::class, 'get_po_report'])->name('get_po_report');
 
-    Route::get('/so-report', [ReportController::class, 'so_report'])->name('so_report');
+
+    Route::get('/so-report{id?}', [ReportController::class, 'so_report'])->name('so_report');
     Route::post('/report-so', [ReportController::class, 'get_so_report'])->name('get_so_report');
+    Route::post('so-report/report-so', [ReportController::class, 'get_so_report'])->name('get_o_report');
+
 
     Route::get('/inward-report', [ReportController::class, 'inward_report'])->name('inward_report');
     Route::post('/report-inward', [ReportController::class, 'get_inward_report'])->name('get_inward_report');

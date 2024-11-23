@@ -126,7 +126,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Date(DD/MM/YY)​</th>
+                                        <th>PO Date​</th>
                                         <th>PO No.</th>
                                         <th>PO Item Number</th>
                                         <th>Seller Name(Party Name)</th>

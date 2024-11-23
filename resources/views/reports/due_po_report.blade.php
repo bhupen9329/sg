@@ -76,6 +76,7 @@
                         onclick="filterButton(
                 $('#filterCompany').val(),
                 $('#filterCategory').val(),
+                  $('#filterDueDate').val(),
                
             )">
                         Apply
@@ -134,6 +135,17 @@
                             @foreach ($Categorys as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <label for="filterCompany" class="mb-2"><strong>Due Date</strong></label>
+                        <select class="custom-select form-control" name="due_date" id="filterDueDate" required>
+                            <option value="" disabled>Select Type</option>
+                            <option value="all" selected>All</option>
+                            <option value="due_future">Due in Future</option>
+                            <option value="due_by_today">Due by Today</option>
+                            <option value="due_today">Due Today</option>
                         </select>
                     </div>
 
@@ -291,11 +303,12 @@ $(document).ready(function () {
         // Call filterButton on page load with default or initial filter values
         filterButton(
             $('#filterCompany').val(),
-            $('#filterCategory').val()
+            $('#filterCategory').val(),
+            $('#filterDueDate').val(),
         );
     });
     
-    function filterButton(filterCompany, filterCategory) {
+    function filterButton(filterCompany, filterCategory, filterDueDate) {
         const filterStatus = $('#filterstatus').val();
         const filteruser = $('#filteruser').val();
         
@@ -305,6 +318,7 @@ $(document).ready(function () {
             data: {
                 filterCompany: filterCompany,
                 filterCategory: filterCategory,
+                filterDueDate: filterDueDate,
                 _token: "{{ csrf_token() }}"
             },
             success: function(response) {

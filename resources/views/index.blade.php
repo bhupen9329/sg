@@ -20,9 +20,9 @@
                 }
 
                 /* .dashboard_dataTables_wrapper_low {
-                                            height: 600px;
-                                            overflow-y: scroll;
-                                        } */
+                                                            height: 600px;
+                                                            overflow-y: scroll;
+                                                        } */
 
                 .note-toolbar .btn-primary:hover,
                 .note-toolbar .btn-primary:active,
@@ -105,6 +105,12 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Purchase Quantity - History</h5>
+                            <a href="javascript:void(0);"
+                                style="text-decoration: underline; color: blue; margin-left: 222px;"
+                                class="rest-quantity-link" id="showMoreDetailsLink">
+                                Show More Details
+                            </a>
+
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -135,6 +141,12 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Sales Order Quantity - Item Wise</h5>
+
+                            <a href="{{ route('so_report') }}"
+                                style="text-decoration: underline; color: blue; margin-left: 222px;"
+                                class="rest-quantity-link">
+                                Show More Details</a>
+
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -162,6 +174,10 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Purchase Order Quantity - Item Wise</h5>
+                            <a href="{{ route('po_report') }}"
+                                style="text-decoration: underline; color: blue; margin-left: 222px;"
+                                class="rest-quantity-link">
+                                Show More Details</a>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -189,6 +205,11 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Sales Order Quantity - History</h5>
+                            <a href="javascript:void(0);"
+                            style="text-decoration: underline; color: blue; margin-left: 222px;"
+                            class="rest-quantity-link" id="showMoreDetailsLinkSo">
+                            Show More Details
+                        </a>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -248,6 +269,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Purchase Order Item </h5>
+
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -487,11 +509,11 @@
                                                             {{ $total_sales_order_quantity }}
                                                         </a> --}}
 
-                                                        <a href="{{route('due_so_report')}}" style="text-decoration: underline; color: blue;"
-                                                        class="rest-quantity-link"
-                                                       >
-                                                        {{ $total_sales_order_quantity }}
-                                                    </a>
+                                                        <a href="{{ route('due_so_report') }}"
+                                                            style="text-decoration: underline; color: blue;"
+                                                            class="rest-quantity-link">
+                                                            {{ $total_sales_order_quantity }}
+                                                        </a>
                                                     </td>
 
 
@@ -545,10 +567,10 @@
                                                             {{ $total_purchase_order_quantity }}
                                                         </a> --}}
 
-                                                        <a href="{{route('due_po_report')}}" style="text-decoration: underline; color: blue;"
-                                                        class="rest-quantity-link"
-                                                       >
-                                                       {{ $total_purchase_order_quantity }}
+                                                        <a href="{{ route('due_po_report') }}"
+                                                            style="text-decoration: underline; color: blue;"
+                                                            class="rest-quantity-link">
+                                                            {{ $total_purchase_order_quantity }}
                                                     </td>
 
 
@@ -600,7 +622,7 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details_so"
                                                                 class="rest-quantity-link"
-                                                                onclick="get_received_so_qty_for_report({{ $total['category_id'] }})">
+                                                                onclick="openModalWithCategorySO({{ $total['category_id'] }})">
                                                                 {{ $total['so_total_quantity'] }}
                                                             </a>
                                                         </td>
@@ -610,7 +632,7 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details"
                                                                 class="rest-quantity-link"
-                                                                onclick="get_received_qty_for_report({{ $total['category_id'] }})">
+                                                                onclick="openModalWithCategory({{ $total['category_id'] }})">
                                                                 {{ $total['po_total_quantity'] }}
                                                             </a>
                                                         </td>
@@ -731,6 +753,32 @@
         </script>
 
         <script>
+            function openModalWithCategory(category_id) {
+                // Update the 'Show More Details' link with the category_id
+                const link = document.getElementById('showMoreDetailsLink');
+                const baseUrl = "{{ route('po_report', ':id') }}";
+                const updatedUrl = baseUrl.replace(':id', category_id);
+                link.setAttribute('href', updatedUrl);
+
+                // Set the category_id in the modal and fetch data
+                get_received_qty_for_report(category_id);
+            }
+
+            function openModalWithCategorySO(category_id) {
+                console.log(category_id);
+                // Update the 'Show More Details' link with the category_id
+                const link = document.getElementById('showMoreDetailsLinkSo');
+                const baseUrl = "{{ route('so_report', ':id') }}";
+                const updatedUrl = baseUrl.replace(':id', category_id);
+                link.setAttribute('href', updatedUrl);
+
+                // Set the category_id in the modal and fetch data
+                get_received_so_qty_for_report(category_id);
+            }
+
+
+
+
             function get_received_qty_for_report(category_id) {
                 let get_category_id = category_id;
                 $.ajax({

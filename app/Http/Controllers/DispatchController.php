@@ -213,8 +213,8 @@ class DispatchController extends Controller
 
             $totalSoDispatch += $actual_so_dispatch_qty;
             $totalPoDispatch += $actual_po_dispatch_qty;
-
-            if ($totalSoDispatch < 0 ||  $totalPoDispatch < 0) {
+    
+            if (($totalSoDispatch < 0 )||  ($totalPoDispatch < 0)) {
                 return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
             }
 

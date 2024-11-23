@@ -120,15 +120,18 @@
                     </div>
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCategory" class="mb-2"><strong>Category</strong></label>
-                        <select class="custom-select form-control item_select   " name="category" id="filterCategory"
-                            required>
+                        <select class="custom-select form-control item_select" name="category" id="filterCategory" required>
                             <option value="" disabled>Select Category</option>
-                            <option value="all" selected>All</option>
+                            <option value="all" {{ is_null($selectedCategory) ? 'selected' : '' }}>All</option>
                             @foreach ($Categorys as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" 
+                                    {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
+                    
 
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCategory" class="mb-2"><strong>Dispatch Status</strong></label>
@@ -187,7 +190,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>PO Date​</t(h>
+                                        <th>PO Date​</th>
                                         <th>PO No.</th>
                                         <th>PO Item No.</th>
                                         <th>Seller Name(Party Name)​</th>
@@ -336,87 +339,101 @@
 
 
     <script>
-    function filterButton() {
-    const filterTodate = $('#filterTodate').val();
-    const filterFromdate = $('#filterFromdate').val();
-    const filterCompany = $('#filterCompany').val();
-    const filterCategory = $('#filterCategory').val();
-    const filterStatus = $('#filterstatus').val();
-    const filterUser = $('#filteruser').val();
+        $(document).ready(function() {
+            // Call filterButton on page load with default or initial filter values
+            filterButton(
+                $('#filterTodate').val(),
+                $('#filterFromdate').val(),
+                $('#filterCompany').val(),
+                $('#filterCategory').val(),
+                $('#filterstatus').val(),
+                $('#filteruser').val(),
+            );
+        });
 
-    $.ajax({
-        type: 'POST',
-        url: 'report-po',
-        data: {
-            filterTodate: filterTodate,
-            filterFromdate: filterFromdate,
-            filterCompany: filterCompany,
-            filterCategory: filterCategory,
-            filterStatus: filterStatus,
-            filterUser: filterUser,
-            _token: "{{ csrf_token() }}"
-        },
-        success: function(response) {
-            if (Array.isArray(response)) {
-                var table = $('#Category_table').DataTable();
-                table.clear().draw();
 
-                var totalPOUnitPrice = 0;
-                var totalPOQty = 0;
-                var totalBalancedQty = 0;
-                var totalDispatchedQty = 0;
+        function filterButton() {
+            const filterTodate = $('#filterTodate').val();
+            const filterFromdate = $('#filterFromdate').val();
+            const filterCompany = $('#filterCompany').val();
+            const filterCategory = $('#filterCategory').val();
+            const filterStatus = $('#filterstatus').val();
+            const filterUser = $('#filteruser').val();
 
-                response.forEach(function(data, index) {
-                    const dispatched_qty = (data.quantity - data.rest_quantity).toLocaleString();
+            $.ajax({
+                type: 'POST',
+                url: 'report-po',
+                data: {
+                    filterTodate: filterTodate,
+                    filterFromdate: filterFromdate,
+                    filterCompany: filterCompany,
+                    filterCategory: filterCategory,
+                    filterStatus: filterStatus,
+                    filterUser: filterUser,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (Array.isArray(response)) {
+                        var table = $('#Category_table').DataTable();
+                        table.clear().draw();
 
-                    totalPOUnitPrice += parseFloat(data.po_unit_price) || 0;
-                    totalPOQty += parseFloat(data.quantity) || 0;
-                    totalBalancedQty += parseFloat(data.rest_quantity) || 0;
-                    totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
+                        var totalPOUnitPrice = 0;
+                        var totalPOQty = 0;
+                        var totalBalancedQty = 0;
+                        var totalDispatchedQty = 0;
 
-                    const rowNode = table.row.add([
-                        index + 1,
-                        data.date,
-                        data.po_document_number,
-                        data.po_item_number,
-                        data.company_name,
-                        data.category,
-                        data.po_unit_price,
-                        data.quantity,
-                        data.rest_quantity,
-                        dispatched_qty,
-                        data.dispatch_status,
-                        data.user_name
-                    ]).draw(false).node();
+                        response.forEach(function(data, index) {
+                            const dispatched_qty = (data.quantity - data.rest_quantity)
+                        .toLocaleString();
 
-                    // Conditional styling for rows
-                    if (data.rest_quantity != 0) {
-                        $(rowNode).find('td:eq(8)').css({
-                            'background-color': '#ff3300',
-                            'color': 'black',
+                            totalPOUnitPrice += parseFloat(data.po_unit_price) || 0;
+                            totalPOQty += parseFloat(data.quantity) || 0;
+                            totalBalancedQty += parseFloat(data.rest_quantity) || 0;
+                            totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
+
+                            const rowNode = table.row.add([
+                                index + 1,
+                                data.date,
+                                data.po_document_number,
+                                data.po_item_number,
+                                data.company_name,
+                                data.category,
+                                data.po_unit_price,
+                                data.quantity,
+                                data.rest_quantity,
+                                dispatched_qty,
+                                data.dispatch_status,
+                                data.user_name
+                            ]).draw(false).node();
+
+                            // Conditional styling for rows
+                            if (data.rest_quantity != 0) {
+                                $(rowNode).find('td:eq(8)').css({
+                                    'background-color': '#ff3300',
+                                    'color': 'black',
+                                });
+                            } else {
+                                $(rowNode).find('td').css({
+                                    'background-color': '#15ff00',
+                                    'color': 'black',
+                                });
+                            }
                         });
+
+                        // Update totals
+                        $('#totalPoUnitPrice').text(totalPOUnitPrice.toFixed(2));
+                        $('#totalPoQty').text(totalPOQty.toFixed(2));
+                        $('#totalBalancedQty').text(totalBalancedQty.toFixed(2));
+                        $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
                     } else {
-                        $(rowNode).find('td').css({
-                            'background-color': '#15ff00',
-                            'color': 'black',
-                        });
+                        console.log("Invalid response format");
                     }
-                });
-
-                // Update totals
-                $('#totalPoUnitPrice').text(totalPOUnitPrice.toFixed(2));
-                $('#totalPoQty').text(totalPOQty.toFixed(2));
-                $('#totalBalancedQty').text(totalBalancedQty.toFixed(2));
-                $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
-            } else {
-                console.log("Invalid response format");
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX request failed:", error);
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX request failed:", error);
+                }
+            });
         }
-    });
-}
 
 
         $('#resetButton').click(function() {

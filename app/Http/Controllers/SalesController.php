@@ -740,6 +740,7 @@ class SalesController extends Controller
             ->join('categories', 'so_items.item_category', '=', 'categories.id')
             ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
             ->where('so_items.item_category', $request->get_category_id)
+            ->where('so_items.so_dispatch_rest_qty', '!=', 0)
             ->get();
 
         return response()->json([
@@ -760,6 +761,7 @@ class SalesController extends Controller
             DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
         )
         ->groupBy('so_items.item_category', 'categories.name')
+        ->where('so_items.so_dispatch_rest_qty', '!=', 0)
         ->get();
     
 
@@ -781,6 +783,7 @@ class SalesController extends Controller
             DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
         )
         ->groupBy('po_items.item_category', 'categories.name')
+        ->where('po_items.po_dispatch_rest_qty', '!=', 0)
         ->get();
     
 
