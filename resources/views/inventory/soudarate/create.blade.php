@@ -59,17 +59,7 @@
                                             required>
                                     </div>
 
-                                    <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Freight</label>
-                                        <input type="text" id="price-input" name="item_freight" class="form-control"
-                                            >
-                                    </div>
-
-                                    <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Insurance</label>
-                                        <input type="text" id="price-input" name="item_insurance" class="form-control">
-                                           
-                                    </div>
+                                 
 
                                     <div class="col-md-8 mt-4">
                                         <label for="remarks" class="form-label">Remarks</label>

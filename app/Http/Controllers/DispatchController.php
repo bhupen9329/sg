@@ -199,7 +199,8 @@ class DispatchController extends Controller
                 $request->so_item_no[$index];
         
             if (in_array($rowKey, $rowIdentifiers)) {
-                return redirect()->back()->with('msg', 'Duplicate rows detected for PO Item, Subcategory, Insurance Status, or SO Item.');
+                return response()->json(['message' => 'Duplicate rows detected for PO Item, Subcategory, Insurance Status, or SO Item.'], 400);
+                // return redirect()->back()->with('msg', 'Duplicate rows detected for PO Item, Subcategory, Insurance Status, or SO Item.');
             }
         
             $rowIdentifiers[] = $rowKey;
@@ -208,7 +209,7 @@ class DispatchController extends Controller
             $po_item = PoItem::where('po_item_no', $request->po_item_number[$index])->first();
         
             if (!$so_item || !$po_item) {
-                return redirect()->back()->with('msg', 'Please select at least one PO Item or SO Item.');
+                return response()->json(['message' => 'Please select at least one PO Item or SO Item.'], 400);
             }
         
             // Initialize cumulative dispatched quantities
@@ -221,16 +222,17 @@ class DispatchController extends Controller
         
             // Check if cumulative dispatch exceeds remaining quantity
             if ($soDispatchQuantities[$request->so_item_no[$index]] > $so_item->so_dispatch_rest_qty) {
-                return redirect()->back()->with('msg', 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . $so_item->so_dispatch_rest_qty . ').');
+                return response()->json(['message' => 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . $so_item->so_dispatch_rest_qty . ').'], 400);
             }
         
             if ($poDispatchQuantities[$request->po_item_number[$index]] > $po_item->po_dispatch_rest_qty) {
-                return redirect()->back()->with('msg', 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . $po_item->po_dispatch_rest_qty . ').');
+                return response()->json(['message' => 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . $po_item->po_dispatch_rest_qty . ').'], 400);
             }
         
             if ($quantity > $so_item->so_dispatch_rest_qty || $quantity > $po_item->po_dispatch_rest_qty) {
-                return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
+                return response()->json(['message' => 'Dispatch Rest Quantity Less than Dispatched Quantity.'], 400);
             }
+           
         }
         
 
@@ -301,7 +303,9 @@ class DispatchController extends Controller
             }
         }
 
-        return redirect()->route('dispatch.index')->with('success', 'Dispatch details saved successfully.');
+        return response()->json(['success' => true, 'redirect' => route('dispatch.index')]);
+
+        // return redirect()->route('dispatch.index')->with('success', 'Dispatch details saved successfully.');
     }
 
 

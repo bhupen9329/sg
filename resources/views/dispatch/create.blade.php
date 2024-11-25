@@ -102,7 +102,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form class="row g-3" method="post" action="{{ route('dispatch.store') }}">
+                            <form id="dispatchForm" class="row g-3" method="post" action="{{ route('dispatch.store') }}">
                                 @csrf
                                 <div class="row mb-3">
                                     <div class="col-md-6">
@@ -392,8 +392,8 @@
      <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
     <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
 
-        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="${qty}" required /></td>
-        <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" class="form-control" value="${qty}" required />
+        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="0" class="form-control" value="${qty}" required /></td>
+        <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" min="0" class="form-control" value="${qty}" required />
         
     <input type="hidden" name="dispatch_so_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
     <input type="hidden" name="dispatch_so_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
@@ -1332,7 +1332,52 @@
     </script>
 
 
+<script>
+    $(document).ready(function () {
+    $('#dispatchForm').on('submit', function (e) {
+        e.preventDefault(); // Prevent page refresh
 
+        let formData = $(this).serialize(); // Serialize form data
+
+        $.ajax({
+            url: "{{ route('dispatch.store') }}", // Backend route
+            type: "POST",
+            data: formData,
+            success: function (response) {
+                window.location.href = response.redirect;
+            },
+            error: function (xhr) {
+                // Determine error message
+                let error = xhr.responseJSON?.message || 'Something went wrong!';
+
+                if (xhr.status === 400) {
+                    Swal.fire({
+                        title: 'Validation Error!',
+                        text: error,
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                } else if (xhr.status === 500) {
+                    Swal.fire({
+                        title: 'Server Error!',
+                        text: 'An internal server error occurred. Please try again later.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: error,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
+        });
+    });
+});
+
+</script>
 
 
 
