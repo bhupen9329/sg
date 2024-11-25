@@ -19,11 +19,6 @@
                     overflow-y: scroll;
                 }
 
-                /* .dashboard_dataTables_wrapper_low {
-                                                            height: 600px;
-                                                            overflow-y: scroll;
-                                                        } */
-
                 .note-toolbar .btn-primary:hover,
                 .note-toolbar .btn-primary:active,
                 .note-toolbar .btn-primary:focus {
@@ -206,10 +201,10 @@
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Sales Order Quantity - History</h5>
                             <a href="javascript:void(0);"
-                            style="text-decoration: underline; color: blue; margin-left: 222px;"
-                            class="rest-quantity-link" id="showMoreDetailsLinkSo">
-                            Show More Details
-                        </a>
+                                style="text-decoration: underline; color: blue; margin-left: 222px;"
+                                class="rest-quantity-link" id="showMoreDetailsLinkSo">
+                                Show More Details
+                            </a>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -302,6 +297,11 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Sales Order Item </h5>
+                            <a href="javascript:void(0);"
+                                style="text-decoration: underline; color: blue; margin-left: 222px;"
+                                class="rest-quantity-link" id="showMoreDetailsLinkSoPartyWise">
+                                Show More Details
+                            </a>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -330,6 +330,11 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal3Label">Purchase Order Item </h5>
+                            <a href="javascript:void(0);"
+                                style="text-decoration: underline; color: blue; margin-left: 222px;"
+                                class="rest-quantity-link" id="showMoreDetailsLinkPoPartyWise">
+                                Show More Details
+                            </a>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"style="width:50px"></button>
                         </div>
@@ -682,7 +687,7 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details_so_party_wise"
                                                                 class="rest-quantity-link"
-                                                                onclick="get_received_so_qty_for_party_wise_report({{ $total['party_id'] }})">
+                                                                onclick="openModalWithCategorySOPartyWise({{ $total['party_id'] }})">
                                                                 {{ $total['so_total_quantity'] }}
                                                             </a>
                                                         </td>
@@ -692,7 +697,7 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details_po_party_wise"
                                                                 class="rest-quantity-link"
-                                                                onclick="get_received_qty_for_party_wise_report({{ $total['party_id'] }})">
+                                                                onclick="openModalWithCategoryPOPartyWise({{ $total['party_id'] }})">
                                                                 {{ $total['po_total_quantity'] }}
                                                             </a>
                                                         </td>
@@ -998,6 +1003,43 @@
                         // Optionally show an error message to the user
                     }
                 });
+            }
+
+
+            function openModalWithCategory(category_id) {
+                // Update the 'Show More Details' link with the category_id
+                const link = document.getElementById('showMoreDetailsLink');
+                const baseUrl = "{{ route('po_report', ':id') }}";
+                const updatedUrl = baseUrl.replace(':id', category_id);
+                link.setAttribute('href', updatedUrl);
+
+                // Set the category_id in the modal and fetch data
+                get_received_qty_for_report(category_id);
+            }
+
+            function openModalWithCategorySOPartyWise(party_id) {
+                console.log(party_id);
+                // Update the 'Show More Details' link with the category_id
+                const link = document.getElementById('showMoreDetailsLinkSoPartyWise');
+                const baseUrl = "{{ route('so_report_party_wise', ':id') }}";
+                const updatedUrl = baseUrl.replace(':id', party_id);
+                link.setAttribute('href', updatedUrl);
+
+                // Set the category_id in the modal and fetch data
+                get_received_so_qty_for_party_wise_report(party_id);
+            }
+
+            function openModalWithCategoryPOPartyWise(party_id) {
+                console.log(party_id);
+
+                // Update the 'Show More Details' link with the party_id
+                const link = document.getElementById('showMoreDetailsLinkPoPartyWise');
+                const baseUrl = "{{ route('po_report_party_wise', ':id') }}";
+                const updatedUrl = baseUrl.replace(':id', party_id);
+                link.setAttribute('href', updatedUrl);
+
+                // Fetch data related to the party_id
+                get_received_qty_for_party_wise_report(party_id);
             }
 
 

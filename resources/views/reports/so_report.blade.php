@@ -108,13 +108,18 @@
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCompany" class="mb-2"><strong>Company</strong></label>
                         <select class="custom-select form-control" name="company_id" id="filterCompany" required>
-                            <option value="" disabled>Select Company</option>
-                            <option value="all" selected>All</option>
+                            <option value="" disabled {{ is_null($selectedCompany) ? 'selected' : '' }}>Select Company</option>
+                            <option value="all" {{ is_null($selectedCompany) ? 'selected' : '' }}>All</option>
                             @foreach ($companys as $company)
-                                <option value="{{ $company->id }}">{{ $company->company_name }}</option>
+                            <option value="{{ $company->id }}" 
+                                {{ isset($selectedCompany) && $selectedCompany->id == $company->id ? 'selected' : '' }}>
+                                {{ $company->company_name }}
+                            </option>
+                            
                             @endforeach
                         </select>
                     </div>
+                    
 
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCategory" class="mb-2"><strong>Category</strong></label>
