@@ -55,13 +55,15 @@ class ReportController extends Controller
     
         // Handle $id if provided
         $selectedCategory = $id ? Category::find($id) : null;
+        
+        $selectedCompany = null;
     
         // Check if the category exists when $id is provided
         if ($id && !$selectedCategory) {
             return redirect()->back()->with('error', 'The selected category does not exist.');
         }
     
-        return view('reports.po_report', compact('companys', 'Categorys', 'user', 'selectedCategory'));
+        return view('reports.po_report', compact('companys', 'Categorys', 'user', 'selectedCategory', 'selectedCompany'));
     }
     
 
@@ -155,14 +157,65 @@ class ReportController extends Controller
     
         // Handle $id if provided
         $selectedCategory = $id ? Category::find($id) : null;
+        $selectedCompany = null;
     
         // Check if the category exists when $id is provided
         if ($id && !$selectedCategory) {
             return redirect()->back()->with('error', 'The selected category does not exist.');
         }
     
-        return view('reports.so_report', compact('companys', 'Categorys', 'user', 'selectedCategory'));
+        return view('reports.so_report', compact('companys', 'Categorys', 'user', 'selectedCategory', 'selectedCompany'));
     }
+    public function so_report_party_wise($id = null)
+    {
+        // Get all companies of type 'buyer'
+        $companys = Company::where('type', 'buyer')->get();
+    
+        // Get all categories and users
+        $Categorys = Category::all();
+        $user = User::all();
+    
+        $selectedCompany = null;
+        $selectedCategory = null;
+    
+        // If $id is provided, find the selected company
+        if ($id) {
+            $selectedCompany = Company::where('id', $id)->where('type', 'buyer')->first();
+    
+            // Check if the company exists
+            if (!$selectedCompany) {
+                return redirect()->back()->with('error', 'The selected company does not exist.');
+            }
+        }
+    
+        return view('reports.so_report', compact('companys', 'Categorys', 'user', 'selectedCompany', 'selectedCategory'));
+    }
+
+    public function po_report_party_wise($id = null)
+    {
+        // Get all companies of type 'buyer'
+        $companys = Company::where('type', 'supplier')->get();
+    
+        // Get all categories and users
+        $Categorys = Category::all();
+        $user = User::all();
+    
+        $selectedCompany = null;
+        $selectedCategory = null;
+    
+        // If $id is provided, find the selected company
+        if ($id) {
+            $selectedCompany = Company::where('id', $id)->where('type', 'supplier')->first();
+    
+            // Check if the company exists
+            if (!$selectedCompany) {
+                return redirect()->back()->with('error', 'The selected company does not exist.');
+            }
+        }
+    
+        return view('reports.po_report', compact('companys', 'Categorys', 'user', 'selectedCompany', 'selectedCategory'));
+    }
+    
     
 
 

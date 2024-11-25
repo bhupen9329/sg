@@ -188,45 +188,51 @@ class DispatchController extends Controller
         $doc_number = 'DIS' . $financial_year . $next_serial_number;
         
 
-        // Check for duplicates
         $rowIdentifiers = [];
-        $totalSoDispatch = 0;
-        $totalPoDispatch = 0;
-
+        $soDispatchQuantities = [];
+        $poDispatchQuantities = [];
+        
         foreach ($request->quantity as $index => $quantity) {
             $rowKey = $request->po_item_number[$index] . '-' .
                 $request->sub_cat_id[$index] . '-' .
                 $request->insurance_status[$index] . '-' .
                 $request->so_item_no[$index];
-
+        
             if (in_array($rowKey, $rowIdentifiers)) {
                 return redirect()->back()->with('msg', 'Duplicate rows detected for PO Item, Subcategory, Insurance Status, or SO Item.');
             }
-
+        
             $rowIdentifiers[] = $rowKey;
-
+        
             $so_item = SoItem::where('so_item_no', $request->so_item_no[$index])->first();
             $po_item = PoItem::where('po_item_no', $request->po_item_number[$index])->first();
-
-            $actual_so_dispatch_qty = ($so_item->so_dispatch_rest_qty - $request->quantity[$index]);
-            $actual_po_dispatch_qty = ($po_item->po_dispatch_rest_qty - $request->quantity[$index]);
-
-            $totalSoDispatch += $actual_so_dispatch_qty;
-            $totalPoDispatch += $actual_po_dispatch_qty;
-    
-            if (($totalSoDispatch < 0 )||  ($totalPoDispatch < 0)) {
-                return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
-            }
-
+        
             if (!$so_item || !$po_item) {
                 return redirect()->back()->with('msg', 'Please select at least one PO Item or SO Item.');
             }
-
-            if (($request->quantity[$index] > $so_item->so_dispatch_rest_qty) || ($request->quantity[$index] > $po_item->po_dispatch_rest_qty)) {
+        
+            // Initialize cumulative dispatched quantities
+            $soDispatchQuantities[$request->so_item_no[$index]] = $soDispatchQuantities[$request->so_item_no[$index]] ?? 0;
+            $poDispatchQuantities[$request->po_item_number[$index]] = $poDispatchQuantities[$request->po_item_number[$index]] ?? 0;
+        
+            // Update cumulative dispatched quantities
+            $soDispatchQuantities[$request->so_item_no[$index]] += $quantity;
+            $poDispatchQuantities[$request->po_item_number[$index]] += $quantity;
+        
+            // Check if cumulative dispatch exceeds remaining quantity
+            if ($soDispatchQuantities[$request->so_item_no[$index]] > $so_item->so_dispatch_rest_qty) {
+                return redirect()->back()->with('msg', 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . $so_item->so_dispatch_rest_qty . ').');
+            }
+        
+            if ($poDispatchQuantities[$request->po_item_number[$index]] > $po_item->po_dispatch_rest_qty) {
+                return redirect()->back()->with('msg', 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . $po_item->po_dispatch_rest_qty . ').');
+            }
+        
+            if ($quantity > $so_item->so_dispatch_rest_qty || $quantity > $po_item->po_dispatch_rest_qty) {
                 return redirect()->back()->with('msg', 'Dispatch Rest Quantity Less than Dispatched Quantity.');
             }
         }
-
+        
 
         //   .............................................................................................................................................   
 

@@ -85,7 +85,7 @@
             </script>
         @endif
 
-        
+
         <div class="dashboard-header pagetitle">
             <h1>Dispatch Summary</h1>
             <nav>
@@ -418,23 +418,24 @@
         }
 
         function cloneRow(button) {
-    const row = button.closest('tr'); // Find the current row
-    const clonedRow = row.cloneNode(true); // Clone the row
+            const row = button.closest('tr'); // Find the current row
+            const clonedRow = row.cloneNode(true); // Clone the row
 
-    // Retain the values for input fields
-    clonedRow.querySelectorAll('input').forEach(input => {
-        input.value = input.value; // Retain the value in input fields
-    });
+            // Retain the values for input fields
+            clonedRow.querySelectorAll('input').forEach(input => {
+                input.value = input.value; // Retain the value in input fields
+            });
 
-    // Retain the selected option for each select dropdown
-    clonedRow.querySelectorAll('select').forEach(select => {
-        const originalSelect = row.querySelector(`select[name="${select.name}"]`); // Find the original select
-        select.value = originalSelect.value; // Set the selected value of the cloned select
-    });
+            // Retain the selected option for each select dropdown
+            clonedRow.querySelectorAll('select').forEach(select => {
+                const originalSelect = row.querySelector(
+                `select[name="${select.name}"]`); // Find the original select
+                select.value = originalSelect.value; // Set the selected value of the cloned select
+            });
 
-    // Insert the cloned row below the current row
-    row.parentNode.insertBefore(clonedRow, row.nextSibling);
-}
+            // Insert the cloned row below the current row
+            row.parentNode.insertBefore(clonedRow, row.nextSibling);
+        }
 
 
 
@@ -1143,7 +1144,7 @@
 
                 // Skip iteration if any of the elements do not exist
                 if (!selectbuyer_name_idItemElement || !itemElement || !itemSubCategoryElement) {
-                    continue;   
+                    continue;
                 }
                 const selected_buyer_id = selectbuyer_name_idItemElement.value;
                 const itemId = itemElement.value;
@@ -1298,7 +1299,7 @@
                         _token: '{{ csrf_token() }}' // Include CSRF token for security
                     },
                     success: function(response) {
-                 
+
                         if (response.success) {
                             unitPriceField.value = response.unit_price; // Set the unit price
                             // Check if the returned quantity is less than or equal to the current quantity
