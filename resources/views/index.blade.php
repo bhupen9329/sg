@@ -4,7 +4,8 @@
     <main id="main" class="main">
 
         <div class="dashboard-header pagetitle">
-            <h1>Dashboard</h1>
+            <h1>Dashboard</h1><br>
+            <p style="color: red">Overview of sales, purchase, stock and valuation insights for open sales orders.</p>
         </div><!-- End Page Title -->
 
         <section class="section dashboard">
