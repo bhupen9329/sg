@@ -109,9 +109,9 @@
                         <label for="filterCompany" class="mb-2"><strong>Due Date</strong></label>
                         <select class="custom-select form-control" name="due_date" id="filterDueDate" required>
                             <option value="" disabled>Select Type</option>
-                            <option value="all" selected>All</option>
+                            <option value="all">All</option>
                             <option value="due_future">Due in Future</option>
-                            <option value="due_by_today">Due by Today</option>
+                            <option value="due_by_today" selected>Due by Today</option>
                             <option value="due_today">Due Today</option>
                         </select>
                     </div>

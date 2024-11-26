@@ -349,7 +349,7 @@
 `;
 
             cell6.innerHTML = `
-             <td><input type="number" name="quantity[]" class="form-control" value="{{ $disaptch_data->dispatched_quantity }}" oninput="calculateTotal(this)" min="0" required /></td>
+             <td><input type="number" name="quantity[]" class="form-control" value="{{ $disaptch_data->dispatched_quantity }}" oninput="calculateTotal(this)" min="1" required /></td>
            
 `;
 

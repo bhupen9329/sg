@@ -392,8 +392,8 @@
      <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
     <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
 
-        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="0" class="form-control" value="${qty}" required /></td>
-        <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" min="0" class="form-control" value="${qty}" required />
+        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required /></td>
+        <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required />
         
     <input type="hidden" name="dispatch_so_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
     <input type="hidden" name="dispatch_so_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
