@@ -168,11 +168,13 @@
                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
 
                                                         <li>
-                                                            @can('Company-edit')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('sales.edit', $data->so_id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>View/Edit</a>
-                                                            @endcan
+                                                                        @if($data->so_dispatch_item_status == 'Open')
+                                                            <a class="dropdown-item"
+                                                            href="{{ route('sales.delete', $data->so_item_id) }}"><i class="fa-solid fa-trash"></i>Delete</a>
+                                                            @endif
                                                         </li>
 
                                                         {{-- <li>
