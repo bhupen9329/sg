@@ -53,7 +53,7 @@ class SalesController extends Controller
 
         $user = Auth::user();
         $roles = $user->getRoleNames();
-  
+
 
         $sales_order_query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
@@ -63,13 +63,14 @@ class SalesController extends Controller
             ->select(
                 '*',
                 'sales_orders.id as so_id',
+                'so_items.id as so_item_id',
                 'so_items.*',
                 'categories.name as category_name',
                 'users.*'
             )
             ->orderBy('sales_orders.id', 'desc');
 
-        if ( $roles->contains('Admin')) {
+        if ($roles->contains('Admin')) {
             $sales_order = $sales_order_query->get();
         } else {
             $sales_order = $sales_order_query->where('sales_orders.so_user_id', $user->id)->get();
@@ -113,8 +114,6 @@ class SalesController extends Controller
 
     public function store(Request $request, ValuationController $valuationcontroller)
     {
-
-
         $year = date('Y');
         $max_serial_number = SalesOrder::all()->max('so_number');
         $last_serial_number = substr($max_serial_number, -4);
@@ -404,12 +403,9 @@ class SalesController extends Controller
 
     public function delete($id)
     {
-
-        $sales_order = SalesOrder::where('id', $id)->first();
-        Quotation::where('id', $sales_order->qt_id)->update(['status' => 'pending']);
-        SalesOrder::where('id', $id)->delete();
-        SoItem::where('sale_id', $id)->delete();
-        return redirect()->route('sales.index')->with('delete', 'Sales Orders Updated Successfully');
+        SoItem::where('id', $id)->delete();
+        InventoryTransaction::where('so_item_id', $id)->delete();
+        return redirect()->route('sales.index')->with('delete', 'Sales Orders Item Delete Successfully');
     }
 
     public function close(Request $request)
@@ -752,18 +748,18 @@ class SalesController extends Controller
     {
 
         $so_data = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
-        ->join('categories', 'so_items.item_category', '=', 'categories.id')
-        ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
-        ->where('sales_orders.company_id', $request->company_id)
-        ->select(
-            'so_items.item_category',
-            'categories.name as category_name',
-            DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
-        )
-        ->groupBy('so_items.item_category', 'categories.name')
-        ->where('so_items.so_dispatch_rest_qty', '!=', 0)
-        ->get();
-    
+            ->join('categories', 'so_items.item_category', '=', 'categories.id')
+            ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
+            ->where('sales_orders.company_id', $request->company_id)
+            ->select(
+                'so_items.item_category',
+                'categories.name as category_name',
+                DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('so_items.item_category', 'categories.name')
+            ->where('so_items.so_dispatch_rest_qty', '!=', 0)
+            ->get();
+
 
         return response()->json([
             'rows_data' => $so_data
@@ -774,18 +770,18 @@ class SalesController extends Controller
     {
 
         $po_data = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
-        ->join('categories', 'po_items.item_category', '=', 'categories.id')
-        ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
-        ->where('purchase_orders.supplier_id', $request->company_id)
-        ->select(
-            'po_items.item_category',
-            'categories.name as category_name',
-            DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
-        )
-        ->groupBy('po_items.item_category', 'categories.name')
-        ->where('po_items.po_dispatch_rest_qty', '!=', 0)
-        ->get();
-    
+            ->join('categories', 'po_items.item_category', '=', 'categories.id')
+            ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+            ->where('purchase_orders.supplier_id', $request->company_id)
+            ->select(
+                'po_items.item_category',
+                'categories.name as category_name',
+                DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
+            )
+            ->groupBy('po_items.item_category', 'categories.name')
+            ->where('po_items.po_dispatch_rest_qty', '!=', 0)
+            ->get();
+
 
         return response()->json([
             'rows_data' => $po_data

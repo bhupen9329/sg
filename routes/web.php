@@ -86,7 +86,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/save-purchase-order', [PurchaseController::class, 'store'])->name('save.purchase-order');
     Route::get('/purchase-edit/{id}', [PurchaseController::class, 'edit'])->name('purchase.edit');
     Route::post('/purchase-update/{id}', [PurchaseController::class, 'update'])->name('purchase.update');
-    Route::delete('/purchase-delete/{id}', [PurchaseController::class, 'delete'])->name('purchase.destroy');
+    Route::get('purchase-delete/{id}', [PurchaseController::class, 'delete'])->name('purchase.delete');
     Route::get('/purchase-show/{id}', [PurchaseController::class, 'show'])->name('purchase.show');
     Route::post('/po-partial-received-save', [PurchaseController::class, 'partial_receive_save'])->name('po-partial-receive.save');
     Route::post('/po-partial-closed-save', [PurchaseController::class, 'partial_closed_save'])->name('po-partial-closed.save');
@@ -180,9 +180,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('sales-store', [SalesController::class, 'store'])->name('sales.store');
     Route::post('sales-quotation-store', [SalesController::class, 'store_quotation'])->name('sales_quotation.store');
     Route::get('sales-edit/{id}', [SalesController::class, 'edit'])->name('sales.edit');
+    Route::get('sales-delete/{id}', [SalesController::class, 'delete'])->name('sales.delete');
     Route::post('sales-update/{id}', [SalesController::class, 'update'])->name('sales.update');
     Route::get('sales-show/{id}', [SalesController::class, 'show'])->name('sales.show');
-    Route::delete('/sales-delete/{id}', [SalesController::class, 'delete'])->name('sales.destroy');
     Route::post('/sales-closed', [SalesController::class, 'close'])->name('sales.closed');
     Route::get('/get_quotation/{id}', [SalesController::class, 'get_quotation_details']);
     Route::get('/get_sales_order/{id}', [SalesController::class, 'get_sales_details']);

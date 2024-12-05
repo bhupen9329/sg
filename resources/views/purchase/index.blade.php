@@ -150,49 +150,57 @@
                                         {{-- @dd($data); --}}
                                         <tr>
                                             @if ($data->po_dispatch_rest_qty == $data->qty)
-                                            <td style="background-color: transparent;">{{ $loop->iteration }}</td>
-                                            <td style="background-color: transparent;">{{ date('d-M-Y', strtotime($data->date)) }}</td>
-                                            <td style="background-color: transparent;">{{ $data->document_number }}</td>
-                                            <td style="background-color: transparent;">{{ $data->po_item_no }}</td>
-                                            <td style="background-color: transparent;">{{ $data->company_name }}</td>
-                                            <td style="background-color: transparent;">{{ $data->category_name }}</td>
-                                            <td style="background-color: transparent;">{{ $data->qty }}</td>
-                                            <td style="background-color: #ff3300;">{{ $data->po_dispatch_rest_qty }}</td>
-                                            <td style="background-color: transparent;">{{ $data->unit_price }}</td>
-                                            <td style="background-color: transparent;">{{ $data->price }}</td>
-                                            <td style="background-color: transparent;">{{ $data->po_dispatch_item_status }}</td>
-                                            <td style="background-color: transparent;">{{ $data->remark ?? 'N/A' }}</td>
-                                            <td style="background-color: transparent;">{{ $data->name ?? 'N/A' }}</td>
-                                        @elseif ($data->po_dispatch_rest_qty == 0)
-                                            <td style="background-color: #15ff00;">{{ $loop->iteration }}</td>
-                                            <td style="background-color: #15ff00;">{{ date('d-M-Y', strtotime($data->date)) }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->document_number }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->po_item_no }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->company_name }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->category_name }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->qty }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->po_dispatch_rest_qty }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->unit_price }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->price }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->po_dispatch_item_status }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->remark ?? 'N/A' }}</td>
-                                            <td style="background-color: #15ff00;">{{ $data->name ?? 'N/A' }}</td>
-                                        @else
-                                            <td >{{ $loop->iteration }}</td>
-                                            <td >{{ date('d-M-Y', strtotime($data->date)) }}</td>
-                                            <td >{{ $data->document_number }}</td>
-                                            <td >{{ $data->po_item_no }}</td>
-                                            <td>{{ $data->company_name }}</td>
-                                            <td>{{ $data->category_name }}</td>
-                                            <td>{{ $data->qty }}</td>
-                                            <td style="background-color: #ff3300;">{{ $data->po_dispatch_rest_qty }}</td>
-                                            <td>{{ $data->unit_price }}</td>
-                                            <td>{{ $data->price }}</td>
-                                            <td>{{ $data->po_dispatch_item_status }}</td>
-                                            <td>{{ $data->remark ?? 'N/A' }}</td>
-                                            <td>{{ $data->name ?? 'N/A' }}</td>
-                                        @endif
-                                        
+                                                <td style="background-color: transparent;">{{ $loop->iteration }}</td>
+                                                <td style="background-color: transparent;">
+                                                    {{ date('d-M-Y', strtotime($data->date)) }}</td>
+                                                <td style="background-color: transparent;">{{ $data->document_number }}</td>
+                                                <td style="background-color: transparent;">{{ $data->po_item_no }}</td>
+                                                <td style="background-color: transparent;">{{ $data->company_name }}</td>
+                                                <td style="background-color: transparent;">{{ $data->category_name }}</td>
+                                                <td style="background-color: transparent;">{{ $data->qty }}</td>
+                                                <td style="background-color: #ff3300;">{{ $data->po_dispatch_rest_qty }}
+                                                </td>
+                                                <td style="background-color: transparent;">{{ $data->unit_price }}</td>
+                                                <td style="background-color: transparent;">{{ $data->price }}</td>
+                                                <td style="background-color: transparent;">
+                                                    {{ $data->po_dispatch_item_status }}</td>
+                                                <td style="background-color: transparent;">{{ $data->remark ?? 'N/A' }}
+                                                </td>
+                                                <td style="background-color: transparent;">{{ $data->name ?? 'N/A' }}</td>
+                                            @elseif ($data->po_dispatch_rest_qty == 0)
+                                                <td style="background-color: #15ff00;">{{ $loop->iteration }}</td>
+                                                <td style="background-color: #15ff00;">
+                                                    {{ date('d-M-Y', strtotime($data->date)) }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->document_number }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->po_item_no }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->company_name }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->category_name }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->qty }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->po_dispatch_rest_qty }}
+                                                </td>
+                                                <td style="background-color: #15ff00;">{{ $data->unit_price }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->price }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->po_dispatch_item_status }}
+                                                </td>
+                                                <td style="background-color: #15ff00;">{{ $data->remark ?? 'N/A' }}</td>
+                                                <td style="background-color: #15ff00;">{{ $data->name ?? 'N/A' }}</td>
+                                            @else
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
+                                                <td>{{ $data->document_number }}</td>
+                                                <td>{{ $data->po_item_no }}</td>
+                                                <td>{{ $data->company_name }}</td>
+                                                <td>{{ $data->category_name }}</td>
+                                                <td>{{ $data->qty }}</td>
+                                                <td style="background-color: #ff3300;">{{ $data->po_dispatch_rest_qty }}
+                                                </td>
+                                                <td>{{ $data->unit_price }}</td>
+                                                <td>{{ $data->price }}</td>
+                                                <td>{{ $data->po_dispatch_item_status }}</td>
+                                                <td>{{ $data->remark ?? 'N/A' }}</td>
+                                                <td>{{ $data->name ?? 'N/A' }}</td>
+                                            @endif
+
 
                                             <td onclick="get_so_id_for_remark({{ $data->id }})">
                                                 <div class="filter">
@@ -203,11 +211,17 @@
                                                                 href="{{ route('buyers.show', $data->id) }}"><i
                                                                     class="fa-regular fa-eye"></i> </a></li> --}}
                                                         <li>
-                                                            @can('Company-edit')
+
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('purchase.edit', $data->po_id) }}"><i
+                                                                    class="fa-solid fa-pencil"></i>View/Edit</a>
+
+                                                            @if ($data->po_dispatch_item_status == 'Open')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('purchase.edit', $data->po_id) }}"><i
-                                                                        class="fa-solid fa-pencil"></i>View/Edit</a>
-                                                            @endcan
+                                                                    href="{{ route('purchase.delete', $data->po_item_id) }}"><i
+                                                                        class="fa-solid fa-trash"></i>Delete</a>
+                                                            @endif
+
                                                         </li>
 
                                                         {{-- <li>
