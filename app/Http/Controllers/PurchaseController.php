@@ -104,12 +104,10 @@ class PurchaseController extends Controller
         return view('purchase.index', compact('po_data'));
     }
 
-    public function create(Request $request)
+    public function create($id)
     {
 
-        // dd($po_id);
-
-        $company = Company::where('id', $request->company_id)->first();
+        $company = Company::where('id', $id)->first();
         $custom_due_date = CompanySetting::first();
         $category = Category::all();
         $user = User::all();

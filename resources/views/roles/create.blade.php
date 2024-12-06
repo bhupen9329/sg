@@ -24,7 +24,7 @@
                                 @csrf
                                 <div class="col-md-4">
                                     <label for="name"><strong>Name <span class="required-classes">*</span></strong></label>
-                                    <input type="text" name="name" class="form-control" id="inputName5" >
+                                    <input type="text" name="name" class="form-control" id="name-input" >
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
@@ -54,4 +54,10 @@
         </section>
 
     </main><!-- End #main -->
+
+    <script>
+        $(document).ready(function() {
+            $('#name-input').focus(); // Example code
+        });
+    </script>
 @endsection

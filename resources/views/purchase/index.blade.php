@@ -223,54 +223,6 @@
                                                             @endif
 
                                                         </li>
-
-                                                        {{-- <li>
-                                                            @can('Sales-view')
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('sales.show', $data->id) }}"><i
-                                                                        class="fa-solid fa-eye"></i>View</a>
-                                                            @endcan
-                                                        </li>
-                                                        <li>
-                                                            @can('Sales-view')
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('sales.edit', $data->id) }}"><i
-                                                                        class="fa-solid fa-pencil"></i>Edit</a>
-                                                            @endcan
-                                                        </li>
-                                                        @if ($data->status == 'pending')
-                                                            <li>
-                                                                @can('Sales-delete')
-                                                                    <form method="POST"
-                                                                        action="{{ route('sales.destroy', $data->id) }}">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="button"
-                                                                            class="dropdown-item delete-button">
-                                                                            <i class="fa-solid fa-trash"></i> Delete
-                                                                        </button>
-                                                                    </form>
-                                                                @endcan
-                                                            </li>
-                                                        @endif
-                                                        <li>
-                                                            @can('Sales-close')
-                                                                <a class="dropdown-item" data-bs-toggle="modal"
-                                                                    data-bs-target="#select_closed"
-                                                                    onclick="sendId('{{ $data->id }}')"><i
-                                                                        class="fa-regular fa-close"></i> Closed</a>
-                                                            @endcan
-                                                        <li>
-                                                        <li>
-                                                            @can('Sales-download')
-                                                            <a class="dropdown-item" href="{{ $data->document_file }}"
-                                                                target="_blank">
-                                                                <i class="fa-solid fa-download"></i> Download
-                                                            </a>
-                                                            @endcan
-                                                        </li> --}}
-
-
                                                     </ul>
                                                 </div>
                                             </td>
@@ -296,27 +248,23 @@
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <form action="{{ route('purchase.create') }}" method="post">
+        <form action="" method="post">
             @csrf
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"style="width:50px"></button>
+                            aria-label="Close" style="width:50px"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <label for="" class="mb-2">Select Company <span
                                     class="required-classes">*</span></label>
-
                             <div class="col-lg-12">
                                 @livewire('purchase')
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
             </div>
@@ -699,4 +647,25 @@
             $('.table.dataTable').removeClass('no-footer');
         });
     </script>
+
+<script>
+    function navigateToPurchaseCreate(selectElement) {
+        const companyId = selectElement.value; // Get the selected company ID
+        if (companyId) {
+            const url = `/purchase-create/${companyId}`; // Build the URL
+            window.location.href = url; // Redirect to the route
+        }
+    }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.custom-select').select2();
+        // Focus the search box when the subcategory dropdown is opened
+        $('.custom-select').on('select2:open', function() {
+            document.querySelector('.select2-search__field').focus();
+        });
+
+    });
+</script>
 @endsection

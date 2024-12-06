@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title','Category - Saraswati Globals')
+@section('title', 'Category - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
         @if ($message = Session::get('success'))
@@ -9,16 +9,16 @@
         @endif
 
         @if (session('msg'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "{{ session('msg') }}",
-                    icon: "error"
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: "{{ session('msg') }}",
+                        icon: "error"
+                    });
                 });
-            });
-        </script>
-    @endif
+            </script>
+        @endif
         <div class="dashboard-header pagetitle">
             <h1>Add Base Item</h1>
             <nav>
@@ -40,19 +40,9 @@
                                     <div class="col-md-8">
                                         <label for="inputName5" class="form-label">Base Item Name</label>
                                         </strong><span class="required-classes">*</span>
-                                        <input type="text" id="name-input" name="name"
-                                           class="form-control" required>
+                                        <input type="text" id="name-input" name="name" class="form-control"
+                                            required>
                                     </div><br>
-                                    {{-- <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Base Price (Rs/MT)</label><span
-                                            class="required-classes">*</span>
-                                        <input type="number" id="edit-input" name="price" min="1" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Margin Amt (Rs/MT)</label><span
-                                            class="required-classes">*</span>
-                                        <input type="number" id="edit-input" name="margin"  min="1" class="form-control" required>
-                                    </div> --}}
                                     <div class="text-end mt-3">
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                         <a class="btn btn-secondary" href="{{ route('category.index') }}">Back</a>
@@ -70,37 +60,14 @@
 
 
 <script>
-    // function check_category_name() {
-    //     //get name from input
-    //     let name = $('#name-input').val();
-    //     // console.log(name);
-    //     $.ajax({
-    //         url: "{{ url('get_category_name') }}",
-    //         method: "post",
-    //         data: {
-    //             name: name,
-    //             "_token": "{{ csrf_token() }}",
-    //         },
-    //         success: function(res) {
-    //             // console.log(res);
-    //             let category_name = res.name;
-    //             // console.log(category_name);
-    //             //alert for same name
-    //             if (name.toLowerCase() === category_name.toLowerCase()) {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Opps!',
-    //                     text: 'Duplicate entry found.'
-    //                 }).then(() => {
-    //                     resetRow_in_same_data();
-    //                 });
-    //             }
-    //         }
-    //     })
-    // }
-
     function resetRow_in_same_data() {
         // Reset specific input fields in the row
         $(`#name-input`).val('').trigger('change');
     }
+</script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#name-input').focus(); // Example code
+    });
 </script>

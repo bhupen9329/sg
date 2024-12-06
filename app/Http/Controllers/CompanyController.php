@@ -35,13 +35,6 @@ class CompanyController extends Controller
   }
   public function store(Request $req)
   {
-    // dd($req);
-
-    // $vaildation = $req->validate([
-    //   'company_name' => 'required',
-    //   'address' => 'required',
-    // ]);
-
     $data = [
       'company_name' => $req->company_name,
       'address' => $req->address,
