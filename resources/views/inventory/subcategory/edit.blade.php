@@ -39,7 +39,7 @@
                                     <div class="col-md-8">
                                         <label for="inputName5" class="form-label">Base Item Name</label>
                                         </strong><span class="required-classes">*</span>
-                                        <select name="category_id" class="item-select form-select" id="name-input">
+                                        <select name="category_id" class="item-select form-select">
                                             <option value="{{ $selected_subcategory->category_id }}">
                                                 {{ $selected_subcategory->name }}
                                             </option>
@@ -59,54 +59,11 @@
                                     <div class="col-md-8 mt-4">
                                         <label for="inputName5" class="form-label">Conv Item Name</label><span
                                             class="required-classes">*</span>
-                                        {{-- <input type="hidden" id="category-id-input" name="category_id"
-                                            value="{{ $selected_subcategory->category_id }}"> --}}
                                         <input type="text" id="sub_category-input" name="sub_category"
                                             onchange="check_category_name({{ $subcategory->id }})"
                                             value="{{ $subcategory->sub_category }}" class="form-control" required>
 
                                     </div>
-                                    {{-- <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Weight(kg/ft)</label><span
-                                            class="required-classes">*</span>
-                                        <input type="number" id="edit-input" name="weight"
-                                            value="{{ $subcategory->weight }}" min="0.001" class="form-control" required step="0.001">
-                                    </div> --}}
-                                    @can('price')
-                                    {{-- <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Difference Amt (Gauge)</label><span
-                                            class="required-classes"> *</span>
-                                        <input type="number" value="{{ $subcategory->difference }}" id="edit-input" min="0" name="diff" class="form-control" required
-                                        step="0.001" >
-                                    </div> --}}
-                                    @endcan
-
-                                    {{-- <div class="col-md-8 mt-4">
-                                        <label for="inputName5" class="form-label">Providers</label><span
-                                            class="required-classes"> *</span>
-                                        <select class="js-example-theme-multipl" multiple="multiple" name="provider[]"
-                                            style="width: 100%" required>
-                                            @if (isset($provider) && count($provider) > 0)
-                                                @foreach ($provider as $s_provider)
-                                                    <option value="{{ $s_provider->id }}" selected>
-                                                        {{ $s_provider->company_name }}</option>
-                                                @endforeach
-                                                @foreach ($company_data as $item)
-                                                    @if (!in_array($item->id, $provider->pluck('id')->toArray()))
-                                                        <option value="{{ $item->id }}">{{ $item->company_name }}
-                                                        </option>
-                                                    @endif
-                                                @endforeach
-                                            @else
-                                                @foreach ($company_data as $item)
-                                                    <option value="{{ $item->id }}">{{ $item->company_name }}</option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                    </div> --}}
-
-
-
                                     <div class="text-end mt-3">
                                         @can('Sub-Category-edit')
                                         @can('price')
@@ -173,3 +130,7 @@
         $('#sub_category-input').val('').trigger('change');
     }
 </script> 
+
+
+
+

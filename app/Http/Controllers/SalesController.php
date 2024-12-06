@@ -91,10 +91,10 @@ class SalesController extends Controller
         return view('sales.index')->with($data);
     }
 
-    public function create(Request $request)
+    public function create($id)
     {
 
-        $company = Company::where('id', $request->company_id)->first();
+        $company = Company::where('id', $id)->first();
         $category = Category::all();
         $custom_due_date = CompanySetting::first();
         $gstsetting = GstSetting::all();

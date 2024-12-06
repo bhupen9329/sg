@@ -76,7 +76,16 @@
             </div>
         </section>
     </main><!-- End #main -->
+    <script>
+        $(document).ready(function() {
+            $('#date-input').focus(); // Example code
+        });
+    </script>
 @endsection
+
+
+  
+
 
 
 

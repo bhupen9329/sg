@@ -187,10 +187,6 @@
                                                 <div class="row">
                                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">
                                                     </h4>
-                                                    <button type="button" id="addRowBtn"
-                                                        class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1"
-                                                        onclick="addRow()" style="display: none">Add
-                                                        Row</button>
                                                 </div>
 
                                                 <div class="btn-list">
@@ -249,10 +245,12 @@
                                                             </tfoot>
                                                         </table>
                                                     </div>
-                                                    <script>
+
+                                                    <script>                                 
                                                         var lastItemId = 1; // Initial Item ID
 
-                                                        function addRow() {
+                                                        function addRow(event) {
+                                                            event.preventDefault(); 
                                                             var table = document.getElementById("myTable");
                                                             var newRow = table.insertRow(table.rows.length);
                                                             // console.log(table);
@@ -286,10 +284,14 @@
                                                             cell4.innerHTML =
                                                                 `
                                                             <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
-                                                            cell5.innerHTML =
-                                                                `
-                                                            <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
 
+                                                            if (lastItemId != 1) {
+                                                                cell5.innerHTML = `
+                                                                    <button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
+                                                                    <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
+                                                            } else {
+                                                                cell5.innerHTML = '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
+                                                            }
 
                                                             // Focus the search box when the dropdown is opened
                                                             $('.item-select-' + lastItemId).on('select2:open', function() {
@@ -517,183 +519,12 @@
         }
 
 
-        $(document).ready(function() {
-            $('.virtual_sotre').select2();
-            $('#addRowBtn').show();
-
-        });
-
-
-
-
-        document.addEventListener("DOMContentLoaded", function() {
-            calculateGrandTotalOnInput();
-
-        });
-
-        document.getElementById("freight").addEventListener("input", calculateGrandTotalOnInput);
-        document.getElementById("additional_charges").addEventListener("input", calculateGrandTotalOnInput);
-        document.getElementById("loading").addEventListener("input", calculateGrandTotalOnInput);
-
-
         // function calculateTotal(lastItemId) {
         //     console.log(lastItemId);
 
         // }
 
 
-        function calculateTotal(lastItemId) {
-            var table = document.getElementById("myTable");
-            var rows = table.getElementsByTagName("tr");
-
-            var subtotal = 0;
-            var totalSGST = 0;
-            var totalCGST = 0;
-            var totalIGST = 0;
-            var type = document.getElementById('selected_type').value;
-            // console.log(type);
-
-            for (var i = 1; i < rows.length; i++) {
-                var row = rows[i];
-                var price = parseFloat(row.cells[7].getElementsByTagName("input")[0].value) || 0;
-                var gstInput = row.cells[8].getElementsByTagName("select")[0];
-                var totalInput = row.cells[9].getElementsByTagName("input")[0];
-                let igstInput = row.querySelector('.igst-value');
-                let cgstInput = row.querySelector('.cgst-value');
-                let sgstInput = row.querySelector('.sgst-value');
-
-                var gst_percent = parseFloat(gstInput.value) || 0;
-
-                // Calculate total before tax
-                var totalBeforeTax = weight * price;
-                subtotal += totalBeforeTax;
-                totalInput.value = totalBeforeTax.toFixed(2);
-
-                // Calculate SGST, CGST, or IGST based on state
-                var sgst = 0,
-                    cgst = 0,
-                    igst = 0;
-                if (type === 'state_gst') {
-                    var gst_half = gst_percent / 2;
-                    sgst = totalBeforeTax * gst_half / 100;
-                    cgst = totalBeforeTax * gst_half / 100;
-                    // if (cgst - Math.floor(cgst) > 0.5) {
-                    //     cgst = Math.ceil(cgst);
-                    // } else {
-                    //     cgst = Math.floor(cgst);
-                    // }
-
-                    // if (sgst - Math.floor(sgst) > 0.5) {
-                    //     sgst = Math.ceil(sgst);
-                    // } else {
-                    //     sgst = Math.floor(sgst);
-                    // }
-
-                    sgstInput.value = sgst.toFixed(2);
-                    cgstInput.value = cgst.toFixed(2);
-                    totalSGST += sgst;
-                    totalCGST += cgst;
-                } else {
-                    igst = totalBeforeTax * gst_percent / 100;
-
-                    // if (igst - Math.floor(igst) > 0.5) {
-                    //     igst = Math.ceil(igst);
-                    // } else {
-                    //     igst = Math.floor(igst);
-
-                    // }
-                    igstInput.value = igst.toFixed(2);
-                    totalIGST += igst;
-                }
-
-            }
-
-            // Set total SGST, CGST, IGST to respective input fields
-            if (type === 'state_gst') {
-                document.getElementById("totalSGST").value = totalSGST;
-                document.getElementById("totalCGST").value = totalCGST;
-            } else {
-                document.getElementById("totalIGST").value = totalIGST;
-            }
-
-            // Set subtotal to the input field with ID "material_value"
-            document.getElementById("material_value").value = subtotal.toFixed(2);
-
-            // Calculate grand total after updating the subtotal
-            calculateGrandTotal(subtotal);
-            // updateOverallTotaGST();
-        }
-
-        function calculateGrandTotalOnInput() {
-            var subtotal = parseFloat(document.getElementById("material_value").value) || 0;
-            calculateGrandTotal(subtotal);
-        }
-
-        function calculateGrandTotal(subtotal) {
-            var totalSGST = parseFloat(document.getElementById("totalSGST").value) || 0;
-            var totalCGST = parseFloat(document.getElementById("totalCGST").value) || 0;
-            var totalIGST = parseFloat(document.getElementById("totalIGST").value) || 0;
-            var freight = parseFloat(document.getElementById("freight").value) || 0;
-            var additional_charges = parseFloat(document.getElementById("additional_charges").value) || 0;
-            var loading = parseFloat(document.getElementById("loading").value) || 0;
-            var other_gst = 18;
-
-            var freight_gst = freight * (other_gst / 100);
-            var additional_charges_gst = additional_charges * (other_gst / 100);
-            var loading_gst = loading * (other_gst / 100);
-            var total_other_gst = freight_gst + additional_charges_gst + loading_gst;
-            var totalWithoutTax = subtotal + freight + additional_charges + loading;
-
-            var totalTax = 0;
-            if (totalSGST || totalCGST) {
-
-                var grand_total_cgst = totalCGST + (total_other_gst / 2);
-                // if (grand_total_cgst - Math.floor(grand_total_cgst) > 0.5) {
-                //     grand_total_cgst = Math.ceil(grand_total_cgst);
-                // } else {
-                //     grand_total_cgst = Math.floor(grand_total_cgst);
-                // }
-                document.getElementById("grandcgst").value = grand_total_cgst.toFixed(2);
-                document.getElementById("grandsgst").value = grand_total_cgst.toFixed(2);
-
-
-                totalSGST += total_other_gst / 2;
-                totalCGST += total_other_gst / 2;
-
-                // if (totalSGST - Math.floor(totalSGST) > 0.5) {
-                //     totalSGST = Math.ceil(totalSGST);
-                // } else {
-                //     totalSGST = Math.floor(totalSGST);
-                //     totalCGST = Math.floor(totalSGST);
-                // }
-                totalTax = totalSGST + totalCGST;
-            } else if (totalIGST) {
-                var grand_total_igst = totalIGST + total_other_gst;
-                // if (grand_total_igst - Math.floor(grand_total_igst) > 0.5) {
-                //     grand_total_igst = Math.ceil(grand_total_igst);
-                // } else {
-                //     grand_total_igst = Math.floor(grand_total_igst);
-                // }
-                document.getElementById("grandigst").value = grand_total_igst.toFixed(2);
-
-                totalIGST += total_other_gst;
-                // if (totalIGST - Math.floor(totalIGST) > 0.5) {
-                //     totalIGST = Math.ceil(totalIGST);
-                // } else {
-                //     totalIGST = Math.floor(totalIGST);
-                // }
-                totalTax = totalIGST;
-
-            }
-
-            var grandTotal = totalWithoutTax + totalTax;
-            grandTotal_round = Math.round(grandTotal);
-            document.getElementById("grandTotal").value = grandTotal_round.toFixed(0);
-            // document.getElementById("grandTotal").value = grandTotal.toFixed(2);
-
-            // Update the GST values back to their respective HTML elements
-
-        }
     </script>
 
 
@@ -772,7 +603,7 @@
                 <option value="${item.id}">${item.sub_category}</option>
             `;
                     }
-                    $(.set_sub_category).html(htmldata);
+                    $('.set_sub_category').html(htmldata);
                 }
             });
         }
@@ -867,4 +698,20 @@
 
         }
     </script>
+
+<script>
+    $(document).ready(function() {
+        // Focus the date input when the page is loaded
+        $('#raised_date_input').focus();
+    });
+</script>
+
+<script>
+           function initializeTable_2() {
+                            addRow(event);
+                        }
+
+                        // Call initializeTable on page load for Payment Terms
+                        document.addEventListener('DOMContentLoaded', initializeTable_2);
+</script>
 @endsection

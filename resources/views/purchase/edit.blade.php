@@ -60,7 +60,7 @@
                                             Raised</strong><span class="required-classes">*</span></label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" value="{{ $po_data->date }}"
-                                            name="date" id="inputPassword" required>
+                                            name="date" id="raised_date_input" required>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -116,10 +116,6 @@
                                                 <div class="row">
                                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">
                                                     </h4>
-                                                    <button type="button" id="addRowBtn"
-                                                        class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1"
-                                                        onclick="addRow()" style="display: none">Add
-                                                        Row</button>
                                                 </div>
 
                                                 <div class="btn-list">
@@ -228,9 +224,13 @@
                                                                 cell4.innerHTML =
                                                                     `
     <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $po_item->price }}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
-                                                                cell5.innerHTML =
-                                                                    `
-    <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
+    if (lastItemId != 1) {
+                                                                cell5.innerHTML = `
+                                                                    <button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
+                                                                    <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
+                                                            } else {
+                                                                cell5.innerHTML = '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
+                                                            }
 
 
                                                                 // Focus the search box when the dropdown is opened
@@ -288,7 +288,8 @@
                                                     <script>
                                                         var lastItemId = 1; // Initial Item ID
 
-                                                        function addRow() {
+                                                        function addRow(event) {
+                                                            event.preventDefault();
                                                             var table = document.getElementById("myTable");
                                                             var newRow = table.insertRow(table.rows.length);
                                                             // console.log(table);
@@ -323,8 +324,8 @@
                                                                 `
                                                             <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
                                                             cell5.innerHTML =
-                                                                `
-                                                            <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
+                                                           `<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
+                                                                    <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
 
 
                                                             // Focus the search box when the dropdown is opened
@@ -685,4 +686,11 @@
             fetchrow();
         });
     </script>
+
+<script>
+    $(document).ready(function() {
+        // Focus the date input when the page is loaded
+        $('#raised_date_input').focus();
+    });
+</script>
 @endsection

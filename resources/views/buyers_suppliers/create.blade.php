@@ -154,6 +154,13 @@
         }
     </script>
 
+<script>
+    $(document).ready(function() {
+        // Focus the date input when the page is loaded
+        $('#name-input').focus();
+    });
+</script>
+
 
 @endsection
 

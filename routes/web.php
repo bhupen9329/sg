@@ -82,7 +82,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // .........................................Purchase.............................................
     Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchase.index');
-    Route::post('/purchase-create', [PurchaseController::class, 'create'])->name('purchase.create');
+    Route::get('/purchase-create/{id}', [PurchaseController::class, 'create'])->name('purchase.create');
     Route::post('/save-purchase-order', [PurchaseController::class, 'store'])->name('save.purchase-order');
     Route::get('/purchase-edit/{id}', [PurchaseController::class, 'edit'])->name('purchase.edit');
     Route::post('/purchase-update/{id}', [PurchaseController::class, 'update'])->name('purchase.update');
@@ -173,7 +173,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // ............................................ Sales............................................
     Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
-    Route::post('/sales-create/', [SalesController::class, 'create'])->name('sales.create');
+    Route::get('/sales-create/{id}', [SalesController::class, 'create'])->name('sales.create');
     Route::post('/sales-create-quotation', [SalesController::class, 'create_quotation'])->name('sales_quotation.create');
     Route::post('/get_subcategory_list', [SubCategoryController::class, 'get_subcategory_list'])->name('get_subcategory_list');
     Route::post('/get_subcategory_details', [SubCategoryController::class, 'get_subcategory_details'])->name('get_subcategory_details');

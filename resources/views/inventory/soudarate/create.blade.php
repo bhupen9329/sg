@@ -151,3 +151,9 @@
         $(`#sub_category-input`).val('').trigger('change');
     }
 </script>
+
+<script>
+    $(document).ready(function() {
+        $('#categorySelect').focus(); // Example code
+    });
+</script>

@@ -176,54 +176,6 @@
                                                             href="{{ route('sales.delete', $data->so_item_id) }}"><i class="fa-solid fa-trash"></i>Delete</a>
                                                             @endif
                                                         </li>
-
-                                                        {{-- <li>
-                                                            @can('Sales-view')
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('sales.show', $data->id) }}"><i
-                                                                        class="fa-solid fa-eye"></i>View</a>
-                                                            @endcan
-                                                        </li>
-                                                        <li>
-                                                            @can('Sales-view')
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('sales.edit', $data->id) }}"><i
-                                                                        class="fa-solid fa-pencil"></i>Edit</a>
-                                                            @endcan
-                                                        </li>
-                                                        @if ($data->status == 'pending')
-                                                            <li>
-                                                                @can('Sales-delete')
-                                                                    <form method="POST"
-                                                                        action="{{ route('sales.destroy', $data->id) }}">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="button"
-                                                                            class="dropdown-item delete-button">
-                                                                            <i class="fa-solid fa-trash"></i> Delete
-                                                                        </button>
-                                                                    </form>
-                                                                @endcan
-                                                            </li>
-                                                        @endif
-                                                        <li>
-                                                            @can('Sales-close')
-                                                                <a class="dropdown-item" data-bs-toggle="modal"
-                                                                    data-bs-target="#select_closed"
-                                                                    onclick="sendId('{{ $data->id }}')"><i
-                                                                        class="fa-regular fa-close"></i> Closed</a>
-                                                            @endcan
-                                                        <li>
-                                                        <li>
-                                                            @can('Sales-download')
-                                                            <a class="dropdown-item" href="{{ $data->document_file }}"
-                                                                target="_blank">
-                                                                <i class="fa-solid fa-download"></i> Download
-                                                            </a>
-                                                            @endcan
-                                                        </li> --}}
-
-
                                                     </ul>
                                                 </div>
                                             </td>
@@ -241,46 +193,10 @@
         </section>
 
     </main><!-- End #main -->
-
-
-    <!-- Type Modal -->
-    <div class="modal fade" id="select_type" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Select Type</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <select class="form-select" name="so_type" id="type" required>
-                        <option value="">Select Type</option>
-                        <option value="quotation">Quotation</option>
-                        <option value="direct">Direct</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Company Modal2 -->
-    {{-- <div class="modal fade" id="company_modal2"tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="companyModalLabel">Select Company</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        onclick="refresh()"></button>
-                </div>
-                <div class="modal-body">
-                    @livewire('sales')
-                </div>
-            </div>
-        </div>
-    </div> --}}
+ 
     <!-- Company Modal2 -->
     <div class="modal fade" id="company_modal2" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
-        <form action="{{ route('sales.create') }}" method="post">
+        <form action="" method="post">
             @csrf
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -289,11 +205,9 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <label for="company_id11" class="mb-2">Select Buyer Company<span
-                                    class="required-classes">*</span></label>
+                            <label for="company_id11" class="mb-2">Select Buyer Company<span class="required-classes">*</span></label>
                             <div class="col-lg-12">
-                                <select class="  form-select Buyer-Company-select" name="company_id" id=" "
-                                    required>
+                                <select class="form-select Buyer-Company-select" name="company_id" id="buyerCompanySelect" required onchange="navigateToSalesCreate(this)">
                                     <option value="" selected disabled>Buyer Company</option>
                                     @foreach ($company as $c_item)
                                         <option value="{{ $c_item->id }}">{{ $c_item->company_name }}</option>
@@ -301,104 +215,11 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-
-
-
-
-    <!-- Company Modal -->
-    <div class="modal fade" id="company_modal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
-        <form action="{{ route('sales_quotation.create') }}" method="post">
-            @csrf
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="companyModalLabel">Select Company</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            onclick="refresh()"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <label for="" class="mb-2">Select Company <span
-                                    class="required-classes">*</span></label>
-                            <div class="col-lg-12">
-                                <select class="js-example-basic-single form-select custom-select" name="company_id"
-                                    id="company_id2" onchange="get_qt(this.value)" required>
-                                    <option value="">Company Name</option>
-                                    @foreach ($company as $c_item)
-                                        <option value="{{ $c_item->id }}">{{ $c_item->company_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <label for="" class="mb-2">Select Quotation <span
-                                    class="required-classes">*</span></label>
-                            <div class="col-lg-12">
-                                <select class="form-select" name="quotation_number" id="quotationSelect" required>
-                                    <option value="">Select Quotation</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
-
-
-    <!-- Modal Structure -->
-    <div class="modal fade" id="select_closed" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('sales.closed') }}" method="post">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Select Closed Type</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <label for="close_type" class="mb-2">Select Type <span
-                                    class="required-classes">*</span></label>
-                            <div class="col-lg-12">
-                                <select class="form-select" name="so_close_type" id="close_type" required>
-                                    <option value="">Select Type</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="partial pending">Partial Pending</option>
-                                    <option value="closed with condition">Closed with Condition</option>
-                                    <option value="closed">Closed</option>
-                                </select>
-                                <input type="hidden" name="id" id="close_id">
-                            </div>
-                        </div>
-                        <!-- Remarks Section -->
-                        <div class="row mt-3" id="remarks_row" style="display: none;">
-                            <label for="remarks" class="mb-2">Remarks</label>
-                            <div class="col-lg-12">
-                                <textarea class="form-control" name="remarks" id="remarks_for_condition" rows="2"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- JavaScript to Handle Modal Data and Toggle Remarks -->
     <script>
         function get_so_id_for_remark(id) {
@@ -668,5 +489,27 @@
             $('.table.dataTable').removeClass('no-footer');
         });
     </script>
+
+<script>
+    function navigateToSalesCreate(selectElement) {
+        const companyId = selectElement.value; // Get the selected company ID
+        if (companyId) {
+            const url = `/sales-create/${companyId}`; // Build the URL
+            window.location.href = url; // Redirect to the route
+        }
+    }
+</script>
+
+<script>
+
+    $(document).ready(function() {
+        $('#buyerCompanySelect').select2();
+        // Focus the search box when the subcategory dropdown is opened
+        $('#buyerCompanySelect').on('select2:open', function() {
+            document.querySelector('.select2-search__field').focus();
+        });
+
+    });
+</script>
 
 @endsection

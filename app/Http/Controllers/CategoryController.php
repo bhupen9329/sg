@@ -48,18 +48,16 @@ class CategoryController extends Controller
     public function create()
     {
         $company_data = Company::all();
-        // dd($company_data);
         return view('inventory.category.create', compact('company_data'));
     }
 
     public function store(Request $request)
     {
+   
         $category_check = Category::where('name', $request->name)->first();
         if($category_check){
           return redirect()->back()->with('msg', 'Base Item already exist');
         }
-
-
         $data = [
             'name' => $request->name,
             'price' => $request->price,
