@@ -108,7 +108,7 @@
                                     <div class="col-md-6">
                                         <label for="get_miller_id" class="form-label">From</label><span
                                             class="required-classes">*</span>
-                                        <select class="form-select Select-Company" id="get_miller_id" name="po_company_id"
+                                        <select class="form-select Select-Company custom-select" id="get_miller_id" name="po_company_id"
                                             onchange="fetchPoNumbers(this)" required>
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies_po as $company)
@@ -120,7 +120,7 @@
                                     <div class="col-md-6">
                                         <label for="to_company_id" class="form-label">To</label><span
                                             class="required-classes">*</span>
-                                        <select class="form-select Select-Company" id="to_company_id" name="so_company_id"
+                                        <select class="form-select Select-Company custom-select" id="to_company_id" name="so_company_id"
                                             onchange="fetchSalesOrders(this)" required>
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies_so as $company)
@@ -1378,6 +1378,27 @@
 });
 
 </script>
+<script>
+    $(document).ready(function () {
+        // Initialize select2 for all custom-select elements
+        $('.custom-select').select2();
+
+        // Focus the date input after select2 initialization
+        setTimeout(function () {
+            $('#get_miller_id').focus();
+        }, 0); // Small delay ensures focus happens after other DOM manipulations
+
+        // Focus the search box when the select2 dropdown is opened
+        $('.custom-select').on('select2:open', function () {
+            setTimeout(function () {
+                document.querySelector('.select2-search__field').focus();
+            }, 100); // Small delay ensures the search field is rendered before focusing
+        });
+    });
+</script>
+
+
+
 
 
 

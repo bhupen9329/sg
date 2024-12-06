@@ -127,7 +127,7 @@
                                     </div>
                                     <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="to_company_id" class="form-label">Vehicle Number</label>
-                                        <input type="text" class="form-control"
+                                        <input type="text" class="form-control" id="vehicle"
                                             value="{{ $disaptch_data->vehicle_number }}" name="vehicle_number">
                                     </div>
 
@@ -486,5 +486,11 @@
 
         }
     </script>
+
+<script>
+    $(document).ready(function() {
+        $('#vehicle').focus(); // Example code
+    });
+</script>
 
 @endsection
