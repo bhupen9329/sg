@@ -78,7 +78,7 @@
 
                                 <?php
                                 $currentDate = date('Y-m-d');
-                                $c_due_date = (int) $custom_due_date->custom_due_date;
+                                $c_due_date = (int) $custom_due_date->custom_due_date + 5;
                                 $due_date = date('Y-m-d', strtotime($currentDate . ' +' . $c_due_date . 'days'));
                                 ?>
 

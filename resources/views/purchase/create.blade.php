@@ -43,7 +43,6 @@
                                             </strong>{{ $po_id }}</label>
                                     </div> --}}
 
-
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label"><strong>Address :
@@ -57,7 +56,7 @@
                                 </div>
                                 <?php
                                 $currentDate = date('Y-m-d');
-                                $c_due_date = (int) $custom_due_date->custom_due_date;
+                                $c_due_date = (int) $custom_due_date->custom_due_date + 5;
                                 $due_date = date('Y-m-d', strtotime($currentDate . ' +' . $c_due_date . 'days'));
                                 // dd($c_due_date);
                                 ?>

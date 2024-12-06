@@ -76,8 +76,10 @@ class SalesController extends Controller
             $sales_order = $sales_order_query->where('sales_orders.so_user_id', $user->id)->get();
         }
 
-        $company = Company::where('type', 'buyer')->get();
-        $supplier_company = Company::where('type', 'supplier')->get();
+        $company = Company::where('type', '!=', 'supplier')->get();
+        $supplier_company = Company::where('type', '!=', 'buyer')->get();
+
+
         $warehouse = WareHouseModel::all();
         $data = [
             'sales_order' => $sales_order,

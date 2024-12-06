@@ -62,10 +62,11 @@ class DispatchController extends Controller
     {
         $purchase_orders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
             ->get();
-        // dd($purchase_orders);
         $sales_orders = SalesOrder::all();
-        $companies_po = Company::where('type', 'supplier')->get();
-        $companies_so = Company::where('type', 'buyer')->get();
+
+        $companies_po = Company::where('type', '!=', 'buyer')->get();
+        $companies_so = Company::where('type', '!=', 'supplier')->get();
+
 
         return view('dispatch.create', compact('purchase_orders', 'sales_orders', 'companies_po', 'companies_so'));
     }

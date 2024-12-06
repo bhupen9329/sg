@@ -42,12 +42,12 @@
                                         required>
                                 </div>
                                
-                                <div class="col-md-6">
-                                    <div class="row">
+                       
+                             
                                         <div class="col-md-6">
                                             <label for="inputName5" class="form-label">Type</label><span
                                                 class="required-classes">*</span>
-                                            <select class="form-select " id="get_selected_type"
+                                            <select class="form-select" id="get_selected_type"
                                                 onchange="check_selected_type(this.value)" name="type" required>
                                                 <option value="" selected disabled>Select Type</option>
                                                 <option value="buyer" {{ $companies->type == 'buyer' ? 'selected' : '' }}>
@@ -56,18 +56,15 @@
                                                 <option value="supplier"
                                                     {{ $companies->type == 'supplier' ? 'selected' : '' }}>
                                                     Supplier</option>
+
+                                                    <option value="both"
+                                                    {{ $companies->type == 'both' ? 'selected' : '' }}>
+                                                    Both</option>
                                             </select>
 
                                         </div>
-                                        {{-- <div class="col-md-6" style="display: none" id="virtual_div">
-                                            <label for="inputName5" class="form-label">Virtual Store</label><span
-                                                class="required-classes">*</span>
-                                            <input type="text" name="virtual_store" class="form-control" id="virtual_input"
-                                                value="{{ $companies->virtual_store }}" >
-                                        </div> --}}
-                                    </div>
-                                </div>
-
+                                   
+                       
                                 <div class="col-md-6">
                                     <label for="inputName5" class="form-label">Mobile</label>
                                     <input type="text" name="mobile" maxlength="10" minlength="10" class="form-control"

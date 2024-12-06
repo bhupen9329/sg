@@ -45,8 +45,8 @@
                                     $current_date = date('Y-m-d');
                                 @endphp
                                 
-                                <div class="col-md-6">
-                                    <div class="row">
+                             
+                                  
                                         <div class="col-md-6">
                                             <label for="inputName5" class="form-label">Type</label><span
                                                 class="required-classes">*</span>
@@ -55,16 +55,10 @@
                                                 <option value="" selected disabled>Select Type </option>
                                                 <option value="buyer">Buyer </option>
                                                 <option value="supplier">Supplier</option>
+                                                <option value="both">Both</option>
                                             </select>
                                         </div>
-                                        {{-- <div class="col-md-6" style="display: none" id="virtual_div">
-                                            <label for="inputName5" class="form-label">Virtual Store</label><span
-                                                class="required-classes">*</span>
-                                            <input type="text" name="virtual_store" class="form-control" id="name-input"
-                                                required>
-                                        </div> --}}
-                                    </div>
-                                </div>
+                               
                                 <div class="col-md-6">
                                     <label for="inputName5" class="form-label">Mobile</label>
                                     <input type="tel" name="mobile" maxlength="10" class="form-control" id="inputName5"
