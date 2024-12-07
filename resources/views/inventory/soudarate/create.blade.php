@@ -48,7 +48,7 @@
                                     <div class="col-md-8 mt-4">
                                         <label for="date-input" class="form-label">Select Date</label><span
                                             class="required-classes">*</span>
-                                        <input type="date" id="date-input" name="selected_date" value="{{ $currentDate }}" class="form-control"
+                                        <input type="date" id="raised_date_input" name="selected_date" value="{{ $currentDate }}" class="form-control"
                                             required>
                                     </div>
 

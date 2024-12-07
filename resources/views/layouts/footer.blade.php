@@ -96,6 +96,32 @@
     });
 </script>
 
+<script>
+    
+    document.addEventListener('DOMContentLoaded', function () {
+    const raisedDateInput = document.getElementById('raised_date_input');
+
+    if (raisedDateInput) {
+        raisedDateInput.addEventListener('blur', function () {
+            const inputDate = new Date(this.value);
+            const startDate = new Date("{{ date('Y-m-d', strtotime('01-04-' . date('Y'))) }}");
+            const endDate = new Date("{{ date('Y-m-d', strtotime('31-03-' . (date('Y') + 1))) }}");
+
+            if (inputDate < startDate || inputDate > endDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Date',
+                    text: `Please select a date between {{ date('d-m-Y', strtotime('01-04-' . date('Y'))) }} and {{ date('d-m-Y', strtotime('31-03-' . (date('Y') + 1))) }}.`,
+                    confirmButtonText: 'OK'
+                });
+                this.value = "{{ date('Y-m-d') }}"; // Reset to default
+            }
+        });
+    }
+});
+
+</script>
+
 <!-- Vendor JS Files -->
 <script src="{{ asset('assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
 <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>

@@ -23,10 +23,12 @@ return new class extends Migration {
             $table->string('price')->nullable();
             $table->string('so_item_status')->default('Open');
             $table->string('so_dispatch_item_status')->default('Open');
+            $table->string('so_item_status_date')->nullable();
+            $table->string('so_item_status_remarks')->nullable();
             $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      */

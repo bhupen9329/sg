@@ -97,9 +97,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/back', [PurchaseController::class, 'back']);
 
     Route::post('/get_received_qty', [PurchaseController::class, 'get_received_qty']);
+    Route::post('/po_pre_close_save', [PurchaseController::class, 'po_pre_closed_save'])->name('po_pre_closed.save');
+
+
+   
+
     Route::post('/get_received_qty_so', [SalesController::class, 'get_received_qty_so']);
-
-
     Route::post('/get_received_qty_party_wise', [SalesController::class, 'get_received_qty_so_party_wise']);
     Route::post('/get_received_qty_po_party_wise', [SalesController::class, 'get_received_qty_po_party_wise']);
 
@@ -190,6 +193,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get-so-remark-for-modal', [SalesController::class, 'get_remark']);
     Route::post('/sales/closed', [SalesController::class, 'closeSales'])->name('sales.closed');
     Route::post('/get-so-remark-for-modal', [SalesController::class, 'getSoRemarkForModal']);
+
+    Route::post('/so_pre_close_save', [SalesController::class, 'so_pre_closed_save'])->name('so_pre_closed.save');
+
 
 
 

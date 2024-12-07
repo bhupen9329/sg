@@ -221,7 +221,14 @@
                                                                     href="{{ route('purchase.delete', $data->po_item_id) }}"><i
                                                                         class="fa-solid fa-trash"></i>Delete</a>
                                                             @endif
-
+                                                     
+                                                                    <a data-bs-toggle="modal" href="#"
+                                                                    onclick="get_po_id({{ $data->po_item_id }})"
+                                                                    class="dropdown-item"
+                                                                    data-bs-target="#Modalforselect_type">
+                                                                    <i class="fa-solid fa-ban"></i>
+                                                                    Change Status
+                                                                </a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -241,9 +248,51 @@
 
     </main><!-- End #main -->
 
-
-    {{-- .................................. modal.............................  --}}
-    <!-- Button trigger modal -->
+        <!-- Modal 1 -->
+        <div class="modal fade" id="Modalforselect_type" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal1Label">Change Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="width:50px"></button>
+                    </div>
+                    <form action="{{ route('po_pre_closed.save') }}" method="POST">
+                        @csrf
+                        <div class="modal-body">
+                            <div class="row  ">
+                                <label for="inputPassword3" class="col-sm-12 col-form-label"><strong>
+                                        Select Status<span class="required-classes">*</span>​</strong> </label>
+                                <div class="col-sm-12">
+                                    <select name="status" id="statusSelect" class="form-select" required>
+                                        <option value="" selected disabled>Select Status</option>
+                                        <option value="Pre Closed">Pre Close</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Date 
+                                    <span class="required-classes">*</span>​</strong> </label>
+                            <div class="col-sm-12">
+                                <input type="date" class="form-control" name="date" id="dateInput" required 
+                                value="<?php echo date('Y-m-d'); ?>">
+                            </div>
+                            <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Remarks
+                               ​</strong> </label>
+                        <div class="col-sm-12">
+                            <textarea class="form-control" name="remarks" id="remarks_for_closure" rows="2"></textarea>
+                            <input type="hidden" id="set_po_item_id" name="po_item_id">
+                        </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    
 
 
     <!-- Modal -->
@@ -274,173 +323,11 @@
 
     <!-- Modals -->
     <!-- Modal 1 -->
-    <div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal1Label">Partial Receive​</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        style="width:50px"></button>
-                </div>
-                <form action="{{ route('po-partial-receive.save') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row  ">
-                            <label for="inputPassword3" class="col-sm-12 col-form-label"><strong>Enter Received
-                                    Quantity<span class="required-classes">*</span>​</strong> </label>
-                            <div class="col-sm-12">
-                                <input type="number" class="form-control" name="received_quantity"
-                                    id="received_total_qty_quantity" required>
-                                <input type="hidden" class="form-control" name="po_id" id="set_po_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+  
 
-    <!-- Modal 2 -->
-    <div class="modal fade" id="modal2" tabindex="-1" aria-labelledby="modal2Label" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal2Label">Partial Closed​</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"style="width:50px"></button>
-                </div>
-                <form action="{{ route('po-partial-closed.save') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row  ">
-                            <label for="inputPassword3" class="col-sm-12 col-form-label"><strong>Enter Received
-                                    Quantity​ <span class="required-classes">*</span></strong> </label>
-                            <div class="col-sm-12">
-                                <input type="number" class="form-control" name="received_quantity"
-                                    id="for_partisaly_closed" required>
-                                <input type="hidden" class="form-control" name="po_id" id="set_po_id2">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 3 -->
-    <div class="modal fade" id="modal3" tabindex="-1" aria-labelledby="modal3Label" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal3Label">Total Closed</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"style="width:50px"></button>
-                </div>
-                <form action="{{ route('total.closed') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row  ">
-                            <label for="inputPassword3" class="col-sm-12 col-form-label text-center"><strong>Are You
-                                    Sure?​ <br>
-                                    You want to Permanently close the Purchase Order.​</strong> </label>
-                            <input type="date" class="form-control" name="closed_date" id="closed_date" required>
-
-                            <div class="col-sm-12">
-                                <input type="hidden" class="form-control" name="po_id" id="set_po_id3">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer justify-content-evenly">
-                        <button type="submit" class="btn btn-primary">Closed</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 4 -->
-    <div class="modal fade" id="Modalfor_quantity_details" tabindex="-1" aria-labelledby="modal3Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal3Label">Received Quantity - History</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"style="width:50px"></button>
-                </div>
-                <div class="modal-body">
-                    <h6 class="text-end py-3"><strong>PO Quantity</strong> : <span id="add_total_qty"></span></h6>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Received Qty</th>
-                                <th scope="col">Balance Qty</th>
-                                <th scope="col" style="width: 20px">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 5 -->
-    <div class="modal fade" id="Modalfor_update_received_qty" tabindex="-1" aria-labelledby="modal3Label"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal3Label">Update Received Quantity </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"style="width:50px"></button>
-                </div>
-                <form action="{{ url('update-partial-received-quantity') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="modal-body">
-                            <div class="col-md-12" id="remove_Update_Quantity">
-                                <label for="Price" class="form-label">Update Quantity</label>
-                                <input type="number" name="received_quantity" id="update_received_qty"
-                                    class="form-control" required>
-                            </div>
-                            <div class="col-12 mt-3">
-                                <label for="Margin" id="set_Received_Quantity_Completed" class="form-label"
-                                    style="color: red">Received Quantity Is Completed</label>
-                            </div>
-                            <div class="col-12 mt-3">
-                                <label for="Margin" id="set_max_qty" class="form-label">Max Value: </label>
-                            </div>
+  
 
 
-                            <input type="hidden" class="form-control" name="po_received_id" id="received_id">
-                            <input type="hidden" class="form-control" name="po_id" id="set_po_id_for_update">
-                            {{-- <div class="d-flex justify-content-end pt-3">
-                                <button type="button" class="btn btn-secondary m-1"
-                                    data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary m-1">Submit</button>
-                            </div> --}}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" id="update_button">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -478,108 +365,11 @@
             });
         });
 
-        function get_po_id(po_id) {
-            po_id = po_id;
-            $('#set_po_id').val(po_id);
-            $('#set_po_id2').val(po_id);
-            $('#set_po_id3').val(po_id);
-            $.ajax({
-                url: "{{ url('get_received_quantity') }}",
-                method: "POST",
-                data: {
-                    po_id: po_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-                    // console.log(res);
-                    let total_qty = res.total_qty.rest_quantity;
-                    $('#received_total_qty_quantity').attr('max', total_qty);
-                    $('#for_partisaly_closed').attr('max', total_qty);
-                    //  $("#remaining_max").attr("max", difference);
-                }
-            });
-
+        function get_po_id(po_item_id) {
+            po_item_id = po_item_id;
+            $('#set_po_item_id').val(po_item_id);
         }
-
-        function get_received_qty(po_id, rest_qty) {
-            let get_po_id = po_id;
-            let total_balance_qty = rest_qty;
-
-            // console.log(po_id);
-            $.ajax({
-                url: "{{ url('get_received_qty') }}",
-                method: "POST",
-                data: {
-                    po_id: get_po_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-                    // console.log(res); // Log the response to the console
-                    let rowsData = res.rows_data;
-                    let totalQty = res.total_qty;
-                    $('#add_total_qty').html(totalQty);
-
-                    let tableBody = document.querySelector('.modal-body table tbody');
-                    tableBody.innerHTML = ''; // Clear existing table rows
-
-                    rowsData.forEach((rowData, index) => {
-                        // Parse the date string and format it
-                        let date = new Date(rowData.date);
-                        let formattedDate = date.toLocaleDateString('en-US', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
-                        });
-                        let row = `<tr>
-                                        <th scope="row">${index + 1}</th>
-                                        <td>${formattedDate}</td>
-                                        <td>${rowData.received_qty}</td>
-                                        <td>${rowData.balance_qty}</td>
-                                        <td>
-                                             <a data-bs-toggle="modal" href="#" class="dropdown-item"
-                                                    data-bs-target="#Modalfor_update_received_qty"
-                                                    style="text-decoration: underline; color: blue;text-align: center;"
-                                                    onclick="update_received_qty(${rowData.id},'${get_po_id}', '${total_balance_qty}', '${totalQty}' , ${rowData.received_qty}, ${rowData.balance_qty})">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </a>
-                                            </td>
-                                    </tr>`;
-                        tableBody.insertAdjacentHTML('beforeend', row);
-                    });
-                }
-
-
-            });
-        }
-
-
-        function update_received_qty(id, get_po_id, total_balance_qty, totalQty, received_qty, balance_qty) {
-            let po_received_id = id;
-            let po_id = get_po_id;
-            let po_received_total_balance_qty = parseFloat(total_balance_qty);
-            // console.log(po_received_total_balance_qty);
-            let po_received_received_qty = parseFloat(received_qty);
-            let max_qty = po_received_total_balance_qty + po_received_received_qty;
-            // console.log(max_qty);
-
-            if (po_received_total_balance_qty === 0) {
-                $('#update_received_qty').attr('max', 0);
-                $('#set_max_qty').html('Max Value : ' + 0);
-                $('#update_button').hide();
-                $('#remove_Update_Quantity').hide();
-                $('#set_Received_Quantity_Completed').show();
-            } else {
-                // $('#update_button').hide();
-                $('#update_received_qty').attr('max', max_qty);
-                $('#set_max_qty').html('Max Value : ' + max_qty);
-                $('#remove_Update_Quantity').show();
-                $('#set_Received_Quantity_Completed').hide();
-            }
-            // console.log(max_qty);
-
-            $('#received_id').val(po_received_id);
-            $('#set_po_id_for_update').val(po_id);
-        }
+   
     </script>
 
 

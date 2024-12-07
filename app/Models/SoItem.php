@@ -22,7 +22,12 @@ class SoItem extends Model
         'so_item_status',
         'so_dispatch_item_status',
         'so_dispatch_rest_qty',
+        'so_item_status_date',
+        'so_item_status_remarks',
     ];
+
       
     public $timestamps = true;
 }
+
+

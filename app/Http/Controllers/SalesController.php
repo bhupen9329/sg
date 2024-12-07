@@ -789,4 +789,10 @@ class SalesController extends Controller
             'rows_data' => $po_data
         ]);
     }
+
+    
+    public function so_pre_closed_save(Request $request){
+        SoItem::where('id', $request->so_item_id)->update(['so_dispatch_item_status' => $request->status, 'so_item_status_date' => $request->date,  'so_item_status_remarks' => $request->remarks,]);
+        return redirect()->route('sales.index')->with('success', 'Sales Order Status Updated Successfully');
+    }
 }
