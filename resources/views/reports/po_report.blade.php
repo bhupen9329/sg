@@ -158,6 +158,8 @@
                             <option value="Partial Pending">Partial Pending</option>
                             <option value="Not Close" selected>Not Close</option>
                             <option value="Close">Close</option>
+                            <option value="Pre Closed">Pre Closed</option>
+                            <option value="Cancelled">Cancelled</option>
 
                         </select>
                     </div>

@@ -23,6 +23,8 @@ class PoItem extends Model
          'po_item_status',
          'po_dispatch_item_status',
          'po_dispatch_rest_qty',
+         'po_item_status_date',
+         'po_item_status_remarks',
         
     ];
       

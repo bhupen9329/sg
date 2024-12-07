@@ -80,6 +80,8 @@
                                 $currentDate = date('Y-m-d');
                                 $c_due_date = (int) $custom_due_date->custom_due_date + 5;
                                 $due_date = date('Y-m-d', strtotime($currentDate . ' +' . $c_due_date . 'days'));
+                                $startFinancialYear = date('d-m-Y', strtotime('01-04-' . date('Y')));
+                                $endFinancialYear = date('d-m-Y', strtotime('31-03-' . (date('Y') + 1)));
                                 ?>
 
                                 <!-- Date Raised Input -->
@@ -89,7 +91,8 @@
                                     </label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" name="date"
-                                            value="{{ $currentDate }}" id="raised_date_input" required>
+                                            value="{{ $currentDate }}" id="raised_date_input" required  
+                                            >
                                     </div>
                                 </div>
 
@@ -119,7 +122,7 @@
 
                                 <div class="row mb-3">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label"><strong>
-                                            Sales Person  </strong><span class="required-classes">*</span></label>
+                                            Sales Person </strong><span class="required-classes">*</span></label>
                                     <div class="col-sm-4 mt-1">
                                         <select name="user_id" class="form-select" required>
                                             @foreach ($user as $user_data)
@@ -246,11 +249,11 @@
                                                         </table>
                                                     </div>
 
-                                                    <script>                                 
+                                                    <script>
                                                         var lastItemId = 1; // Initial Item ID
 
                                                         function addRow(event) {
-                                                            event.preventDefault(); 
+                                                            event.preventDefault();
                                                             var table = document.getElementById("myTable");
                                                             var newRow = table.insertRow(table.rows.length);
                                                             // console.log(table);
@@ -286,11 +289,13 @@
                                                             <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
 
                                                             if (lastItemId != 1) {
-                                                                cell5.innerHTML = `
+                                                                cell5.innerHTML =
+                                                                    `
                                                                     <button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
                                                                     <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
                                                             } else {
-                                                                cell5.innerHTML = '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
+                                                                cell5.innerHTML =
+                                                                    '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
                                                             }
 
                                                             // Focus the search box when the dropdown is opened
@@ -523,8 +528,6 @@
         //     console.log(lastItemId);
 
         // }
-
-
     </script>
 
 
@@ -699,19 +702,22 @@
         }
     </script>
 
-<script>
-    $(document).ready(function() {
-        // Focus the date input when the page is loaded
-        $('#raised_date_input').focus();
-    });
-</script>
+    <script>
+        $(document).ready(function() {
+            // Focus the date input when the page is loaded
+            $('#raised_date_input').focus();
+        });
+    </script>
 
-<script>
-           function initializeTable_2() {
-                            addRow(event);
-                        }
+    <script>
+        function initializeTable_2() {
+            addRow(event);
+        }
 
-                        // Call initializeTable on page load for Payment Terms
-                        document.addEventListener('DOMContentLoaded', initializeTable_2);
-</script>
+        // Call initializeTable on page load for Payment Terms
+        document.addEventListener('DOMContentLoaded', initializeTable_2);
+
+
+
+    </script>
 @endsection

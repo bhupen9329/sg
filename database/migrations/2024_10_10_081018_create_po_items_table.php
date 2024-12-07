@@ -27,7 +27,8 @@ return new class extends Migration
             $table->string('po_item_status')->default('Open');
             $table->string('po_dispatch_item_status')->default('Open');
             $table->string('po_dispatch_rest_qty')->nullable();
-            
+            $table->string('po_item_status_date')->nullable();
+            $table->string('po_item_status_remarks')->nullable();
             $table->timestamps();
         });
     }

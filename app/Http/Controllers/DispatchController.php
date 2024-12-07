@@ -75,14 +75,13 @@ class DispatchController extends Controller
     {
 
         $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-            ->Join('po_items', function ($join) {
-                $join->on('po_items.po_id', '=', 'purchase_orders.id')
-                    ->where('po_items.po_dispatch_item_status', '!=', 'Close');
-            })
-            ->Join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->where('purchase_orders.supplier_id', $request->company_id)
-            ->get();
-
+        ->join('po_items', function ($join) {
+            $join->on('po_items.po_id', '=', 'purchase_orders.id')
+                ->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled']);
+        })
+        ->join('categories', 'categories.id', '=', 'po_items.item_category')
+        ->where('purchase_orders.supplier_id', $request->company_id)
+        ->get();
 
         return response()->json(['purchase_orders' => $purchaseOrders]);
     }
@@ -100,12 +99,11 @@ class DispatchController extends Controller
         $salesOrders = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('so_items', function ($join) {
                 $join->on('so_items.so_id', '=', 'sales_orders.id')
-                    ->where('so_items.so_dispatch_item_status', '!=', 'Close');
+                    ->whereNotIn('so_items.so_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled']);
             })
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
             ->where('sales_orders.company_id', $companyId)
             ->get();
-
         return response()->json(['salesOrders' => $salesOrders]);
     }
 

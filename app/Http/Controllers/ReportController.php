@@ -87,6 +87,7 @@ class ReportController extends Controller
                 'purchase_orders.id as po_id',
                 'purchase_orders.document_number',
                 'purchase_orders.date',
+                'po_items.*',
                 'po_items.po_item_no',
                 'po_items.qty',
                 'po_items.unit_price',
@@ -106,8 +107,13 @@ class ReportController extends Controller
                 $query->where('po_items.po_dispatch_item_status', '=', 'Open');
             } elseif ($filterStatus == 'Close') {
                 $query->where('po_items.po_dispatch_item_status', '=', 'Close');
-            } else {
+            } elseif($filterStatus == 'Partial Pending') {
                 $query->where('po_items.po_dispatch_item_status', '=', 'Partial Pending');
+            }
+            elseif($filterStatus == 'Pre Closed') {
+                $query->where('po_items.po_dispatch_item_status', '=', 'Pre Closed');
+            }else{
+                $query->where('po_items.po_dispatch_item_status', '=', 'Cancelled');
             }
         }
 
@@ -140,6 +146,8 @@ class ReportController extends Controller
                 'quantity' => $filteredData->qty,
                 'rest_quantity' => $filteredData->po_dispatch_rest_qty ?? 0,
                 'dispatch_status' => $filteredData->po_dispatch_item_status,
+                'po_item_status_date' => $filteredData->po_item_status_date,
+                'po_item_status_remarks' => $filteredData->po_item_status_remarks,
             ];
             $data[] = $tempData;
         }
@@ -241,6 +249,7 @@ class ReportController extends Controller
                 'so_items.so_item_no',
                 'companies.company_name',
                 'categories.name as category_name',
+                'so_items.*',
                 'so_items.qty',
                 'so_items.unit_price',
                 'so_items.so_dispatch_rest_qty',
@@ -258,8 +267,14 @@ class ReportController extends Controller
             $query->where('so_items.so_dispatch_item_status', '=', 'Open');
         } elseif ($filterStatus == 'Close') {
             $query->where('so_items.so_dispatch_item_status', '=', 'Close');
-        } else {
+        } 
+        elseif($filterStatus == 'Partial Pending') {
             $query->where('so_items.so_dispatch_item_status', '=', 'Partial Pending');
+        }
+        elseif($filterStatus == 'Pre Closed') {
+            $query->where('so_items.so_dispatch_item_status', '=', 'Pre Closed');
+        }else{
+            $query->where('so_items.so_dispatch_item_status', '=', 'Cancelled');
         }
     }
 
@@ -289,6 +304,9 @@ class ReportController extends Controller
                 'rest_qty' => $filteredData->so_dispatch_rest_qty,
                 'dispatch_status' => $filteredData->so_dispatch_item_status,
                 'user_name' => $filteredData->user_name,
+                'so_item_status_date' => $filteredData->po_item_status_date,
+                'so_item_status_remarks' => $filteredData->po_item_status_remarks,
+           
             ];
             $data[] = $tempData;
         }
