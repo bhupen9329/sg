@@ -334,8 +334,8 @@ class DispatchController extends Controller
 
         $freight_insurance = FreightRate::latest()->first();
 
-        $dispatch_po_price = ($disaptch_data->dispatch_unit_price + $disaptch_data->conv_rate + $disaptch_data->dispatch_freight + $disaptch_data->dispatch_other);
-        $dispatch_so_price = ($disaptch_data->dispatch_so_unit_price + $disaptch_data->conv_rate + $disaptch_data->dispatch_freight + $disaptch_data->dispatch_other);
+        $dispatch_po_price = ($disaptch_data->dispatch_unit_price);
+        $dispatch_so_price = ($disaptch_data->dispatch_so_unit_price);
 
         // dd($disaptch_data);
         $sub_items = SubCategory::where('category_id',  $disaptch_data->category_id)->get();
@@ -388,21 +388,15 @@ class DispatchController extends Controller
             $dispatch->dispatched_quantity = $request->quantity[$index];
             $dispatch->conv_rate = $request->conv_rate[$index];
             $dispatch->dispatch_unit_price = $request->dispatch_unit_price_actual[$index];
-            $dispatch->dispatch_freight = $request->dispatch_freight[$index];
 
             $dispatch->dispatch_total = $request->dispatch_total[$index];
 
 
             $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price_actual[$index];
-            $dispatch->dispatch_so_freight = $request->dispatch_so_freight[$index];
-            if ($request->insurance_status[$index] == 'yes') {
                 // dd($request->dispatch_so_other_actual[$index]);
-                $dispatch->dispatch_other = $request->dispatch_so_other_actual[$index];
-                $dispatch->dispatch_so_other = $request->dispatch_so_other_actual[$index];
-            } else {
-                $dispatch->dispatch_other = 0;
-                $dispatch->dispatch_so_other = 0;
-            }
+                $dispatch->dispatch_other = $request->dispatch_fregiht_insuance[$index];
+                $dispatch->dispatch_so_other = $request->dispatch_fregiht_insuance[$index];
+          
 
             $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
             $dispatch->receiver_person = $request->receiver_person;
