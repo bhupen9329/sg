@@ -59,7 +59,7 @@ class SalesController extends Controller
             ->join('so_items', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
             ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
-            ->where('so_items.so_item_status', '!=', 'Close')
+            ->whereNotIn('so_items.so_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled'])
             ->select(
                 '*',
                 'sales_orders.id as so_id',

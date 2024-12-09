@@ -75,13 +75,13 @@ class DispatchController extends Controller
     {
 
         $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
-        ->join('po_items', function ($join) {
-            $join->on('po_items.po_id', '=', 'purchase_orders.id')
-                ->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled']);
-        })
-        ->join('categories', 'categories.id', '=', 'po_items.item_category')
-        ->where('purchase_orders.supplier_id', $request->company_id)
-        ->get();
+            ->join('po_items', function ($join) {
+                $join->on('po_items.po_id', '=', 'purchase_orders.id')
+                    ->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled']);
+            })
+            ->join('categories', 'categories.id', '=', 'po_items.item_category')
+            ->where('purchase_orders.supplier_id', $request->company_id)
+            ->get();
 
         return response()->json(['purchase_orders' => $purchaseOrders]);
     }
@@ -156,9 +156,10 @@ class DispatchController extends Controller
 
     public function storeDispatch(Request $request)
     {
+
         $month = date('m'); // Current month
         $year = date('Y');  // Current calendar year
-        
+
         // Check if the current month is after March (i.e., April to December)
         if ($month >= 4) {
             // Financial year starts from April to March, so the year should be the current year
@@ -167,12 +168,12 @@ class DispatchController extends Controller
             // For months from January to March, the financial year will be the previous year
             $financial_year = $year - 1;
         }
-        
+
         // Get the last dispatch document number for the current financial year
         $last_sail_number = Dispatch::whereYear('created_at', '=', $financial_year)
             ->latest('id')
             ->first();
-        
+
         if ($last_sail_number) {
             // Extract the serial number from the last dispatch number
             $max_serial_number = $last_sail_number->dispatch_number;
@@ -182,58 +183,56 @@ class DispatchController extends Controller
             // If no records exist, start with serial number '0001'
             $next_serial_number = '0001';
         }
-        
+
         // Generate the document number
         $doc_number = 'DIS' . $financial_year . $next_serial_number;
-        
+
 
         $rowIdentifiers = [];
         $soDispatchQuantities = [];
         $poDispatchQuantities = [];
-        
+
         foreach ($request->quantity as $index => $quantity) {
             $rowKey = $request->po_item_number[$index] . '-' .
                 $request->sub_cat_id[$index] . '-' .
-                $request->insurance_status[$index] . '-' .
                 $request->so_item_no[$index];
-        
+
             if (in_array($rowKey, $rowIdentifiers)) {
                 return response()->json(['message' => 'Duplicate rows detected for PO Item, Subcategory, Insurance Status, or SO Item.'], 400);
                 // return redirect()->back()->with('msg', 'Duplicate rows detected for PO Item, Subcategory, Insurance Status, or SO Item.');
             }
-        
+
             $rowIdentifiers[] = $rowKey;
-        
+
             $so_item = SoItem::where('so_item_no', $request->so_item_no[$index])->first();
             $po_item = PoItem::where('po_item_no', $request->po_item_number[$index])->first();
-        
+
             if (!$so_item || !$po_item) {
                 return response()->json(['message' => 'Please select at least one PO Item or SO Item.'], 400);
             }
-        
+
             // Initialize cumulative dispatched quantities
             $soDispatchQuantities[$request->so_item_no[$index]] = $soDispatchQuantities[$request->so_item_no[$index]] ?? 0;
             $poDispatchQuantities[$request->po_item_number[$index]] = $poDispatchQuantities[$request->po_item_number[$index]] ?? 0;
-        
+
             // Update cumulative dispatched quantities
             $soDispatchQuantities[$request->so_item_no[$index]] += $quantity;
             $poDispatchQuantities[$request->po_item_number[$index]] += $quantity;
-        
+
             // Check if cumulative dispatch exceeds remaining quantity
             if ($soDispatchQuantities[$request->so_item_no[$index]] > $so_item->so_dispatch_rest_qty) {
                 return response()->json(['message' => 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . $so_item->so_dispatch_rest_qty . ').'], 400);
             }
-        
+
             if ($poDispatchQuantities[$request->po_item_number[$index]] > $po_item->po_dispatch_rest_qty) {
                 return response()->json(['message' => 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . $po_item->po_dispatch_rest_qty . ').'], 400);
             }
-        
+
             if ($quantity > $so_item->so_dispatch_rest_qty || $quantity > $po_item->po_dispatch_rest_qty) {
                 return response()->json(['message' => 'Dispatch Rest Quantity Less than Dispatched Quantity.'], 400);
             }
-           
         }
-        
+
 
         //   .............................................................................................................................................   
 
@@ -247,12 +246,11 @@ class DispatchController extends Controller
                 ->join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
                 ->select('purchase_orders.*', 'po_items.*', 'po_items.id as po_item_id')
                 ->first();
-
             $dispatch = new Dispatch();
             $dispatch->date = $request->date;
             $dispatch->dispatch_number = $doc_number;
-            $dispatch->po_company_id = $so_item->company_id;
-            $dispatch->so_company_id = $po_item->supplier_id;
+            $dispatch->po_company_id =  $po_item->supplier_id;
+            $dispatch->so_company_id =  $so_item->company_id;
             $dispatch->po_id = $po_item->po_id;
             $dispatch->so_id = $so_item->so_id;
             $dispatch->po_item_id = $po_item->po_item_id;
@@ -262,21 +260,14 @@ class DispatchController extends Controller
             $dispatch->dispatched_quantity = $request->quantity[$index];
             $dispatch->conv_rate = $request->conv_rate[$index];
             $dispatch->dispatch_unit_price = $request->dispatch_unit_price_actual[$index];
-            $dispatch->dispatch_freight = $request->dispatch_freight[$index];
 
-            if ($request->insurance_status[$index] == 'yes') {
-                $dispatch->dispatch_other = $request->dispatch_other[$index];
-                $dispatch->dispatch_so_other = $request->dispatch_so_other[$index];
-            } else {
-                $dispatch->dispatch_other = 0;
-                $dispatch->dispatch_so_other = 0;
-            }
+            $dispatch->dispatch_other = $request->dispatch_fregiht_insuance[$index];
+            $dispatch->dispatch_so_other = $request->dispatch_fregiht_insuance[$index];
 
             $dispatch->dispatch_total = $request->dispatch_total[$index];
             $dispatch->vehicle_number = $request->vehicle_number;
 
             $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price_actual[$index];
-            $dispatch->dispatch_so_freight = $request->dispatch_so_freight[$index];
 
             $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
             $dispatch->receiver_person = $request->receiver_person;

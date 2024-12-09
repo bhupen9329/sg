@@ -192,8 +192,8 @@
                                             <th>Base Item Name​</th>
                                             <th>SO Unit Price</th>
                                             <th>SO Quantity</th>
-                                            <th>Balanced SO Quantity</th>
                                             <th>Dispatched Quantity</th>
+                                            <th>Balanced SO Quantity</th>
                                             <th>SO Dispatch Status</th>
                                             <th>Sales Person</th>
                                         </tr>
@@ -211,8 +211,8 @@
                                             <td></td>
                                             <td style="text-align:left; font-weight: bold;" id="totalSOUnitPrice">0</td>
                                             <td style="text-align:left; font-weight: bold;" id="totalSOQty">0</td>
-                                            <td style="text-align:left; font-weight: bold;" id="totalRestQty">0</td>
                                             <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalRestQty">0</td>
                                             <td colspan="2"></td>
                                         </tr>
                                     </tfoot>
@@ -347,15 +347,15 @@ function filterButton(filterTodate, filterFromdate, filterCompany, filterCategor
                         data.category,
                         data.so_unit_price,
                         data.quantity,
-                        data.rest_qty,
                         dispatched_qty,
+                        data.rest_qty,
                         data.dispatch_status,
                         data.user_name,
                     ]).draw(false).node();
 
                     // Optionally add additional styles to the row or other cells
                     if(data.rest_qty != 0){
-                        $(rowNode).find('td:eq(8)').css({
+                        $(rowNode).find('td:eq(9)').css({
                         'background-color': '#ff3300',
                         'color': 'black',
                     });

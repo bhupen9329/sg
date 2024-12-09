@@ -296,12 +296,12 @@
                 </li>
             @endcan
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('manual.matching')}}">
                     <i class="fa-solid fas fa-pencil-alt"></i>
                     <span>Manual Matching</span>
                 </a>
-            </li>
+            </li> --}}
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('dispatch.index') }}">

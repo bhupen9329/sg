@@ -89,7 +89,7 @@
                                     </label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" name="date"
-                                            value="{{ $sales_order->date }}" id="raised_date_input" required>
+                                            value="{{ $sales_order->date }}" id="raised_date_input"  onchange="setDueDate()" required>
                                     </div>
                                 </div>
 
@@ -730,6 +730,19 @@
         $('#raised_date_input').focus();
     });
 </script>
+
+<script>
+    function setDueDate() {
+        const raisedDateInput = document.getElementById('raised_date_input');
+        const dueDateInput = document.getElementById('due_date_input');
+        
+        const raisedDate = new Date(raisedDateInput.value);
+        if (!isNaN(raisedDate.getTime())) {
+            raisedDate.setDate(raisedDate.getDate() + 10); // +10 days
+            dueDateInput.value = raisedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        }
+    }
+    </script>
 
 
 @endsection

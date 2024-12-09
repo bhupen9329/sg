@@ -347,14 +347,10 @@
                         <td>Conv Rate</td>
                         <td>${res.conv_rate ?? 0}</td>
                     </tr>`,
-                            `<tr>
-                        <th scope="row">3</th>
-                        <td>Freight Rate</td>
-                        <td>${res.dispatch_freight ?? 0}</td>
-                    </tr>`,
+                            
                             `<tr>
                         <th scope="row">4</th>
-                        <td>Insurance Rate</td>
+                        <td>Loading + Insurance Rate</td>
                         <td>${res.dispatch_other ?? 0}</td>
                     </tr>`,
 
@@ -413,14 +409,10 @@
                         <td>Conv Rate</td>
                         <td>${res.conv_rate ?? 0}</td>
                     </tr>`,
-                    `<tr>
-                        <th scope="row">3</th>
-                        <td>Freight Rate</td>
-                        <td>${res.dispatch_freight ?? 0}</td>
-                    </tr>`,
+                   
                     `<tr>
                         <th scope="row">4</th>
-                        <td>Insurance Rate</td>
+                        <td>Loading + Insurance Rate</td>
                         <td>${res.dispatch_other ?? 0}</td>
                     </tr>`,
                     `<tr>

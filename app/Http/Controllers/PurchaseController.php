@@ -61,7 +61,7 @@ class PurchaseController extends Controller
                 ->join('categories', 'categories.id', '=', 'po_items.item_category')
                 ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
                 ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'po_items.id as po_item_id', 'categories.name as category_name', 'users.*')
-                ->where('po_items.po_item_status', '!=', 'Close')
+                ->whereNotIn('po_items.po_dispatch_item_status',  ['Close', 'Pre Closed', 'Cancelled'])
                 ->orderBy('purchase_orders.id', 'desc')
                 ->get();
             // dd( $po_data);
@@ -72,7 +72,7 @@ class PurchaseController extends Controller
                 ->join('categories', 'categories.id', '=', 'po_items.item_category')
                 ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
                 ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'po_items.id as po_item_id', 'categories.name as category_name', 'users.*')
-                ->where('po_items.po_item_status', '!=', 'Close')
+                ->whereNotIn('po_items.po_dispatch_item_status',  ['Close', 'Pre Closed', 'Cancelled'])
                 ->where('purchase_orders.po_user_id', $user->id)
                 ->orderBy('purchase_orders.id', 'desc')
                 ->get();
