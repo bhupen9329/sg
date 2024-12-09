@@ -150,7 +150,7 @@
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_long">Insurance</th>
+                                            <th class="table_heading_long">Loading + Insurance</th>
                                             <th class="table_heading_long">PO Unit Price</th>
                                             <th class="table_heading_long">SO Unit Price</th>
                                             <th class="table_heading_normal">Quantity<span
@@ -322,10 +322,7 @@
 
             cell3.innerHTML = `
                   <td>
-    <select name="insurance_status[]" onchange="calculateTotal(this)" class="form-select insurance_status">
-    <option value="yes" {{ $disaptch_data->dispatch_other != 0 ? 'selected' : '' }}>Yes</option>
-    <option value="no" {{ $disaptch_data->dispatch_other == 0 ? 'selected' : '' }}>No</option>
-</select>
+   <input type="number" name="dispatch_fregiht_insuance[]" oninput="calculateTotal(this)" value={{ $disaptch_data->dispatch_other }} class="form-control"  value="0" required />
 
 
              <input type="hidden" name="conv_rate[]" id="conv_rate"value="{{ $disaptch_data->conv_rate }}" class="form-control" oninput="calculateTotal(this)" required />
@@ -421,7 +418,7 @@
 
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
 
-            const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
+          
             const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
 
             const other_actual = parseFloat(row.querySelector('input[name="dispatch_so_other_actual[]"]').value) || 0;
@@ -435,20 +432,15 @@
             const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
             const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
-            const insuranceStatus = row.querySelector('select[name="insurance_status[]"]').value;
+            const freight_insurance = parseFloat(row.querySelector('input[name="dispatch_fregiht_insuance[]"]').value) || 0;
 
             // Calculate the total values for PO and SO based on the quantity
 
-            let totalPOUnitPrice = 0;
-            let totalSOUnitPrice = 0;
 
-            if (insuranceStatus === 'yes') {
-                totalPOUnitPrice = unitPriceActual + convRate + freight + other_actual;
-                totalSOUnitPrice = sounitPriceActual + convRate + freight + other_actual;
-            } else {
-                totalPOUnitPrice = unitPriceActual + convRate + freight;
-                totalSOUnitPrice = sounitPriceActual + convRate + freight;
-            }
+
+
+            let totalPOUnitPrice = unitPriceActual + convRate;
+            let totalSOUnitPrice = sounitPriceActual + convRate;
 
 
             row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
@@ -456,15 +448,8 @@
 
             if (quantity) {
                 // Multiply only the total (not unit price)
-
-                if (insuranceStatus === 'yes') {
-                    totalAmount = (totalPOUnitPrice) * quantity;
-                    totalSoAmount = (totalSOUnitPrice) * quantity;
-                } else {
-                    totalAmount = (totalPOUnitPrice) * quantity;
-                    totalSoAmount = (totalSOUnitPrice) * quantity;
-                }
-
+                    totalAmount = (((totalPOUnitPrice) * quantity) + freight_insurance);
+                    totalSoAmount = (((totalSOUnitPrice) * quantity) + freight_insurance);
                 row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
                 row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
             } else {

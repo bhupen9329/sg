@@ -215,8 +215,8 @@
                                         <th>Base Item Name​</th>
                                         <th>PO Unit Price</th>
                                         <th>PO Quantity</th>
-                                        <th>Balanced PO Quantity</th>
                                         <th>Dispatched Quantity</th>
+                                        <th>Balanced PO Quantity</th>
                                         <th>PO Dispatch Status</th>
                                         <th>PO Person</th>
 
@@ -235,8 +235,8 @@
                                         <td></td>
                                         <td style="text-align:left; font-weight: bold;" id="totalPoUnitPrice">0</td>
                                         <td style="text-align:left; font-weight: bold;" id="totalPoQty">0</td>
-                                        <td style="text-align:left; font-weight: bold;" id="totalBalancedQty">0</td>
                                         <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
+                                        <td style="text-align:left; font-weight: bold;" id="totalBalancedQty">0</td>
                                         <td colspan="2"></td>
                                     </tr>
                                 </tfoot>
@@ -418,15 +418,15 @@
                                 data.category,
                                 data.po_unit_price,
                                 data.quantity,
-                                data.rest_quantity,
                                 dispatched_qty,
+                                data.rest_quantity,
                                 data.dispatch_status,
                                 data.user_name
                             ]).draw(false).node();
 
                             // Conditional styling for rows
                             if (data.rest_quantity != 0) {
-                                $(rowNode).find('td:eq(8)').css({
+                                $(rowNode).find('td:eq(9)').css({
                                     'background-color': '#ff3300',
                                     'color': 'black',
                                 });

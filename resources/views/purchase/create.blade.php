@@ -56,7 +56,7 @@
                                 </div>
                                 <?php
                                 $currentDate = date('Y-m-d');
-                                $c_due_date = (int) $custom_due_date->custom_due_date + 5;
+                                $c_due_date = (int) $custom_due_date->custom_due_date;
                                 $due_date = date('Y-m-d', strtotime($currentDate . ' +' . $c_due_date . 'days'));
                                 // dd($c_due_date);
                                 ?>
@@ -65,7 +65,7 @@
                                             Raised</strong><span class="required-classes">*</span></label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" value="{{ $currentDate }}"
-                                            name="date" id="raised_date_input" required>
+                                            name="date" id="raised_date_input"  onchange="setDueDate()" required>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -714,4 +714,17 @@
                  // Call initializeTable on page load for Payment Terms
                  document.addEventListener('DOMContentLoaded', initializeTable_2);
 </script>
+
+<script>
+    function setDueDate() {
+        const raisedDateInput = document.getElementById('raised_date_input');
+        const dueDateInput = document.getElementById('due_date_input');
+        
+        const raisedDate = new Date(raisedDateInput.value);
+        if (!isNaN(raisedDate.getTime())) {
+            raisedDate.setDate(raisedDate.getDate() + 10); // +10 days
+            dueDateInput.value = raisedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        }
+    }
+    </script>
 @endsection

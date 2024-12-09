@@ -105,11 +105,30 @@
                             <form id="dispatchForm" class="row g-3" method="post" action="{{ route('dispatch.store') }}">
                                 @csrf
                                 <div class="row mb-3">
-                                    <div class="col-md-6">
+
+                                    <?php
+                                    $currentDate = date('Y-m-d');
+                                    ?>
+
+                                    <div class="col-md-6 mt-2"> <!-- Change this to col-md-6 for equal width -->
+                                        <label for="to_company_id" class="form-label">Dispatch Date<span
+                                                class="required-classes">*</span></label>
+                                        <input type="date" class="form-control" name="date" id="raised_date_input"
+                                            value="{{ $currentDate }}" required>
+                                    </div>
+
+                                    <div class="col-md-6 mt-2"> <!-- Change this to col-md-6 for equal width -->
+                                        <label for="to_company_id" class="form-label">Vehicle Number</label>
+                                        <input type="text" class="form-control" name="vehicle_number">
+                                    </div>
+
+
+
+                                    <div class="col-md-6 mt-4">
                                         <label for="get_miller_id" class="form-label">From</label><span
                                             class="required-classes">*</span>
-                                        <select class="form-select Select-Company custom-select" id="get_miller_id" name="po_company_id"
-                                            onchange="fetchPoNumbers(this)" required>
+                                        <select class="form-select Select-Company custom-select" id="get_miller_id"
+                                            name="po_company_id" onchange="fetchPoNumbers(this)" required>
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies_po as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
@@ -117,33 +136,16 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 mt-4">
                                         <label for="to_company_id" class="form-label">To</label><span
                                             class="required-classes">*</span>
-                                        <select class="form-select Select-Company custom-select" id="to_company_id" name="so_company_id"
-                                            onchange="fetchSalesOrders(this)" required>
+                                        <select class="form-select Select-Company custom-select" id="to_company_id"
+                                            name="so_company_id" onchange="fetchSalesOrders(this)" required>
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies_so as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
-
-
-                                    <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
-                                        <label for="to_company_id" class="form-label">Vehicle Number</label>
-                                        <input type="text" class="form-control" name="vehicle_number">
-                                    </div>
-
-                                    <?php
-                                    $currentDate = date('Y-m-d');
-                                    ?>
-
-                                    <div class="col-md-6 mt-4"> <!-- Change this to col-md-6 for equal width -->
-                                        <label for="to_company_id" class="form-label">Dispatch Date<span
-                                                class="required-classes">*</span></label>
-                                        <input type="date" class="form-control" name="date" id="raised_date_input"
-                                            value="{{ $currentDate }}" required>
                                     </div>
                                 </div>
 
@@ -157,14 +159,12 @@
                                         <tr>
                                             <th class="table_heading_long">Base Item Name<span
                                                     class="required-classes">*</span></th>
-                                            <th class="table_heading_long">PO Item NO.<span
-                                                    class="required-classes">*</span></th>
                                             <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_long">Insurance</th>
-                                            <th class="table_heading_long">PO Unit Price</th>
+                                            <th class="table_heading_long">Loading + Insurance</th>
+                                            <th class="table_heading_long">PO Price</th>
                                             <th class="table_heading_long">SO Item NO.<span
                                                     class="required-classes">*</span></th>
-                                            <th class="table_heading_long">SO Unit Price</th>
+                                            <th class="table_heading_long">SO Price</th>
                                             <th class="table_heading_normal">Quantity<span
                                                     class="required-classes">*</span>
                                             </th>
@@ -182,7 +182,7 @@
                                 </table>
                                 {{-- ............................................................. Purchase Details................................................................  --}}
                                 <div class="row mt-5">
-                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Details</h4>
+                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Selected Details</h4>
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
                                 </div>
 
@@ -205,7 +205,7 @@
                                 </table>
                                 {{-- ............................................................. Sales Details................................................................  --}}
                                 <div class="row mt-5">
-                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Details</h4>
+                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Selected Details</h4>
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
                                 </div>
 
@@ -358,21 +358,18 @@
                 subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
             });
 
-            const unit_price = (parseFloat(unitPrice) + parseFloat(freight) + parseFloat(insurance));
+            const unit_price = (parseFloat(unitPrice));
 
             newRow.innerHTML = `
     <td>${itemName}</td>
     <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
-        <td>${po_item_number}</td>
+       
           <input type="hidden" name="po_item_number[]" class="form-control" value="${po_item_number}" required>
     <td>
         <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
     </td>
         <td>
-        <select name="insurance_status[]" onchange="calculateTotal(this)" class="form-select insurance_status">
-            <option value="yes" selected>Yes</option>
-            <option value="no">No</option>
-            </select>
+            <input type="number" name="dispatch_fregiht_insuance[]" oninput="calculateTotal(this)" class="form-control"  value="0" required />
     </td>
 
      
@@ -429,7 +426,7 @@
             // Retain the selected option for each select dropdown
             clonedRow.querySelectorAll('select').forEach(select => {
                 const originalSelect = row.querySelector(
-                `select[name="${select.name}"]`); // Find the original select
+                    `select[name="${select.name}"]`); // Find the original select
                 select.value = originalSelect.value; // Set the selected value of the cloned select
             });
 
@@ -462,6 +459,7 @@
 
             const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
             const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
+
             const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
@@ -469,39 +467,27 @@
             const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
                 .value) || 0;
 
-            const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
+            // const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
             const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
-            const insuranceStatus = row.querySelector('select[name="insurance_status[]"]').value;
+            // const insuranceStatus = row.querySelector('select[name="insurance_status[]"]').value;
+
+            const freight_insurance = parseFloat(row.querySelector('input[name="dispatch_fregiht_insuance[]"]').value) || 0;
+
+
 
             // Calculate the total values for PO and SO based on the quantity
 
-            let totalPOUnitPrice = 0;
-            let totalSOUnitPrice = 0;
 
-            if (insuranceStatus === 'yes') {
-                totalPOUnitPrice = unitPriceActual + convRate + freight + other;
-                totalSOUnitPrice = sounitPriceActual + convRate + freight + other;
-            } else {
-                totalPOUnitPrice = unitPriceActual + convRate + freight;
-                totalSOUnitPrice = sounitPriceActual + convRate + freight;
-            }
-
+            let totalPOUnitPrice = unitPriceActual + convRate;
+            let totalSOUnitPrice = sounitPriceActual + convRate;
 
             row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
             row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
 
             if (quantity) {
-                // Multiply only the total (not unit price)
-
-                if (insuranceStatus === 'yes') {
-                    totalAmount = (totalPOUnitPrice) * quantity;
-                    totalSoAmount = (totalSOUnitPrice) * quantity;
-                } else {
-                    totalAmount = (totalPOUnitPrice) * quantity;
-                    totalSoAmount = (totalSOUnitPrice) * quantity;
-                }
-
+                totalAmount = (((totalPOUnitPrice) * quantity) + freight_insurance);
+                totalSoAmount = (((totalSOUnitPrice) * quantity) + freight_insurance);
                 row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
                 row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
             } else {
@@ -509,11 +495,9 @@
                 let totalAmount = 0;
                 let totalSoAmount = 0;
 
-                totalAmount = totalPOUnitPrice; // If no quantity, just use the unit price
-                totalSoAmount = totalSOUnitPrice;
+                totalAmount = totalPOUnitPrice + freight_insurance; // If no quantity, just use the unit price
+                totalSoAmount = totalSOUnitPrice + freight_insurance;
 
-
-                // Ensure unit prices remain unchanged
 
                 row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
                 row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
@@ -809,18 +793,6 @@
                     // Show the modal
                     $('#SalescompanyModal').modal('show');
 
-                    // Optional: Fetch and display data in the modal based on selectedCompanyId
-                    // $.ajax({
-                    //     url: '/get-company-details', // Adjust this to your route
-                    //     type: 'GET',
-                    //     data: { company_id: selectedCompanyId },
-                    //     success: function(response) {
-                    //         $('#companyModal .modal-body').html(response); // Update modal content
-                    //     },
-                    //     error: function(error) {
-                    //         console.error("Error fetching company details:", error);
-                    //     }
-                    // });
                 }
             });
         });
@@ -1332,74 +1304,71 @@
     </script>
 
 
-<script>
-    $(document).ready(function () {
-    $('#dispatchForm').on('submit', function (e) {
-        e.preventDefault(); // Prevent page refresh
+    <script>
+        $(document).ready(function() {
+            $('#dispatchForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent page refresh
 
-        let formData = $(this).serialize(); // Serialize form data
+                let formData = $(this).serialize(); // Serialize form data
 
-        $.ajax({
-            url: "{{ route('dispatch.store') }}", // Backend route
-            type: "POST",
-            data: formData,
-            success: function (response) {
-                window.location.href = response.redirect;
-            },
-            error: function (xhr) {
-                // Determine error message
-                let error = xhr.responseJSON?.message || 'Something went wrong!';
+                $.ajax({
+                    url: "{{ route('dispatch.store') }}", // Backend route
+                    type: "POST",
+                    data: formData,
+                    success: function(response) {
+                        window.location.href = response.redirect;
+                    },
+                    error: function(xhr) {
+                        // Determine error message
+                        let error = xhr.responseJSON?.message || 'Something went wrong!';
 
-                if (xhr.status === 400) {
-                    Swal.fire({
-                        title: 'Validation Error!',
-                        text: error,
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    });
-                } else if (xhr.status === 500) {
-                    Swal.fire({
-                        title: 'Server Error!',
-                        text: 'An internal server error occurred. Please try again later.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: error,
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            }
+                        if (xhr.status === 400) {
+                            Swal.fire({
+                                title: 'Validation Error!',
+                                text: error,
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        } else if (xhr.status === 500) {
+                            Swal.fire({
+                                title: 'Server Error!',
+                                text: 'An internal server error occurred. Please try again later.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: error,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }
+                });
+            });
         });
-    });
-});
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Initialize select2 for all custom-select elements
+            $('.custom-select').select2();
 
-</script>
-<script>
-    $(document).ready(function () {
-        // Initialize select2 for all custom-select elements
-        $('.custom-select').select2();
+            // Focus the date input after select2 initialization
 
-        // Focus the date input after select2 initialization
-        setTimeout(function () {
-            $('#get_miller_id').focus();
-        }, 0); // Small delay ensures focus happens after other DOM manipulations
 
-        // Focus the search box when the select2 dropdown is opened
-        $('.custom-select').on('select2:open', function () {
-            setTimeout(function () {
-                document.querySelector('.select2-search__field').focus();
-            }, 100); // Small delay ensures the search field is rendered before focusing
+            // Focus the search box when the select2 dropdown is opened
+            $('.custom-select').on('select2:open', function() {
+                setTimeout(function() {
+                    document.querySelector('.select2-search__field').focus();
+                }, 100); // Small delay ensures the search field is rendered before focusing
+            });
         });
-    });
-</script>
 
-
-
-
-
+        $(document).ready(function() {
+            // Focus the date input when the page is loaded
+            $('#raised_date_input').focus();
+        });
+    </script>
 
 @endsection

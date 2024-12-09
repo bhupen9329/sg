@@ -78,7 +78,7 @@
 
                                 <?php
                                 $currentDate = date('Y-m-d');
-                                $c_due_date = (int) $custom_due_date->custom_due_date + 5;
+                                $c_due_date = (int) $custom_due_date->custom_due_date;
                                 $due_date = date('Y-m-d', strtotime($currentDate . ' +' . $c_due_date . 'days'));
                                 $startFinancialYear = date('d-m-Y', strtotime('01-04-' . date('Y')));
                                 $endFinancialYear = date('d-m-Y', strtotime('31-03-' . (date('Y') + 1)));
@@ -91,8 +91,7 @@
                                     </label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" name="date"
-                                            value="{{ $currentDate }}" id="raised_date_input" required  
-                                            >
+                                            value="{{ $currentDate }}" id="raised_date_input" onchange="setDueDate()" required>
                                     </div>
                                 </div>
 
@@ -109,7 +108,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Due Date Input -->
                                 <div class="row mb-3">
                                     <label for="dueDateInput" class="col-sm-2 col-form-label">
                                         <strong>Due Date</strong><span class="required-classes">*</span>
@@ -119,6 +117,7 @@
                                             value="{{ $due_date }}" required>
                                     </div>
                                 </div>
+                                
 
                                 <div class="row mb-3">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label"><strong>
@@ -719,5 +718,18 @@
 
 
 
+    </script>
+
+<script>
+    function setDueDate() {
+        const raisedDateInput = document.getElementById('raised_date_input');
+        const dueDateInput = document.getElementById('due_date_input');
+        
+        const raisedDate = new Date(raisedDateInput.value);
+        if (!isNaN(raisedDate.getTime())) {
+            raisedDate.setDate(raisedDate.getDate() + 10); // +10 days
+            dueDateInput.value = raisedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        }
+    }
     </script>
 @endsection
