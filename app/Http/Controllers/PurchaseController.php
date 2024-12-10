@@ -640,4 +640,18 @@ class PurchaseController extends Controller
         PoItem::where('id', $request->po_item_id)->update(['po_dispatch_item_status' => $request->status, 'po_item_status_date' => $request->date,  'po_item_status_remarks' => $request->remarks,]);
         return redirect()->route('purchase.index')->with('success', 'Purchase Order Status Updated Successfully');
     }
+    public function get_received_qty(Request $request)
+    {
+        // dd($request);
+
+        $Po_data = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
+            ->join('categories', 'po_items.item_category', '=', 'categories.id')
+            ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
+            ->where('po_items.item_category', $request->get_category_id)
+            ->get();
+
+        return response()->json([
+            'rows_data' => $Po_data
+        ]);
+    }
 }

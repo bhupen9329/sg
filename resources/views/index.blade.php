@@ -5,7 +5,7 @@
 
         <div class="dashboard-header pagetitle">
             <h1>Dashboard</h1><br>
-            <p style="color: red">Overview of sales, purchase, stock and valuation insights for sales orders.</p>
+            <p style="color: red">Overview of sales, purchase, stock and valuation insights for open orders.</p>
         </div><!-- End Page Title -->
 
         <section class="section dashboard">
@@ -771,7 +771,7 @@
             }
 
             function openModalWithCategorySO(category_id) {
-                console.log(category_id);
+
                 // Update the 'Show More Details' link with the category_id
                 const link = document.getElementById('showMoreDetailsLinkSo');
                 const baseUrl = "{{ route('so_report', ':id') }}";
@@ -813,8 +813,9 @@
                                 <td>${formattedDate}</td>
                                  <td>${rowData.company_name}</td>
                                 <td>${rowData.document_number}</td>
-                                <td>${rowData.qty}</td>
-                                 <td>${rowData.po_dispatch_rest_qty}</td>
+                                                <td>${parseFloat(rowData.qty).toFixed(3)}</td>
+                                  <td>${parseFloat(rowData.po_dispatch_rest_qty).toFixed(3)}</td>
+            
                             </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
@@ -852,8 +853,8 @@
                                 <td>${formattedDate}</td>
                                  <td>${rowData.company_name}</td>
                                 <td>${rowData.so_number}</td>
-                                <td>${rowData.qty}</td>
-                                 <td>${rowData.so_dispatch_rest_qty}</td>
+                                  <td>${parseFloat(rowData.qty).toFixed(3)}</td>
+                                  <td>${parseFloat(rowData.so_dispatch_rest_qty).toFixed(3)}</td>
                             </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
@@ -875,7 +876,7 @@
                         <tr>
                             <td>${index + 1}</td>
                             <td>${item.name}</td>
-                            <td>${item.total_qty}</td>
+                           <td>${parseFloat(item.total_qty).toFixed(3)}</td>
                         </tr>`;
                             });
                         } else {
@@ -904,7 +905,7 @@
                         <tr>
                             <td>${index + 1}</td>
                             <td>${item.name}</td>
-                            <td>${item.total_qty}</td>
+                            <td>${parseFloat(item.total_qty).toFixed(3)}</td>
                         </tr>`;
                             });
                         } else {
@@ -953,7 +954,7 @@
                     <td>${rowData.so_number}</td>
                      <td>${rowData.company_name}</td>
                     <td>${rowData.name}</td>
-                    <td>${rowData.total_quantity}</td>
+                        <td>${parseFloat(rowData.total_quantity).toFixed(3)}</td>
                 </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
@@ -994,7 +995,7 @@
                     <td>${rowData.po_number}</td>
                      <td>${rowData.company_name}</td>
                     <td>${rowData.name}</td>
-                    <td>${rowData.total_quantity}</td>
+                        <td>${parseFloat(rowData.total_quantity).toFixed(3)}</td>
                 </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
@@ -1071,7 +1072,7 @@
                             let row = `<tr>
                                 <th scope="row">${index + 1}</th>
                                  <td>${rowData.category_name}</td>
-                                <td>${rowData.total_quantity}</td>
+                                   <td>${parseFloat(rowData.total_quantity).toFixed(3)}</td>
                             </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
@@ -1107,7 +1108,7 @@
                             let row = `<tr>
                                 <th scope="row">${index + 1}</th>
                                  <td>${rowData.category_name}</td>
-                                <td>${rowData.total_quantity}</td>
+                                    <td>${parseFloat(rowData.total_quantity).toFixed(3)}</td>
                             </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });

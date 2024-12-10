@@ -143,30 +143,29 @@
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">Dispatch Details</h4>
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
                                 </div>
-
+                                <div class="table-responsive" style="overflow-x: auto;">
                                 <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table">
                                     <thead>
                                         <tr>
-                                            <th class="table_heading_long">Base Item Name<span
-                                                    class="required-classes">*</span></th>
-                                            <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_long">Loading + Insurance</th>
-                                            <th class="table_heading_long">PO Unit Price</th>
-                                            <th class="table_heading_long">SO Unit Price</th>
-                                            <th class="table_heading_normal">Quantity<span
-                                                    class="required-classes">*</span>
-                                            </th>
-                                            <th class="table_heading_long">Payable Total<span
-                                                    class="required-classes">*</span></th>
-                                            <th class="table_heading_long">Receivable Total<span
-                                                    class="required-classes">*</span></th>
-
+                                            <th style="width: 150px;" class="table_heading_long">Base Item<span class="required-classes">*</span></th>
+                                            <th style="width: 200px;" class="table_heading_long">Conv Item</th>
+                                            <th style="width: 150px;" class="table_heading_long">Conv Price</th>
+                                            <th style="width: 150px;" class="table_heading_long">PO Price</th>
+                                            <th style="width: 150px;" class="table_heading_long">Gross PO Price</th>
+                                            <th style="width: 150px;" class="table_heading_long">Loading + Insurance</th>
+                                            <th style="width: 150px;" class="table_heading_normal">Quantity<span class="required-classes">*</span></th>
+                                            <th style="width: 150px;" class="table_heading_long">Payable Total<span class="required-classes">*</span></th>
+                                            <th style="width: 150px;" class="table_heading_long">SO Price</th>
+                                            <th style="width: 150px;" class="table_heading_long">SO Gross Price</th>
+                                            <th style="width: 150px;" class="table_heading_long">Receivable Total<span class="required-classes">*</span></th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
                                 </table>
+                            </div>
 
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Details</h4>
@@ -302,6 +301,9 @@
             var cell6 = newRow.insertCell(5);
             var cell7 = newRow.insertCell(6);
             var cell8 = newRow.insertCell(7);
+            var cell9 = newRow.insertCell(8);
+            var cell10 = newRow.insertCell(9);
+            var cell11 = newRow.insertCell(10);
 
             cell1.innerHTML = `
              <td>{{ $disaptch_data->category_name }}</td>
@@ -321,6 +323,20 @@
 `;
 
             cell3.innerHTML = `
+             <td> <input type="number" name="conv_rate[]"  class="form-control" onchange="calculateTotal(this)"  value="{{ $disaptch_data->conv_rate }}" min="1" readonly required /></td>
+           
+`;
+
+cell4.innerHTML = `
+             <td> <input type="number"  class="form-control" onchange="calculateTotal(this)"  value="{{ $disaptch_data->po_item_unit_price }}" min="1" readonly required /></td>
+           
+`;
+cell5.innerHTML = `
+             <td> <input type="number" name="dispatch_unit_price[]"  class="form-control" onchange="calculateTotal(this)"  value="{{ $dispatch_po_price_gross }}" min="1" readonly required /></td>
+           
+`;
+
+            cell6.innerHTML = `
                   <td>
    <input type="number" name="dispatch_fregiht_insuance[]" oninput="calculateTotal(this)" value={{ $disaptch_data->dispatch_other }} class="form-control"  value="0" required />
 
@@ -336,26 +352,26 @@
     </td>
            
 `;
-            cell4.innerHTML = `
-             <td> <input type="number" name="dispatch_unit_price[]"  class="form-control" onchange="calculateTotal(this)"  value="{{ $dispatch_po_price }}" min="1" readonly required /></td>
-           
-`;
-            cell5.innerHTML = `
-            <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  value="{{ $dispatch_so_price }}"  class="form-control" readonly required /></td>
-           
-`;
-
-            cell6.innerHTML = `
+cell7.innerHTML = `
              <td><input type="number" name="quantity[]" class="form-control" value="{{ $disaptch_data->dispatched_quantity }}" oninput="calculateTotal(this)" min="1" required /></td>
            
 `;
-
-
-            cell7.innerHTML = `
+cell8.innerHTML = `
             <td><input type="number" name="dispatch_total[]" value="{{ $disaptch_data->dispatch_total }}" class="form-control" readonly required /></td>
 `;
 
-            cell8.innerHTML = `
+cell9.innerHTML = `
+            <td><input type="number" id="so_unit_price"  value="{{ $disaptch_data->dispatch_so_unit_price }}"  class="form-control" readonly required /></td>
+           
+`;
+          
+            cell10.innerHTML = `
+            <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  value="{{ $dispatch_so_price_gross }}"  class="form-control" readonly required /></td>
+           
+`;
+
+
+            cell11.innerHTML = `
              <td><input type="number" name="dispatch_so_total[]" value="{{ $disaptch_data->dispatch_so_total }}" class="form-control" readonly required /></td>
            
 `;
@@ -418,7 +434,7 @@
 
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
 
-          
+
             const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
 
             const other_actual = parseFloat(row.querySelector('input[name="dispatch_so_other_actual[]"]').value) || 0;
@@ -439,8 +455,8 @@
 
 
 
-            let totalPOUnitPrice = unitPriceActual + convRate;
-            let totalSOUnitPrice = sounitPriceActual + convRate;
+            let totalPOUnitPrice = unitPriceActual + convRate + freight_insurance;
+            let totalSOUnitPrice = sounitPriceActual + convRate + freight_insurance;
 
 
             row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
@@ -448,8 +464,8 @@
 
             if (quantity) {
                 // Multiply only the total (not unit price)
-                    totalAmount = (((totalPOUnitPrice) * quantity) + freight_insurance);
-                    totalSoAmount = (((totalSOUnitPrice) * quantity) + freight_insurance);
+                totalAmount = (((totalPOUnitPrice) * quantity));
+                totalSoAmount = ((totalSOUnitPrice) * quantity);
                 row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
                 row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
             } else {
@@ -472,10 +488,10 @@
         }
     </script>
 
-<script>
-    $(document).ready(function() {
-        $('#vehicle').focus(); // Example code
-    });
-</script>
+    <script>
+        $(document).ready(function() {
+            $('#vehicle').focus(); // Example code
+        });
+    </script>
 
 @endsection

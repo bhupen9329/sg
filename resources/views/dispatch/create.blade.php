@@ -154,32 +154,31 @@
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
                                 </div>
 
-                                <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table">
-                                    <thead>
-                                        <tr>
-                                            <th class="table_heading_long">Base Item Name<span
-                                                    class="required-classes">*</span></th>
-                                            <th class="table_heading_long">Conv Item Name</th>
-                                            <th class="table_heading_long">Loading + Insurance</th>
-                                            <th class="table_heading_long">PO Price</th>
-                                            <th class="table_heading_long">SO Item NO.<span
-                                                    class="required-classes">*</span></th>
-                                            <th class="table_heading_long">SO Price</th>
-                                            <th class="table_heading_normal">Quantity<span
-                                                    class="required-classes">*</span>
-                                            </th>
-                                            <th class="table_heading_long">Payable Total<span
-                                                    class="required-classes">*</span></th>
-                                            <th class="table_heading_long">Receivable Total<span
-                                                    class="required-classes">*</span></th>
-
-                                            <th class="table_heading_action">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Rows will be dynamically added here -->
-                                    </tbody>
-                                </table>
+                                <div class="table-responsive" style="overflow-x: auto;">
+                                    <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table" style="min-width: 1200px;">
+                                        <thead>
+                                            <tr>
+                                                <th class="table_heading_long">Base Item<span class="required-classes">*</span></th>
+                                                <th style="width: 150px;" class="table_heading_long">Conv Item</th>
+                                                <th style="width: 115px;" class="table_heading_long">Conv Price</th>
+                                                <th style="width: 115px;" class="table_heading_long">PO Price</th>
+                                                <th style="width: 115px;" class="table_heading_long">Gross PO Price</th>
+                                                <th style="width: 115px;" class="table_heading_long">Loading + Insurance</th>
+                                                <th style="width: 115px;" class="table_heading_normal">Quantity<span class="required-classes">*</span></th>
+                                                <th style="width: 115px;" class="table_heading_long">Payable Total<span class="required-classes">*</span></th>
+                                                <th style="width: 212px;" class="table_heading_long">SO Item NO.<span class="required-classes">*</span></th>
+                                                <th style="width: 115px;" class="table_heading_long">SO Price</th>
+                                                <th style="width: 115px;" class="table_heading_long">SO Gross Price</th>
+                                                <th style="width: 115px;" class="table_heading_long">Receivable Total<span class="required-classes">*</span></th>
+                                                <th  class="table_heading_action">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Rows will be dynamically added here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
                                 {{-- ............................................................. Purchase Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Selected Details</h4>
@@ -311,7 +310,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="table-responsive">
+                        <div  class="table-responsive">
                             <table class="table" id="dataTable">
                                 <thead>
                                     <tr>
@@ -368,35 +367,35 @@
     <td>
         <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
     </td>
+            <td>
+            <input type="number"  name="conv_rate_show[]" id="conv_price" oninput="calculateTotal(this)" class="form-control"  value="0" readonly/>
+              
+         <td>
+            <input type="number"  oninput="calculateTotal(this)" class="form-control"  value="${unitPrice}" readonly />
+    </td>
+     <td><input type="number" name="dispatch_unit_price[]" class="form-control"  value="${unit_price}"  readonly required /></td>
+    </td>
         <td>
             <input type="number" name="dispatch_fregiht_insuance[]" oninput="calculateTotal(this)" class="form-control"  value="0" required />
     </td>
+         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required /></td>
+     <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
 
-     
    <input type="hidden" name="conv_rate[]" id="conv_rate" value="0" class="form-control" oninput="calculateTotal(this)" required />
-    <td><input type="number" name="dispatch_unit_price[]" class="form-control"  value="${unit_price}"  readonly required /></td>
     <input type="hidden" name="dispatch_unit_price_actual[]" class="form-control"  value="${unitPrice}"  readonly required />
-        <input type="hidden" name="dispatch_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
-    <input type="hidden" name="dispatch_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
+     <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required />
+        
 
           <td>
 <select name="so_item_no[]" onchange="fetchUnitPrice(this)"  required  class="form-select">
     <option value="" disabled selected>Select SO Item</option>
 </select>
-
     </td>
-    
-     <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
+      <td><input type="number" name="dispatch_so_unit_price_actual[]" id="so_unit_price"  class="form-control" readonly required /></td>
+        <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
     <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
 
-        <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required /></td>
-        <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required />
-        
-    <input type="hidden" name="dispatch_so_freight[]" value="${freight}" class="form-control" oninput="calculateTotal(this)" required />
-    <input type="hidden" name="dispatch_so_other[]" value="${insurance}" class="form-control" oninput="calculateTotal(this)" required />
-      <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
     <td><input type="number" name="dispatch_so_total[]" value="0" id="dispatch_so_total" class="form-control" readonly required /></td>
- 
     <td>
     <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
         <i class="fas fa-minus-circle"></i>
@@ -409,10 +408,10 @@
 </td>
 
 `;
-
-
             lastItemId++;
         }
+
+        
 
         function cloneRow(button) {
             const row = button.closest('tr'); // Find the current row
@@ -457,8 +456,8 @@
 
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
 
-            const freight = parseFloat(row.querySelector('input[name="dispatch_freight[]"]').value) || 0;
-            const other = parseFloat(row.querySelector('input[name="dispatch_other[]"]').value) || 0;
+
+
 
             const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
@@ -467,8 +466,6 @@
             const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
                 .value) || 0;
 
-            // const sofreight = parseFloat(row.querySelector('input[name="dispatch_so_freight[]"]').value) || 0;
-            const soother = parseFloat(row.querySelector('input[name="dispatch_so_other[]"]').value) || 0;
 
             // const insuranceStatus = row.querySelector('select[name="insurance_status[]"]').value;
 
@@ -479,15 +476,15 @@
             // Calculate the total values for PO and SO based on the quantity
 
 
-            let totalPOUnitPrice = unitPriceActual + convRate;
-            let totalSOUnitPrice = sounitPriceActual + convRate;
+            let totalPOUnitPrice = unitPriceActual + convRate + freight_insurance;
+            let totalSOUnitPrice = sounitPriceActual + convRate + freight_insurance;
 
             row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
             row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
 
             if (quantity) {
-                totalAmount = (((totalPOUnitPrice) * quantity) + freight_insurance);
-                totalSoAmount = (((totalSOUnitPrice) * quantity) + freight_insurance);
+                totalAmount = ((totalPOUnitPrice) * quantity);
+                totalSoAmount = ((totalSOUnitPrice) * quantity);
                 row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
                 row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
             } else {
@@ -495,8 +492,8 @@
                 let totalAmount = 0;
                 let totalSoAmount = 0;
 
-                totalAmount = totalPOUnitPrice + freight_insurance; // If no quantity, just use the unit price
-                totalSoAmount = totalSOUnitPrice + freight_insurance;
+                totalAmount = totalPOUnitPrice;
+                totalSoAmount = totalSOUnitPrice;
 
 
                 row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
@@ -1233,12 +1230,16 @@
                 },
                 success: function(response) {
                     const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
+                    const convRateFieldShow = $(selectElement).closest('tr').find('input[name="conv_rate_show[]"]');
 
                     if (response && response.item_price) {
                         // Set the conversion rate from the response
                         convRateField.val(response.item_price);
+                        convRateFieldShow.val(response.item_price);
+
                     } else {
                         convRateField.val(0);
+                        convRateFieldShow.val(0);
                         console.error('Conversion rate not found in response');
                     }
 

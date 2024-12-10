@@ -91,19 +91,22 @@
                     <div class="col-md-3 col-sm-12" style="margin-top: 7px">
                         <label for="filterTodate"><strong>From Date</strong></label>
                         <?php
-                        $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
+                        $currentDate = new DateTime();
+                        $currentYear = $currentDate->format('Y');
+                        $financialYearStart = new DateTime(($currentDate->format('m') >= 4 ? $currentYear : $currentYear - 1) . '-04-01');
                         ?>
-                        <input type="date" class="form-control" max="" value="<?php echo $firstDayOfMonth; ?>" name="to_date"
+                        <input type="date" class="form-control" value="<?php echo $financialYearStart->format('Y-m-d'); ?>" name="to_date"
                             id="filterTodate" required>
                     </div>
                     <div class="col-md-3 col-sm-12" style="margin-top: 7px">
                         <label for="filterFromdate"><strong>To Date</strong></label>
                         <?php
-                        $lastDayOfMonth = (new DateTime('last day of this month'))->format('Y-m-d');
+                        $financialYearEnd = new DateTime(($currentDate->format('m') >= 4 ? $currentYear + 1 : $currentYear) . '-03-31');
                         ?>
-                        <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
+                        <input type="date" class="form-control" value="<?php echo $financialYearEnd->format('Y-m-d'); ?>" name="from_date"
                             id="filterFromdate" required>
                     </div>
+                    
 
                     <div class="col-md-2 col-sm-12">
                         <label for="filterCompany" class="mb-2"><strong>Company</strong></label>

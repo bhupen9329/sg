@@ -113,6 +113,39 @@
             }
         }
     </style>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleSidebarBtn = document.getElementById('toggle_sidebar');
+            
+            // Check if the current URL contains the word "create"
+            if (window.location.href.match(/create/)) { 
+                // Programmatically click the sidebar toggle button
+                toggleSidebarBtn.click();  
+            }
+        });
+    </script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleSidebarBtn = document.getElementById('toggle_sidebar');
+            
+            // Check if the current URL contains the word "create"
+            if (window.location.href.match(/edit/)) { 
+                // Programmatically click the sidebar toggle button
+                toggleSidebarBtn.click();  
+            }
+        });
+    </script>
+       <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleSidebarBtn = document.getElementById('toggle_sidebar');
+            
+            // Check if the current URL contains the word "create"
+            if (window.location.href.match(/report/)) { 
+                // Programmatically click the sidebar toggle button
+                toggleSidebarBtn.click();  
+            }
+        });
+    </script>
     <div class="container-fluid loader_container">
         <div class="loader" id="select_loader"></div>
     </div>
@@ -125,7 +158,7 @@
                 {{-- <img src="{{ asset('assets/img/logo.png') }}" alt=""> --}}
                 <span class="d-none d-lg-block">Saraswati Globals</span>
             </a>
-            <i class="bi bi-list toggle-sidebar-btn"></i>
+            <i class="bi bi-list toggle-sidebar-btn" id="toggle_sidebar"></i>
         </div><!-- End Logo -->
 
 
@@ -514,7 +547,7 @@
                         @endcan
                     </li>
 
-                    <li>
+                    {{-- <li>
                
                             <a href="{{ route('freight_rate.index')}}">
                                 <i class="bi bi-circle"></i><span>Freight Rate</span>
@@ -522,7 +555,7 @@
                            
 
                       
-                    </li>
+                    </li> --}}
                 </ul>
             </li><!-- End Icons Nav -->
         @endif
