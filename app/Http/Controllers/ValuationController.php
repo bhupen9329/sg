@@ -486,6 +486,7 @@ class ValuationController extends Controller
                     'details' => $logEntry['details'],
                     'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                     'inventory_stack' => array_reverse($inventoryStack),
+                    
                 ];
                 // dump($transactionLogs);
     

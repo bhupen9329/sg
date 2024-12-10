@@ -92,20 +92,22 @@
             <div class="page-header">
                 <div class="row">
                     <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterTodate"><strong>Dispatch From Date</strong></label>
+                        <label for="filterTodate"><strong>From Date</strong></label>
                         <?php
-                        $firstDayOfMonth = (new DateTime('first day of this month'))->format('Y-m-d');
+                        $currentDate = new DateTime();
+                        $currentYear = $currentDate->format('Y');
+                        $financialYearStart = new DateTime(($currentDate->format('m') >= 4 ? $currentYear : $currentYear - 1) . '-04-01');
                         ?>
-                        <input type="date" class="form-control" value="<?php echo $firstDayOfMonth; ?>" name="to_date"
-                            id="filterTodate" required>
+                        <input type="date" class="form-control" name="to_date" id="filterTodate"
+                            value="<?php echo $financialYearStart->format('Y-m-d'); ?>" required>
                     </div>
                     <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterFromdate"><strong>Dispatch To Date</strong></label>
+                        <label for="filterFromdate"><strong>To Date</strong></label>
                         <?php
-                        $lastDayOfMonth = (new DateTime('last day of this month'))->format('Y-m-d');
+                        $financialYearEnd = new DateTime(($currentDate->format('m') >= 4 ? $currentYear + 1 : $currentYear) . '-03-31');
                         ?>
-                        <input type="date" class="form-control" value="<?php echo $lastDayOfMonth; ?>" name="from_date"
-                            id="filterFromdate" required>
+                        <input type="date" class="form-control" name="from_date" id="filterFromdate"
+                            value="<?php echo $financialYearEnd->format('Y-m-d'); ?>" required>
                     </div>
 
                     <div class="col-md-2 col-sm-12">
@@ -565,21 +567,17 @@
                     <td>Conv Rate</td>
                     <td>${res.conv_rate ?? 0}</td>
                 </tr>`,
+                        
                         `<tr>
                     <th scope="row">3</th>
-                    <td>Freight Rate</td>
-                    <td>${res.dispatch_freight ?? 0}</td>
-                </tr>`,
-                        `<tr>
-                    <th scope="row">4</th>
-                    <td>Insurance Rate</td>
+                    <td>Loading + Insurance Rate</td>
                     <td>${res.dispatch_other ?? 0}</td>
                 </tr>`,
 
                 `<tr>
                     <th scope="row"></th>
                     <td><strong>Total</strong></td>
-   <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
+   <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
                 </tr>`,
 
 
@@ -633,18 +631,13 @@ $.ajax({
                 </tr>`,
                 `<tr>
                     <th scope="row">3</th>
-                    <td>Freight Rate</td>
-                    <td>${res.dispatch_freight ?? 0}</td>
-                </tr>`,
-                `<tr>
-                    <th scope="row">4</th>
-                    <td>Insurance Rate</td>
+                    <td>Loading + Insurance Rate</td>
                     <td>${res.dispatch_other ?? 0}</td>
                 </tr>`,
                 `<tr>
                     <th scope="row"></th>
                     <td><strong>Total</strong></td>
-   <td><strong>${(parseFloat(res.dispatch_so_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
+   <td><strong>${(parseFloat(res.dispatch_so_unit_price ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
                 </tr>`,
             ];
 

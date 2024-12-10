@@ -327,6 +327,8 @@ class DispatchController extends Controller
                 'so_items.qty as so_qty',
                 'po_items.id as po_item_id',
                 'so_items.id as so_item_id',
+                'po_items.unit_price as po_item_unit_price',
+                'so_items.unit_price as so_item_unit_price',
                 'dispatches.id as dispatch_id',
             )
             ->where('dispatches.id', $id)
@@ -336,6 +338,10 @@ class DispatchController extends Controller
 
         $dispatch_po_price = ($disaptch_data->dispatch_unit_price);
         $dispatch_so_price = ($disaptch_data->dispatch_so_unit_price);
+
+        
+        $dispatch_po_price_gross = ($disaptch_data->dispatch_unit_price + $disaptch_data->dispatch_other + $disaptch_data->conv_rate);
+        $dispatch_so_price_gross = ($disaptch_data->dispatch_so_unit_price + $disaptch_data->dispatch_other + $disaptch_data->conv_rate);
 
         // dd($disaptch_data);
         $sub_items = SubCategory::where('category_id',  $disaptch_data->category_id)->get();
@@ -354,7 +360,7 @@ class DispatchController extends Controller
 
         // dd( $so_item,  $po_item);
 
-        return view('dispatch.edit', compact('disaptch_data', 'sub_items', 'so_item', 'po_item', 'dispatch_po_price', 'dispatch_so_price', 'freight_insurance'));
+        return view('dispatch.edit', compact('disaptch_data', 'sub_items', 'so_item', 'po_item', 'dispatch_po_price_gross', 'dispatch_so_price_gross', 'dispatch_po_price', 'dispatch_so_price', 'freight_insurance'));
     }
 
     public function updateDispatch(Request $request, $id)
