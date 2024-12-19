@@ -341,6 +341,11 @@ $(document).ready(function () {
                         totalRestQty += parseFloat(data.rest_qty) || 0;
                         totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
 
+
+                        var quantity = parseFloat(data.quantity).toFixed(3);
+                        var rest_quantity = parseFloat(data.rest_qty).toFixed(3);
+                        var dispatchedqty = parseFloat(dispatched_qty).toFixed(3);
+
                         // Add row to DataTable
                         table.row.add([
                             index + 1,
@@ -349,18 +354,18 @@ $(document).ready(function () {
                             data.po_item_number,
                             data.company_name,
                             data.category,
-                            data.quantity,
-                            data.rest_qty,
-                            dispatched_qty,
+                            quantity,
+                            rest_quantity,
+                            dispatchedqty,
                             data.dispatch_status,
                             data.user_name,
                         ]).draw(false);
                     });
 
                     // Update grand totals in the footer
-                    $('#totalSOQty').text(totalSOQty.toFixed(2));
-                    $('#totalRestQty').text(totalRestQty.toFixed(2));
-                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
+                    $('#totalSOQty').text(totalSOQty.toFixed(3));
+                    $('#totalRestQty').text(totalRestQty.toFixed(3));
+                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(3));
                 } else {
                     console.error("Invalid or empty response received.");
                 }

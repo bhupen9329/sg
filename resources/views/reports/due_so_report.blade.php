@@ -331,6 +331,12 @@
                         totalRestQty += parseFloat(data.rest_qty) || 0;
                         totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
 
+                        var quantity = parseFloat(data.quantity).toFixed(3);
+                        var rest_quantity = parseFloat(data.rest_qty).toFixed(3);
+                        var dispatchedqty = parseFloat(dispatched_qty).toFixed(3);
+
+
+
                         // Add row to DataTable
                         table.row.add([
                             index + 1,
@@ -339,9 +345,9 @@
                             data.so_item_number,
                             data.company_name,
                             data.category,
-                            data.quantity,
-                            data.rest_qty,
-                            dispatched_qty,
+                            quantity,
+                            rest_quantity,
+                            dispatchedqty,
                             data.dispatch_status,
                             data.user_name,
                         ]).draw(false);

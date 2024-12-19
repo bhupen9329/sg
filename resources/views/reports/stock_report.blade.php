@@ -261,11 +261,12 @@
                         var table = $('#Category_table').DataTable();
                         table.clear().draw();
                         response.forEach(function(data, index) {
+                            var quantity = parseFloat(data.total_quantity).toFixed(3);
                             table.row.add([
                                 index + 1,
                                 data.name,
                                 data.sub_category,
-                                data.total_quantity,
+                                quantity,
                                 data.virtual_store,
                             ]).draw(false);
                         });
