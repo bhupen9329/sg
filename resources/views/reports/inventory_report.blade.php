@@ -324,15 +324,18 @@
                 // Add rows to the table
                 Object.keys(categoryMap).forEach(function(categoryName, index) {
                     var data = categoryMap[categoryName];
+                    var poQuantity = parseFloat(data.poQuantity).toFixed(3);
+                    var soQuantity = parseFloat(data.soQuantity).toFixed(3);
+
                     table.row.add([
                         index + 1,
                         categoryName,
                         data.poQuantity !== "N/A" ?
                         '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details" class="rest-quantity-link" onclick="get_received_qty_for_report(' +
-                        data.poCategoryId + ')">' + data.poQuantity + '</a>' : "N/A",
+                        data.poCategoryId + ')">' + poQuantity + '</a>' : "N/A",
                         data.soQuantity !== "N/A" ?
                         '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_so" class="rest-quantity-link" onclick="get_received_so_qty_for_report(' +
-                        data.soCategoryId + ')">' + data.soQuantity + '</a>' : "N/A"
+                        data.soCategoryId + ')">' + soQuantity + '</a>' : "N/A"
                     ]).draw(false);
                 });
             } else {
@@ -344,9 +347,6 @@
         }
     });
 }
-
-
-
         $('#resetButton').click(function() {
             location.reload();
         });
@@ -390,8 +390,8 @@
                                     <td>${formattedDate}</td>
                                      <td>${rowData.company_name}</td>
                                     <td>${rowData.document_number}</td>
-                                    <td>${rowData.qty}</td>
-                                     <td>${rowData.po_dispatch_rest_qty}</td>
+                                    <td> ${parseFloat(rowData.qty).toFixed(3)}</td>
+                                     <td> ${parseFloat(rowData.po_dispatch_rest_qty).toFixed(3)}</td>
                                 </tr>`;
                         tableBody.insertAdjacentHTML('beforeend', row);
                     });
@@ -429,8 +429,8 @@
                                     <td>${formattedDate}</td>
                                      <td>${rowData.company_name}</td>
                                     <td>${rowData.so_number}</td>
-                                    <td>${rowData.qty}</td>
-                                     <td>${rowData.so_dispatch_rest_qty}</td>
+                                           <td> ${parseFloat(rowData.qty).toFixed(3)}</td>
+                                     <td> ${parseFloat(rowData.so_dispatch_rest_qty).toFixed(3)}</td>
                                 </tr>`;
                         tableBody.insertAdjacentHTML('beforeend', row);
                     });
