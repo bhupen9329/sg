@@ -661,7 +661,6 @@ class ValuationController extends Controller
                         }                  
                         $poQty =  $remainingQty;
                     } else {
-                    
                         $costOfGoodsPurchased += $lastPurchase['quantity'] * $transaction->unit_price;
                         $poQty -= $lastPurchase['quantity'];
                         $totalQuantity += $lastPurchase['quantity']; 
@@ -732,13 +731,19 @@ class ValuationController extends Controller
                         $totalValue +=  $poQty * $averagelastUnitPrice;
 
                         if ($remainingQty < 0) {
-                            $inventoryStack[] = [
-                                'quantity' => $remainingQty,
-                                'unit_price' => $averagelastUnitPrice,
-                                'transaction_date' => $lastPurchase['transaction_date'],
-                            ];
+                            // $inventoryStack[] = [
+                            //     'quantity' => $remainingQty,
+                            //     'unit_price' => $averagelastUnitPrice,
+                            //     'transaction_date' => $lastPurchase['transaction_date'],
+                            // ];
 
-                            $inventoryStack = array_reverse($inventoryStack);
+                            // $inventoryStack = array_reverse($inventoryStack);
+
+                            array_unshift($inventoryStack, [
+                                'quantity' => $remainingQty,
+                                'unit_price' => $lastPurchase['unit_price'],
+                                'transaction_date' => $lastPurchase['transaction_date'],
+                            ]);
                         
                         } else {                        }
 
@@ -823,13 +828,15 @@ class ValuationController extends Controller
                     // $totalValue = ($totalQuantity ?? 0) * ( $totalUnitPrice ?? 0);
 
                                $total_val_sum = 0;
+                               $total_val_qty_sum = 0;
                         foreach($inventoryStack as $stack){
                             $total = ($stack['quantity'] *  $stack['unit_price']);
                             $total_val_sum +=  $total;
+                            $total_val_qty_sum +=  $stack['quantity'];
                         }
 
                         $totalValue =  $total_val_sum;
-                   
+                        $totalQuantity = $total_val_qty_sum;
                 }
             
                }        
@@ -1028,6 +1035,7 @@ class ValuationController extends Controller
                 'details' => $logEntry['details'],
                 'status' => $totalQuantity < 0 ? 'Short' : 'Long',
                 'inventory_stack' => ($inventoryStack),
+                'totallastQuantity' => $totallastQuantity ?? 0,
             ];
             // dump($transactionLogs);
 
@@ -1258,7 +1266,6 @@ class ValuationController extends Controller
                             $total = ($stack['quantity'] *  $stack['unit_price']);
                             $total_val_sum +=  $total;
                             $total_val_qty_sum +=  $stack['quantity'];
-
                         }
 
                         $totalValue =  $total_val_sum;
@@ -1494,31 +1501,17 @@ class ValuationController extends Controller
 
     public function calculateFIFO($id = null,  $item_id = null, $i = null)
     {
-
-  
         if ($id && $item_id &&  $i) {
             $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
-         
-            // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-
-            // Get all transactions up to and including the specific transaction_date
-
             $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
             ->where('item_id', $item_id)
             ->orderBy('transaction_date', 'asc')
             ->orderBy('id', 'asc') // Ensures unique order even on same date
             ->limit($i)
             ->get();
-      
      
         } elseif($id && $item_id){
             $transaction_data = InventoryTransaction::where('id', $id)->select('transaction_date')->first();
-         
-            // $transactions = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
-
-            // Get all transactions up to and including the specific transaction_date
-          
-
 
             $transactions = InventoryTransaction::where('transaction_date', '<=', $transaction_data->transaction_date)
             ->where('item_id', $item_id)
@@ -1559,7 +1552,6 @@ class ValuationController extends Controller
         foreach ($transactions as $transaction) {
             if (strtolower($transaction->transaction_type) === 'purchase') {
 
-                // Add purchase to the stack
                 $poQtyCheck = abs($transaction->quantity); // Get absolute quantity for selling
                 $poQty = $poQtyCheck;
                 $lastPurchasePrice = $transaction->unit_price;
@@ -1571,8 +1563,6 @@ class ValuationController extends Controller
                     'details' => [],
                     'po_qty' => $poQty,
                 ];
-
-
 
                 if ($lastTransactionStatus == 'Long' ||  $lastTransactionStatus == '') {
 
@@ -1608,16 +1598,22 @@ class ValuationController extends Controller
 
                             // If there is remaining quantity from the last purchase, push it back to the stack
                             if ($remainingQty < 0) {
-         
+                                // dd( $inventoryStack);
+                                // $inventoryStack[] = [
+                                //     'quantity' => $remainingQty,
+                                //     'unit_price' => $lastPurchase['unit_price'],
+                                //     'transaction_date' => $lastPurchase['transaction_date'],
+                                // ];
+                                // // dd( $inventoryStack);
+                                // $inventoryStack = array_reverse($inventoryStack);
 
-                                $inventoryStack[] = [
-                                    'quantity' => $remainingQty,
-                                    'unit_price' => $lastPurchase['unit_price'],
-                                    'transaction_date' => $lastPurchase['transaction_date'],
-                                ];
-                                $inventoryStack = array_reverse($inventoryStack);
+                                array_unshift($inventoryStack, [
+        'quantity' => $remainingQty,
+        'unit_price' => $lastPurchase['unit_price'],
+        'transaction_date' => $lastPurchase['transaction_date'],
+    ]);
                             } else {
-                          
+                             
                             }
 
                             // Log the purchase details
@@ -1690,7 +1686,7 @@ class ValuationController extends Controller
                             'unit_price' => $lastPurchasePrice,
                             'transaction_date' => $transaction->transaction_date,
                         ];
-
+                   
                         $totalQuantity =  $poQty;  // Assuming adding for purchases
                         $totalValue  =  $poQty * $transaction->unit_price;
                     } else {
@@ -1914,6 +1910,8 @@ class ValuationController extends Controller
                     'inventory_stack' => ($inventoryStack),
                 ];
 
+          
+
                 $lastTransactionStatus = $totalQuantity < 0 ? 'Short' : 'Long';
             }
         }
@@ -1925,7 +1923,6 @@ class ValuationController extends Controller
 
         // Final calculations
         // $finalPrice = ($lastTransactionStatus === 'Long') ? $totalValue / $totalQuantity : $totalValue / $totalQuantity;
-
         return [
             'transaction_logs' => $transactionLogs,
             'final_balance_qty' => $totalQuantity,
@@ -3382,7 +3379,6 @@ public function getPositionReport()
     {
 
         $averageData = $this->calculateAverage($id, $item_id);
-        //  dd($averageData);
         return view('inventory_valuation.average', $averageData);
     }
 

@@ -69,7 +69,9 @@ class HomeController extends Controller
         $lifo_transaction = [];
         $fifo_transaction = [];
         $avg_transaction = [];
-        $latestEntriesByDate = []; // Store the latest entries item-wise
+
+
+        $latestEntriesByDate = []; 
 
         $lifoData = '';
         $fifoData = '';
@@ -256,7 +258,6 @@ class HomeController extends Controller
             'mergedTotalsPartyWise',
             'total_sales_order_quantity',
             'total_purchase_order_quantity',
-
             'categories',
             'inventory_transaction',
             'lifo_transaction',
