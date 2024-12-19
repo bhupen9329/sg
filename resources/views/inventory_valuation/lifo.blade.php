@@ -270,6 +270,7 @@
                                                 ?>
                                                 @if (isset($log['details']) && is_array($log['details']))
                                                     @foreach ($log['details'] as $detail)
+                                          
                                                         @if ($log['transaction_type'] == 'Sell')
                                                             <?php $totalPurchaseQty += $detail['used_qty']; ?>
                                                             <!-- Display purchase details -->
