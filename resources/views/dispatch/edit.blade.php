@@ -273,7 +273,7 @@
             <select name="sub_cat_id[]" class="form-select select_brand_name">${subItemOptions}</select>
         </td>
             <td><input type="text" name="conv_rate[]" class="form-control"  required /></td>
-            <td><input type="number" name="quantity[]" min="0" class="form-control" value="" required /></td>
+            <td><input type="number" name="quantity[]" step="0.001" min="0.001" class="form-control" value="" required /></td>
             <td>
                 <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>
             </td>
@@ -353,7 +353,7 @@ cell5.innerHTML = `
            
 `;
 cell7.innerHTML = `
-             <td><input type="number" name="quantity[]" class="form-control" value="{{ $disaptch_data->dispatched_quantity }}" oninput="calculateTotal(this)" min="1" required /></td>
+             <td><input type="number" name="quantity[]" class="form-control" step="0.001" value="{{ $disaptch_data->dispatched_quantity }}" oninput="calculateTotal(this)" min="0.001" required /></td>
            
 `;
 cell8.innerHTML = `

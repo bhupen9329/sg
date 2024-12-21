@@ -378,7 +378,7 @@
         <td>
             <input type="number" name="dispatch_fregiht_insuance[]" oninput="calculateTotal(this)" class="form-control"  value="0" required />
     </td>
-         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required /></td>
+         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="0.001" class="form-control" value="${qty}" required /></td>
      <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
 
    <input type="hidden" name="conv_rate[]" id="conv_rate" value="0" class="form-control" oninput="calculateTotal(this)" required />

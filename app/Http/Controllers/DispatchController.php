@@ -267,7 +267,7 @@ class DispatchController extends Controller
             $dispatch->dispatch_total = $request->dispatch_total[$index];
             $dispatch->vehicle_number = $request->vehicle_number;
 
-            $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price_actual[$index];
+            $dispatch->dispatch_so_unit_price = $so_item->unit_price;
 
             $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
             $dispatch->receiver_person = $request->receiver_person;

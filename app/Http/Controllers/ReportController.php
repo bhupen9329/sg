@@ -49,7 +49,7 @@ class ReportController extends Controller
     {
 
        
-        $companys = Company::where('type', 'supplier')->get();
+        $companys = Company::whereIn('type', ['supplier', 'both'])->get();
         $Categorys = Category::all();
         $user = User::all();
     
@@ -159,15 +159,13 @@ class ReportController extends Controller
     // SO Report
     public function so_report($id = null)
     {
-        $companys = Company::where('type', 'buyer')->get();
+        $companys = Company::whereIn('type', ['buyer', 'both'])->get();
         $Categorys = Category::all();
         $user = User::all();
-    
-        // Handle $id if provided
+
         $selectedCategory = $id ? Category::find($id) : null;
         $selectedCompany = null;
-    
-        // Check if the category exists when $id is provided
+       
         if ($id && !$selectedCategory) {
             return redirect()->back()->with('error', 'The selected category does not exist.');
         }
