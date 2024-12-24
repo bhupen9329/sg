@@ -49,7 +49,7 @@
                                         class="rest-quantity-link" onclick="get_received_so_qty_for_report_item_wise()">
                                         <h6>
 
-                                            {{ $sales_order }}
+                                            {{ number_format($sales_order, 3) }}
                                         </h6>
                                     </a>
 
@@ -81,7 +81,8 @@
                                         data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_item_wise_po"
                                         class="rest-quantity-link" onclick="get_received_po_qty_for_report_item_wise()">
                                         <h6>
-                                            {{ $purchase_order }}
+                                            {{-- {{ $purchase_order }} --}}
+                                            {{ number_format($purchase_order, 3) }}
                                         </h6>
                                     </a>
                                 </div>
@@ -405,7 +406,7 @@
                                                             @foreach ($lifo_transaction as $lifo_transactions)
                                                                 @if ($data['id'] == $lifo_transactions['transaction_id'] && $data['item_id'] == $lifo_transactions['item_id'])
                                                                     <td style="padding: 8px;">
-                                                                        {{ number_format($lifo_transactions['balance_qty'], 2) ?? 'N/A' }}
+                                                                        {{ number_format($lifo_transactions['balance_qty'], 3) ?? 'N/A' }}
                                                                     </td>
                                                                     <td style="padding: 8px;">
                                                                         <a
@@ -518,7 +519,7 @@
                                                         <a href="{{ route('due_so_report') }}"
                                                             style="text-decoration: underline; color: blue;"
                                                             class="rest-quantity-link">
-                                                            {{ $total_sales_order_quantity }}
+                                                            {{ number_format($total_sales_order_quantity, 3) }}
                                                         </a>
                                                     </td>
 
@@ -576,7 +577,7 @@
                                                         <a href="{{ route('due_po_report') }}"
                                                             style="text-decoration: underline; color: blue;"
                                                             class="rest-quantity-link">
-                                                            {{ $total_purchase_order_quantity }}
+                                                            {{ number_format($total_purchase_order_quantity, 3) }}
                                                     </td>
 
 
@@ -629,7 +630,7 @@
                                                                 data-bs-target="#Modalfor_quantity_details_so"
                                                                 class="rest-quantity-link"
                                                                 onclick="openModalWithCategorySO({{ $total['category_id'] }})">
-                                                                {{ $total['so_total_quantity'] }}
+                                                                {{ number_format((float) $total['so_total_quantity'], 3) }}
                                                             </a>
                                                         </td>
                                                         <td>
@@ -639,7 +640,7 @@
                                                                 data-bs-target="#Modalfor_quantity_details"
                                                                 class="rest-quantity-link"
                                                                 onclick="openModalWithCategory({{ $total['category_id'] }})">
-                                                                {{ $total['po_total_quantity'] }}
+                                                                {{ number_format((float) $total['po_total_quantity'], 3) }}
                                                             </a>
                                                         </td>
 
@@ -689,7 +690,8 @@
                                                                 data-bs-target="#Modalfor_quantity_details_so_party_wise"
                                                                 class="rest-quantity-link"
                                                                 onclick="openModalWithCategorySOPartyWise({{ $total['party_id'] }})">
-                                                                {{ $total['so_total_quantity'] }}
+                                                                {{-- {{ $total['so_total_quantity'] }} --}}
+                                                                {{ number_format((float) $total['so_total_quantity'], 3) }}
                                                             </a>
                                                         </td>
                                                         <td>
@@ -699,7 +701,8 @@
                                                                 data-bs-target="#Modalfor_quantity_details_po_party_wise"
                                                                 class="rest-quantity-link"
                                                                 onclick="openModalWithCategoryPOPartyWise({{ $total['party_id'] }})">
-                                                                {{ $total['po_total_quantity'] }}
+                                                                {{-- {{ $total['po_total_quantity'] }} --}}
+                                                                {{ number_format((float) $total['po_total_quantity'], 3) }}
                                                             </a>
                                                         </td>
 

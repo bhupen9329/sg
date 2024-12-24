@@ -474,6 +474,8 @@
                         const dispatchSoTotal = parseFloat(data.dispatch_so_total) || 0;
                         const dispatchedQty = parseFloat(data.dispatched_quantity) || 0;
 
+                        let dispatchedqty = (dispatchedQty).toFixed(3);
+
                         // Update grand totals
                         totalDispatchTotal += dispatchTotal;
                         totalDispatchSoTotal += dispatchSoTotal;
@@ -494,7 +496,7 @@
                             </a>`,
                             data.category_name,
                             data.sub_category_name ?? 'N/A',
-                            dispatchedQty,
+                            dispatchedqty,
                             data.so_company,
                             data.so_item_no,
                             `<a href="javascript:void(0);" data-bs-toggle="modal" 
@@ -508,7 +510,7 @@
                     // Update grand totals in the footer
                     $('#totalDispatchTotal').text(totalDispatchTotal.toFixed(2));
                     $('#totalDispatchSoTotal').text(totalDispatchSoTotal.toFixed(2));
-                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
+                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(3));
 
                 } else {
                     console.error("Invalid or empty response received.");

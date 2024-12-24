@@ -122,6 +122,8 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date</th>
+                                    <th scope="col">Due Date</th>
+                                    <th scope="col">Due Days</th>
                                     <th scope="col">Party Name</th>
                                     <th scope="col">PO Number</th>
                                     <th scope="col">Total Qty</th>
@@ -152,6 +154,8 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date</th>
+                                    <th scope="col">Due Date</th>
+                                    <th scope="col">Due Days</th>
                                     <th scope="col">Party Name</th>
                                     <th scope="col">SO Number</th>
                                     <th scope="col">Total Qty</th>
@@ -274,79 +278,80 @@
 
 
     <script>
-    function filterButton(filterCategory) {
-    $.ajax({
-        type: 'POST',
-        url: 'report-inventory',
-        data: {
-            filterCategory: filterCategory,
-            _token: "{{ csrf_token() }}"
-        },
-        success: function(response) {
-            if (response) {
-                var table = $('#Category_table').DataTable();
-                table.clear().draw();
+        function filterButton(filterCategory) {
+            $.ajax({
+                type: 'POST',
+                url: 'report-inventory',
+                data: {
+                    filterCategory: filterCategory,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response) {
+                        var table = $('#Category_table').DataTable();
+                        table.clear().draw();
 
-                // Initialize a map to handle merging of PO and SO data
-                var categoryMap = {};
+                        // Initialize a map to handle merging of PO and SO data
+                        var categoryMap = {};
 
-                // Process PO totals
-                if (Array.isArray(response.filteredPOTotal)) {
-                    response.filteredPOTotal.forEach(function(poData) {
-                        categoryMap[poData.category_name] = {
-                            poQuantity: poData.total_quantity,
-                            soQuantity: "N/A",
-                            poCategoryId: poData.category_id,
-                            soCategoryId: null
-                        };
-                    });
-                }
-
-                // Process SO totals
-                if (Array.isArray(response.filteredSOTotal)) {
-                    response.filteredSOTotal.forEach(function(soData) {
-                        if (categoryMap[soData.category_name]) {
-                            // Update existing entry with SO data
-                            categoryMap[soData.category_name].soQuantity = soData.total_quantity;
-                            categoryMap[soData.category_name].soCategoryId = soData.category_id;
-                        } else {
-                            // Add new entry for SO data
-                            categoryMap[soData.category_name] = {
-                                poQuantity: "N/A",
-                                soQuantity: soData.total_quantity,
-                                poCategoryId: null,
-                                soCategoryId: soData.category_id
-                            };
+                        // Process PO totals
+                        if (Array.isArray(response.filteredPOTotal)) {
+                            response.filteredPOTotal.forEach(function(poData) {
+                                categoryMap[poData.category_name] = {
+                                    poQuantity: poData.total_quantity,
+                                    soQuantity: "N/A",
+                                    poCategoryId: poData.category_id,
+                                    soCategoryId: null
+                                };
+                            });
                         }
-                    });
+
+                        // Process SO totals
+                        if (Array.isArray(response.filteredSOTotal)) {
+                            response.filteredSOTotal.forEach(function(soData) {
+                                if (categoryMap[soData.category_name]) {
+                                    // Update existing entry with SO data
+                                    categoryMap[soData.category_name].soQuantity = soData
+                                    .total_quantity;
+                                    categoryMap[soData.category_name].soCategoryId = soData.category_id;
+                                } else {
+                                    // Add new entry for SO data
+                                    categoryMap[soData.category_name] = {
+                                        poQuantity: "N/A",
+                                        soQuantity: soData.total_quantity,
+                                        poCategoryId: null,
+                                        soCategoryId: soData.category_id
+                                    };
+                                }
+                            });
+                        }
+
+                        // Add rows to the table
+                        Object.keys(categoryMap).forEach(function(categoryName, index) {
+                            var data = categoryMap[categoryName];
+                            var poQuantity = parseFloat(data.poQuantity).toFixed(3);
+                            var soQuantity = parseFloat(data.soQuantity).toFixed(3);
+
+                            table.row.add([
+                                index + 1,
+                                categoryName,
+                                data.poQuantity !== "N/A" ?
+                                '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details" class="rest-quantity-link" onclick="get_received_qty_for_report(' +
+                                data.poCategoryId + ')">' + poQuantity + '</a>' : "N/A",
+                                data.soQuantity !== "N/A" ?
+                                '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_so" class="rest-quantity-link" onclick="get_received_so_qty_for_report(' +
+                                data.soCategoryId + ')">' + soQuantity + '</a>' : "N/A"
+                            ]).draw(false);
+                        });
+                    } else {
+                        console.error("Invalid or empty response received.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX request failed:", status, error);
                 }
-
-                // Add rows to the table
-                Object.keys(categoryMap).forEach(function(categoryName, index) {
-                    var data = categoryMap[categoryName];
-                    var poQuantity = parseFloat(data.poQuantity).toFixed(3);
-                    var soQuantity = parseFloat(data.soQuantity).toFixed(3);
-
-                    table.row.add([
-                        index + 1,
-                        categoryName,
-                        data.poQuantity !== "N/A" ?
-                        '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details" class="rest-quantity-link" onclick="get_received_qty_for_report(' +
-                        data.poCategoryId + ')">' + poQuantity + '</a>' : "N/A",
-                        data.soQuantity !== "N/A" ?
-                        '<a href="#" style="text-decoration: underline; color: blue;" data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_so" class="rest-quantity-link" onclick="get_received_so_qty_for_report(' +
-                        data.soCategoryId + ')">' + soQuantity + '</a>' : "N/A"
-                    ]).draw(false);
-                });
-            } else {
-                console.error("Invalid or empty response received.");
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX request failed:", status, error);
+            });
         }
-    });
-}
         $('#resetButton').click(function() {
             location.reload();
         });
@@ -380,14 +385,29 @@
                     rowsData.forEach((rowData, index) => {
                         // Parse the date string and format it
                         let date = new Date(rowData.date);
+                        let due_date = new Date(rowData.due_date);
                         let formattedDate = date.toLocaleDateString('en-GB', {
                             day: '2-digit',
                             month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
                             year: 'numeric'
                         });
+
+                        let formattedDueDate = due_date.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                            year: 'numeric'
+                        });
+
+                        let today = new Date();
+                        let timeDifference = due_date.getTime() - today.getTime();
+                        let differenceInDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+
                         let row = `<tr>
                                     <th scope="row">${index + 1}</th>
                                     <td>${formattedDate}</td>
+                                             <td>${formattedDueDate}</td>
+                                    <td>${differenceInDays}</td>
                                      <td>${rowData.company_name}</td>
                                     <td>${rowData.document_number}</td>
                                     <td> ${parseFloat(rowData.qty).toFixed(3)}</td>
@@ -419,14 +439,28 @@
                     rowsData.forEach((rowData, index) => {
                         // Parse the date string and format it
                         let date = new Date(rowData.date);
+                        let due_date = new Date(rowData.due_date);
                         let formattedDate = date.toLocaleDateString('en-GB', {
                             day: '2-digit',
                             month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
                             year: 'numeric'
                         });
+
+                        let formattedDueDate = due_date.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit', // Use '2-digit' for numeric month or 'short' for abbreviated text month
+                            year: 'numeric'
+                        });
+
+                        let today = new Date();
+                        let timeDifference = due_date.getTime() - today.getTime();
+                        let differenceInDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
                         let row = `<tr>
                                     <th scope="row">${index + 1}</th>
                                     <td>${formattedDate}</td>
+                                    <td>${formattedDueDate}</td>
+                                    <td>${differenceInDays}</td>
                                      <td>${rowData.company_name}</td>
                                     <td>${rowData.so_number}</td>
                                            <td> ${parseFloat(rowData.qty).toFixed(3)}</td>

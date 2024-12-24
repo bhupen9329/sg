@@ -31,6 +31,7 @@ use App\Models\FifoTransaction;
 use App\Models\AverageTransactionUsedQty;
 use App\Models\AverageTransactionStack;
 use App\Models\AverageTransaction;
+use App\Models\Dispatch;
 use App\Models\PurchaseOrder;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -68,7 +69,7 @@ class SalesController extends Controller
                 'categories.name as category_name',
                 'users.*'
             )
-            ->orderBy('sales_orders.id', 'desc');
+            ->orderBy('sales_orders.date', 'asc');
 
         if ($roles->contains('Admin')) {
             $sales_order = $sales_order_query->get();
@@ -732,7 +733,6 @@ class SalesController extends Controller
 
     public function get_received_qty_so(Request $request)
     {
-        // dd($request);
 
         $So_data = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
             ->join('categories', 'so_items.item_category', '=', 'categories.id')
@@ -794,5 +794,48 @@ class SalesController extends Controller
     public function so_pre_closed_save(Request $request){
         SoItem::where('id', $request->so_item_id)->update(['so_dispatch_item_status' => $request->status, 'so_item_status_date' => $request->date,  'so_item_status_remarks' => $request->remarks,]);
         return redirect()->route('sales.index')->with('success', 'Sales Order Status Updated Successfully');
+    }
+
+
+    public function get_dispatch_qty (Request $request)
+    {
+        $received_qty_records = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
+        ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+        ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+        ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+        ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+        ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+        ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+        ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+        ->select(
+            'dispatches.*',
+            'so_items.so_dispatch_rest_qty',
+            'po_items.po_dispatch_rest_qty',
+            'po_company.company_name as po_company',
+            'so_company.company_name as so_company',
+            'sales_orders.so_number',
+            'purchase_orders.id as po_id',
+            'sales_orders.id as so_id',
+            'purchase_orders.document_number as po_number',
+            'sales_orders.date as so_date',
+            'purchase_orders.date as po_date',
+            'categories.name as category_name',
+            'subcategories.sub_category as sub_category_name',
+            'po_items.po_item_no',
+            'so_items.so_item_no',
+            'po_items.unit_price as po_unit_price',
+            'so_items.unit_price as so_unit_price',
+            'po_items.qty as po_qty',
+            'so_items.qty as so_qty',
+            'dispatches.id as dispatch_id',
+            'dispatches.created_at as dispatch_date',
+        )
+        ->where('dispatches.so_item_id', $request->get_so_item_id)->get();
+
+        return response()->json([
+            'received_qty_records' => $received_qty_records,
+            'total_dispatched' => $request->total_dispatched,
+
+        ]);
     }
 }

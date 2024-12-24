@@ -165,7 +165,7 @@
                                                 <td>{{ $data->category_name }}</td>
                                                 <td>{{ $data->sub_category_name }}</td>
 
-                                                <td>{{ $data->dispatched_quantity }}</td>
+                                                <td>{{ number_format($data->dispatched_quantity, 3) }}</td>
 
                                                 <td>{{ $data->so_company }}</td>
 

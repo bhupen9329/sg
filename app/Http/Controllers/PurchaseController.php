@@ -28,6 +28,7 @@ use App\Models\AverageTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Http\Controllers\ValuationController;
+use App\Models\Dispatch;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,8 +63,9 @@ class PurchaseController extends Controller
                 ->join('users', 'purchase_orders.po_user_id', '=', 'users.id')
                 ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'po_items.id as po_item_id', 'categories.name as category_name', 'users.*')
                 ->whereNotIn('po_items.po_dispatch_item_status',  ['Close', 'Pre Closed', 'Cancelled'])
-                ->orderBy('purchase_orders.id', 'desc')
+                ->orderBy('purchase_orders.date', 'asc')
                 ->get();
+
             // dd( $po_data);
         } else {
             // Non-admin users ke liye sirf unhi ke PO dikhayein
@@ -74,7 +76,7 @@ class PurchaseController extends Controller
                 ->select('*', 'purchase_orders.id as po_id', 'po_items.*', 'po_items.id as po_item_id', 'categories.name as category_name', 'users.*')
                 ->whereNotIn('po_items.po_dispatch_item_status',  ['Close', 'Pre Closed', 'Cancelled'])
                 ->where('purchase_orders.po_user_id', $user->id)
-                ->orderBy('purchase_orders.id', 'desc')
+                ->orderBy('purchase_orders.date', 'asc')
                 ->get();
         }
 
@@ -652,6 +654,49 @@ class PurchaseController extends Controller
 
         return response()->json([
             'rows_data' => $Po_data
+        ]);
+    }
+
+
+    public function get_dispatch_qty_po(Request $request)
+    {
+        $received_qty_records = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
+        ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+        ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+        ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+        ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+        ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+        ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+        ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+        ->select(
+            'dispatches.*',
+            'so_items.so_dispatch_rest_qty',
+            'po_items.po_dispatch_rest_qty',
+            'po_company.company_name as po_company',
+            'so_company.company_name as so_company',
+            'sales_orders.so_number',
+            'purchase_orders.id as po_id',
+            'sales_orders.id as so_id',
+            'purchase_orders.document_number as po_number',
+            'sales_orders.date as so_date',
+            'purchase_orders.date as po_date',
+            'categories.name as category_name',
+            'subcategories.sub_category as sub_category_name',
+            'po_items.po_item_no',
+            'so_items.so_item_no',
+            'po_items.unit_price as po_unit_price',
+            'so_items.unit_price as so_unit_price',
+            'po_items.qty as po_qty',
+            'so_items.qty as so_qty',
+            'dispatches.id as dispatch_id',
+            'dispatches.created_at as dispatch_date',
+        )
+        ->where('dispatches.po_item_id', $request->get_po_item_id)->get();
+
+        return response()->json([
+            'received_qty_records' => $received_qty_records,
+            'total_dispatched' => $request->total_dispatched,
+
         ]);
     }
 }

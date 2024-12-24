@@ -99,6 +99,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get_received_qty', [PurchaseController::class, 'get_received_qty']);
     Route::post('/po_pre_close_save', [PurchaseController::class, 'po_pre_closed_save'])->name('po_pre_closed.save');
 
+    Route::post('/get_dispatch_qty_po', [PurchaseController::class, 'get_dispatch_qty_po']);
+
+
 
    
 
@@ -193,8 +196,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get-so-remark-for-modal', [SalesController::class, 'get_remark']);
     Route::post('/sales/closed', [SalesController::class, 'closeSales'])->name('sales.closed');
     Route::post('/get-so-remark-for-modal', [SalesController::class, 'getSoRemarkForModal']);
-
     Route::post('/so_pre_close_save', [SalesController::class, 'so_pre_closed_save'])->name('so_pre_closed.save');
+
+    Route::post('/get_dispatch_qty', [SalesController::class, 'get_dispatch_qty']);
+
 
 
 
