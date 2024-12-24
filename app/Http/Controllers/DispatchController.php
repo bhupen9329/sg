@@ -17,7 +17,6 @@ use App\Models\FreightRate;
 class DispatchController extends Controller
 {
 
-
     public function index()
     {
 
@@ -48,10 +47,10 @@ class DispatchController extends Controller
                 'po_items.qty as po_qty',
                 'so_items.qty as so_qty',
                 'dispatches.id as dispatch_id',
-                'dispatches.created_at as dispatch_date',
+                'dispatches.date as dispatch_date',
 
             )
-            ->orderBy('dispatches.id', 'desc')
+            ->orderBy('dispatches.date', 'asc')
             ->get();
         // dd($disaptch_data);
 
@@ -73,7 +72,6 @@ class DispatchController extends Controller
 
     public function getPurchaseOrders(Request $request)
     {
-
         $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
             ->join('po_items', function ($join) {
                 $join->on('po_items.po_id', '=', 'purchase_orders.id')
@@ -81,6 +79,7 @@ class DispatchController extends Controller
             })
             ->join('categories', 'categories.id', '=', 'po_items.item_category')
             ->where('purchase_orders.supplier_id', $request->company_id)
+            ->orderBy('purchase_orders.date', 'asc')
             ->get();
 
         return response()->json(['purchase_orders' => $purchaseOrders]);
@@ -103,6 +102,7 @@ class DispatchController extends Controller
             })
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
             ->where('sales_orders.company_id', $companyId)
+            ->orderBy('sales_orders.date', 'asc')
             ->get();
         return response()->json(['salesOrders' => $salesOrders]);
     }
@@ -157,34 +157,26 @@ class DispatchController extends Controller
     public function storeDispatch(Request $request)
     {
 
-        $month = date('m'); // Current month
-        $year = date('Y');  // Current calendar year
-
-        // Check if the current month is after March (i.e., April to December)
+        $month = date('m'); 
+        $year = date('Y');  
+       
         if ($month >= 4) {
-            // Financial year starts from April to March, so the year should be the current year
             $financial_year = $year;
         } else {
-            // For months from January to March, the financial year will be the previous year
             $financial_year = $year - 1;
         }
-
-        // Get the last dispatch document number for the current financial year
         $last_sail_number = Dispatch::whereYear('created_at', '=', $financial_year)
             ->latest('id')
             ->first();
 
         if ($last_sail_number) {
-            // Extract the serial number from the last dispatch number
             $max_serial_number = $last_sail_number->dispatch_number;
             $last_serial_number = substr($max_serial_number, -4); // Get the last 4 digits
             $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
         } else {
-            // If no records exist, start with serial number '0001'
             $next_serial_number = '0001';
         }
 
-        // Generate the document number
         $doc_number = 'DIS' . $financial_year . $next_serial_number;
 
 
@@ -275,8 +267,10 @@ class DispatchController extends Controller
             $dispatch->remarks = $request->remarks;
             $dispatch->save();
 
-            $actual_so_dispatch_qty = ($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity);
-            $actual_po_dispatch_qty = ($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity);
+
+            $actual_so_dispatch_qty = number_format($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity, 3);
+            $actual_po_dispatch_qty = number_format($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity, 3);
+            
 
             $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
             $po_item->update(['po_dispatch_rest_qty' => $actual_po_dispatch_qty]);
@@ -291,6 +285,7 @@ class DispatchController extends Controller
             } else {
                 $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
             }
+      
         }
 
         return response()->json(['success' => true, 'redirect' => route('dispatch.index')]);

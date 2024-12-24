@@ -255,33 +255,38 @@
 
     <!-- Modal  -->
     <div class="modal fade" id="Modalfor_quantity_details" tabindex="-1" aria-labelledby="modal3Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal3Label">Received Quantity - History</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"style="width:50px"></button>
-                </div>
-                <div class="modal-body">
-                    <h6 class="text-end py-3"><strong>PO Quantity</strong> : <span id="add_total_qty"></span></h6>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Received Qty</th>
-                                <th scope="col">Balance Qty</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal3Label">Dispatched Quantity - History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"style="width:50px"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="text-end py-3"><strong>Total Dispatched Quantity</strong> : <span id="add_total_qty"></span></h6>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Dispathed Date</th>
+                            <th scope="col">Dispatch Number</th>
+                            <th scope="col">Base Item</th>
+                            <th scope="col">From</th>
+                            <th scope="col">PO unit price</th>
+                            <th scope="col">To</th>
+                            <th scope="col">SO unit price</th>
+                            <th scope="col">Dispatched Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
 
     {{-- csv  print   --}}
     <script>
@@ -373,87 +378,97 @@
 
 
         function filterButton() {
-            const filterTodate = $('#filterTodate').val();
-            const filterFromdate = $('#filterFromdate').val();
-            const filterCompany = $('#filterCompany').val();
-            const filterCategory = $('#filterCategory').val();
-            const filterStatus = $('#filterstatus').val();
-            const filterUser = $('#filteruser').val();
+    const filterTodate = $('#filterTodate').val();
+    const filterFromdate = $('#filterFromdate').val();
+    const filterCompany = $('#filterCompany').val();
+    const filterCategory = $('#filterCategory').val();
+    const filterStatus = $('#filterstatus').val();
+    const filterUser = $('#filteruser').val();
 
-            $.ajax({
-                type: 'POST',
-                url: 'report-po',
-                data: {
-                    filterTodate: filterTodate,
-                    filterFromdate: filterFromdate,
-                    filterCompany: filterCompany,
-                    filterCategory: filterCategory,
-                    filterStatus: filterStatus,
-                    filterUser: filterUser,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    if (Array.isArray(response)) {
-                        var table = $('#Category_table').DataTable();
-                        table.clear().draw();
+    $.ajax({
+        type: 'POST',
+        url: 'report-po',
+        data: {
+            filterTodate: filterTodate,
+            filterFromdate: filterFromdate,
+            filterCompany: filterCompany,
+            filterCategory: filterCategory,
+            filterStatus: filterStatus,
+            filterUser: filterUser,
+            _token: "{{ csrf_token() }}"
+        },
+        success: function(response) {
+            if (Array.isArray(response)) {
+                var table = $('#Category_table').DataTable();
+                table.clear().draw();
 
-                        var totalPOUnitPrice = 0;
-                        var totalPOQty = 0;
-                        var totalBalancedQty = 0;
-                        var totalDispatchedQty = 0;
+                var totalPOUnitPrice = 0;
+                var totalPOQty = 0;
+                var totalBalancedQty = 0;
+                var totalDispatchedQty = 0;
 
-                        response.forEach(function(data, index) {
-                            const dispatched_qty = (data.quantity - data.rest_quantity)
-                        .toLocaleString();
+                response.forEach(function(data, index) {
+                    // Parse and format quantities
+                    const quantity = parseFloat(data.quantity) || 0;
+                    const rest_quantity = parseFloat(data.rest_quantity) || 0;
+                    const dispatched_qty = (quantity - rest_quantity).toFixed(3); // Calculate dispatched qty and format
 
-                            totalPOUnitPrice += parseFloat(data.po_unit_price) || 0;
-                            totalPOQty += parseFloat(data.quantity) || 0;
-                            totalBalancedQty += parseFloat(data.rest_quantity) || 0;
-                            totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
+                    // Update totals
+                    totalPOUnitPrice += parseFloat(data.po_unit_price) || 0;
+                    totalPOQty += quantity;
+                    totalBalancedQty += rest_quantity;
+                    totalDispatchedQty += parseFloat(dispatched_qty) || 0;
 
-                            const rowNode = table.row.add([
-                                index + 1,
-                                data.date,
-                                data.po_document_number,
-                                data.po_item_number,
-                                data.company_name,
-                                data.category,
-                                data.po_unit_price,
-                                data.quantity,
-                                dispatched_qty,
-                                data.rest_quantity,
-                                data.dispatch_status,
-                                data.user_name
-                            ]).draw(false).node();
+                    // Add row to DataTable
+                    const rowNode = table.row.add([
+                        index + 1,
+                        data.date,
+                        data.po_document_number,
+                        data.po_item_number,
+                        data.company_name,
+                        data.category,
+                        parseFloat(data.po_unit_price).toFixed(2), // Format PO Unit Price
+                        quantity.toFixed(3), // Format Quantity
+                            
+                `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                               data-bs-target="#Modalfor_quantity_details" 
+                               onclick="get_received_po_qty_for_report('${data.po_item_id}', ' ${dispatched_qty}')">
+                               ${dispatched_qty}
+                            </a>`,
+                        rest_quantity.toFixed(3), // Format Rest Quantity
+                        data.dispatch_status,
+                        data.user_name
+                    ]).draw(false).node();
 
-                            // Conditional styling for rows
-                            if (data.rest_quantity != 0) {
-                                $(rowNode).find('td:eq(9)').css({
-                                    'background-color': '#ff3300',
-                                    'color': 'black',
-                                });
-                            } else {
-                                $(rowNode).find('td').css({
-                                    'background-color': '#15ff00',
-                                    'color': 'black',
-                                });
-                            }
+                    // Conditional styling for rows
+                    if (rest_quantity !== 0) {
+                        $(rowNode).find('td:eq(9)').css({
+                            'background-color': '#ff3300',
+                            'color': 'black',
                         });
-
-                        // Update totals
-                        $('#totalPoUnitPrice').text(totalPOUnitPrice.toFixed(2));
-                        $('#totalPoQty').text(totalPOQty.toFixed(2));
-                        $('#totalBalancedQty').text(totalBalancedQty.toFixed(2));
-                        $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
                     } else {
-                        console.log("Invalid response format");
+                        $(rowNode).find('td').css({
+                            'background-color': '#15ff00',
+                            'color': 'black',
+                        });
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX request failed:", error);
-                }
-            });
+                });
+
+                // Update totals in the footer
+                $('#totalPoUnitPrice').text(totalPOUnitPrice.toFixed(2));
+                $('#totalPoQty').text(totalPOQty.toFixed(3));
+                $('#totalBalancedQty').text(totalBalancedQty.toFixed(3));
+                $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(3));
+            } else {
+                console.log("Invalid response format");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX request failed:", error);
         }
+    });
+}
+
 
 
         $('#resetButton').click(function() {
@@ -470,47 +485,59 @@
     </script>
 
     <script>
-        function get_received_qty_for_report(po_id, rest_qty) {
-            let get_po_id = po_id;
-            let total_balance_qty = rest_qty;
 
-            // console.log(po_id, total_balance_qty);
-            $.ajax({
-                url: "{{ url('get_received_qty') }}",
-                method: "POST",
-                data: {
-                    po_id: get_po_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(res) {
-                    // console.log(res); // Log the response to the console
-                    let rowsData = res.rows_data;
-                    let totalQty = res.total_qty;
-                    $('#add_total_qty').html(totalQty);
+        function get_received_po_qty_for_report(po_item_id, total_dispatched_qty) {
+let get_po_item_id = po_item_id;
+let totalDispatchedQty = total_dispatched_qty;
 
-                    let tableBody = document.querySelector('.modal-body table tbody');
-                    tableBody.innerHTML = ''; // Clear existing table rows
+$.ajax({
+    url: "{{ url('get_dispatch_qty_po') }}",
+    method: "POST",
+    data: {
+        get_po_item_id: get_po_item_id,
+        total_dispatched: totalDispatchedQty,
+        "_token": "{{ csrf_token() }}",
+    },
+    success: function(res) {
+        let rowsData = res.received_qty_records;
+        let totalQty = res.total_dispatched;
 
-                    rowsData.forEach((rowData, index) => {
-                        // Parse the date string and format it
-                        let date = new Date(rowData.date);
-                        let formattedDate = date.toLocaleDateString('en-US', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
-                        });
-                        let row = `<tr>
-                                        <th scope="row">${index + 1}</th>
-                                        <td>${formattedDate}</td>
-                                        <td>${rowData.received_qty}</td>
-                                        <td>${rowData.balance_qty}</td>
-                                    </tr>`;
-                        tableBody.insertAdjacentHTML('beforeend', row);
-                    });
-                }
+        // Update total dispatched quantity
+        $('#add_total_qty').html(parseFloat(totalQty).toFixed(3));
 
+        let tableBody = document.querySelector('.modal-body table tbody');
+        tableBody.innerHTML = ''; // Clear existing table rows
 
+        rowsData.forEach((rowData, index) => {
+            // Parse the date string and format it
+            let date = new Date(rowData.dispatch_date);
+            let formattedDate = date.toLocaleDateString('en-US', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
             });
-        }
+
+            // Format the dispatched quantity to 3 decimal places
+            let dispatchedQuantity = parseFloat(rowData.dispatched_quantity || 0).toFixed(3);
+
+            let row = `<tr>
+                            <th scope="row">${index + 1}</th>
+                            <td>${formattedDate ?? 'N/A'}</td>
+                            <td>${rowData.dispatch_number ?? 'N/A'}</td>
+                             <td>${rowData.category_name ?? 'N/A'}</td>
+                            <td>${rowData.po_company ?? 'N/A'}</td>
+                            <td>${rowData.po_unit_price ?? 'N/A'}</td>
+                            <td>${rowData.so_company ?? 'N/A'}</td>
+                            <td>${rowData.so_unit_price ?? 'N/A'}</td>
+                            <td>${dispatchedQuantity}</td>
+                        </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    },
+    error: function(xhr, status, error) {
+        console.error("AJAX request failed:", error);
+    }
+});
+}
     </script>
 @endsection

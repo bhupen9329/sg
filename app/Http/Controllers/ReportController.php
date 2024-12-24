@@ -47,8 +47,6 @@ class ReportController extends Controller
 
     public function po_report($id = null)
     {
-
-       
         $companys = Company::whereIn('type', ['supplier', 'both'])->get();
         $Categorys = Category::all();
         $user = User::all();
@@ -90,6 +88,7 @@ class ReportController extends Controller
                 'po_items.*',
                 'po_items.po_item_no',
                 'po_items.qty',
+                'po_items.id as po_item_id',
                 'po_items.unit_price',
                 'po_items.po_dispatch_rest_qty',
                 'po_items.po_dispatch_item_status',
@@ -97,7 +96,8 @@ class ReportController extends Controller
                 'categories.name as category_name',
                 'users.name as user_name'
             )
-            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate]);
+            ->whereBetween('purchase_orders.date', [$filterTodate, $filterFromdate])
+            ->orderBy('purchase_orders.date', 'asc');
 
         if ($filterStatus != 'all') {
 
@@ -136,6 +136,7 @@ class ReportController extends Controller
         foreach ($filteredDatas as $filteredData) {
             $tempData = [
                 'po_id' => $filteredData->po_id,
+                'po_item_id' => $filteredData->po_item_id,
                 'po_document_number' => $filteredData->document_number,
                 'po_item_number' => $filteredData->po_item_no,
                 'date' => date('d-M-Y', strtotime($filteredData->date)),
@@ -249,12 +250,14 @@ class ReportController extends Controller
                 'categories.name as category_name',
                 'so_items.*',
                 'so_items.qty',
+                'so_items.id as so_item_id',
                 'so_items.unit_price',
                 'so_items.so_dispatch_rest_qty',
                 'so_items.so_dispatch_item_status',
                 'users.name as user_name'
             )
-            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate]);
+            ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate])
+            ->orderBy('sales_orders.date', 'asc');
 
             
         if ($filterStatus != 'all') {
@@ -294,6 +297,7 @@ class ReportController extends Controller
             $tempData = [
                 'date' => date('d-M-Y', strtotime($filteredData->date)),
                 'so_number' => $filteredData->so_number,
+                'so_item_id' => $filteredData->so_item_id,
                 'so_item_number' => $filteredData->so_item_no,
                 'company_name' => $filteredData->company_name,
                 'category' => $filteredData->category_name,
@@ -1493,7 +1497,8 @@ class ReportController extends Controller
                 'dispatches.created_at as dispatch_date',
 
             )
-            ->whereBetween('dispatches.date', [$filterTodate, $filterFromdate]);
+            ->whereBetween('dispatches.date', [$filterTodate, $filterFromdate])
+            ->orderBy('dispatches.date', 'asc');
 
         if ($filterItem_name && $filterItem_name != 'all') {
             $query->where('dispatches.category_id', $filterItem_name);

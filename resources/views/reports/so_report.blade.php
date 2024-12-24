@@ -168,6 +168,41 @@
             </div>
         </div>
 
+            <!-- Modal  -->
+    <div class="modal fade" id="Modalfor_quantity_details" tabindex="-1" aria-labelledby="modal3Label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal3Label">Dispatched Quantity - History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"style="width:50px"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="text-end py-3"><strong>Total Dispatched Quantity</strong> : <span id="add_total_qty"></span></h6>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Dispathed Date</th>
+                            <th scope="col">Dispatch Number</th>
+                            <th scope="col">Base Item</th>
+                            <th scope="col">From</th>
+                            <th scope="col">PO unit price</th>
+                            <th scope="col">To</th>
+                            <th scope="col">SO unit price</th>
+                            <th scope="col">Dispatched Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
@@ -330,51 +365,57 @@ function filterButton(filterTodate, filterFromdate, filterCompany, filterCategor
                 var totalDispatchedQty = 0;
 
                 response.forEach(function (data, index) {
-                    // Calculate dispatched quantity
-                    const dispatched_qty = (data.quantity - data.rest_qty).toLocaleString();
+            // Parse quantities as numbers
+            const quantity = parseFloat(data.quantity) || 0;
+            const rest_qty = parseFloat(data.rest_qty) || 0;
+            const dispatched_qty = (quantity - rest_qty).toFixed(3); // Calculate dispatched quantity and format it
 
-                    // Update totals
-                    totalSOUnitPrice += parseFloat(data.so_unit_price) || 0;
-                    totalSOQty += parseFloat(data.quantity) || 0;
-                    totalRestQty += parseFloat(data.rest_qty) || 0;
-                    totalDispatchedQty += parseFloat(dispatched_qty.replace(/,/g, '')) || 0;
+            // Update totals
+            totalSOUnitPrice += parseFloat(data.so_unit_price) || 0;
+            totalSOQty += quantity;
+            totalRestQty += rest_qty;
+            totalDispatchedQty += parseFloat(dispatched_qty) || 0;
 
-                    // Add row to DataTable
-                
-                    const rowNode = table.row.add([
-                        index + 1,
-                        data.date,
-                        data.so_number,
-                        data.so_item_number,
-                        data.company_name,
-                        data.category,
-                        data.so_unit_price,
-                        data.quantity,
-                        dispatched_qty,
-                        data.rest_qty,
-                        data.dispatch_status,
-                        data.user_name,
-                    ]).draw(false).node();
+            // Add row to DataTable
+            const rowNode = table.row.add([
+                index + 1,
+                data.date,
+                data.so_number,
+                data.so_item_number,
+                data.company_name,
+                data.category,
+                parseFloat(data.so_unit_price).toFixed(2), // Format SO Unit Price
+                quantity.toFixed(3), // Format Quantity
+            
+                `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                               data-bs-target="#Modalfor_quantity_details" 
+                               onclick="get_received_so_qty_for_report('${data.so_item_id}', ' ${dispatched_qty}')">
+                               ${dispatched_qty}
+                            </a>`,
+                // dispatched_qty, // Already formatted
+                rest_qty.toFixed(3), // Format Rest Quantity
+                data.dispatch_status,
+                data.user_name,
+            ]).draw(false).node();
 
-                    // Optionally add additional styles to the row or other cells
-                    if(data.rest_qty != 0){
-                        $(rowNode).find('td:eq(9)').css({
-                        'background-color': '#ff3300',
-                        'color': 'black',
-                    });
-                    }else{
-                        $(rowNode).find('td').css({
-                        'background-color': '#15ff00',
-                        'color': 'black',
-                    });
-                    }
-             
+            // Optionally add additional styles to the row or other cells
+            if (rest_qty !== 0) {
+                $(rowNode).find('td:eq(9)').css({
+                    'background-color': '#ff3300',
+                    'color': 'black',
                 });
+            } else {
+                $(rowNode).find('td').css({
+                    'background-color': '#15ff00',
+                    'color': 'black',
+                });
+            }
+        });
 
                 // Update grand totals in the footer
                 $('#totalSOUnitPrice').text(totalSOUnitPrice.toFixed(2));
-                $('#totalSOQty').text(totalSOQty.toFixed(2));
-                $('#totalRestQty').text(totalRestQty.toFixed(2));
+                $('#totalSOQty').text(totalSOQty.toFixed(3));
+                $('#totalRestQty').text(totalRestQty.toFixed(3));
                 $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(2));
             } else {
                 console.error("Invalid or empty response received.");
@@ -409,5 +450,63 @@ function filterButton(filterTodate, filterFromdate, filterCompany, filterCategor
                 document.querySelector('.select2-search__field').focus();
             });
         });
+
+
+function get_received_so_qty_for_report(so_item_id, total_dispatched_qty) {
+let get_so_item_id = so_item_id;
+let totalDispatchedQty = total_dispatched_qty;
+
+$.ajax({
+    url: "{{ url('get_dispatch_qty') }}",
+    method: "POST",
+    data: {
+        get_so_item_id: get_so_item_id,
+        total_dispatched: totalDispatchedQty,
+        "_token": "{{ csrf_token() }}",
+    },
+    success: function(res) {
+        let rowsData = res.received_qty_records;
+        let totalQty = res.total_dispatched;
+
+        // Update total dispatched quantity
+        $('#add_total_qty').html(parseFloat(totalQty).toFixed(3));
+
+        let tableBody = document.querySelector('.modal-body table tbody');
+        tableBody.innerHTML = ''; // Clear existing table rows
+
+        rowsData.forEach((rowData, index) => {
+            // Parse the date string and format it
+            let date = new Date(rowData.dispatch_date);
+            let formattedDate = date.toLocaleDateString('en-US', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+
+            // Format the dispatched quantity to 3 decimal places
+            let dispatchedQuantity = parseFloat(rowData.dispatched_quantity || 0).toFixed(3);
+
+            let row = `<tr>
+                            <th scope="row">${index + 1}</th>
+                            <td>${formattedDate ?? 'N/A'}</td>
+                            <td>${rowData.dispatch_number ?? 'N/A'}</td>
+                             <td>${rowData.category_name ?? 'N/A'}</td>
+                            <td>${rowData.po_company ?? 'N/A'}</td>
+                            <td>${rowData.po_unit_price ?? 'N/A'}</td>
+                            <td>${rowData.so_company ?? 'N/A'}</td>
+                            <td>${rowData.so_unit_price ?? 'N/A'}</td>
+                            <td>${dispatchedQuantity}</td>
+                        </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    },
+    error: function(xhr, status, error) {
+        console.error("AJAX request failed:", error);
+    }
+});
+}
+
     </script>
 @endsection
+
+

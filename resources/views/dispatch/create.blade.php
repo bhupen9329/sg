@@ -87,7 +87,7 @@
 
 
         <div class="dashboard-header pagetitle">
-            <h1>Dispatch Summary</h1>
+            <h1>New Dispatch</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
@@ -128,7 +128,7 @@
                                         <label for="get_miller_id" class="form-label">From</label><span
                                             class="required-classes">*</span>
                                         <select class="form-select Select-Company custom-select" id="get_miller_id"
-                                            name="po_company_id" onchange="fetchPoNumbers(this)" required>
+                                            name="po_company_id" onchange="fetchPoNumbers(this)">
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies_po as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
@@ -140,7 +140,7 @@
                                         <label for="to_company_id" class="form-label">To</label><span
                                             class="required-classes">*</span>
                                         <select class="form-select Select-Company custom-select" id="to_company_id"
-                                            name="so_company_id" onchange="fetchSalesOrders(this)" required>
+                                            name="so_company_id" onchange="fetchSalesOrders(this)">
                                             <option value="" disabled selected>Select Company</option>
                                             @foreach ($companies_so as $company)
                                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
@@ -856,6 +856,8 @@
                     alert('An error occurred while fetching purchase orders. Please try again.');
                 }
             });
+
+            companySelect.value = ""; 
         }
 
         function fetchSalesOrders(selectElement) {
@@ -912,6 +914,8 @@
                     alert('An error occurred while fetching sales orders. Please try again.');
                 }
             });
+
+            selectElement.value = ""; 
         }
 
 
