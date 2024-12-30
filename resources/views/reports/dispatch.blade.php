@@ -212,10 +212,11 @@
                                             <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
                                             <td></td>
                                             <td></td>
-                                            <td style="text-align:left; font-weight: bold;" id="totalDispatchSoTotal">0</td>
+                                            <td style="text-align:left; font-weight: bold;" id="totalDispatchSoTotal">0
+                                            </td>
                                         </tr>
                                     </tfoot>
-                                    
+
                                 </table>
                             </div>
 
@@ -247,67 +248,70 @@
                                 </div>
                             </div> --}}
 
-                            <div class="modal fade" id="Modalfor_quantity_details_so" tabindex="-1" aria-labelledby="modal3Label"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modal3Label">Payable Total Details</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"style="width:50px"></button>
-                                    </div>
-                                    <div class="modal-body-so">
-                                        <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched Qty</strong> : <span id="so_add_qty"></span></h6>
-                                        <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Payable Total</strong> : <span id="so_add_total_qty"></span></h6>
-                                        <table class="table SO table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">Type</th>
-                                                    <th scope="col">Rate</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                
+                            <div class="modal fade" id="Modalfor_quantity_details_so" tabindex="-1"
+                                aria-labelledby="modal3Label" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modal3Label">Payable Total Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"style="width:50px"></button>
+                                        </div>
+                                        <div class="modal-body-so">
+                                            <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched
+                                                    Qty</strong> : <span id="so_add_qty"></span></h6>
+                                            <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Payable
+                                                    Total</strong> : <span id="so_add_total_qty"></span></h6>
+                                            <table class="table SO table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Type</th>
+                                                        <th scope="col">Rate</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                        <div class="modal fade" id="Modalfor_quantity_details_po" tabindex="-1" aria-labelledby="modal3Label"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-            
-                                    <h5 class="modal-title" id="modal3Label">Receivable Total Details</h5>
-            
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body-po">
-                                    <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched Qty</strong> : <span
-                                            id="add_qty"></span></h6>
-                                    <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Receivable Total</strong> : <span
-                                            id="add_total_qty"></span></h6>
-                                    <table class="table SO table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">Type</th>
-                                                <th scope="col">Rate</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-            
-                                        </tbody>
-                                    </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+
+
+                            <div class="modal fade" id="Modalfor_quantity_details_po" tabindex="-1"
+                                aria-labelledby="modal3Label" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title" id="modal3Label">Receivable Total Details</h5>
+
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body-po">
+                                            <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched
+                                                    Qty</strong> : <span id="add_qty"></span></h6>
+                                            <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Receivable
+                                                    Total</strong> : <span id="add_total_qty"></span></h6>
+                                            <table class="table SO table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Type</th>
+                                                        <th scope="col">Rate</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- <div class="modal fade" id="Modalfor_quantity_details_po" tabindex="-1"
                                 aria-labelledby="modal3Label" aria-hidden="true">
@@ -339,37 +343,39 @@
                                     </div>
                                 </div>
                             </div> --}}
-                            
-        <div class="modal fade" id="Modalfor_quantity_details_po" tabindex="-1" aria-labelledby="modal3Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    
-                    <h5 class="modal-title" id="modal3Label">Receivable Total Details</h5>
-                    
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body-po">
-                    <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched Qty</strong> : <span id="add_qty"></span></h6>
-                    <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Receivable Total</strong> : <span id="add_total_qty"></span></h6>
-                    <table class="table SO table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
 
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                            <div class="modal fade" id="Modalfor_quantity_details_po" tabindex="-1"
+                                aria-labelledby="modal3Label" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title" id="modal3Label">Receivable Total Details</h5>
+
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body-po">
+                                            <h6 class="text-end mt-2" style="margin-right: 20px;"><strong>Dispatched
+                                                    Qty</strong> : <span id="add_qty"></span></h6>
+                                            <h6 class="text-end mt-1" style="margin-right: 20px;"><strong>Receivable
+                                                    Total</strong> : <span id="add_total_qty"></span></h6>
+                                            <table class="table SO table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Type</th>
+                                                        <th scope="col">Rate</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -446,87 +452,87 @@
 
 
 
-<script>
-    function filterButton(filterTodate, filterFromdate, filterItem_name, filterCompany, filterDispatch) {
-        $.ajax({
-            type: 'POST',
-            url: '/dispatch-report-get',
-            data: {
-                filterTodate: filterTodate,
-                filterFromdate: filterFromdate,
-                filterItem_name: filterItem_name,
-                filterCompany: filterCompany,
-                filterDispatch: filterDispatch,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function(response) {
-                if (response && Array.isArray(response)) {
-                    var table = $('#Category_table').DataTable();
-                    table.clear().draw();
+    <script>
+        function filterButton(filterTodate, filterFromdate, filterItem_name, filterCompany, filterDispatch) {
+            $.ajax({
+                type: 'POST',
+                url: '/dispatch-report-get',
+                data: {
+                    filterTodate: filterTodate,
+                    filterFromdate: filterFromdate,
+                    filterItem_name: filterItem_name,
+                    filterCompany: filterCompany,
+                    filterDispatch: filterDispatch,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response && Array.isArray(response)) {
+                        var table = $('#Category_table').DataTable();
+                        table.clear().draw();
 
-                    // Initialize total variables
-                    var totalDispatchTotal = 0;
-                    var totalDispatchSoTotal = 0;
-                    var totalDispatchedQty = 0;
+                        // Initialize total variables
+                        var totalDispatchTotal = 0;
+                        var totalDispatchSoTotal = 0;
+                        var totalDispatchedQty = 0;
 
-                    response.forEach(function(data, index) {
-                        const dispatchTotal = parseFloat(data.dispatch_total) || 0;
-                        const dispatchSoTotal = parseFloat(data.dispatch_so_total) || 0;
-                        const dispatchedQty = parseFloat(data.dispatched_quantity) || 0;
+                        response.forEach(function(data, index) {
+                            const dispatchTotal = parseFloat(data.dispatch_total).toFixed(2) || 0;
+                            const dispatchSoTotal = parseFloat(data.dispatch_so_total).toFixed(2) || 0;
+                            const dispatchedQty = parseFloat(data.dispatched_quantity) || 0;
 
-                        let dispatchedqty = (dispatchedQty).toFixed(3);
+                            let dispatchedqty = (dispatchedQty).toFixed(3);
 
-                        // Update grand totals
-                        totalDispatchTotal += dispatchTotal;
-                        totalDispatchSoTotal += dispatchSoTotal;
-                        totalDispatchedQty += dispatchedQty;
+                            // Update grand totals
+                            totalDispatchTotal += dispatchTotal;
+                            totalDispatchSoTotal += dispatchSoTotal;
+                            totalDispatchedQty += dispatchedQty;
 
-                        // Add row to the table
-                        table.row.add([
-                            index + 1,
-                            data.disaptch_date,
-                            data.dispatch_number,
-                            data.vehicle_number ?? 'N/A',
-                            data.po_company,
-                            data.po_item_no,
-                            `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                            // Add row to the table
+                            table.row.add([
+                                index + 1,
+                                data.disaptch_date,
+                                data.dispatch_number,
+                                data.vehicle_number ?? 'N/A',
+                                data.po_company,
+                                data.po_item_no,
+                                `<a href="javascript:void(0);" data-bs-toggle="modal" 
                                data-bs-target="#Modalfor_quantity_details_so" 
                                onclick="get_received_so_qty_for_report('${data.dispatch_id}')">
                                ${dispatchTotal}
                             </a>`,
-                            data.category_name,
-                            data.sub_category_name ?? 'N/A',
-                            dispatchedqty,
-                            data.so_company,
-                            data.so_item_no,
-                            `<a href="javascript:void(0);" data-bs-toggle="modal" 
+                                data.category_name,
+                                data.sub_category_name ?? 'N/A',
+                                dispatchedqty,
+                                data.so_company,
+                                data.so_item_no,
+                                `<a href="javascript:void(0);" data-bs-toggle="modal" 
                                data-bs-target="#Modalfor_quantity_details_po" 
                                onclick="get_received_po_qty_for_report('${data.dispatch_id}')">
                                ${dispatchSoTotal ?? 'N/A'}
                             </a>`,
-                        ]).draw(false);
-                    });
+                            ]).draw(false);
+                        });
 
-                    // Update grand totals in the footer
-                    $('#totalDispatchTotal').text(totalDispatchTotal.toFixed(2));
-                    $('#totalDispatchSoTotal').text(totalDispatchSoTotal.toFixed(2));
-                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(3));
+                        // Update grand totals in the footer
+                        $('#totalDispatchTotal').text(totalDispatchTotal.toFixed(2));
+                        $('#totalDispatchSoTotal').text(totalDispatchSoTotal.toFixed(2));
+                        $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(3));
 
-                } else {
-                    console.error("Invalid or empty response received.");
+                    } else {
+                        console.error("Invalid or empty response received.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX request failed:", status, error);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX request failed:", status, error);
-            }
-        });
-    }
+            });
+        }
 
-    $('#resetButton').click(function() {
-        // Reload the page to reset filters
-        location.reload();
-    });
-</script>
+        $('#resetButton').click(function() {
+            // Reload the page to reset filters
+            location.reload();
+        });
+    </script>
 
 
 
@@ -537,124 +543,123 @@
         });
     </script>
 
-<script>
-    function get_received_so_qty_for_report(dispatch_id) {
-        $.ajax({
-            url: "{{ url('get_dispatch_payable_total') }}",
-            method: "POST",
-            data: {
-                dispatch_id: dispatch_id,
-                "_token": "{{ csrf_token() }}"
-            },
-            success: function(res) {
-                let tableBody = document.querySelector('.modal-body-so table tbody');
-                tableBody.innerHTML = ''; // Clear existing table rows
+    <script>
+        function get_received_so_qty_for_report(dispatch_id) {
+            $.ajax({
+                url: "{{ url('get_dispatch_payable_total') }}",
+                method: "POST",
+                data: {
+                    dispatch_id: dispatch_id,
+                    "_token": "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    let tableBody = document.querySelector('.modal-body-so table tbody');
+                    tableBody.innerHTML = ''; // Clear existing table rows
 
-                // Check if the required properties exist in the response
-                if (res) {
-                    // Create rows according to the table structure
-                    $('#so_add_qty').html(res.dispatched_quantity);
-                    $('#so_add_total_qty').html(res.dispatch_total);
+                    // Check if the required properties exist in the response
+                    if (res) {
+                        // Create rows according to the table structure
+                        $('#so_add_qty').html(res.dispatched_quantity);
+                        $('#so_add_total_qty').html(res.dispatch_total);
 
-                    
-                    let rows = [
 
-                        `<tr>
+                        let rows = [
+
+                            `<tr>
                     <th scope="row">1</th>
                     <td>PO Unit Rate</td>
                     <td>${res.dispatch_unit_price ?? 0}</td>
                 </tr>`,
-                        `<tr>
+                            `<tr>
                     <th scope="row">2</th>
                     <td>Conv Rate</td>
                     <td>${res.conv_rate ?? 0}</td>
                 </tr>`,
-                        
-                        `<tr>
+
+                            `<tr>
                     <th scope="row">3</th>
                     <td>Loading + Insurance Rate</td>
                     <td>${res.dispatch_other ?? 0}</td>
                 </tr>`,
 
-                `<tr>
+                            `<tr>
                     <th scope="row"></th>
                     <td><strong>Total</strong></td>
-   <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
+   <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.dispatch_other ?? 0) + parseFloat(res.conv_rate ?? 0)).toFixed(2)}</strong></td>
                 </tr>`,
 
 
-            
-                    ];
 
-                    // Insert all rows into the table body
-                    rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
-                } else {
-                    console.error("Dispatch data not found in response");
+                        ];
+
+                        // Insert all rows into the table body
+                        rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+                    } else {
+                        console.error("Dispatch data not found in response");
+                    }
+                },
+                error: function(err) {
+                    console.error("An error occurred:", err);
                 }
-            },
-            error: function(err) {
-                console.error("An error occurred:", err);
-            }
-        });
-    }
-</script>
-<script>
-  function get_received_po_qty_for_report(dispatch_id) {
-$.ajax({
-    url: "{{ url('get_dispatch_so_unit_price') }}",
-    method: "POST",
-    data: {
-        dispatch_id: dispatch_id,
-        "_token": "{{ csrf_token() }}"
-    },
-    success: function(res) {
-        // Clear existing table rows
-        let tableBody = document.querySelector('.modal-body-po table tbody');
-        tableBody.innerHTML = '';
+            });
+        }
+    </script>
+    <script>
+        function get_received_po_qty_for_report(dispatch_id) {
+            $.ajax({
+                url: "{{ url('get_dispatch_so_unit_price') }}",
+                method: "POST",
+                data: {
+                    dispatch_id: dispatch_id,
+                    "_token": "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    // Clear existing table rows
+                    let tableBody = document.querySelector('.modal-body-po table tbody');
+                    tableBody.innerHTML = '';
 
-        // Set total quantity in the span element
-        $('#add_total_qty').html(res.total_qty);
-        $('#add_qty').html(res.dispatched_quantity);
+                    // Set total quantity in the span element
+                    $('#add_total_qty').html(res.total_qty);
+                    $('#add_qty').html(res.dispatched_quantity);
 
 
-        // Check if the required properties exist in the response
-        if (res) {
-            // Create rows according to the table structure
-            let rows = [
-                `<tr>
+                    // Check if the required properties exist in the response
+                    if (res) {
+                        // Create rows according to the table structure
+                        let rows = [
+                            `<tr>
                     <th scope="row">1</th>
                     <td>SO Unit Rate</td>
                     <td>${res.dispatch_so_unit_price ?? 0}</td>
                 </tr>`,
-                `<tr>
+                            `<tr>
                     <th scope="row">2</th>
                     <td>Conv Rate</td>
                     <td>${res.conv_rate ?? 0}</td>
                 </tr>`,
-                `<tr>
+                            `<tr>
                     <th scope="row">3</th>
                     <td>Loading + Insurance Rate</td>
                     <td>${res.dispatch_other ?? 0}</td>
                 </tr>`,
-                `<tr>
+                            `<tr>
                     <th scope="row"></th>
                     <td><strong>Total</strong></td>
-   <td><strong>${(parseFloat(res.dispatch_so_unit_price ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
+   <td><strong>${(parseFloat(res.dispatch_so_unit_price ?? 0) + parseFloat(res.dispatch_other ?? 0) + parseFloat(res.conv_rate ?? 0)).toFixed(2)}</strong></td>
                 </tr>`,
-            ];
+                        ];
 
-            // Insert all rows into the table body
-            rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
-        } else {
-            console.error("Dispatch data not found in response");
+                        // Insert all rows into the table body
+                        rows.forEach(row => tableBody.insertAdjacentHTML('beforeend', row));
+                    } else {
+                        console.error("Dispatch data not found in response");
+                    }
+                },
+                error: function(err) {
+                    console.error("An error occurred:", err);
+                }
+            });
         }
-    },
-    error: function(err) {
-        console.error("An error occurred:", err);
-    }
-});
-}
+    </script>
 
-</script>
-   
 @endsection

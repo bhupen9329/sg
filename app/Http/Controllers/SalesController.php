@@ -426,7 +426,6 @@ class SalesController extends Controller
         $sales_order = SalesOrder::where('sales_orders.id', $id)
             ->select('sales_orders.*', 'sales_orders.id as so_id')
             ->first();
-
         $user = User::all();
 
 

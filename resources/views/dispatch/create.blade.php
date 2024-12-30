@@ -155,22 +155,29 @@
                                 </div>
 
                                 <div class="table-responsive" style="overflow-x: auto;">
-                                    <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table" style="min-width: 1200px;">
+                                    <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table"
+                                        style="min-width: 1200px;">
                                         <thead>
                                             <tr>
-                                                <th class="table_heading_long">Base Item<span class="required-classes">*</span></th>
+                                                <th class="table_heading_long">Base Item<span
+                                                        class="required-classes">*</span></th>
                                                 <th style="width: 150px;" class="table_heading_long">Conv Item</th>
                                                 <th style="width: 115px;" class="table_heading_long">Conv Price</th>
                                                 <th style="width: 115px;" class="table_heading_long">PO Price</th>
                                                 <th style="width: 115px;" class="table_heading_long">Gross PO Price</th>
-                                                <th style="width: 115px;" class="table_heading_long">Loading + Insurance</th>
-                                                <th style="width: 115px;" class="table_heading_normal">Quantity<span class="required-classes">*</span></th>
-                                                <th style="width: 115px;" class="table_heading_long">Payable Total<span class="required-classes">*</span></th>
-                                                <th style="width: 212px;" class="table_heading_long">SO Item NO.<span class="required-classes">*</span></th>
+                                                <th style="width: 115px;" class="table_heading_long">Loading + Insurance
+                                                </th>
+                                                <th style="width: 115px;" class="table_heading_normal">Quantity<span
+                                                        class="required-classes">*</span></th>
+                                                <th style="width: 115px;" class="table_heading_long">Payable Total<span
+                                                        class="required-classes">*</span></th>
+                                                <th style="width: 212px;" class="table_heading_long">SO Item NO.<span
+                                                        class="required-classes">*</span></th>
                                                 <th style="width: 115px;" class="table_heading_long">SO Price</th>
                                                 <th style="width: 115px;" class="table_heading_long">SO Gross Price</th>
-                                                <th style="width: 115px;" class="table_heading_long">Receivable Total<span class="required-classes">*</span></th>
-                                                <th  class="table_heading_action">Action</th>
+                                                <th style="width: 115px;" class="table_heading_long">Receivable Total<span
+                                                        class="required-classes">*</span></th>
+                                                <th class="table_heading_action">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -178,7 +185,7 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                
+
                                 {{-- ............................................................. Purchase Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Selected Details</h4>
@@ -196,6 +203,7 @@
                                             <th>Rest Quantity (Q)</th>
                                             <th>PO Unit Price</th>
                                             <th>PO Price</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -219,6 +227,7 @@
                                             <th>Rest Quantity (Q)</th>
                                             <th>SO Unit Price</th>
                                             <th>SO Price</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -310,7 +319,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div  class="table-responsive">
+                        <div class="table-responsive">
                             <table class="table" id="dataTable">
                                 <thead>
                                     <tr>
@@ -411,7 +420,7 @@
             lastItemId++;
         }
 
-        
+
 
         function cloneRow(button) {
             const row = button.closest('tr'); // Find the current row
@@ -505,13 +514,24 @@
         }
 
 
-        function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
-            '', Price = '') {
-            var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
-            var newRow = table.insertRow(table.rows.length);
-            const formattedDate = formatDate(Date);
+        function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice = '', Price = '', PoId = '') {
+    var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
+    var newRow = table.insertRow(table.rows.length);
+    const formattedDate = formatDate(Date);
 
-            newRow.innerHTML = `
+    // Assuming `editRoute` is passed to JavaScript as a global variable from Blade
+    const editRoute = "{{ route('purchase.edit', ':id') }}";
+    const editUrl = editRoute.replace(':id', PoId);
+
+    // Check if Quantity equals RestQty
+    const editOption = (Quantity === RestQty) 
+        ? `<a href="${editUrl}" class="dropdown-item"
+               style="text-decoration: underline; color: blue; text-align: center;">
+               <i class="fa-solid fa-pen-to-square"></i>
+           </a>`
+        : '';
+
+    newRow.innerHTML = `
         <td>${formattedDate}</td>
         <td>${poNumber}</td>
         <td>${ItemName}</td>
@@ -523,9 +543,12 @@
         <td>${RestQty}</td>
         <td>${UnitPrice}</td>
         <td>${Price}</td>
+        <td>${editOption}</td>
     `;
-            lastItemId++;
-        }
+    lastItemId++;
+}
+
+
 
         function formatDate(dateString) {
             if (!dateString) return ''; // Return empty string if no date is provided
@@ -541,23 +564,40 @@
             return `${day}-${month}-${year}`;
         }
 
-        function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
-            '', Price = '', ) {
-            var table = document.getElementById("soTable").getElementsByTagName('tbody')[0];
-            var newRow = table.insertRow(table.rows.length);
-            const formattedDate = formatDate(Date);
-            newRow.innerHTML = `
-            <td> ${formattedDate}</td>
-            <td>${soNumber}</td>
-            <td>${ItemName}</td>
-            <td>${soItemNumber}</td>
-            <td>${Quantity}</td>
-            <td>${RestQty}</td>
-            <td>${UnitPrice}</td>
-            <td>${Price}</td>
-        `;
-            lastItemId++;
-        }
+        function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice = '', Price = '', SoId = '') {
+            console.log(SoId);
+    var table = document.getElementById("soTable").getElementsByTagName('tbody')[0];
+    var newRow = table.insertRow(table.rows.length);
+    const formattedDate = formatDate(Date);
+
+    // Assuming `editRoute` is passed to JavaScript as a global variable from Blade
+    const editRoute = "{{ route('sales.edit', ':id') }}"; // Update route name if needed
+    const editUrl = editRoute.replace(':id', SoId);
+
+    // Check if Quantity equals RestQty
+    const editOption = (Quantity === RestQty) 
+        ? `<a href="${editUrl}" class="dropdown-item"
+               style="text-decoration: underline; color: blue; text-align: center;">
+               <i class="fa-solid fa-pen-to-square"></i>
+           </a>`
+        : '';
+
+    newRow.innerHTML = `
+        <td>${formattedDate}</td>
+        <td>${soNumber}</td>
+        <td>${ItemName}</td>
+        <td>
+            <input type="hidden" name="so_item_no[]" value="${soItemNumber}">
+            ${soItemNumber}
+        </td>
+        <td>${Quantity}</td>
+        <td>${RestQty}</td>
+        <td>${UnitPrice}</td>
+        <td>${Price}</td>
+        <td>${editOption}</td>
+    `;
+    lastItemId++;
+}
 
 
 
@@ -662,6 +702,7 @@
                     },
                     success: function(response) {
                         const so_item = response.so_items;
+                        console.log(so_item);
 
                         // Original `SORow` call
                         SORow(
@@ -673,8 +714,9 @@
                             so_item.so_dispatch_rest_qty,
                             so_item.unit_price,
                             so_item.so_price,
+                            so_item.so_id,
                             response.freight_insurance.freight_rate,
-                            response.freight_insurance.insurance_rate
+                            response.freight_insurance.insurance_rate,
                         );
                     },
                     error: function(xhr, status, error) {
@@ -739,7 +781,7 @@
 
                         PORow(po_item.date, po_item.document_number, po_item.name, po_item.po_item_no,
                             po_item.qty, po_item.po_dispatch_rest_qty, po_item.unit_price, po_item
-                            .po_price);
+                            .po_price, po_item.po_id);
 
                     },
                     error: function(xhr, status, error) {
@@ -857,7 +899,7 @@
                 }
             });
 
-            companySelect.value = ""; 
+            companySelect.value = "";
         }
 
         function fetchSalesOrders(selectElement) {
@@ -915,7 +957,7 @@
                 }
             });
 
-            selectElement.value = ""; 
+            selectElement.value = "";
         }
 
 
@@ -1234,7 +1276,8 @@
                 },
                 success: function(response) {
                     const convRateField = $(selectElement).closest('tr').find('input[name="conv_rate[]"]');
-                    const convRateFieldShow = $(selectElement).closest('tr').find('input[name="conv_rate_show[]"]');
+                    const convRateFieldShow = $(selectElement).closest('tr').find(
+                        'input[name="conv_rate_show[]"]');
 
                     if (response && response.item_price) {
                         // Set the conversion rate from the response
