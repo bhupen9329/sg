@@ -11,15 +11,15 @@ class CompanyController extends Controller
 {
 
 
-  // function __construct()
-  // {
-  //   $this->middleware('permission:Company-index', ['only' => ['index']]);
-  //   $this->middleware('permission:Company-create', ['only' => ['create', 'store']]);
-  //   $this->middleware('permission:Company-edit', ['only' => ['edit', 'update']]);
-  //   $this->middleware('permission:Company-delete', ['only' => ['delete']]);
+  function __construct()
+  {
+    $this->middleware('permission:Buyers & Suppliers-index', ['only' => ['index']]);
+    $this->middleware('permission:Buyers & Suppliers-create', ['only' => ['create', 'store']]);
+    $this->middleware('permission:Buyers & Suppliers-edit', ['only' => ['edit', 'update']]);
+    $this->middleware('permission:Buyers & Suppliers-delete', ['only' => ['delete']]);
 
 
-  // }
+  }
 
   public function index()
   {

@@ -16,6 +16,12 @@ use Illuminate\Support\Facades\Auth;
 class StockController extends Controller
 {
 
+    function __construct()
+    {
+        $this->middleware('permission:Stocks-index', ['only' => ['index']]);
+        $this->middleware('permission:Stocks-create', ['only' => ['create','store']]);
+    }
+
 
   
     public function index()

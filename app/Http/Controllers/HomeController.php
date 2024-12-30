@@ -26,9 +26,12 @@ use App\Http\Controllers\ValuationController;
 
 class HomeController extends Controller
 {
+ 
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permission:Dashboard', ['only' => ['dashboard_index']]);
+
     }
 
     public function login(Request $request)

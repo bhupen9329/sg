@@ -41,6 +41,17 @@ class SalesController extends Controller
 {
 
 
+    function __construct()
+    {
+        $this->middleware('permission:Sales-index', ['only' => ['index','show']]);
+        $this->middleware('permission:Sales-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:Sales-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:Sales-delete', ['only' => ['delete']]);
+    }
+
+
+
+
     public function index()
     {
 
