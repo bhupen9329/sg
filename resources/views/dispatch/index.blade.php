@@ -131,19 +131,35 @@
                                             <th style="width: 84.8125px;">From (Party Name)</th>
                                             <th style="width: 84.8125px;">PO Item No</th>
                                             <th style="width: 84.8125px;">PO Item Unit Price</th>
-                                            <th>Payable Total</th>
+                                            <th>PO Gross Price</th>
                                             <th>Category</th>
                                             <th>Conv Item Name</th>
                                             <th>Dispatch Qty</th>
                                             <th style="width: 84.8125px;">To (Party Name)</th>
                                             <th>SO Item No</th>
                                             <th style="width: 84.8125px;">SO Item Unit Price</th>
-                                            <th>Receivable Total</th>
+                                            <th>SO Gross Price</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($disaptch_data as $data)
+                                        @php
+                                        $gross_so = (
+                                            floatval($data->dispatch_so_unit_price ?? 0) + 
+                                            floatval($data->dispatch_so_freight ?? 0) + 
+                                            floatval($data->conv_rate ?? 0) + 
+                                            floatval($data->dispatch_other ?? 0)
+                                        );
+                                        
+                                        $gross_po = (
+                                            floatval($data->dispatch_unit_price ?? 0) + 
+                                            floatval($data->dispatch_freight ?? 0) + 
+                                            floatval($data->conv_rate ?? 0) + 
+                                            floatval($data->dispatch_other ?? 0)
+                                        );
+                                        @endphp
+                                        
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
@@ -158,7 +174,7 @@
                                                     <a href="javascript:void(0);" data-bs-toggle="modal"
                                                         data-bs-target="#Modalfor_quantity_details_so"
                                                         onclick="get_received_so_qty_for_report('{{ $data->dispatch_id }}')">
-                                                        {{ $data->dispatch_total }}
+                                                        {{ number_format($gross_po, 2) }}
                                                     </a>
                                                 </td>
 
@@ -177,7 +193,7 @@
                                                     <a href="javascript:void(0);" data-bs-toggle="modal"
                                                         data-bs-target="#Modalfor_quantity_details_po"
                                                         onclick="get_received_po_qty_for_report('{{ $data->dispatch_id }}')">
-                                                        {{ $data->dispatch_so_total }}
+                                                        {{  number_format($gross_so, 2) }}
                                                     </a>
                                                 </td>
                                                 {{-- <td>{{ $data->dispatch_so_unit_price }}</td> --}}
@@ -359,8 +375,6 @@
                         <td><strong>Total</strong></td>
        <td><strong>${(parseFloat(res.dispatch_unit_price ?? 0) + parseFloat(res.conv_rate ?? 0) + parseFloat(res.dispatch_freight ?? 0) + parseFloat(res.dispatch_other ?? 0)).toFixed(2)}</strong></td>
                     </tr>`,
-
-
                 
                         ];
 

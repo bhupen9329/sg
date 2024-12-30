@@ -50,7 +50,7 @@ class DispatchController extends Controller
                 'dispatches.date as dispatch_date',
 
             )
-            ->orderBy('dispatches.date', 'asc')
+            ->orderBy('dispatches.date', 'desc')
             ->get();
         // dd($disaptch_data);
 
@@ -125,7 +125,7 @@ class DispatchController extends Controller
         $itemId = $request->item_id;
         $po_items = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
             ->join('categories', 'categories.id', '=', 'po_items.item_category')
-            ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price', 'po_items.po_dispatch_rest_qty')
+            ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price', 'po_items.po_dispatch_rest_qty', 'po_items.po_id')
             ->where('po_item_no', $request->poItemNo)->first();
 
         // Retrieve the item and its sub-items based on the item ID
@@ -143,7 +143,7 @@ class DispatchController extends Controller
         // dd($request);
         $so_items = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price')
+            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price', 'so_items.so_id as so_id')
             ->where('so_item_no', $request->so_item_no)->first();
 
         $freight_insurance = FreightRate::latest()->first();

@@ -1527,9 +1527,9 @@ class ReportController extends Controller
                 'dispatched_quantity' => $filteredData->dispatched_quantity,
                 'vehicle_number' => $filteredData->vehicle_number,
                 'po_item_no' => $filteredData->po_item_no,
-                'dispatch_total' => $filteredData->dispatch_total,
+                'dispatch_total' => ($filteredData->dispatch_unit_price) + ($filteredData->conv_rate) + ($filteredData->dispatch_freight)+ ($filteredData->dispatch_other),
                 'so_item_no' => $filteredData->so_item_no,
-                'dispatch_so_total' => $filteredData->dispatch_so_total,
+                'dispatch_so_total' => ($filteredData->dispatch_so_unit_price) + ($filteredData->conv_rate) + ($filteredData->dispatch_so_freight) + ($filteredData->dispatch_so_other),
                 'dispatch_id' => $filteredData->dispatch_id,
                 'dispatch_number' => $filteredData->dispatch_number,
             ];
