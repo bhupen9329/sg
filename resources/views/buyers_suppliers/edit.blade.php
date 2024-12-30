@@ -84,7 +84,10 @@
                                         style="height: 50px;" required>{{ $companies->address }}</textarea>
                                 </div>
                                 <div class="text-end mt-3">
+                                    @can('Buyers & Suppliers-create')
+                                        
                                     <button type="submit" class="btn btn-primary">Update</button>
+                                    @endcan
                                     <a class="btn btn-secondary" href="{{ route('buyers.index') }}">Back</a>
                                 </div>
                             </form>

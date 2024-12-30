@@ -39,15 +39,7 @@ use Illuminate\Support\Facades\DB;
 
 class SalesController extends Controller
 {
-    function __construct()
-    {
-        $this->middleware('permission:Sales-index', ['only' => ['index']]);
-        $this->middleware('permission:Sales-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:Sales-view', ['only' => ['edit']]);
-        $this->middleware('permission:Sales-edit', ['only' => ['update']]);
-        $this->middleware('permission:Sales-delete', ['only' => ['delete']]);
-        $this->middleware('permission:Sales-close', ['only' => ['close']]);
-    }
+
 
     public function index()
     {

@@ -13,15 +13,15 @@ class CompanySettingController extends Controller
 {
 
 
-    function __construct()
-    {
-         $this->middleware('permission:GST-index', ['only' => ['gstindex']]);
-         $this->middleware('permission:GST-create', ['only' => ['create','gst_store']]);
-         $this->middleware('permission:GST-edit', ['only' => ['gst_update']]);
-         $this->middleware('permission:GST-delete', ['only' => ['gst_setting_delete','']]);
-         $this->middleware('permission:Setting-company', ['only' => ['index','update']]);
+    // function __construct()
+    // {
+    //      $this->middleware('permission:GST-index', ['only' => ['gstindex']]);
+    //      $this->middleware('permission:GST-create', ['only' => ['create','gst_store']]);
+    //      $this->middleware('permission:GST-edit', ['only' => ['gst_update']]);
+    //      $this->middleware('permission:GST-delete', ['only' => ['gst_setting_delete','']]);
+    //      $this->middleware('permission:Setting-company', ['only' => ['index','update']]);
 
-    }
+    // }
 
 
 

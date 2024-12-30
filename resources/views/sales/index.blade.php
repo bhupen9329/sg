@@ -118,7 +118,8 @@
                                                 <td>{{ $data->company_name }}</td>
                                                 <td>{{ $data->category_name }}</td>
                                                 <td>{{ $data->qty }}</td>
-                                                <td style="background-color: #ff3300">{{ $data->so_dispatch_rest_qty }}</td>
+                                                <td style="background-color: #ff3300">{{ $data->so_dispatch_rest_qty }}
+                                                </td>
                                                 <td>{{ $data->unit_price }}</td>
                                                 <td>{{ $data->price }}</td>
 
@@ -127,7 +128,8 @@
                                                 <td>{{ $data->name ?? 'N/A' }}</td>
                                             @elseif($data->so_dispatch_rest_qty == 0)
                                                 <td style="background-color: #15ff00">{{ $loop->iteration }}</td>
-                                                <td style="background-color: #15ff00">{{ date('d-M-Y', strtotime($data->date)) }}</td>
+                                                <td style="background-color: #15ff00">
+                                                    {{ date('d-M-Y', strtotime($data->date)) }}</td>
                                                 {{-- <td>{{ date('d-m-Y', strtotime($data->date))  }}</td> --}}
                                                 <td style="background-color: #15ff00">{{ $data->so_number }}</td>
                                                 <td style="background-color: #15ff00">{{ $data->so_item_no }}</td>
@@ -139,8 +141,10 @@
                                                 <td style="background-color: #15ff00">{{ $data->unit_price }}</td>
                                                 <td style="background-color: #15ff00">{{ $data->price }}</td>
 
-                                                <td style="background-color: #15ff00">{{ $data->so_dispatch_item_status }}</td>
-                                                <td style="background-color: #15ff00">{{ $data->terms_condition ?? 'N/A' }}</td>
+                                                <td style="background-color: #15ff00">{{ $data->so_dispatch_item_status }}
+                                                </td>
+                                                <td style="background-color: #15ff00">{{ $data->terms_condition ?? 'N/A' }}
+                                                </td>
                                                 <td style="background-color: #15ff00">{{ $data->name ?? 'N/A' }}</td>
                                             @else
                                                 <td>{{ $loop->iteration }}</td>
@@ -168,21 +172,29 @@
                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
 
                                                         <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('sales.edit', $data->so_id) }}"><i
-                                                                        class="fa-solid fa-pencil"></i>View/Edit</a>
-                                                                        @if($data->so_dispatch_item_status == 'Open')
+                                                            @can('Sales-edit')
+                                                                
+                                                       
                                                             <a class="dropdown-item"
-                                                            href="{{ route('sales.delete', $data->so_item_id) }}"><i class="fa-solid fa-trash"></i>Delete</a>
+                                                                href="{{ route('sales.edit', $data->so_id) }}"><i
+                                                                    class="fa-solid fa-pencil"></i>View/Edit</a>
+                                                                    @endcan
+                                                            @if ($data->so_dispatch_item_status == 'Open')
+                                                            @can('Sales-delete')
+
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('sales.delete', $data->so_item_id) }}"><i
+                                                                        class="fa-solid fa-trash"></i>Delete</a>
+                                                                    @endcan
+
                                                             @endif
 
                                                             <a data-bs-toggle="modal" href="#"
-                                                            onclick="get_po_id({{ $data->so_item_id }})"
-                                                            class="dropdown-item"
-                                                            data-bs-target="#Modalforselect_type">
-                                                            <i class="fa-solid fa-ban"></i>
-                                                            Change Status
-                                                        </a>
+                                                                onclick="get_po_id({{ $data->so_item_id }})"
+                                                                class="dropdown-item" data-bs-target="#Modalforselect_type">
+                                                                <i class="fa-solid fa-ban"></i>
+                                                                Change Status
+                                                            </a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -200,8 +212,8 @@
             </div>
         </section>
 
-           <!-- Modal 1 -->
-           <div class="modal fade" id="Modalforselect_type" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
+        <!-- Modal 1 -->
+        <div class="modal fade" id="Modalforselect_type" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -222,18 +234,18 @@
                                         <option value="Cancelled">Cancelled</option>
                                     </select>
                                 </div>
-                                <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Date 
-                                    <span class="required-classes">*</span>​</strong> </label>
-                            <div class="col-sm-12">
-                                <input type="date" class="form-control" name="date" id="dateInput" required 
-                                value="<?php echo date('Y-m-d'); ?>">
-                            </div>
-                            <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Remarks
-                               ​</strong> </label>
-                        <div class="col-sm-12">
-                            <textarea class="form-control" name="remarks" id="remarks_for_closure" rows="2"></textarea>
-                            <input type="hidden" id="set_po_item_id" name="so_item_id">
-                        </div>
+                                <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Date
+                                        <span class="required-classes">*</span>​</strong> </label>
+                                <div class="col-sm-12">
+                                    <input type="date" class="form-control" name="date" id="dateInput" required
+                                        value="<?php echo date('Y-m-d'); ?>">
+                                </div>
+                                <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Remarks
+                                        ​</strong> </label>
+                                <div class="col-sm-12">
+                                    <textarea class="form-control" name="remarks" id="remarks_for_closure" rows="2"></textarea>
+                                    <input type="hidden" id="set_po_item_id" name="so_item_id">
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -246,7 +258,7 @@
         </div>
 
     </main><!-- End #main -->
- 
+
     <!-- Company Modal2 -->
     <div class="modal fade" id="company_modal2" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
         <form action="" method="post">
@@ -258,9 +270,11 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <label for="company_id11" class="mb-2">Select Buyer Company<span class="required-classes">*</span></label>
+                            <label for="company_id11" class="mb-2">Select Buyer Company<span
+                                    class="required-classes">*</span></label>
                             <div class="col-lg-12">
-                                <select class="form-select Buyer-Company-select" name="company_id" id="buyerCompanySelect" required onchange="navigateToSalesCreate(this)">
+                                <select class="form-select Buyer-Company-select" name="company_id"
+                                    id="buyerCompanySelect" required onchange="navigateToSalesCreate(this)">
                                     <option value="" selected disabled>Buyer Company</option>
                                     @foreach ($company as $c_item)
                                         <option value="{{ $c_item->id }}">{{ $c_item->company_name }}</option>
@@ -543,31 +557,30 @@
         });
     </script>
 
-<script>
-    function navigateToSalesCreate(selectElement) {
-        const companyId = selectElement.value; // Get the selected company ID
-        if (companyId) {
-            const url = `/sales-create/${companyId}`; // Build the URL
-            window.location.href = url; // Redirect to the route
+    <script>
+        function navigateToSalesCreate(selectElement) {
+            const companyId = selectElement.value; // Get the selected company ID
+            if (companyId) {
+                const url = `/sales-create/${companyId}`; // Build the URL
+                window.location.href = url; // Redirect to the route
+            }
         }
-    }
-</script>
+    </script>
 
-<script>
+    <script>
+        $(document).ready(function() {
+            $('#buyerCompanySelect').select2();
+            // Focus the search box when the subcategory dropdown is opened
+            $('#buyerCompanySelect').on('select2:open', function() {
+                document.querySelector('.select2-search__field').focus();
+            });
 
-    $(document).ready(function() {
-        $('#buyerCompanySelect').select2();
-        // Focus the search box when the subcategory dropdown is opened
-        $('#buyerCompanySelect').on('select2:open', function() {
-            document.querySelector('.select2-search__field').focus();
         });
 
-    });
-
-    function get_po_id(po_item_id) {
+        function get_po_id(po_item_id) {
             po_item_id = po_item_id;
             $('#set_po_item_id').val(po_item_id);
         }
-</script>
+    </script>
 
 @endsection

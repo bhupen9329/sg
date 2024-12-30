@@ -19,12 +19,7 @@ use Illuminate\Support\Facades\DB;
 class StockAdjustmentController extends Controller
 {
 
-    function __construct()
-    {
-        $this->middleware('permission:Stock-Adjustment-index', ['only' => ['index']]);
-        $this->middleware('permission:Stock-Adjustment-create', ['only' => ['create']]);
-        $this->middleware('permission:Stock-Adjustment-delete', ['only' => ['delete']]);
-    }
+ 
 
     public function index()
     {

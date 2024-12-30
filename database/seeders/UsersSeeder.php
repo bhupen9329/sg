@@ -11,36 +11,44 @@ use Spatie\Permission\Models\Role;
 
 class UsersSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        // Create users
         $admin = User::create([
             'name' => 'Pankaj Agrawal',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make('12345678')
+            'password' => Hash::make('12345678') // Ideally, fetch password from env or .env file
         ]);
-
+    
         $madan = User::create([
             'name' => 'Madan',
             'email' => 'madan@gmail.com',
             'password' => Hash::make('12345678')
         ]);
-
+    
         $aashish = User::create([
             'name' => 'Aashish',
             'email' => 'aashish@gmail.com',
             'password' => Hash::make('12345678')
         ]);
-
-        // Assign admin role to the user
-        $adminRole = Role::where('name', 'Admin')->first();
+    
+        $deshmukh = User::create([
+            'name' => 'Deshmukh',
+            'email' => 'deshmukh@gmail.com',
+            'password' => Hash::make('12345678')
+        ]);
+    
+        // Ensure roles exist or create them if they don't
+        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
+        $accountantRole = Role::firstOrCreate(['name' => 'Accountant']);
+        $salespersonRole = Role::firstOrCreate(['name' => 'Sales Person']);
+        $dispatchRole = Role::firstOrCreate(['name' => 'Dispatch']);
+    
+        // Assign roles to users
         $admin->assignRole($adminRole);
-        
-        $EmployeeRole = Role::where('name', 'Employee')->first();
-        
-        $madan->assignRole($EmployeeRole);
-        $aashish->assignRole($EmployeeRole);
+        $deshmukh->assignRole($accountantRole);
+        $madan->assignRole($salespersonRole);
+        $aashish->assignRole($dispatchRole);
     }
+    
 }

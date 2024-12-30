@@ -94,7 +94,7 @@
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
                                     <div class="btn-group">
                                         @can('Sub-Category-create')
-                                            @can('price')
+                                            @can('Conversion-index')
                                                 <a class="btn btn-primary mb-4 mr-3 "href="{{ route('subcategory.create') }}">Add
                                                     New
                                                     Conv Item</a>
@@ -139,7 +139,7 @@
                                                             class="bi bi-three-dots"></i></a>
                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                                         <li>
-                                                            @can('Sub-Category-view')
+                                                            @can('Conversion-edit')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('subcategory.edit', $data->id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>Edit</a>
@@ -147,7 +147,7 @@
                                                         </li>
 
                                                         <li>
-                                                            @can('Sub-Category-delete')
+                                                            @can('Conversion-delete')
                                                                 <form method="POST"
                                                                     action="{{ route('subcategory.delete', $data->id) }}">
                                                                     @csrf

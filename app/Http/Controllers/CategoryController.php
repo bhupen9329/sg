@@ -9,15 +9,15 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
 
-    function __construct()
-    {
-         $this->middleware('permission:Category-index', ['only' => ['index']]);
-         $this->middleware('permission:Category-create', ['only' => ['create','store']]);
-         $this->middleware('permission:Category-view', ['only' => ['edit']]);
-         $this->middleware('permission:Category-edit', ['only' => ['update']]);
-         $this->middleware('permission:Category-delete', ['only' => ['delete']]);
+    // function __construct()
+    // {
+    //      $this->middleware('permission:Category-index', ['only' => ['index']]);
+    //      $this->middleware('permission:Category-create', ['only' => ['create','store']]);
+    //      $this->middleware('permission:Category-view', ['only' => ['edit']]);
+    //      $this->middleware('permission:Category-edit', ['only' => ['update']]);
+    //      $this->middleware('permission:Category-delete', ['only' => ['delete']]);
 
-    }
+    // }
 
     public function index(Request $request)
     {

@@ -21,15 +21,15 @@ class QuotationController extends Controller
 {
 
 
-    function __construct()
-    {
-        $this->middleware('permission:Quotation-index', ['only' => ['index']]);
-        $this->middleware('permission:Quotation-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:Quotation-view', ['only' => ['edit']]);
-        $this->middleware('permission:Quotation-edit', ['only' => ['update']]);
-        $this->middleware('permission:Quotation-delete', ['only' => ['delete']]);
-        $this->middleware('permission:Quotation-email', ['only' => ['send_email']]);
-    }
+    // function __construct()
+    // {
+    //     $this->middleware('permission:Quotation-index', ['only' => ['index']]);
+    //     $this->middleware('permission:Quotation-create', ['only' => ['create', 'store']]);
+    //     $this->middleware('permission:Quotation-view', ['only' => ['edit']]);
+    //     $this->middleware('permission:Quotation-edit', ['only' => ['update']]);
+    //     $this->middleware('permission:Quotation-delete', ['only' => ['delete']]);
+    //     $this->middleware('permission:Quotation-email', ['only' => ['send_email']]);
+    // }
 
     public function index()
     {
