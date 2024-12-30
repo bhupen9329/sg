@@ -17,6 +17,16 @@ use App\Models\FreightRate;
 class DispatchController extends Controller
 {
 
+    function __construct()
+    {
+         $this->middleware('permission:Dispatch-index', ['only' => ['index']]);
+         $this->middleware('permission:Dispatch-create', ['only' => ['create','storeDispatch']]);
+         $this->middleware('permission:Dispatch-edit', ['only' => ['updateDispatch','editDispatch']]);
+         $this->middleware('permission:Dispatch-delete', ['only' => ['destroyDispatch']]);
+
+    }
+
+
     public function index()
     {
 

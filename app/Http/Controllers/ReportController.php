@@ -31,9 +31,6 @@ class ReportController extends Controller
 {
 
 
-
-    // PO Reports
-
     public function po_report($id = null)
     {
         $companys = Company::whereIn('type', ['supplier', 'both'])->get();

@@ -14,6 +14,14 @@ class SubCategoryController extends Controller
 {
 
 
+    function __construct()
+    {
+         $this->middleware('permission:Conversion-index', ['only' => ['index']]);
+         $this->middleware('permission:Conversion-create', ['only' => ['create','store']]);
+         $this->middleware('permission:Conversion-edit', ['only' => ['update','edit']]);
+         $this->middleware('permission:Conversion-delete', ['only' => ['delete']]);
+
+    }
   
 
     public function index(Request $request)
