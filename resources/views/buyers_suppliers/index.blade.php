@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
                                     <div class="btn-group">
-                                        @can('Company-create')
+                                        @can('Buyers & Suppliers-create')
                                             <a class="btn btn-primary mb-4 mr-3 "href="{{ route('buyers.create') }}">Add New
                                                 Company</a>
                                         @endcan
@@ -112,14 +112,14 @@
                                                                 href="{{ route('buyers.show', $data->id) }}"><i
                                                                     class="fa-regular fa-eye"></i> View</a></li>
                                                         <li>
-                                                            @can('Company-edit')
+                                                            @can('Buyers & Suppliers-edit')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('buyers.edit', $data->id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>Edit</a>
                                                             @endcan
                                                         </li>
                                                         <li>
-                                                            @can('Company-delete')
+                                                            @can('Buyers & Suppliers-delete')
                                                                 <form method="POST"
                                                                     action="{{ route('buyers.destroy', $data->id) }}">
                                                                     @csrf

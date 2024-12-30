@@ -21,15 +21,15 @@ class InwardController extends Controller
 {
 
 
-    function __construct()
-    {
-        $this->middleware('permission:Inward-index', ['only' => ['index']]);
-        $this->middleware('permission:Inward-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:Inward-view', ['only' => ['edit']]);
-        $this->middleware('permission:Inward-edit', ['only' => ['update']]);
-        $this->middleware('permission:Inward-approve', ['only' => ['approve']]);
-        $this->middleware('permission:Inward-delete', ['only' => ['delete', '']]);
-    }
+    // function __construct()
+    // {
+    //     $this->middleware('permission:Inward-index', ['only' => ['index']]);
+    //     $this->middleware('permission:Inward-create', ['only' => ['create', 'store']]);
+    //     $this->middleware('permission:Inward-view', ['only' => ['edit']]);
+    //     $this->middleware('permission:Inward-edit', ['only' => ['update']]);
+    //     $this->middleware('permission:Inward-approve', ['only' => ['approve']]);
+    //     $this->middleware('permission:Inward-delete', ['only' => ['delete', '']]);
+    // }
 
     public function index()
     {

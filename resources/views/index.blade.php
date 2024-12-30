@@ -8,6 +8,8 @@
             <p style="color: red">Overview of sales, purchase, stock and valuation insights for open orders.</p>
         </div><!-- End Page Title -->
 
+        @can('Dashboard')
+            
         <section class="section dashboard">
             <style>
                 .card {
@@ -30,6 +32,7 @@
                     --bs-gutter-x: -0.5rem !important;
                 }
             </style>
+
             <!-- Left side columns -->
             <div class="row ">
 
@@ -482,7 +485,6 @@
 
             <div class="row">
 
-
                 <div class="col-lg-6 px-2 py-4 ">
                     <div class="row dashboard-container">
                         <div class="col-lg-12">
@@ -724,17 +726,11 @@
 
                 </div>
 
-
-
-
-
             </div>
 
-
-
-
-
         </section>
+        @endcan
+
 
         <script>
             function get_category_id(id) {

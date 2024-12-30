@@ -30,18 +30,7 @@ use Illuminate\Http\Request;
 class ReportController extends Controller
 {
 
-    function __construct()
-    {
-        $this->middleware('permission:PO-Report', ['only' => ['po_report', 'get_po_report']]);
-        $this->middleware('permission:SO-Report', ['only' => ['so_report', 'get_so_report']]);
-        $this->middleware('permission:Quotation-Report', ['only' => ['quotation_execution_report', 'get_quotation_execution_report']]);
-        $this->middleware('permission:Inward-Report', ['only' => ['inward_report', 'get_inward_report']]);
-        $this->middleware('permission:Outward-Report', ['only' => ['outward_report', 'get_outward_report']]);
-        $this->middleware('permission:Stock-Report', ['only' => ['stock_report', 'get_stock_report']]);
-        $this->middleware('permission:Ageing-Report', ['only' => ['ageing_report', 'get_ageing_report']]);
-        $this->middleware('permission:Stock-Transaction-Report', ['only' => ['stock_transaction_report', 'get_stock_transaction_report']]);
-        $this->middleware('permission:Top-Selling-Report', ['only' => ['top_selling_report', 'get_top_selling_report']]);
-    }
+
 
     // PO Reports
 

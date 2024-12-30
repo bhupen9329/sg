@@ -9,13 +9,13 @@ use Illuminate\Routing\Controllers\Middleware;
 class EmailSettingController extends Controller
 {
 
-    function __construct()
-    {
-        $this->middleware('permission:Setting-email', ['only' => ['index','update']]);
+    // function __construct()
+    // {
+    //     $this->middleware('permission:Setting-email', ['only' => ['index','update']]);
 
 
 
-    }
+    // }
 
     public function index()
     {

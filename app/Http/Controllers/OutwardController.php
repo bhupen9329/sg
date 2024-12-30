@@ -22,15 +22,15 @@ use Illuminate\Support\Facades\Auth;
 class OutwardController extends Controller
 {
 
-    function __construct()
-    {
-        $this->middleware('permission:Outward-index', ['only' => ['index']]);
-        $this->middleware('permission:Outward-create', ['only' => ['create', 'create_so', 'store', 'store_so']]);
-        $this->middleware('permission:Outward-view', ['only' => ['edit']]);
-        $this->middleware('permission:Outward-edit', ['only' => ['update']]);
-        $this->middleware('permission:Outward-approve', ['only' => ['approve']]);
-        $this->middleware('permission:Outward-delete', ['only' => ['delete', '']]);
-    }
+    // function __construct()
+    // {
+    //     $this->middleware('permission:Outward-index', ['only' => ['index']]);
+    //     $this->middleware('permission:Outward-create', ['only' => ['create', 'create_so', 'store', 'store_so']]);
+    //     $this->middleware('permission:Outward-view', ['only' => ['edit']]);
+    //     $this->middleware('permission:Outward-edit', ['only' => ['update']]);
+    //     $this->middleware('permission:Outward-approve', ['only' => ['approve']]);
+    //     $this->middleware('permission:Outward-delete', ['only' => ['delete', '']]);
+    // }
     public function index()
     {
         $outward_data = Outward::join('companies', 'outwards.company_id', '=', 'companies.id')

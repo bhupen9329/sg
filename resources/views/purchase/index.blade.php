@@ -212,23 +212,28 @@
                                                                     class="fa-regular fa-eye"></i> </a></li> --}}
                                                         <li>
 
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('purchase.edit', $data->po_id) }}"><i
-                                                                    class="fa-solid fa-pencil"></i>View/Edit</a>
+                                                            @can('Purchase-edit')
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('purchase.edit', $data->po_id) }}"><i
+                                                                        class="fa-solid fa-pencil"></i>View/Edit</a>
+                                                            @endcan
+
 
                                                             @if ($data->po_dispatch_item_status == 'Open')
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('purchase.delete', $data->po_item_id) }}"><i
-                                                                        class="fa-solid fa-trash"></i>Delete</a>
+                                                                @can('Purchase-delete')
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('purchase.delete', $data->po_item_id) }}"><i
+                                                                            class="fa-solid fa-trash"></i>Delete</a>
+                                                                @endcan
                                                             @endif
-                                                     
-                                                                    <a data-bs-toggle="modal" href="#"
-                                                                    onclick="get_po_id({{ $data->po_item_id }})"
-                                                                    class="dropdown-item"
-                                                                    data-bs-target="#Modalforselect_type">
-                                                                    <i class="fa-solid fa-ban"></i>
-                                                                    Change Status
-                                                                </a>
+
+                                                            <a data-bs-toggle="modal" href="#"
+                                                                onclick="get_po_id({{ $data->po_item_id }})"
+                                                                class="dropdown-item"
+                                                                data-bs-target="#Modalforselect_type">
+                                                                <i class="fa-solid fa-ban"></i>
+                                                                Change Status
+                                                            </a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -248,51 +253,51 @@
 
     </main><!-- End #main -->
 
-        <!-- Modal 1 -->
-        <div class="modal fade" id="Modalforselect_type" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modal1Label">Change Status</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            style="width:50px"></button>
-                    </div>
-                    <form action="{{ route('po_pre_closed.save') }}" method="POST">
-                        @csrf
-                        <div class="modal-body">
-                            <div class="row  ">
-                                <label for="inputPassword3" class="col-sm-12 col-form-label"><strong>
-                                        Select Status<span class="required-classes">*</span>​</strong> </label>
-                                <div class="col-sm-12">
-                                    <select name="status" id="statusSelect" class="form-select" required>
-                                        <option value="" selected disabled>Select Status</option>
-                                        <option value="Pre Closed">Pre Close</option>
-                                        <option value="Cancelled">Cancelled</option>
-                                    </select>
-                                </div>
-                                <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Date 
+    <!-- Modal 1 -->
+    <div class="modal fade" id="Modalforselect_type" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal1Label">Change Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="width:50px"></button>
+                </div>
+                <form action="{{ route('po_pre_closed.save') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row  ">
+                            <label for="inputPassword3" class="col-sm-12 col-form-label"><strong>
+                                    Select Status<span class="required-classes">*</span>​</strong> </label>
+                            <div class="col-sm-12">
+                                <select name="status" id="statusSelect" class="form-select" required>
+                                    <option value="" selected disabled>Select Status</option>
+                                    <option value="Pre Closed">Pre Close</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Date
                                     <span class="required-classes">*</span>​</strong> </label>
                             <div class="col-sm-12">
-                                <input type="date" class="form-control" name="date" id="dateInput" required 
-                                value="<?php echo date('Y-m-d'); ?>">
+                                <input type="date" class="form-control" name="date" id="dateInput" required
+                                    value="<?php echo date('Y-m-d'); ?>">
                             </div>
                             <label for="inputPassword3" class="col-sm-12 col-form-label"><strong> Remarks
-                               ​</strong> </label>
-                        <div class="col-sm-12">
-                            <textarea class="form-control" name="remarks" id="remarks_for_closure" rows="2"></textarea>
-                            <input type="hidden" id="set_po_item_id" name="po_item_id">
-                        </div>
+                                    ​</strong> </label>
+                            <div class="col-sm-12">
+                                <textarea class="form-control" name="remarks" id="remarks_for_closure" rows="2"></textarea>
+                                <input type="hidden" id="set_po_item_id" name="po_item_id">
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
             </div>
         </div>
-    
+    </div>
+
 
 
     <!-- Modal -->
@@ -303,8 +308,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Select Company</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close" style="width:50px"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="width:50px"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
@@ -323,9 +328,9 @@
 
     <!-- Modals -->
     <!-- Modal 1 -->
-  
 
-  
+
+
 
 
 
@@ -369,7 +374,6 @@
             po_item_id = po_item_id;
             $('#set_po_item_id').val(po_item_id);
         }
-   
     </script>
 
 
@@ -438,24 +442,24 @@
         });
     </script>
 
-<script>
-    function navigateToPurchaseCreate(selectElement) {
-        const companyId = selectElement.value; // Get the selected company ID
-        if (companyId) {
-            const url = `/purchase-create/${companyId}`; // Build the URL
-            window.location.href = url; // Redirect to the route
+    <script>
+        function navigateToPurchaseCreate(selectElement) {
+            const companyId = selectElement.value; // Get the selected company ID
+            if (companyId) {
+                const url = `/purchase-create/${companyId}`; // Build the URL
+                window.location.href = url; // Redirect to the route
+            }
         }
-    }
-</script>
+    </script>
 
-<script>
-    $(document).ready(function() {
-        $('.custom-select').select2();
-        // Focus the search box when the subcategory dropdown is opened
-        $('.custom-select').on('select2:open', function() {
-            document.querySelector('.select2-search__field').focus();
+    <script>
+        $(document).ready(function() {
+            $('.custom-select').select2();
+            // Focus the search box when the subcategory dropdown is opened
+            $('.custom-select').on('select2:open', function() {
+                document.querySelector('.select2-search__field').focus();
+            });
+
         });
-
-    });
-</script>
+    </script>
 @endsection

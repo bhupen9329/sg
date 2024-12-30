@@ -17,12 +17,7 @@ class StockController extends Controller
 {
 
 
-    function __construct()
-    {
-        $this->middleware('permission:Stock-index', ['only' => ['index']]);
-        $this->middleware('permission:Stock-create', ['only' => ['create', 'store']]);
-    }
-
+  
     public function index()
     {
 

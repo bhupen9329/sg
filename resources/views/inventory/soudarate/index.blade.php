@@ -94,7 +94,7 @@
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
                                     <div class="btn-group">
                                         @can('Sub-Category-create')
-                                            @can('price')
+                                            @can('Conversion Rate-create')
                                                 <a class="btn btn-primary mb-4 mr-3 "href="{{ route('rate.create') }}">Add
                                                     New
                                                     Conv Rate</a>
@@ -133,7 +133,7 @@
                                                             class="bi bi-three-dots"></i></a>
                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                                         <li>
-                                                            @can('Sub-Category-view')
+                                                            @can('Conversion Rate-edit')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('rate.edit', $data->conv_id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>Edit</a>
@@ -141,7 +141,7 @@
                                                         </li>
 
                                                         <li>
-                                                            @can('Sub-Category-delete')
+                                                            @can('Conversion Rate-delete')
                                                                 <form method="POST"
                                                                     action="{{ route('rate.delete', $data->conv_id) }}">
                                                                     @csrf

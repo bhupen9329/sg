@@ -38,15 +38,15 @@ class PurchaseController extends Controller
 
 
 
-    function __construct()
-    {
-        $this->middleware('permission:Purchase-index', ['only' => ['index']]);
-        $this->middleware('permission:Purchase-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:Purchase-view', ['only' => ['edit']]);
-        $this->middleware('permission:Purchase-edit', ['only' => ['update']]);
-        $this->middleware('permission:Purchase-close', ['only' => ['partial_receive_save']]);
-        $this->middleware('permission:Purchase-delete', ['only' => ['delete']]);
-    }
+    // function __construct()
+    // {
+    //     $this->middleware('permission:Purchase-index', ['only' => ['index']]);
+    //     $this->middleware('permission:Purchase-create', ['only' => ['create', 'store']]);
+    //     $this->middleware('permission:Purchase-view', ['only' => ['edit']]);
+    //     $this->middleware('permission:Purchase-edit', ['only' => ['update']]);
+    //     $this->middleware('permission:Purchase-close', ['only' => ['partial_receive_save']]);
+    //     $this->middleware('permission:Purchase-delete', ['only' => ['delete']]);
+    // }
     public function index()
     {
 

@@ -1,48 +1,48 @@
 @extends('layouts.main')
-@section('title','Category - Saraswati Globals')
+@section('title', 'Category - Saraswati Globals')
 @section('content')
     <main id="main" class="main">
         @if ($message = Session::get('success'))
-        <div class="tt active">
-            <div class="tt-content">
-                <i class="fas fa-solid fa-check check"></i>
-                <div class="message">
-                    <span class="text text-1">Success</span>
-                    <span class="text text-2"> {{ $message }}</span>
+            <div class="tt active">
+                <div class="tt-content">
+                    <i class="fas fa-solid fa-check check"></i>
+                    <div class="message">
+                        <span class="text text-1">Success</span>
+                        <span class="text text-2"> {{ $message }}</span>
+                    </div>
                 </div>
+                <i class="fa-solid fa-xmark close"></i>
+                <div class="pg active"></div>
             </div>
-            <i class="fa-solid fa-xmark close"></i>
-            <div class="pg active"></div>
-        </div>
-    @endif
+        @endif
 
-    @if ($message = Session::get('update'))
-        <div class="tt active">
-            <div class="tt-content">
-                <i class="fas fa-solid fa-check check"></i>
-                <div class="message">
-                    <span class="text text-1">Update</span>
-                    <span class="text text-2"> {{ $message }}</span>
+        @if ($message = Session::get('update'))
+            <div class="tt active">
+                <div class="tt-content">
+                    <i class="fas fa-solid fa-check check"></i>
+                    <div class="message">
+                        <span class="text text-1">Update</span>
+                        <span class="text text-2"> {{ $message }}</span>
+                    </div>
                 </div>
+                <i class="fa-solid fa-xmark close"></i>
+                <div class="pg active"></div>
             </div>
-            <i class="fa-solid fa-xmark close"></i>
-            <div class="pg active"></div>
-        </div>
-    @endif
+        @endif
 
-    @if ($message = Session::get('delete'))
-        <div class="tt active">
-            <div class="tt-content">
-                <i class="fas fa-solid fa-exclamation exclamation update"></i>
-                <div class="message">
-                    <span class="text text-1">Delete</span>
-                    <span class="text text-2"> {{ $message }}</span>
+        @if ($message = Session::get('delete'))
+            <div class="tt active">
+                <div class="tt-content">
+                    <i class="fas fa-solid fa-exclamation exclamation update"></i>
+                    <div class="message">
+                        <span class="text text-1">Delete</span>
+                        <span class="text text-2"> {{ $message }}</span>
+                    </div>
                 </div>
+                <i class="fa-solid fa-xmark close"></i>
+                <div class="pg active"></div>
             </div>
-            <i class="fa-solid fa-xmark close"></i>
-            <div class="pg active"></div>
-        </div>
-    @endif
+        @endif
 
 
 
@@ -74,11 +74,9 @@
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
                                     <div class="btn-group">
-                                        @can('Category-create')
-                                        @can('price')
+                                        @can('Base Item-create')
                                             <a class="btn btn-primary mb-4 mr-3 "href="{{ route('category.create') }}">Add New
                                                 Base Item</a>
-                                        @endcan
                                         @endcan
                                     </div>
                                 </div>
@@ -90,10 +88,6 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Base Item Name</th>
-                                        @can('price')
-                                        {{-- <th>Base Price</th>
-                                        <th>Margin</th> --}}
-                                        @endcan
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -102,17 +96,13 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $data->name }}</td>
-                                            @can('price')
-                                            {{-- <td>{{ $data->price }}</td>
-                                            <td>{{ $data->margin }} </td> --}}
-                                            @endcan
                                             <td>
                                                 <div class="filter">
                                                     <a class="icon" href="#" data-bs-toggle="dropdown"><i
                                                             class="bi bi-three-dots"></i></a>
                                                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                                         <li>
-                                                            @can('Category-view')
+                                                            @can('Base Item-edit')
                                                                 <a class="dropdown-item"
                                                                     href="{{ route('category.edit', $data->id) }}"><i
                                                                         class="fa-solid fa-pencil"></i>Edit</a>
@@ -120,7 +110,7 @@
                                                         </li>
 
                                                         <li>
-                                                            @can('Category-delete')
+                                                            @can('Base Item-delete')
                                                                 <form method="POST"
                                                                     action="{{ route('category.delete', $data->id) }}">
                                                                     @csrf
@@ -156,9 +146,9 @@
             var table = $('#Category_table').DataTable({
                 dom: 'Bfrtip',
                 lengthMenu: [
-            [10, 20, 50, 100, 150, -1],
-            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
-        ],
+                    [10, 20, 50, 100, 150, -1],
+                    ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+                ],
                 buttons: [
                     'pageLength',
                     {
@@ -167,7 +157,9 @@
                         title: 'Saraswati Globals (Category Details)',
 
                         exportOptions: {
-                            columns: [0, 1, 2, 3,], // Include all columns except the last one with dropdown
+                            columns: [0, 1, 2,
+                                3,
+                            ], // Include all columns except the last one with dropdown
                         }
                     },
                     {
@@ -175,23 +167,25 @@
                         text: 'PRINT',
                         title: 'Saraswati Globals (Category Details)',
                         exportOptions: {
-                            columns: [0, 1, 2, 3,] // Include all columns except the last one with dropdown
+                            columns: [0, 1, 2,
+                                3,
+                            ] // Include all columns except the last one with dropdown
                         },
                         customize: function(win) {
-                        $(win.document.body).find('table')
-                            .addClass('table')
-                            .css({
-                                'margin': '10px',
-                                'padding': '10px'
-                            });
+                            $(win.document.body).find('table')
+                                .addClass('table')
+                                .css({
+                                    'margin': '10px',
+                                    'padding': '10px'
+                                });
 
-                        $(win.document.body).find('h1')
-                            .css({
-                                'text-align': 'center',
-                                'font-size': '20px',
-                                'margin-top': '20px'
-                            });
-                    }
+                            $(win.document.body).find('h1')
+                                .css({
+                                    'text-align': 'center',
+                                    'font-size': '20px',
+                                    'margin-top': '20px'
+                                });
+                        }
                     }
                 ]
             });
@@ -208,10 +202,9 @@
         });
     </script>
 
-<script>
-    $(document).ready(function() {
-    $('.table.dataTable').removeClass('no-footer');
-});
-
- </script>
+    <script>
+        $(document).ready(function() {
+            $('.table.dataTable').removeClass('no-footer');
+        });
+    </script>
 @endsection

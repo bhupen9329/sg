@@ -15,8 +15,7 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         // Dashboard Permission for roles
-        Permission::firstOrCreate(['name' => 'Dashboard-set-base-pirce']);
-        Permission::firstOrCreate(['name' => 'Dashboard-set-notes']);
+        Permission::firstOrCreate(['name' => 'Dashboard']);
 
         // Permission for roles Create
         Permission::firstOrCreate(['name' => 'Role-index']);
@@ -30,131 +29,80 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'User-edit']);
         Permission::firstOrCreate(['name' => 'User-delete']);
 
-        // Permission for Company
-        Permission::firstOrCreate(['name' => 'Company-index']);
-        Permission::firstOrCreate(['name' => 'Company-create']);
-        Permission::firstOrCreate(['name' => 'Company-edit']);
-        Permission::firstOrCreate(['name' => 'Company-delete']);
 
-        // Permission for Warehouse
-        Permission::firstOrCreate(['name' => 'Warehouse-index']);
-        Permission::firstOrCreate(['name' => 'Warehouse-create']);
-        Permission::firstOrCreate(['name' => 'Warehouse-edit']);
-        Permission::firstOrCreate(['name' => 'Warehouse-delete']);
+        // Permission for Base Item
+        Permission::firstOrCreate(['name' => 'Base Item-index']);
+        Permission::firstOrCreate(['name' => 'Base Item-create']);
+        Permission::firstOrCreate(['name' => 'Base Item-edit']);
+        Permission::firstOrCreate(['name' => 'Base Item-delete']);
+
+        // Permission for Conversion Item
+        Permission::firstOrCreate(['name' => 'Conversion-index']);
+        Permission::firstOrCreate(['name' => 'Conversion-create']);
+        Permission::firstOrCreate(['name' => 'Conversion-edit']);
+        Permission::firstOrCreate(['name' => 'Conversion-delete']);
+
+        // Permission for Conversion Item Rate
+        Permission::firstOrCreate(['name' => 'Conversion Rate-index']);
+        Permission::firstOrCreate(['name' => 'Conversion Rate-create']);
+        Permission::firstOrCreate(['name' => 'Conversion Rate-edit']);
+        Permission::firstOrCreate(['name' => 'Conversion Rate-delete']);
 
 
-        // Permission for Setting
+        // Permission for Conversion Stock
+        Permission::firstOrCreate(['name' => 'Stocks-index']);
+        Permission::firstOrCreate(['name' => 'Stocks-create']);
+        Permission::firstOrCreate(['name' => 'Stocks-edit']);
+        Permission::firstOrCreate(['name' => 'Stocks-delete']);
+
+
+
+        // Permission for Setting Compnay
         Permission::firstOrCreate(['name' => 'Setting-company']);
-        Permission::firstOrCreate(['name' => 'Setting-email']);
 
-        // Permission for Sub GST
-        Permission::firstOrCreate(['name' => 'GST-index']);
-        Permission::firstOrCreate(['name' => 'GST-create']);
-        Permission::firstOrCreate(['name' => 'GST-edit']);
-        Permission::firstOrCreate(['name' => 'GST-delete']);
+        // Additional Report
+        Permission::firstOrCreate(['name' => 'Additional-Reports']);
 
-        // Permission for Quotation
-        Permission::firstOrCreate(['name' => 'Quotation-index']);
-        Permission::firstOrCreate(['name' => 'Quotation-view']);
-        Permission::firstOrCreate(['name' => 'Quotation-create']);
-        Permission::firstOrCreate(['name' => 'Quotation-edit']);
-        Permission::firstOrCreate(['name' => 'Quotation-delete']);
-        Permission::firstOrCreate(['name' => 'Quotation-email']);
-        Permission::firstOrCreate(['name' => 'Quotation-download']);
+        // Reports
+        Permission::firstOrCreate(['name' => 'Reports']);
 
 
-        // Permission for Category
-        Permission::firstOrCreate(['name' => 'Category-index']);
-        Permission::firstOrCreate(['name' => 'Category-view']);
-        Permission::firstOrCreate(['name' => 'Category-create']);
-        Permission::firstOrCreate(['name' => 'Category-edit']);
-        Permission::firstOrCreate(['name' => 'Category-delete']);
+        // Permission for Dispatch
+        Permission::firstOrCreate(['name' => 'Dispatch-index']);
+        Permission::firstOrCreate(['name' => 'Dispatch-create']);
+        Permission::firstOrCreate(['name' => 'Dispatch-edit']);
+        Permission::firstOrCreate(['name' => 'Dispatch-delete']);
 
-        // Permission for Sub Category
-        Permission::firstOrCreate(['name' => 'Sub-Category-index']);
-        Permission::firstOrCreate(['name' => 'Sub-Category-view']);
-        Permission::firstOrCreate(['name' => 'Sub-Category-create']);
-        Permission::firstOrCreate(['name' => 'Sub-Category-edit']);
-        Permission::firstOrCreate(['name' => 'Sub-Category-delete']);
+        // Permission for Buyers & Suppliers
+        Permission::firstOrCreate(['name' => 'Buyers & Suppliers-index']);
+        Permission::firstOrCreate(['name' => 'Buyers & Suppliers-create']);
+        Permission::firstOrCreate(['name' => 'Buyers & Suppliers-edit']);
+        Permission::firstOrCreate(['name' => 'Buyers & Suppliers-delete']);
 
 
-        // Permission for Purchase
-        Permission::firstOrCreate(['name' => 'Purchase-index']);
-        Permission::firstOrCreate(['name' => 'Purchase-view']);
-        Permission::firstOrCreate(['name' => 'Purchase-create']);
-        Permission::firstOrCreate(['name' => 'Purchase-edit']);
-        Permission::firstOrCreate(['name' => 'Purchase-close']);
-        Permission::firstOrCreate(['name' => 'Purchase-delete']);
-
-
-        // Permission for Inward
-        Permission::firstOrCreate(['name' => 'Inward-index']);
-        Permission::firstOrCreate(['name' => 'Inward-Credit-Note']);
-        Permission::firstOrCreate(['name' => 'Inward-view']);
-        Permission::firstOrCreate(['name' => 'Inward-create']);
-        Permission::firstOrCreate(['name' => 'Inward-edit']);
-        Permission::firstOrCreate(['name' => 'Inward-approve']);
-        Permission::firstOrCreate(['name' => 'Inward-delete']);
-
-
-        // Permission for Stock
-        Permission::firstOrCreate(['name' => 'Stock-index']);
-        Permission::firstOrCreate(['name' => 'Stock-create']);
-
-
-
-        // Permission for Outward
-        Permission::firstOrCreate(['name' => 'Outward-index']);
-        Permission::firstOrCreate(['name' => 'Outward-view']);
-        Permission::firstOrCreate(['name' => 'Outward-create']);
-        Permission::firstOrCreate(['name' => 'Outward-edit']);
-        Permission::firstOrCreate(['name' => 'Outward-approve']);
-        Permission::firstOrCreate(['name' => 'Outward-delete']);
-
-
-
-
-        // Permission for Stock Adjustment
-        Permission::firstOrCreate(['name' => 'Stock-Adjustment-index']);
-        Permission::firstOrCreate(['name' => 'Stock-Adjustment-delete']);
-        Permission::firstOrCreate(['name' => 'Stock-Adjustment-create']);
-
-
-
-        // Permission for sales
+        // Permission for Sales
         Permission::firstOrCreate(['name' => 'Sales-index']);
-        Permission::firstOrCreate(['name' => 'Sales-view']);
         Permission::firstOrCreate(['name' => 'Sales-create']);
-        Permission::firstOrCreate(['name' => 'Sales-close']);
         Permission::firstOrCreate(['name' => 'Sales-edit']);
         Permission::firstOrCreate(['name' => 'Sales-delete']);
 
-        // Permission for Reports
-        Permission::firstOrCreate(['name' => 'PO-Report']);
-        Permission::firstOrCreate(['name' => 'SO-Report']);
-        Permission::firstOrCreate(['name' => 'Quotation-Report']);
-        Permission::firstOrCreate(['name' => 'Inward-Report']);
-        Permission::firstOrCreate(['name' => 'Outward-Report']);
-        Permission::firstOrCreate(['name' => 'Stock-Report']);
-        Permission::firstOrCreate(['name' => 'Top-Selling-Report']);
-        Permission::firstOrCreate(['name' => 'Stock-Transaction-Report']);
-        Permission::firstOrCreate(['name' => 'Ageing-Report']);
 
-        //Price permission 
-        Permission::firstOrCreate(['name' => 'price']);
+        // Permission for Sales
+        Permission::firstOrCreate(['name' => 'Purchase-index']);
+        Permission::firstOrCreate(['name' => 'Purchase-create']);
+        Permission::firstOrCreate(['name' => 'Purchase-edit']);
+        Permission::firstOrCreate(['name' => 'Purchase-delete']);
 
-        //Stock Transaction permission 
-        Permission::firstOrCreate(['name' => 'stock-transaction']);
 
 
         $admin = Role::create(['name' => 'Admin']);
-        $employee = Role::create(['name' => 'Employee']);
+        $accountant = Role::create(['name' => 'Accountant']);
+        $dispatch = Role::create(['name' => 'Dispatch']);
+        $salesperson = Role::create(['name' => 'Sales Person']);
 
         $admin->givePermissionTo([
 
-            'Dashboard-set-base-pirce',
-            'Dashboard-set-notes',
-
+            'Dashboard',
             'Role-index',
             'Role-create',
             'Role-edit',
@@ -165,125 +113,133 @@ class PermissionSeeder extends Seeder
             'User-edit',
             'User-delete',
 
+            'Base Item-index',
+            'Base Item-create',
+            'Base Item-edit',
+            'Base Item-delete',
 
+            'Conversion-index',
+            'Conversion-create',
+            'Conversion-edit',
+            'Conversion-delete',
 
-            'Company-index',
-            'Company-create',
-            'Company-edit',
-            'Company-delete',
+            'Conversion Rate-index',
+            'Conversion Rate-create',
+            'Conversion Rate-edit',
+            'Conversion Rate-delete',
 
-            'Warehouse-index',
-            'Warehouse-create',
-            'Warehouse-edit',
-            'Warehouse-delete',
+            'Stocks-index',
+            'Stocks-create',
+            'Stocks-edit',
+            'Stocks-delete',
 
             'Setting-company',
-            'Setting-email',
 
+            'Additional-Reports',
 
-            'GST-index',
-            'GST-create',
-            'GST-edit',
-            'GST-delete',
+            'Reports',
 
-            'Quotation-index',
-            'Quotation-view',
-            'Quotation-create',
-            'Quotation-edit',
-            'Quotation-delete',
-            'Quotation-email',
-            'Quotation-download',
+            'Dispatch-index',
+            'Dispatch-create',
+            'Dispatch-edit',
+            'Dispatch-delete',
 
-            'Sub-Category-index',
-            'Sub-Category-view',
-            'Sub-Category-create',
-            'Sub-Category-edit',
-            'Sub-Category-delete',
-
-            'Category-index',
-            'Category-view',
-            'Category-create',
-            'Category-edit',
-            'Category-delete',
-
-            'Purchase-index',
-            'Purchase-view',
-            'Purchase-create',
-            'Purchase-edit',
-            'Purchase-close',
-            'Purchase-delete',
-
-
+            'Buyers & Suppliers-index',
+            'Buyers & Suppliers-create',
+            'Buyers & Suppliers-edit',
+            'Buyers & Suppliers-delete',
 
             'Sales-index',
-            'Sales-view',
             'Sales-create',
             'Sales-edit',
-            'Sales-close',
             'Sales-delete',
-
-
-            'Inward-index',
-            'Inward-view',
-            'Inward-create',
-            'Inward-edit',
-            'Inward-approve',
-            'Inward-delete',
-            'Inward-Credit-Note',
-
-
-            'Outward-index',
-            'Outward-view',
-            'Outward-create',
-            'Outward-edit',
-            'Outward-approve',
-            'Outward-delete',
-
-
-            'Stock-index',
-            'Stock-create',
-
-
-
-            'PO-Report',
-            'SO-Report',
-            'Quotation-Report',
-            'Inward-Report',
-            'Outward-Report',
-            'Stock-Report',
-            'Top-Selling-Report',
-            'Stock-Transaction-Report',
-            // 'Quotation-Execution-Report',
-            'Ageing-Report',
-
-            'Stock-Adjustment-index',
-            'Stock-Adjustment-delete',
-            'Stock-Adjustment-create',
-
-            'price',
-
-            'stock-transaction',
+            
+            'Purchase-index',
+            'Purchase-create',
+            'Purchase-edit',
+            'Purchase-delete'
 
         ]);
 
-        $employee->givePermissionTo([
 
-            'Purchase-index',
-            'Purchase-view',
-            'Purchase-create',
-            'Purchase-edit',
-            'Purchase-close',
-            'Purchase-delete',
+        $accountant->givePermissionTo([
 
+           
+            'Base Item-index',
+            'Base Item-create',
+            'Base Item-edit',
+            'Base Item-delete',
 
+            'Conversion-index',
+            'Conversion-create',
+            'Conversion-edit',
+            'Conversion-delete',
+
+            'Conversion Rate-index',
+            'Conversion Rate-create',
+            'Conversion Rate-edit',
+            'Conversion Rate-delete',
+
+            'Stocks-index',
+            'Stocks-create',
+            'Stocks-edit',
+            'Stocks-delete',
+
+    
+            'Additional-Reports',
+            'Reports',
+
+            'Dispatch-index',
+            'Dispatch-create',
+            'Dispatch-edit',
+            'Dispatch-delete',
+
+            'Buyers & Suppliers-index',
+            'Buyers & Suppliers-create',
+            'Buyers & Suppliers-edit',
+            'Buyers & Suppliers-delete',
 
             'Sales-index',
-            'Sales-view',
             'Sales-create',
             'Sales-edit',
-            'Sales-close',
             'Sales-delete',
-       
+
+            'Purchase-index',
+            'Purchase-create',
+            'Purchase-edit',
+            'Purchase-delete'
+
+        ]);
+
+        $dispatch->givePermissionTo([
+
+        
+            'Base Item-index',
+            'Conversion-index',
+            'Conversion Rate-index',
+            'Stocks-index',
+
+          
+            'Dispatch-index',
+            'Buyers & Suppliers-index',
+            'Sales-index',
+            'Purchase-index',
+
+
+        ]);
+
+
+        $salesperson->givePermissionTo([
+
+          
+        
+            'Stocks-index',
+      
+            'Dispatch-index',
+            'Buyers & Suppliers-index',
+            'Sales-index',
+            'Purchase-index',
+
         ]);
     }
 }

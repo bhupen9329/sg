@@ -113,36 +113,36 @@
             }
         }
     </style>
-      <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleSidebarBtn = document.getElementById('toggle_sidebar');
-            
+
             // Check if the current URL contains the word "create"
-            if (window.location.href.match(/create/)) { 
+            if (window.location.href.match(/create/)) {
                 // Programmatically click the sidebar toggle button
-                toggleSidebarBtn.click();  
+                toggleSidebarBtn.click();
             }
         });
     </script>
-        <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleSidebarBtn = document.getElementById('toggle_sidebar');
-            
+
             // Check if the current URL contains the word "create"
-            if (window.location.href.match(/edit/)) { 
+            if (window.location.href.match(/edit/)) {
                 // Programmatically click the sidebar toggle button
-                toggleSidebarBtn.click();  
+                toggleSidebarBtn.click();
             }
         });
     </script>
-       <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleSidebarBtn = document.getElementById('toggle_sidebar');
-            
+
             // Check if the current URL contains the word "create"
-            if (window.location.href.match(/report/)) { 
+            if (window.location.href.match(/report/)) {
                 // Programmatically click the sidebar toggle button
-                toggleSidebarBtn.click();  
+                toggleSidebarBtn.click();
             }
         });
     </script>
@@ -216,22 +216,16 @@
 
         <ul class="sidebar-nav" id="sidebar-nav">
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ url('dashboard') }}">
-                    <i class="bi bi-grid"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-
-
-            {{-- @can('Quotation-index')
+            @can('Dashboard')
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('quotation.index') }}">
-                        <i class="fa-solid fa-quote-left"></i>
-                        <span>Quotation</span>
+                    <a class="nav-link collapsed" href="{{ url('dashboard') }}">
+                        <i class="bi bi-grid"></i>
+                        <span>Dashboard</span>
                     </a>
                 </li>
-            @endcan --}}
+            @endcan
+
+
 
 
             @if ((auth()->check() && auth()->user()->can('Sales-index')) || auth()->user()->can('Purchase-index'))
@@ -260,67 +254,9 @@
             @endif
 
 
-            {{-- @can('Inward-index')
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('inward.index') }}">
-                        <i class="fa-solid fa-down-left-and-up-right-to-center"></i>
-                        <span>Inward</span>
-                    </a>
-                </li>
-            @endcan
-
-            @can('Outward-index')
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('outward.index') }}">
-                        <i class="fa-solid fa-angles-right"></i>
-                        <span>Outward</span>
-                    </a>
-                </li>
-            @endcan
 
 
-
-            @can('Stock-index')
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('stock.index') }}">
-                        <i class="fa-solid fa-arrow-trend-up"></i>
-                        <span>Virtual Store</span>
-                    </a>
-                </li>
-            @endcan --}}
-            {{-- @can('Stock-Adjustment-index')
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('adjustment.index') }}">
-                        <i class="fa-solid fa-plus-minus"></i>
-                        <span>Stocks Adjustment</span>
-                    </a>
-                </li>
-            @endcan --}}
-            
-            {{-- @can('stock-transaction')
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('stock_transaction.index') }}">
-                        <i class="fa-solid fa-exchange-alt"></i>
-
-                        <span>Stocks Transaction</span>
-                    </a>
-                </li>
-
-               @endcan --}}
-
-
-    
-
-            {{-- @can('Warehouse-index')
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('warehouse.index') }}">
-                        <i class="fa-solid fa-warehouse"></i>
-                        <span>Warehouse</span>
-                    </a>
-                </li>
-            @endcan --}}
-
-            @can('Company-index')
+            @can('Buyers & Suppliers-index')
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('buyers.index') }}">
                         <i class="fa-solid fa-indian-rupee-sign"></i>
@@ -329,120 +265,60 @@
                 </li>
             @endcan
 
-            {{-- <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('manual.matching')}}">
-                    <i class="fa-solid fas fa-pencil-alt"></i>
-                    <span>Manual Matching</span>
-                </a>
-            </li> --}}
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('dispatch.index') }}">
-                    <i class="fa-solid fas fa fa-paper-plane"></i>
-                    <span>Dispatch</span>
-                </a>
-            </li>
-
-            {{-- <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('inventory_valuation.index')}}">
-                    <i class="fa-solid fa-indian-rupee-sign"></i>
-                    <span>Inventory Valuation</span>
-                </a>
-            </li> --}}
 
 
-            @if (
-                (auth()->check() && auth()->user()->can('PO-Report')) ||
-                    auth()->user()->can('SO-Report') ||
-                    auth()->user()->can('Quotation-Report') ||
-                    auth()->user()->can('Inward-Report') ||
-                    auth()->user()->can('Outward-Report') ||
-                    auth()->user()->can('Stock-Report') ||
-                    auth()->user()->can('Stock-Transaction-Report') ||
-                    auth()->user()->can('Ageing-Report') ||
-                    auth()->user()->can('Top-Selling-Report'))
+            @can('Dispatch-index')
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-target="#report-nav" data-bs-toggle="collapse"
-                        href="#">
+                    <a class="nav-link collapsed" href="{{ route('dispatch.index') }}">
+                        <i class="fa-solid fas fa fa-paper-plane"></i>
+                        <span>Dispatch</span>
+                    </a>
+                </li>
+            @endcan
+
+
+
+            @can('Reports')
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#report-nav" data-bs-toggle="collapse" href="#">
                         <i class="bi bi-file-text"></i>
 
                         </i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <ul id="report-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                        {{-- <li>
-                            @can('PO-Report')
-                                <a href="{{ route('po_report') }}">
-                                    <i class="bi bi-circle"></i><span>Purchase Order Report</span>
-                                </a>
-                            @endcan
-                        </li>
+
                         <li>
-                            @can('SO-Report')
-                                <a href="{{ route('so_report') }}">
-                                    <i class="bi bi-circle"></i><span>Sales Order Report </span>
-                                </a>
-                            @endcan
-                        </li>
-                        <li>
-                            @can('Inward-Report')
-                                <a href="{{ route('inward_report') }}">
-                                    <i class="bi bi-circle"></i><span>Inward Report</span>
-                                </a>
-                            @endcan
+
+                            <a href="{{ route('position.report') }}">
+                                <i class="bi bi-circle"></i><span>Position Report </span>
+                            </a>
+
                         </li>
 
                         <li>
-                            @can('Outward-Report')
-                                <a href="{{ route('outward_report') }}">
-                                    <i class="bi bi-circle"></i><span> Outward Report</span>
-                                </a>
-                            @endcan
-                        </li>
 
-
-                        <li>
-                            @can('Stock-Report')
-                                <a href="{{ route('stock_report') }}">
-                                    <i class="bi bi-circle"></i><span>Virtual Store Report</span>
-                                </a>
-                            @endcan
-                        </li> --}}
- 
-
-                        
-
-                        <li>
-                        
-                                <a href="{{ route('position.report') }}">
-                                    <i class="bi bi-circle"></i><span>Position Report </span>
-                                </a>
-                          
-                        </li>
-
-                        <li>
-                        
                             <a href="{{ route('po_report') }}">
                                 <i class="bi bi-circle"></i><span>Purchase Report </span>
                             </a>
-                      
-                    </li>
- 
+
+                        </li>
+
 
                         <li>
-        
-                                <a href="{{ route('so_report') }}">
-                                    <i class="bi bi-circle"></i><span>Sales Report</span>
-                                </a>
-                    
+
+                            <a href="{{ route('so_report') }}">
+                                <i class="bi bi-circle"></i><span>Sales Report</span>
+                            </a>
+
                         </li>
                         <li>
-        
-                                <a href="{{ route('dispatch_report') }}">
-                                    <i class="bi bi-circle"></i><span>Dispatch Report</span>
-                                </a>
-                    
+
+                            <a href="{{ route('dispatch_report') }}">
+                                <i class="bi bi-circle"></i><span>Dispatch Report</span>
+                            </a>
+
                         </li>
- 
+
                         {{-- <li>
                             @can('Quotation-Execution-Report')
                                 <a href="{{ route('quotation_execution_report') }}">
@@ -453,112 +329,94 @@
 
                     </ul>
                 </li><!-- End Icons Nav -->
-            @endif
+            @endcan
 
 
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#report-aggregate-nav" data-bs-toggle="collapse"
-                    href="#">
-                    <i class="bi bi-file-text"></i>
+            @can('Additional-Reports')
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#report-aggregate-nav" data-bs-toggle="collapse"
+                        href="#">
+                        <i class="bi bi-file-text"></i>
 
-                    </i><span>Additional Reports</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="report-aggregate-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                        </i><span>Additional Reports</span><i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="report-aggregate-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
 
-                    <li>
-                    
+                        <li>
                             <a href="{{ route('company_wise.report') }}">
                                 <i class="bi bi-circle"></i><span>Company Wise Report </span>
                             </a>
-                      
-                    </li>
+                        </li>
 
-                    <li>
-                    
-                        <a href="{{ route('due_so_report') }}">
-                            <i class="bi bi-circle"></i><span>Due SO Report </span>
-                        </a>
-                  
-                </li>
+                        <li>
+                            <a href="{{ route('due_so_report') }}">
+                                <i class="bi bi-circle"></i><span>Due SO Report </span>
+                            </a>
+                        </li>
 
-                <li>
-                    
-                    <a href="{{ route('due_po_report') }}">
-                        <i class="bi bi-circle"></i><span>Due PO Report </span>
+                        <li>
+                            <a href="{{ route('due_po_report') }}">
+                                <i class="bi bi-circle"></i><span>Due PO Report </span>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </li><!-- End Icons Nav -->
+            @endcan
+
+            @can('Stocks-index')
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="{{ route('inventory.report') }}">
+                        <i class="fa-solid fa-box"></i>
+
+                        <span>Stocks</span>
                     </a>
+                </li>
+            @endcan
 
 
-
-              
-            </li>
-
-                  
-
-                    {{-- <li>
-                        @can('Quotation-Execution-Report')
-                            <a href="{{ route('quotation_execution_report') }}">
-                                <i class="bi bi-circle"></i><span> Quotation Execution Report</span>
-                            </a>
+            @if (
+                (auth()->check() && auth()->user()->can('Base Item-index')) ||
+                    auth()->user()->can('Conversion-index') ||
+                    auth()->user()->can('Conversion Rate-index'))
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#category-nav" data-bs-toggle="collapse"
+                        href="#">
+                        <i class="bi bi-archive-fill"></i>
+                        </i><span>Item Master</span><i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="category-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                        @can('Base Item-index')
+                            <li>
+                                <a href="{{ route('category.index') }}">
+                                    <i class="bi bi-circle"></i><span>Base Item</span>
+                                </a>
+                            </li>
                         @endcan
-                    </li> --}}
 
-                </ul>
-            </li><!-- End Icons Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('inventory.report') }}">
-                    <i class="fa-solid fa-box"></i>
-
-                    <span>Stocks</span>
-                </a>
-            </li>
-
-            @if ((auth()->check() && auth()->user()->can('Category-index')) || auth()->user()->can('Sub-Category-index'))
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#category-nav" data-bs-toggle="collapse"
-                    href="#">
-                    <i class="bi bi-archive-fill"></i>
-                    </i><span>Item Master</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="category-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        @can('Category-index')
-                            <a href="{{ route('category.index') }}">
-                                <i class="bi bi-circle"></i><span>Base Item</span>
-                            </a>
+                        @can('Conversion-index')
+                            <li>
+                                <a href="{{ route('subcategory.index') }}">
+                                    <i class="bi bi-circle"></i><span>Conversion Item</span>
+                                </a>
+                            </li>
                         @endcan
-                    </li>
 
 
-                    <li>
-                        @can('Sub-Category-index')
-                            <a href="{{ route('subcategory.index') }}">
-                                <i class="bi bi-circle"></i><span>Conversion Item</span>
-                            </a>
+                        @can('Conversion Rate-index')
+                            <li>
+                                <a href="{{ route('rate.index') }}">
+                                    <i class="bi bi-circle"></i><span>Conversion Rate</span>
+                                </a>
+                            </li>
                         @endcan
-                    </li>
 
-                    <li>
-                        @can('Sub-Category-index')
-                            <a href="{{ route('rate.index')}}">
-                                <i class="bi bi-circle"></i><span>Conversion Rate</span>
-                            </a>
-                        @endcan
-                    </li>
-
-                    {{-- <li>
-               
-                            <a href="{{ route('freight_rate.index')}}">
-                                <i class="bi bi-circle"></i><span>Freight Rate</span>
-                            </a>
-                           
-
-                      
-                    </li> --}}
-                </ul>
-            </li><!-- End Icons Nav -->
-        @endif
+                    </ul>
+                </li><!-- End Icons Nav -->
+            @endif
 
 
 
@@ -589,10 +447,7 @@
             @endif
 
 
-            @if (
-                (auth()->check() && auth()->user()->can('Setting-company')) ||
-                    auth()->user()->can('Setting-gst') ||
-                    auth()->user()->can('Setting-email'))
+            @if (auth()->check() && auth()->user()->can('Setting-company'))
                 <li class="nav-item">
                     <a class="nav-link collapsed" data-bs-target="#setting-nav" data-bs-toggle="collapse"
                         href="#">
