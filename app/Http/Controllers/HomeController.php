@@ -30,7 +30,7 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:Dashboard', ['only' => ['dashboard_index']]);
+        // $this->middleware('permission:Dashboard', ['only' => ['dashboard_index']]);
 
     }
 
