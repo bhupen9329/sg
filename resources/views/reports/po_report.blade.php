@@ -271,7 +271,8 @@
                             <th scope="col">#</th>
                             <th scope="col">Dispathed Date</th>
                             <th scope="col">Dispatch Number</th>
-                            <th scope="col">Base Item</th>
+                            <th scope="col">Base Item</th>.
+                            <th scope="col">Conv Item</th>
                             <th scope="col">From</th>
                             <th scope="col">PO unit price</th>
                             <th scope="col">To</th>
@@ -525,6 +526,7 @@ $.ajax({
                             <td>${formattedDate ?? 'N/A'}</td>
                             <td>${rowData.dispatch_number ?? 'N/A'}</td>
                              <td>${rowData.category_name ?? 'N/A'}</td>
+                             <td>${rowData.sub_category_name ?? 'N/A'}</td>
                             <td>${rowData.po_company ?? 'N/A'}</td>
                             <td>${rowData.po_unit_price ?? 'N/A'}</td>
                             <td>${rowData.so_company ?? 'N/A'}</td>

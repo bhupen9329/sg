@@ -19,11 +19,10 @@ class DispatchController extends Controller
 
     function __construct()
     {
-         $this->middleware('permission:Dispatch-index', ['only' => ['index']]);
-         $this->middleware('permission:Dispatch-create', ['only' => ['create','storeDispatch']]);
-         $this->middleware('permission:Dispatch-edit', ['only' => ['updateDispatch','editDispatch']]);
-         $this->middleware('permission:Dispatch-delete', ['only' => ['destroyDispatch']]);
-
+        $this->middleware('permission:Dispatch-index', ['only' => ['index']]);
+        $this->middleware('permission:Dispatch-create', ['only' => ['create', 'storeDispatch']]);
+        $this->middleware('permission:Dispatch-edit', ['only' => ['updateDispatch', 'editDispatch']]);
+        $this->middleware('permission:Dispatch-delete', ['only' => ['destroyDispatch']]);
     }
 
 
@@ -167,9 +166,9 @@ class DispatchController extends Controller
     public function storeDispatch(Request $request)
     {
 
-        $month = date('m'); 
-        $year = date('Y');  
-       
+        $month = date('m');
+        $year = date('Y');
+
         if ($month >= 4) {
             $financial_year = $year;
         } else {
@@ -193,6 +192,8 @@ class DispatchController extends Controller
         $rowIdentifiers = [];
         $soDispatchQuantities = [];
         $poDispatchQuantities = [];
+
+        // dd( $request);
 
         foreach ($request->quantity as $index => $quantity) {
             $rowKey = $request->po_item_number[$index] . '-' .
@@ -221,19 +222,50 @@ class DispatchController extends Controller
             $soDispatchQuantities[$request->so_item_no[$index]] += $quantity;
             $poDispatchQuantities[$request->po_item_number[$index]] += $quantity;
 
+
+            $dispatchedSOQty = round(floatval($soDispatchQuantities[$request->so_item_no[$index]]), 3);
+            $soRestQty = round(floatval($so_item->so_dispatch_rest_qty), 3);
+
+            $dispatchedPOQty = round(floatval($poDispatchQuantities[$request->po_item_number[$index]]), 3);
+            $poRestQty = round(floatval($po_item->po_dispatch_rest_qty), 3);
+
+            $dispatchedQty = round(floatval($quantity), 3);
+
             // Check if cumulative dispatch exceeds remaining quantity
-            if ($soDispatchQuantities[$request->so_item_no[$index]] > $so_item->so_dispatch_rest_qty) {
-                return response()->json(['message' => 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . $so_item->so_dispatch_rest_qty . ').'], 400);
-            }
+            // if ($soDispatchQuantities[$request->so_item_no[$index]] > $so_item->so_dispatch_rest_qty) {
+            //     return response()->json(['message' => 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . $so_item->so_dispatch_rest_qty . ').'], 400);
+            // }
 
-            if ($poDispatchQuantities[$request->po_item_number[$index]] > $po_item->po_dispatch_rest_qty) {
-                return response()->json(['message' => 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . $po_item->po_dispatch_rest_qty . ').'], 400);
-            }
+            // if ($poDispatchQuantities[$request->po_item_number[$index]] > $po_item->po_dispatch_rest_qty) {
+            //     return response()->json(['message' => 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . $po_item->po_dispatch_rest_qty . ').'], 400);
+            // }
 
-            if ($quantity > $so_item->so_dispatch_rest_qty || $quantity > $po_item->po_dispatch_rest_qty) {
-                return response()->json(['message' => 'Dispatch Rest Quantity Less than Dispatched Quantity.'], 400);
+            // if ($quantity > $so_item->so_dispatch_rest_qty || $quantity > $po_item->po_dispatch_rest_qty) {
+            //     return response()->json(['message' => 'Dispatch Rest Quantity Less than Dispatched Quantity.'], 400);
+            // }
+
+            if ($dispatchedSOQty > $soRestQty) {
+                return response()->json([
+                    'message' => 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . number_format($soRestQty, 3) . ').'
+                ], 400);
+            }
+            
+            // Validate PO dispatch quantity
+            if ($dispatchedPOQty > $poRestQty) {
+                return response()->json([
+                    'message' => 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . number_format($poRestQty, 3) . ').'
+                ], 400);
+            }
+            
+            // Validate combined dispatch quantity
+            if ($dispatchedQty > $soRestQty || $dispatchedQty > $poRestQty) {
+                return response()->json([
+                    'message' => 'Dispatch Rest Quantity Less than Dispatched Quantity.'
+                ], 400);
             }
         }
+
+
 
 
         //   .............................................................................................................................................   
@@ -280,7 +312,7 @@ class DispatchController extends Controller
 
             $actual_so_dispatch_qty = number_format($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity, 3);
             $actual_po_dispatch_qty = number_format($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity, 3);
-            
+
 
             $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
             $po_item->update(['po_dispatch_rest_qty' => $actual_po_dispatch_qty]);
@@ -295,7 +327,6 @@ class DispatchController extends Controller
             } else {
                 $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
             }
-      
         }
 
         return response()->json(['success' => true, 'redirect' => route('dispatch.index')]);
@@ -344,7 +375,7 @@ class DispatchController extends Controller
         $dispatch_po_price = ($disaptch_data->dispatch_unit_price);
         $dispatch_so_price = ($disaptch_data->dispatch_so_unit_price);
 
-        
+
         $dispatch_po_price_gross = ($disaptch_data->dispatch_unit_price + $disaptch_data->dispatch_other + $disaptch_data->conv_rate);
         $dispatch_so_price_gross = ($disaptch_data->dispatch_so_unit_price + $disaptch_data->dispatch_other + $disaptch_data->conv_rate);
 
@@ -404,10 +435,10 @@ class DispatchController extends Controller
 
 
             $dispatch->dispatch_so_unit_price = $request->dispatch_so_unit_price_actual[$index];
-                // dd($request->dispatch_so_other_actual[$index]);
-                $dispatch->dispatch_other = $request->dispatch_fregiht_insuance[$index];
-                $dispatch->dispatch_so_other = $request->dispatch_fregiht_insuance[$index];
-          
+            // dd($request->dispatch_so_other_actual[$index]);
+            $dispatch->dispatch_other = $request->dispatch_fregiht_insuance[$index];
+            $dispatch->dispatch_so_other = $request->dispatch_fregiht_insuance[$index];
+
 
             $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
             $dispatch->receiver_person = $request->receiver_person;

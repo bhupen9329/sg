@@ -183,6 +183,24 @@
                                         <tbody>
                                             <!-- Rows will be dynamically added here -->
                                         </tbody>
+
+                                        <tfoot>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th>Total</th>
+                                            <th></th>
+                                            <th>
+                                            <td style="text-align:left  ; font-weight: bold;" id="totalQty">0</td>
+                                            </th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tfoot>
                                     </table>
                                 </div>
 
@@ -286,7 +304,7 @@
                                         <th>Quantity (Q)</th>
                                         <th>Rest Quantity (Q)</th>
                                         <th>PO Unit Price</th>
-                                        <th>PO Price</th>
+                                        <th>Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -331,7 +349,7 @@
                                         <th>Quantity (Q)</th>
                                         <th>Rest Quantity (Q)</th>
                                         <th>SO Unit Price</th>
-                                        <th>SO Price</th>
+                                        <th>Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -459,79 +477,68 @@
         }
 
         function calculateTotal(element) {
-            const row = element.closest('tr');
-            const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
-            const unitPriceActual = parseFloat(row.querySelector('input[name="dispatch_unit_price_actual[]"]').value) || 0;
+    const row = element.closest('tr');
+    const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
+    const unitPriceActual = parseFloat(row.querySelector('input[name="dispatch_unit_price_actual[]"]').value) || 0;
+    const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
+    const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+    const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
+    const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
+        .value) || 0;
+    const freight_insurance = parseFloat(row.querySelector('input[name="dispatch_fregiht_insuance[]"]').value) || 0;
 
-            const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
+    // Calculate the total values for PO and SO based on the quantity
+    let totalPOUnitPrice = unitPriceActual + convRate + freight_insurance;
+    let totalSOUnitPrice = sounitPriceActual + convRate + freight_insurance;
 
+    row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
+    row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
 
+    let totalAmount = 0;
+    let totalSoAmount = 0;
 
+    if (quantity) {
+        totalAmount = (totalPOUnitPrice * quantity);
+        totalSoAmount = (totalSOUnitPrice * quantity);
+        row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+        row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
+    } else {
+        totalAmount = totalPOUnitPrice;
+        totalSoAmount = totalSOUnitPrice;
+        row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+        row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
+    }
 
-            const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+    // Calculate the total quantity for all rows
+    let totalQty = 0;
+    const rows = document.querySelectorAll('#myTable tbody tr'); // Change the selector if needed
+    rows.forEach(function(row) {
+        const qty = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+        totalQty += qty;
+    });
+   
+    document.getElementById('totalQty').textContent = totalQty.toFixed(3);
+}
 
-            const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
+        function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
+            '', Price = '', PoId = '') {
+            var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+            const formattedDate = formatDate(Date);
 
-            const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
-                .value) || 0;
+            // Assuming `editRoute` is passed to JavaScript as a global variable from Blade
+            const editRoute = "{{ route('purchase.edit', ':id') }}";
+            const editUrl = editRoute.replace(':id', PoId);
 
-
-            // const insuranceStatus = row.querySelector('select[name="insurance_status[]"]').value;
-
-            const freight_insurance = parseFloat(row.querySelector('input[name="dispatch_fregiht_insuance[]"]').value) || 0;
-
-
-
-            // Calculate the total values for PO and SO based on the quantity
-
-
-            let totalPOUnitPrice = unitPriceActual + convRate + freight_insurance;
-            let totalSOUnitPrice = sounitPriceActual + convRate + freight_insurance;
-
-            row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
-            row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
-
-            if (quantity) {
-                totalAmount = ((totalPOUnitPrice) * quantity);
-                totalSoAmount = ((totalSOUnitPrice) * quantity);
-                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
-                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
-            } else {
-
-                let totalAmount = 0;
-                let totalSoAmount = 0;
-
-                totalAmount = totalPOUnitPrice;
-                totalSoAmount = totalSOUnitPrice;
-
-
-                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
-                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
-            }
-
-            // Update the total fields without affecting unit price
-
-        }
-
-
-        function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice = '', Price = '', PoId = '') {
-    var table = document.getElementById("poTable").getElementsByTagName('tbody')[0];
-    var newRow = table.insertRow(table.rows.length);
-    const formattedDate = formatDate(Date);
-
-    // Assuming `editRoute` is passed to JavaScript as a global variable from Blade
-    const editRoute = "{{ route('purchase.edit', ':id') }}";
-    const editUrl = editRoute.replace(':id', PoId);
-
-    // Check if Quantity equals RestQty
-    const editOption = (Quantity === RestQty) 
-        ? `<a href="${editUrl}" class="dropdown-item"
+            // Check if Quantity equals RestQty
+            const editOption = (Quantity === RestQty) ?
+                `<a href="${editUrl}" class="dropdown-item"
                style="text-decoration: underline; color: blue; text-align: center;">
                <i class="fa-solid fa-pen-to-square"></i>
-           </a>`
-        : '';
+           </a>` :
+                '';
 
-    newRow.innerHTML = `
+            newRow.innerHTML = `
         <td>${formattedDate}</td>
         <td>${poNumber}</td>
         <td>${ItemName}</td>
@@ -545,8 +552,8 @@
         <td>${Price}</td>
         <td>${editOption}</td>
     `;
-    lastItemId++;
-}
+            lastItemId++;
+        }
 
 
 
@@ -564,25 +571,26 @@
             return `${day}-${month}-${year}`;
         }
 
-        function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice = '', Price = '', SoId = '') {
+        function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
+            '', Price = '', SoId = '') {
             console.log(SoId);
-    var table = document.getElementById("soTable").getElementsByTagName('tbody')[0];
-    var newRow = table.insertRow(table.rows.length);
-    const formattedDate = formatDate(Date);
+            var table = document.getElementById("soTable").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+            const formattedDate = formatDate(Date);
 
-    // Assuming `editRoute` is passed to JavaScript as a global variable from Blade
-    const editRoute = "{{ route('sales.edit', ':id') }}"; // Update route name if needed
-    const editUrl = editRoute.replace(':id', SoId);
+            // Assuming `editRoute` is passed to JavaScript as a global variable from Blade
+            const editRoute = "{{ route('sales.edit', ':id') }}"; // Update route name if needed
+            const editUrl = editRoute.replace(':id', SoId);
 
-    // Check if Quantity equals RestQty
-    const editOption = (Quantity === RestQty) 
-        ? `<a href="${editUrl}" class="dropdown-item"
+            // Check if Quantity equals RestQty
+            const editOption = (Quantity === RestQty) ?
+                `<a href="${editUrl}" class="dropdown-item"
                style="text-decoration: underline; color: blue; text-align: center;">
                <i class="fa-solid fa-pen-to-square"></i>
-           </a>`
-        : '';
+           </a>` :
+                '';
 
-    newRow.innerHTML = `
+            newRow.innerHTML = `
         <td>${formattedDate}</td>
         <td>${soNumber}</td>
         <td>${ItemName}</td>
@@ -596,8 +604,8 @@
         <td>${Price}</td>
         <td>${editOption}</td>
     `;
-    lastItemId++;
-}
+            lastItemId++;
+        }
 
 
 
@@ -883,7 +891,7 @@
                         <td>${po.qty}</td>
                         <td>${po.po_dispatch_rest_qty}</td>
                         <td>${po.unit_price}</td>
-                        <td>${po.total_price}</td>
+                        <td>${po.remark ?? 'N/A'}</td>
                     </tr>`;
                         tableBody.append(row);
 
@@ -939,7 +947,7 @@
                             <td>${so.qty}</td>
                             <td>${so.so_dispatch_rest_qty  }</td>
                             <td>${so.unit_price}</td>
-                            <td>${so.total_price}</td>
+                             <td>${so.terms_condition ?? 'N/A'}</td>
                         </tr>`;
                             tableBody.append(row);
                         });

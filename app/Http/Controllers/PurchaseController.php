@@ -687,7 +687,7 @@ class PurchaseController extends Controller
             'po_items.qty as po_qty',
             'so_items.qty as so_qty',
             'dispatches.id as dispatch_id',
-            'dispatches.created_at as dispatch_date',
+            'dispatches.date as dispatch_date',
         )
         ->where('dispatches.po_item_id', $request->get_po_item_id)->get();
 
