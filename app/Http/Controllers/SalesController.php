@@ -799,7 +799,7 @@ class SalesController extends Controller
     }
 
 
-    public function get_dispatch_qty (Request $request)
+    public function get_dispatch_qty(Request $request)
     {
         $received_qty_records = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
         ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
@@ -830,7 +830,7 @@ class SalesController extends Controller
             'po_items.qty as po_qty',
             'so_items.qty as so_qty',
             'dispatches.id as dispatch_id',
-            'dispatches.created_at as dispatch_date',
+            'dispatches.date as dispatch_date',
         )
         ->where('dispatches.so_item_id', $request->get_so_item_id)->get();
 

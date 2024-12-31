@@ -150,15 +150,15 @@
                                                     floatval($data->dispatch_so_freight ?? 0) +
                                                     floatval($data->conv_rate ?? 0) +
                                                     floatval($data->dispatch_other ?? 0);
-
+                                    
                                                 $gross_po =
                                                     floatval($data->dispatch_unit_price ?? 0) +
                                                     floatval($data->dispatch_freight ?? 0) +
                                                     floatval($data->conv_rate ?? 0) +
                                                     floatval($data->dispatch_other ?? 0);
                                             @endphp
-
-                                            <tr>
+                                    
+                                            <tr data-dispatch-number="{{ $data->dispatch_number }}">
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ date('d-M-Y', strtotime($data->date)) }}</td>
                                                 <td>{{ $data->dispatch_number ?? 'N/A' }}</td>
@@ -175,14 +175,14 @@
                                                         {{ number_format($gross_po, 2) }}
                                                     </a>
                                                 </td>
-
+                                    
                                                 <td>{{ $data->category_name }}</td>
                                                 <td>{{ $data->sub_category_name }}</td>
-
+                                    
                                                 <td>{{ number_format($data->dispatched_quantity, 3) }}</td>
-
+                                    
                                                 <td>{{ $data->so_company }}</td>
-
+                                    
                                                 <td><a
                                                         href="{{ route('sales.edit', ['id' => $data->so_id]) }}">{{ $data->so_item_no }}</a>
                                                 </td>
@@ -194,28 +194,21 @@
                                                         {{ number_format($gross_so, 2) }}
                                                     </a>
                                                 </td>
-                                                {{-- <td>{{ $data->dispatch_so_unit_price }}</td> --}}
-                                                {{-- <td>{{ $data->dispatch_so_total }}</td> --}}
-
-
+                                    
                                                 <td>
                                                     <div class="filter">
                                                         <a class="icon" href="#" data-bs-toggle="dropdown"><i
                                                                 class="bi bi-three-dots"></i></a>
                                                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-
+                                    
                                                             @can('Dispatch-edit')
                                                                 <li>
-
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('dispatch.edit', $data->dispatch_id) }}"><i
                                                                             class="fa-solid fa-pencil"></i>Edit</a>
-
-
-
                                                                 </li>
                                                             @endcan
-
+                                    
                                                             @can('Dispatch-delete')
                                                                 <li>
                                                                     <form method="GET"
@@ -228,14 +221,14 @@
                                                                     </form>
                                                                 </li>
                                                             @endcan
-
+                                    
                                                         </ul>
                                                     </div>
                                                 </td>
-
                                             </tr>
                                         @endforeach
                                     </tbody>
+                                    
                                 </table>
                             </div>
 
@@ -322,22 +315,35 @@
 
 
     <script>
-        $(document).ready(function() {
-            $('#Category_table').DataTable({
-                dom: 'Bfrtip',
-                // Set the default page length
-                pageLength: 50,
-                // Configure the drop down options
-                lengthMenu: [
-                    [10, 20, 50, 100, 150, -1],
-                    ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
-                ],
-                // Add to buttons the pageLength option
-                buttons: [
-                    'pageLength', 'csv', 'print'
-                ]
+$(document).ready(function() {
+    var table = $('#Category_table').DataTable({
+        dom: 'Bfrtip',
+        pageLength: 50,
+        lengthMenu: [
+            [10, 20, 50, 100, 150, -1],
+            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+        ],
+        buttons: ['pageLength', 'csv', 'print'],
+        drawCallback: function(settings) {
+            var api = this.api();
+            var lastDispatchNumber = null;
+
+            api.rows({ page: 'current' }).every(function(rowIdx, tableLoop, rowLoop) {
+                var data = this.node();
+                var dispatchNumber = $(data).data('dispatch-number');
+
+                if (dispatchNumber !== lastDispatchNumber) {
+                    lastDispatchNumber = dispatchNumber;
+
+                    $(data).before(
+                        '<tr class="group"><td colspan="16" style="text-align: center; border-top: 2px solid #8B0000;"></td></tr>'
+                    );
+                }
             });
-        });
+        }
+    });
+});
+
     </script>
 
     <script>
