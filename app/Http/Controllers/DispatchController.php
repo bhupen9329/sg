@@ -166,28 +166,59 @@ class DispatchController extends Controller
     public function storeDispatch(Request $request)
     {
 
-        $month = date('m');
+        // $month = date('m');
+        // $year = date('Y');
+
+        // if ($month >= 4) {
+        //     $financial_year = $year;
+        // } else {
+        //     $financial_year = $year - 1;
+        // }
+        // $last_sail_number = Dispatch::whereYear('created_at', '=', $financial_year)
+        //     ->latest('id')
+        //     ->first();
+
+        // if ($last_sail_number) {
+        //     $max_serial_number = $last_sail_number->dispatch_number;
+        //     $last_serial_number = substr($max_serial_number, -4); // Get the last 4 digits
+        //     $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+        // } else {
+        //     $next_serial_number = '0001';
+        // }
+
+        // $doc_number = 'DIS' . $financial_year . $next_serial_number;
+
         $year = date('Y');
+        $month = date('m');
 
+        // Financial year calculation
         if ($month >= 4) {
-            $financial_year = $year;
+            $financial_year_start = $year;
+            $financial_year_end = $year + 1;
         } else {
-            $financial_year = $year - 1;
+            $financial_year_start = $year - 1;
+            $financial_year_end = $year;
         }
-        $last_sail_number = Dispatch::whereYear('created_at', '=', $financial_year)
-            ->latest('id')
-            ->first();
 
-        if ($last_sail_number) {
-            $max_serial_number = $last_sail_number->dispatch_number;
+        // Financial year format
+        $financial_year = $financial_year_start;
+
+        // Fetch the latest dispatch number for the current financial year
+        $last_dispatch = Dispatch::whereBetween('created_at', [
+            "$financial_year_start-04-01 00:00:00",
+            "$financial_year_end-03-31 23:59:59",
+        ])->orderBy('dispatch_number', 'desc')->first();
+
+        if ($last_dispatch) {
+            $max_serial_number = $last_dispatch->dispatch_number;
             $last_serial_number = substr($max_serial_number, -4); // Get the last 4 digits
-            $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+            $next_serial_number = str_pad((int)$last_serial_number + 1, 4, '0', STR_PAD_LEFT);
         } else {
-            $next_serial_number = '0001';
+            $next_serial_number = '0001'; // Default serial number when no records exist
         }
 
+        // Generate Dispatch number with financial year
         $doc_number = 'DIS' . $financial_year . $next_serial_number;
-
 
         $rowIdentifiers = [];
         $soDispatchQuantities = [];
@@ -249,14 +280,14 @@ class DispatchController extends Controller
                     'message' => 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds its remaining quantity (' . number_format($soRestQty, 3) . ').'
                 ], 400);
             }
-            
+
             // Validate PO dispatch quantity
             if ($dispatchedPOQty > $poRestQty) {
                 return response()->json([
                     'message' => 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds its remaining quantity (' . number_format($poRestQty, 3) . ').'
                 ], 400);
             }
-            
+
             // Validate combined dispatch quantity
             if ($dispatchedQty > $soRestQty || $dispatchedQty > $poRestQty) {
                 return response()->json([

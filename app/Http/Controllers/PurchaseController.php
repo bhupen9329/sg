@@ -42,19 +42,17 @@ class PurchaseController extends Controller
     {
         $this->middleware('permission:Purchase-index', ['only' => ['index']]);
         $this->middleware('permission:Purchase-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:Purchase-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:Purchase-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:Purchase-delete', ['only' => ['delete']]);
     }
     public function index()
     {
 
-
         $user = Auth::user(); // Get the authenticated user
-
         // Retrieve all roles assigned to the user
         $roles = $user->getRoleNames();
 
-        if ( $roles->contains('Admin')) {
+        if ($roles->contains('Admin')) {
             $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
                 ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
                 ->join('categories', 'categories.id', '=', 'po_items.item_category')
@@ -125,17 +123,52 @@ class PurchaseController extends Controller
     {
         //  dd($request);
 
-        $max_serial_number = PurchaseOrder::orderBy('document_number', 'desc')->first();
+        // $max_serial_number = PurchaseOrder::orderBy('document_number', 'desc')->first();
+        // $year = date('Y');
+        // if ($max_serial_number) {
+        //     $max_serial_number = $max_serial_number->document_number;
+        //     $last_serial_number = substr($max_serial_number, -4);
+        //     $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+        // } else {
+        //     // Default serial number when no records exist
+        //     $next_serial_number = str_pad(1, 4, '0', STR_PAD_LEFT);
+        // }
+        // $po_id = 'PO' . $year . $next_serial_number;
+
         $year = date('Y');
+        $month = date('m');
+
+        // Financial year calculation
+        if ($month >= 4) {
+            $financial_year_start = $year;
+            $financial_year_end = $year + 1;
+        } else {
+            $financial_year_start = $year - 1;
+            $financial_year_end = $year;
+        }
+
+        // Financial year format like 2024-2025
+        $financial_year = $financial_year_start;
+
+        // Fetch the latest document number for the current financial year
+        $max_serial_number = PurchaseOrder::whereBetween('created_at', [
+            "$financial_year_start-04-01 00:00:00",
+            "$financial_year_end-03-31 23:59:59",
+        ])->orderBy('document_number', 'desc')->first();
+
         if ($max_serial_number) {
-            $max_serial_number = $max_serial_number->document_number;
-            $last_serial_number = substr($max_serial_number, -4);
-            $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+            $last_serial_number = substr($max_serial_number->document_number, -4);
+            $next_serial_number = str_pad((int)$last_serial_number + 1, 4, '0', STR_PAD_LEFT);
         } else {
             // Default serial number when no records exist
             $next_serial_number = str_pad(1, 4, '0', STR_PAD_LEFT);
         }
-        $po_id = 'PO' . $year . $next_serial_number;
+
+        // Generate PO number with financial year
+        $po_id = 'PO' . $financial_year . $next_serial_number;
+
+
+
 
 
         $purchaseOrder = new PurchaseOrder();
@@ -636,7 +669,8 @@ class PurchaseController extends Controller
         return redirect()->route('purchase.index')->with('delete', 'Purchase Order Item Delete Successfully');
     }
 
-    public function po_pre_closed_save(Request $request){
+    public function po_pre_closed_save(Request $request)
+    {
         PoItem::where('id', $request->po_item_id)->update(['po_dispatch_item_status' => $request->status, 'po_item_status_date' => $request->date,  'po_item_status_remarks' => $request->remarks,]);
         return redirect()->route('purchase.index')->with('success', 'Purchase Order Status Updated Successfully');
     }
@@ -659,37 +693,37 @@ class PurchaseController extends Controller
     public function get_dispatch_qty_po(Request $request)
     {
         $received_qty_records = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
-        ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
-        ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
-        ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
-        ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
-        ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
-        ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
-        ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
-        ->select(
-            'dispatches.*',
-            'so_items.so_dispatch_rest_qty',
-            'po_items.po_dispatch_rest_qty',
-            'po_company.company_name as po_company',
-            'so_company.company_name as so_company',
-            'sales_orders.so_number',
-            'purchase_orders.id as po_id',
-            'sales_orders.id as so_id',
-            'purchase_orders.document_number as po_number',
-            'sales_orders.date as so_date',
-            'purchase_orders.date as po_date',
-            'categories.name as category_name',
-            'subcategories.sub_category as sub_category_name',
-            'po_items.po_item_no',
-            'so_items.so_item_no',
-            'po_items.unit_price as po_unit_price',
-            'so_items.unit_price as so_unit_price',
-            'po_items.qty as po_qty',
-            'so_items.qty as so_qty',
-            'dispatches.id as dispatch_id',
-            'dispatches.date as dispatch_date',
-        )
-        ->where('dispatches.po_item_id', $request->get_po_item_id)->get();
+            ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+            ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+            ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+            ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+            ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+            ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+            ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+            ->select(
+                'dispatches.*',
+                'so_items.so_dispatch_rest_qty',
+                'po_items.po_dispatch_rest_qty',
+                'po_company.company_name as po_company',
+                'so_company.company_name as so_company',
+                'sales_orders.so_number',
+                'purchase_orders.id as po_id',
+                'sales_orders.id as so_id',
+                'purchase_orders.document_number as po_number',
+                'sales_orders.date as so_date',
+                'purchase_orders.date as po_date',
+                'categories.name as category_name',
+                'subcategories.sub_category as sub_category_name',
+                'po_items.po_item_no',
+                'so_items.so_item_no',
+                'po_items.unit_price as po_unit_price',
+                'so_items.unit_price as so_unit_price',
+                'po_items.qty as po_qty',
+                'so_items.qty as so_qty',
+                'dispatches.id as dispatch_id',
+                'dispatches.date as dispatch_date',
+            )
+            ->where('dispatches.po_item_id', $request->get_po_item_id)->get();
 
         return response()->json([
             'received_qty_records' => $received_qty_records,
