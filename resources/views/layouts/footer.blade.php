@@ -96,7 +96,7 @@
     });
 </script>
 
-<script>
+{{-- <script>
     
     document.addEventListener('DOMContentLoaded', function () {
     const raisedDateInput = document.getElementById('raised_date_input');
@@ -120,7 +120,48 @@
     }
 });
 
+</script> --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const raisedDateInput = document.getElementById('raised_date_input');
+
+        if (raisedDateInput) {
+            raisedDateInput.addEventListener('blur', function () {
+                const inputDate = new Date(this.value);
+
+                // Determine financial year dynamically
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1; // Months are 0-based
+
+                let startDate, endDate, financialYear;
+
+                if (currentMonth >= 4) { // From April to December
+                    startDate = new Date(currentYear, 3, 1); // 1st April
+                    endDate = new Date(currentYear + 1, 2, 31); // 31st March next year
+                    financialYear = `${currentYear}-${currentYear + 1}`;
+                } else { // From January to March
+                    startDate = new Date(currentYear - 1, 3, 1); // 1st April previous year
+                    endDate = new Date(currentYear, 2, 31); // 31st March current year
+                    financialYear = `${currentYear - 1}-${currentYear}`;
+                }
+
+                if (inputDate < startDate || inputDate > endDate) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Date',
+                        text: `Please select a date within the financial year ${financialYear} (${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}).`,
+                        confirmButtonText: 'OK'
+                    });
+                    this.value = ""; // Clear the input value
+                }
+            });
+        }
+    });
 </script>
+
+
 
 <!-- Vendor JS Files -->
 <script src="{{ asset('assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
