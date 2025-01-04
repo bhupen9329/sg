@@ -487,7 +487,7 @@ class SalesController extends Controller
         $gstsetting = GstSetting::all();
         $so_number = $sales_order->so_number;
 
-        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->where('so_items.so_item_status', 'Open')->where('so_items.so_id', $id)->where('so_items.so_dispatch_item_status', 'Open')->select('categories.*', 'so_items.*', 'so_items.price as price')->get();
+        $so_items = SoItem::join('categories', 'so_items.item_category', '=', 'categories.id')->where('so_items.so_id', $id)->select('categories.*', 'so_items.*', 'so_items.price as price')->get();
         //   dd( $so_items);
         $data = [
             'company' => $company,

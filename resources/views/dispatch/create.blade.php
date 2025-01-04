@@ -1311,52 +1311,51 @@
 
 
         function fetchUnitPrice(selectElement) {
-            const soItemNo = selectElement.value; // Get the selected SO item number
-            const row = selectElement.closest('tr'); // Find the current table row
-            const unitPriceField = row.querySelector(
-                'input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
-            const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
-            const QtyFieldValue = row.querySelector('input[name="quantity_po[]"]').value; // Get the current quantity value
+    const soItemNo = selectElement.value; // Get the selected SO item number
+    const row = selectElement.closest('tr'); // Find the current table row
+    const unitPriceField = row.querySelector('input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
+    const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
+    const QtyFieldValue = parseFloat(row.querySelector('input[name="quantity_po[]"]').value); // Get the current quantity value as a number
 
-            if (soItemNo) {
-                $.ajax({
-                    url: '/get-so-unit-price', // Replace with your actual route URL
-                    method: 'POST',
-                    data: {
-                        so_item_no: soItemNo,
-                        _token: '{{ csrf_token() }}' // Include CSRF token for security
-                    },
-                    success: function(response) {
+    if (soItemNo) {
+        $.ajax({
+            url: '/get-so-unit-price', // Replace with your actual route URL
+            method: 'POST',
+            data: {
+                so_item_no: soItemNo,
+                _token: '{{ csrf_token() }}' // Include CSRF token for security
+            },
+            success: function(response) {
+                if (response.success) {
+                    const responseQty = parseFloat(response.qty); // Parse response.qty as a number
 
-                        if (response.success) {
-                            unitPriceField.value = response.unit_price; // Set the unit price
-                            // Check if the returned quantity is less than or equal to the current quantity
-                            if (response.qty <= QtyFieldValue) {
-                                QtyField.value = response
-                                    .qty; // Set the quantity field to the returned quantity
-                                QtyField.setAttribute('max', response
-                                    .qty); // Set the max attribute to the returned quantity
-                            } else {
-                                QtyField.value =
-                                    QtyFieldValue; // Restore the original quantity if it's less than the returned value
-                                QtyField.setAttribute('max',
-                                    QtyFieldValue); // Set the max to the original quantity
-                            }
-                            calculateTotal(selectElement); // Call your function to recalculate totals
-                        } else {
-                            console.error("Failed to fetch unit price:", response.message);
-                            unitPriceField.value = ''; // Clear the field in case of failure
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error fetching unit price:", error);
-                        unitPriceField.value = ''; // Clear the field in case of error
+                    unitPriceField.value = response.unit_price; // Set the unit price
+
+                    // Compare quantities properly
+                    if (responseQty <= QtyFieldValue) {
+                        QtyField.value = responseQty; // Set the quantity field to the returned quantity
+                        QtyField.setAttribute('max', responseQty); // Set the max attribute to the returned quantity
+                    } else {
+                        QtyField.value = QtyFieldValue; // Restore the original quantity if it's less than the returned value
+                        QtyField.setAttribute('max', QtyFieldValue); // Set the max to the original quantity
                     }
-                });
-            } else {
-                unitPriceField.value = ''; // Clear the unit price if no SO item is selected
+
+                    calculateTotal(selectElement); // Call your function to recalculate totals
+                } else {
+                    console.error("Failed to fetch unit price:", response.message);
+                    unitPriceField.value = ''; // Clear the field in case of failure
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching unit price:", error);
+                unitPriceField.value = ''; // Clear the field in case of error
             }
-        }
+        });
+    } else {
+        unitPriceField.value = ''; // Clear the unit price if no SO item is selected
+    }
+}
+
     </script>
 
 
