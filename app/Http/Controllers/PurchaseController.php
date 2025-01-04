@@ -550,7 +550,7 @@ class PurchaseController extends Controller
             $number_of_days = $date->diffInDays($due_date, false);
         }
 
-        $po_items = PoItem::join('categories', 'po_items.item_category', '=', 'categories.id')->where('po_items.po_id', $id)->where('po_items.po_item_status', 'Open')->where('po_items.po_dispatch_item_status', 'Open')->select('categories.*', 'po_items.*', 'po_items.price as price')->get();
+        $po_items = PoItem::join('categories', 'po_items.item_category', '=', 'categories.id')->where('po_items.po_id', $id)->select('categories.*', 'po_items.*', 'po_items.price as price')->get();
         $data = [
             'company' => $company,
             'category' => $category,

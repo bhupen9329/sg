@@ -240,17 +240,18 @@
                                                                     <th>
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
-                                                                            name="total_amount" id="overall_total_amount"
-                                                                            value="{{ $sales_order->total_price }}"
+                                                                            name="total_price" id="overall_total_price"
+                                                                            value="{{ $sales_order->total_amount }}"
                                                                             required readonly>
                                                                     </th>
                                                                     <th>
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
-                                                                            name="total_price" id="overall_total_price"
-                                                                            value="{{ $sales_order->total_amount }}"
+                                                                            name="total_amount" id="overall_total_amount"
+                                                                            value="{{ $sales_order->total_price }}"
                                                                             required readonly>
                                                                     </th>
+                                                          
                                                             
                                                                     <th></th>
                                                                 </tr>
