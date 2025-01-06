@@ -204,7 +204,7 @@
                                                             @can('Dispatch-edit')
                                                                 <li>
                                                                     <a class="dropdown-item"
-                                                                        href="{{ route('dispatch.edit', $data->dispatch_id) }}"><i
+                                                                        href="{{ route('dispatch.edit', $data->dispatch_number) }}"><i
                                                                             class="fa-solid fa-pencil"></i>Edit</a>
                                                                 </li>
                                                             @endcan
@@ -314,36 +314,90 @@
 
 
 
+<!--    <script>-->
+<!--$(document).ready(function() {-->
+<!--    var table = $('#Category_table').DataTable({-->
+<!--        dom: 'Bfrtip',-->
+<!--        pageLength: 50,-->
+<!--        lengthMenu: [-->
+<!--            [10, 20, 50, 100, 150, -1],-->
+<!--            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']-->
+<!--        ],-->
+<!--        buttons: ['pageLength', 'csv', 'print'],-->
+<!--        drawCallback: function(settings) {-->
+<!--            var api = this.api();-->
+<!--            var lastDispatchNumber = null;-->
+
+<!--            api.rows({ page: 'current' }).every(function(rowIdx, tableLoop, rowLoop) {-->
+<!--                var data = this.node();-->
+<!--                var dispatchNumber = $(data).data('dispatch-number');-->
+
+<!--                if (dispatchNumber !== lastDispatchNumber) {-->
+<!--                    lastDispatchNumber = dispatchNumber;-->
+
+<!--                    $(data).before(-->
+<!--                        '<tr class="group"><td colspan="16" style="text-align: center; border-top: 2px solid #8B0000;"></td></tr>'-->
+<!--                    );-->
+<!--                }-->
+<!--            });-->
+<!--        }-->
+<!--    });-->
+<!--});-->
+
+<!--    </script>-->
+
     <script>
-$(document).ready(function() {
-    var table = $('#Category_table').DataTable({
-        dom: 'Bfrtip',
-        pageLength: 50,
-        lengthMenu: [
-            [10, 20, 50, 100, 150, -1],
-            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
-        ],
-        buttons: ['pageLength', 'csv', 'print'],
-        drawCallback: function(settings) {
-            var api = this.api();
-            var lastDispatchNumber = null;
+        $(document).ready(function() {
+            var table = $('#Category_table').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 50,
+                lengthMenu: [
+                    [10, 20, 50, 100, 150, -1],
+                    ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+                ],
+                buttons: ['pageLength', 'csv', 'print'],
+                drawCallback: function(settings) {
+                    var api = this.api();
+                    var lastDispatchNumber = null;
+                    var totalQuantity = 0; // Initialize total quantity for each dispatch_number
 
-            api.rows({ page: 'current' }).every(function(rowIdx, tableLoop, rowLoop) {
-                var data = this.node();
-                var dispatchNumber = $(data).data('dispatch-number');
+                    api.rows({
+                        page: 'current'
+                    }).every(function(rowIdx, tableLoop, rowLoop) {
+                        var data = this.node();
+                        var dispatchNumber = $(data).data('dispatch-number');
+                        var quantity = parseFloat($(data).find('td:eq(10)').text()
+                            .trim()); // Get the dispatched quantity from the 11th column
 
-                if (dispatchNumber !== lastDispatchNumber) {
-                    lastDispatchNumber = dispatchNumber;
+                        if (dispatchNumber !== lastDispatchNumber) {
+                            // If a new dispatch number starts, display the sum for the previous one
+                            if (lastDispatchNumber !== null) {
+                                $(data).before(
+                                    '<tr class="group"><td colspan="10" style="text-align: end;font-weight: bold;">Total Qty:</td><td colspan="6" style="text-align: left;font-weight: bold;">' +
+                                    totalQuantity.toFixed(3) + '</td></tr>' +
+                                    '<tr class="group"><td colspan="16" style="text-align: center; border-top: 2px solid #8B0000;"></td></tr>'
+                                );
+                            }
 
-                    $(data).before(
-                        '<tr class="group"><td colspan="16" style="text-align: center; border-top: 2px solid #8B0000;"></td></tr>'
-                    );
+
+                            // Reset the totalQuantity for the new dispatch number
+                            totalQuantity = quantity;
+                            lastDispatchNumber = dispatchNumber;
+                        } else {
+                            totalQuantity += quantity; // Add to the total quantity
+                        }
+                    });
+
+                    // After looping through all rows, display the last total quantity if necessary
+                    if (lastDispatchNumber !== null) {
+                        $(api.row(':last').node()).after(
+                            '<tr class="group"><td colspan="16" style="text-align: center; border-top: 2px solid #8B0000;">Total Quantity: ' +
+                            totalQuantity.toFixed(3) + '</td></tr>'
+                        );
+                    }
                 }
             });
-        }
-    });
-});
-
+        });
     </script>
 
     <script>

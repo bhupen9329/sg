@@ -167,12 +167,15 @@
                                                 <th style="width: 115px;" class="table_heading_long">Gross PO Price</th>
                                                 <th style="width: 115px;" class="table_heading_long">Loading + Insurance
                                                 </th>
-                                                <th style="width: 115px;" class="table_heading_normal">Quantity<span
+                                                <th style="width: 115px;" class="table_heading_normal">PORest Qty<span
+                                                    class="required-classes">*</span></th>
+                                                <th style="width: 115px;" class="table_heading_normal">Qty<span
                                                         class="required-classes">*</span></th>
                                                 <th style="width: 115px;" class="table_heading_long">Payable Total<span
                                                         class="required-classes">*</span></th>
                                                 <th style="width: 212px;" class="table_heading_long">SO Item NO.<span
                                                         class="required-classes">*</span></th>
+                                                <th style="width: 115px;" class="table_heading_long">SORest Qty</th>
                                                 <th style="width: 115px;" class="table_heading_long">SO Price</th>
                                                 <th style="width: 115px;" class="table_heading_long">SO Gross Price</th>
                                                 <th style="width: 115px;" class="table_heading_long">Receivable Total<span
@@ -189,6 +192,7 @@
                                             <th></th>
                                             <th></th>
                                             <th>Total</th>
+                                            <th></th>
                                             <th></th>
                                             <th>
                                             <td style="text-align:left  ; font-weight: bold;" id="totalQty">0</td>
@@ -405,7 +409,8 @@
         <td>
             <input type="number" name="dispatch_fregiht_insuance[]" oninput="calculateTotal(this)" class="form-control"  value="0" required />
     </td>
-         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="0.001" class="form-control" value="${qty}" required /></td>
+     <td><input type="number" name="po_rest_qty_show"  oninput="calculateTotal(this)" step="0.001" min="0.001" class="form-control" value="${qty}" readonly /></td>
+         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="0.001" class="form-control" value="0" required /></td>
      <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
 
    <input type="hidden" name="conv_rate[]" id="conv_rate" value="0" class="form-control" oninput="calculateTotal(this)" required />
@@ -418,6 +423,7 @@
     <option value="" disabled selected>Select SO Item</option>
 </select>
     </td>
+     <td><input type="number" name="so_rest_qty_show[]"  id="so_rest_qty_show"  class="form-control" value="0" readonly/></td>
       <td><input type="number" name="dispatch_so_unit_price_actual[]" id="so_unit_price"  class="form-control" readonly required /></td>
         <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
     <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
@@ -440,7 +446,69 @@
 
 
 
-        function cloneRow(button) {
+        // function cloneRow(button) {
+        //     const row = button.closest('tr'); // Find the current row
+        //     const clonedRow = row.cloneNode(true); // Clone the row
+
+        //     // Retain the values for input fields
+        //     clonedRow.querySelectorAll('input').forEach(input => {
+        //         input.value = input.value; // Retain the value in input fields
+        //     });
+
+        //     // Retain the selected option for each select dropdown
+        //     clonedRow.querySelectorAll('select').forEach(select => {
+        //         const originalSelect = row.querySelector(
+        //             `select[name="${select.name}"]`); // Find the original select
+        //         select.value = originalSelect.value; // Set the selected value of the cloned select
+        //     });
+
+        //     // Insert the cloned row below the current row
+        //     row.parentNode.insertBefore(clonedRow, row.nextSibling);
+        // }
+
+//         function cloneRow(button) {
+//     const row = button.closest('tr'); // Find the current row
+//     const clonedRow = row.cloneNode(true); // Clone the row
+
+//     // Get the values of the original row's input fields
+//     const originalQty = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
+//     const originalQtySO = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
+//     const originalQuantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+
+//     // Calculate the value for 'po_rest_qty_show' and 'so_rest_qty_show' in the cloned row
+//     const newRestQty = originalQty - originalQuantity;
+//     const newRestQtySO = originalQtySO - originalQuantity;
+//     // Update the cloned row values
+//     clonedRow.querySelectorAll('input').forEach(input => {
+//         if (input.name === 'po_rest_qty_show') {
+//             input.value = newRestQty.toFixed(3); // Set the new calculated value
+//         } else if (input.name === 'so_rest_qty_show[]') {
+//             input.value = newRestQtySO.toFixed(3); // Set the new calculated value
+//         } else if (input.name === 'quantity[]') {
+//             input.value = '0'; // Reset quantity to 0 for the new row
+//         } else {
+//             input.value = input.value; // Retain other input values
+//         }
+//     });
+
+//     // Retain the selected option for each select dropdown
+//     clonedRow.querySelectorAll('select').forEach(select => {
+//         const originalSelect = row.querySelector(`select[name="${select.name}"]`); // Find the original select
+//         select.value = originalSelect.value; // Set the selected value of the cloned select
+//     });
+
+//     // Reset dependent fields to prevent errors in cloned row
+//     clonedRow.querySelectorAll('input[type="number"]').forEach(input => {
+//         if (input.name.includes('dispatch') || input.name === 'quantity[]') {
+//             input.value = '0'; // Reset numeric inputs
+//         }
+//     });
+
+//     // Insert the cloned row below the current row
+//     row.parentNode.insertBefore(clonedRow, row.nextSibling);
+// }
+
+function cloneRow(button) {
             const row = button.closest('tr'); // Find the current row
             const clonedRow = row.cloneNode(true); // Clone the row
 
@@ -455,6 +523,27 @@
                     `select[name="${select.name}"]`); // Find the original select
                 select.value = originalSelect.value; // Set the selected value of the cloned select
             });
+
+
+    const originalQty = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
+    const originalQtySO = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
+    const originalQuantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+
+
+    const newRestQty = originalQty - originalQuantity;
+    const newRestQtySO = originalQtySO - originalQuantity;
+
+    clonedRow.querySelectorAll('input').forEach(input => {
+        if (input.name === 'po_rest_qty_show') {
+            input.value = newRestQty.toFixed(3); // Set the new calculated value
+        } else if (input.name === 'so_rest_qty_show[]') {
+            input.value = newRestQtySO.toFixed(3); // Set the new calculated value
+        } else if (input.name === 'quantity[]') {
+            input.value = '0'; // Reset quantity to 0 for the new row
+        } else {
+            input.value = input.value; // Retain other input values
+        }
+    });
 
             // Insert the cloned row below the current row
             row.parentNode.insertBefore(clonedRow, row.nextSibling);
@@ -686,7 +775,7 @@
                             if (so_item.name === itemName) {
                                 // Create an option element
                                 const option =
-                                    `<option value="${so_item.so_item_no}">${so_item.so_item_no} - ${so_item.name}</option>`;
+                                    `<option value="${so_item.so_item_no}">${so_item.name}, ${so_item.unit_price}, ${so_item.so_dispatch_rest_qty}-(${so_item.so_item_no})</option>`;
                                 dropdown.insertAdjacentHTML('beforeend', option);
                             }
                         },
@@ -1316,6 +1405,7 @@
     const unitPriceField = row.querySelector('input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
     const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
     const QtyFieldValue = parseFloat(row.querySelector('input[name="quantity_po[]"]').value); // Get the current quantity value as a number
+    const QtyFieldShow = row.querySelector('input[name="so_rest_qty_show[]"]');
 
     if (soItemNo) {
         $.ajax({
@@ -1328,17 +1418,19 @@
             success: function(response) {
                 if (response.success) {
                     const responseQty = parseFloat(response.qty); // Parse response.qty as a number
+                   
 
                     unitPriceField.value = response.unit_price; // Set the unit price
 
                     // Compare quantities properly
                     if (responseQty <= QtyFieldValue) {
-                        QtyField.value = responseQty; // Set the quantity field to the returned quantity
+                        // QtyField.value = responseQty; // Set the quantity field to the returned quantity
                         QtyField.setAttribute('max', responseQty); // Set the max attribute to the returned quantity
                     } else {
-                        QtyField.value = QtyFieldValue; // Restore the original quantity if it's less than the returned value
+                        // QtyField.value = QtyFieldValue; // Restore the original quantity if it's less than the returned value
                         QtyField.setAttribute('max', QtyFieldValue); // Set the max to the original quantity
                     }
+                    QtyFieldShow.value = responseQty;
 
                     calculateTotal(selectElement); // Call your function to recalculate totals
                 } else {
