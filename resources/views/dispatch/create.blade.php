@@ -161,6 +161,7 @@
                                             <tr>
                                                 <th class="table_heading_long">Base Item<span
                                                         class="required-classes">*</span></th>
+                                                <th style="width: 150px;" class="table_heading_long">PO Item No.</th>
                                                 <th style="width: 150px;" class="table_heading_long">Conv Item</th>
                                                 <th style="width: 115px;" class="table_heading_long">Conv Price</th>
                                                 <th style="width: 115px;" class="table_heading_long">PO Price</th>
@@ -168,12 +169,12 @@
                                                 <th style="width: 115px;" class="table_heading_long">Loading + Insurance
                                                 </th>
                                                 <th style="width: 115px;" class="table_heading_normal">PORest Qty<span
-                                                    class="required-classes">*</span></th>
+                                                        class="required-classes">*</span></th>
                                                 <th style="width: 115px;" class="table_heading_normal">Qty<span
                                                         class="required-classes">*</span></th>
                                                 <th style="width: 115px;" class="table_heading_long">Payable Total<span
                                                         class="required-classes">*</span></th>
-                                                <th style="width: 212px;" class="table_heading_long">SO Item NO.<span
+                                                <th style="width: 212px;" class="table_heading_long">SO Item No.<span
                                                         class="required-classes">*</span></th>
                                                 <th style="width: 115px;" class="table_heading_long">SORest Qty</th>
                                                 <th style="width: 115px;" class="table_heading_long">SO Price</th>
@@ -188,6 +189,7 @@
                                         </tbody>
 
                                         <tfoot>
+                                            <th></th>
                                             <th></th>
                                             <th></th>
                                             <th></th>
@@ -394,7 +396,7 @@
     <td>${itemName}</td>
     <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
        
-          <input type="hidden" name="po_item_number[]" class="form-control" value="${po_item_number}" required>
+          <td><input type="text" name="po_item_number[]" class="form-control" value="${po_item_number}" readonly required></td>
     <td>
         <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
     </td>
@@ -466,49 +468,49 @@
         //     row.parentNode.insertBefore(clonedRow, row.nextSibling);
         // }
 
-//         function cloneRow(button) {
-//     const row = button.closest('tr'); // Find the current row
-//     const clonedRow = row.cloneNode(true); // Clone the row
+        //         function cloneRow(button) {
+        //     const row = button.closest('tr'); // Find the current row
+        //     const clonedRow = row.cloneNode(true); // Clone the row
 
-//     // Get the values of the original row's input fields
-//     const originalQty = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
-//     const originalQtySO = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
-//     const originalQuantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+        //     // Get the values of the original row's input fields
+        //     const originalQty = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
+        //     const originalQtySO = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
+        //     const originalQuantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
-//     // Calculate the value for 'po_rest_qty_show' and 'so_rest_qty_show' in the cloned row
-//     const newRestQty = originalQty - originalQuantity;
-//     const newRestQtySO = originalQtySO - originalQuantity;
-//     // Update the cloned row values
-//     clonedRow.querySelectorAll('input').forEach(input => {
-//         if (input.name === 'po_rest_qty_show') {
-//             input.value = newRestQty.toFixed(3); // Set the new calculated value
-//         } else if (input.name === 'so_rest_qty_show[]') {
-//             input.value = newRestQtySO.toFixed(3); // Set the new calculated value
-//         } else if (input.name === 'quantity[]') {
-//             input.value = '0'; // Reset quantity to 0 for the new row
-//         } else {
-//             input.value = input.value; // Retain other input values
-//         }
-//     });
+        //     // Calculate the value for 'po_rest_qty_show' and 'so_rest_qty_show' in the cloned row
+        //     const newRestQty = originalQty - originalQuantity;
+        //     const newRestQtySO = originalQtySO - originalQuantity;
+        //     // Update the cloned row values
+        //     clonedRow.querySelectorAll('input').forEach(input => {
+        //         if (input.name === 'po_rest_qty_show') {
+        //             input.value = newRestQty.toFixed(3); // Set the new calculated value
+        //         } else if (input.name === 'so_rest_qty_show[]') {
+        //             input.value = newRestQtySO.toFixed(3); // Set the new calculated value
+        //         } else if (input.name === 'quantity[]') {
+        //             input.value = '0'; // Reset quantity to 0 for the new row
+        //         } else {
+        //             input.value = input.value; // Retain other input values
+        //         }
+        //     });
 
-//     // Retain the selected option for each select dropdown
-//     clonedRow.querySelectorAll('select').forEach(select => {
-//         const originalSelect = row.querySelector(`select[name="${select.name}"]`); // Find the original select
-//         select.value = originalSelect.value; // Set the selected value of the cloned select
-//     });
+        //     // Retain the selected option for each select dropdown
+        //     clonedRow.querySelectorAll('select').forEach(select => {
+        //         const originalSelect = row.querySelector(`select[name="${select.name}"]`); // Find the original select
+        //         select.value = originalSelect.value; // Set the selected value of the cloned select
+        //     });
 
-//     // Reset dependent fields to prevent errors in cloned row
-//     clonedRow.querySelectorAll('input[type="number"]').forEach(input => {
-//         if (input.name.includes('dispatch') || input.name === 'quantity[]') {
-//             input.value = '0'; // Reset numeric inputs
-//         }
-//     });
+        //     // Reset dependent fields to prevent errors in cloned row
+        //     clonedRow.querySelectorAll('input[type="number"]').forEach(input => {
+        //         if (input.name.includes('dispatch') || input.name === 'quantity[]') {
+        //             input.value = '0'; // Reset numeric inputs
+        //         }
+        //     });
 
-//     // Insert the cloned row below the current row
-//     row.parentNode.insertBefore(clonedRow, row.nextSibling);
-// }
+        //     // Insert the cloned row below the current row
+        //     row.parentNode.insertBefore(clonedRow, row.nextSibling);
+        // }
 
-function cloneRow(button) {
+        function cloneRow(button) {
             const row = button.closest('tr'); // Find the current row
             const clonedRow = row.cloneNode(true); // Clone the row
 
@@ -525,27 +527,27 @@ function cloneRow(button) {
             });
 
 
-    const originalQty = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
-    const originalQtySO = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
-    const originalQuantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+            const originalQty = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
+            const originalQtySO = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
+            const originalQuantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
 
 
-    const newRestQty = originalQty - originalQuantity;
-    const newRestQtySO = originalQtySO - originalQuantity;
+            const newRestQty = originalQty - originalQuantity;
+            const newRestQtySO = originalQtySO - originalQuantity;
 
-    
 
-    clonedRow.querySelectorAll('input').forEach(input => {   
-        if (input.name === 'po_rest_qty_show') {
-            input.value = newRestQty.toFixed(3); // Set the new calculated value
-        } else if (input.name === 'so_rest_qty_show[]') {
-            input.value = newRestQtySO.toFixed(3); // Set the new calculated value
-        } else if (input.name === 'quantity[]') {
-            input.value = '0'; // Reset quantity to 0 for the new row
-        } else {
-            input.value = input.value; // Retain other input values
-        }
-    });
+
+            clonedRow.querySelectorAll('input').forEach(input => {
+                if (input.name === 'po_rest_qty_show') {
+                    input.value = newRestQty.toFixed(3); // Set the new calculated value
+                } else if (input.name === 'so_rest_qty_show[]') {
+                    input.value = newRestQtySO.toFixed(3); // Set the new calculated value
+                } else if (input.name === 'quantity[]') {
+                    input.value = '0'; // Reset quantity to 0 for the new row
+                } else {
+                    input.value = input.value; // Retain other input values
+                }
+            });
 
             // Insert the cloned row below the current row
             row.parentNode.insertBefore(clonedRow, row.nextSibling);
@@ -568,48 +570,107 @@ function cloneRow(button) {
         }
 
         function calculateTotal(element) {
-    const row = element.closest('tr');
-    const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
-    const unitPriceActual = parseFloat(row.querySelector('input[name="dispatch_unit_price_actual[]"]').value) || 0;
-    const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
-    const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
-    const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
-    const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
-        .value) || 0;
-    const freight_insurance = parseFloat(row.querySelector('input[name="dispatch_fregiht_insuance[]"]').value) || 0;
+            const row = element.closest('tr');
+            const unitPrice = parseFloat(row.querySelector('input[name="dispatch_unit_price[]"]').value) || 0;
+            const unitPriceActual = parseFloat(row.querySelector('input[name="dispatch_unit_price_actual[]"]').value) || 0;
+            const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
+            const quantityInput = row.querySelector('input[name="quantity[]"]');
 
-    // Calculate the total values for PO and SO based on the quantity
-    let totalPOUnitPrice = unitPriceActual + convRate + freight_insurance;
-    let totalSOUnitPrice = sounitPriceActual + convRate + freight_insurance;
+            const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+            const po_rest_quantity = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
+            const so_rest_quantity = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
+            const po_item_number = parseFloat(row.querySelector('input[name="po_item_number[]"]').value) || 0;
 
-    row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
-    row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
 
-    let totalAmount = 0;
-    let totalSoAmount = 0;
+            if (quantity > po_rest_quantity || quantity > so_rest_quantity) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Quantity Exceeded',
+                    text: 'The entered quantity exceeds the available PO or SO quantity.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Reset the quantity to 0 after SweetAlert
+                    quantityInput.value = 0;
+                });
+                return; // Exit the function if the condition is met
+            }
 
-    if (quantity) {
-        totalAmount = (totalPOUnitPrice * quantity);
-        totalSoAmount = (totalSOUnitPrice * quantity);
-        row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
-        row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
-    } else {
-        totalAmount = totalPOUnitPrice;
-        totalSoAmount = totalSOUnitPrice;
-        row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
-        row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
-    }
+            // Update subsequent rows
+            let remainingPoQty = po_rest_quantity - quantity;
+            let remainingSoQty = so_rest_quantity - quantity;
 
-    // Calculate the total quantity for all rows
-    let totalQty = 0;
-    const rows = document.querySelectorAll('#myTable tbody tr'); // Change the selector if needed
-    rows.forEach(function(row) {
-        const qty = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
-        totalQty += qty;
-    });
-   
-    document.getElementById('totalQty').textContent = totalQty.toFixed(3);
-}
+            let isCurrentRow = true;
+            const currentPoItemNumber = element.closest('tr').querySelector('input[name="po_item_number[]"]').value;
+
+            Array.from(document.querySelector("#myTable tbody").rows).forEach((row) => {
+                if (isCurrentRow) {
+                    if (row === element.closest('tr')) {
+                        isCurrentRow = false; // Current row found; start updating next rows
+                    }
+                    return;
+                }
+
+                const rowPoItemNumber = row.querySelector('input[name="po_item_number[]"]').value;
+                console.log(rowPoItemNumber);
+
+                // Only process rows with the same po_item_number
+                if (rowPoItemNumber !== currentPoItemNumber) {
+                    return;
+                }
+
+                const nextPoRestQtyInput = row.querySelector('input[name="po_rest_qty_show"]');
+                const nextSoRestQtyInput = row.querySelector('input[name="so_rest_qty_show[]"]');
+
+                if (nextPoRestQtyInput) {
+                    nextPoRestQtyInput.value = Math.max(remainingPoQty, 0).toFixed(3);
+                }
+
+                if (nextSoRestQtyInput) {
+                    nextSoRestQtyInput.value = Math.max(remainingSoQty, 0).toFixed(3);
+                }
+
+                remainingPoQty -= parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+                remainingSoQty -= parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+            });
+
+
+            const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
+            const sounitPriceActual = parseFloat(row.querySelector('input[name="dispatch_so_unit_price_actual[]"]')
+                .value) || 0;
+            const freight_insurance = parseFloat(row.querySelector('input[name="dispatch_fregiht_insuance[]"]').value) || 0;
+
+            // Calculate the total values for PO and SO based on the quantity
+            let totalPOUnitPrice = unitPriceActual + convRate + freight_insurance;
+            let totalSOUnitPrice = sounitPriceActual + convRate + freight_insurance;
+
+            row.querySelector('input[name="dispatch_unit_price[]"]').value = totalPOUnitPrice.toFixed(2);
+            row.querySelector('input[name="dispatch_so_unit_price[]"]').value = totalSOUnitPrice.toFixed(2);
+
+            let totalAmount = 0;
+            let totalSoAmount = 0;
+
+            if (quantity) {
+                totalAmount = (totalPOUnitPrice * quantity);
+                totalSoAmount = (totalSOUnitPrice * quantity);
+                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
+            } else {
+                totalAmount = totalPOUnitPrice;
+                totalSoAmount = totalSOUnitPrice;
+                row.querySelector('input[name="dispatch_total[]"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name="dispatch_so_total[]"]').value = totalSoAmount.toFixed(2);
+            }
+
+            // Calculate the total quantity for all rows
+            let totalQty = 0;
+            const rows = document.querySelectorAll('#myTable tbody tr'); // Change the selector if needed
+            rows.forEach(function(row) {
+                const qty = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+                totalQty += qty;
+            });
+
+            document.getElementById('totalQty').textContent = totalQty.toFixed(3);
+        }
 
         function PORow(Date = '', poNumber = '', ItemName = '', poItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
             '', Price = '', PoId = '') {
@@ -725,11 +786,7 @@ function cloneRow(button) {
                     }
                 }
             }
-
-            // Delete the row with the same item number in poTable
             deleteRowFromPoTable(itemNumber);
-
-            // Also remove the row from the current table (myTable) where the delete button was clicked
             row.remove();
         }
 
@@ -1402,54 +1459,57 @@ function cloneRow(button) {
 
 
         function fetchUnitPrice(selectElement) {
-    const soItemNo = selectElement.value; // Get the selected SO item number
-    const row = selectElement.closest('tr'); // Find the current table row
-    const unitPriceField = row.querySelector('input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
-    const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
-    const QtyFieldValue = parseFloat(row.querySelector('input[name="quantity_po[]"]').value); // Get the current quantity value as a number
-    const QtyFieldShow = row.querySelector('input[name="so_rest_qty_show[]"]');
+            const soItemNo = selectElement.value; // Get the selected SO item number
+            const row = selectElement.closest('tr'); // Find the current table row
+            const unitPriceField = row.querySelector(
+            'input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
+            const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
+            const QtyFieldValue = parseFloat(row.querySelector('input[name="quantity_po[]"]')
+            .value); // Get the current quantity value as a number
+            const QtyFieldShow = row.querySelector('input[name="so_rest_qty_show[]"]');
 
-    if (soItemNo) {
-        $.ajax({
-            url: '/get-so-unit-price', // Replace with your actual route URL
-            method: 'POST',
-            data: {
-                so_item_no: soItemNo,
-                _token: '{{ csrf_token() }}' // Include CSRF token for security
-            },
-            success: function(response) {
-                if (response.success) {
-                    const responseQty = parseFloat(response.qty); // Parse response.qty as a number
-                   
+            if (soItemNo) {
+                $.ajax({
+                    url: '/get-so-unit-price', // Replace with your actual route URL
+                    method: 'POST',
+                    data: {
+                        so_item_no: soItemNo,
+                        _token: '{{ csrf_token() }}' // Include CSRF token for security
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            const responseQty = parseFloat(response.qty); // Parse response.qty as a number
 
-                    unitPriceField.value = response.unit_price; // Set the unit price
 
-                    // Compare quantities properly
-                    if (responseQty <= QtyFieldValue) {
-                        // QtyField.value = responseQty; // Set the quantity field to the returned quantity
-                        QtyField.setAttribute('max', responseQty); // Set the max attribute to the returned quantity
-                    } else {
-                        // QtyField.value = QtyFieldValue; // Restore the original quantity if it's less than the returned value
-                        QtyField.setAttribute('max', QtyFieldValue); // Set the max to the original quantity
+                            unitPriceField.value = response.unit_price; // Set the unit price
+
+                            // Compare quantities properly
+                            if (responseQty <= QtyFieldValue) {
+                                // QtyField.value = responseQty; // Set the quantity field to the returned quantity
+                                QtyField.setAttribute('max',
+                                responseQty); // Set the max attribute to the returned quantity
+                            } else {
+                                // QtyField.value = QtyFieldValue; // Restore the original quantity if it's less than the returned value
+                                QtyField.setAttribute('max',
+                                QtyFieldValue); // Set the max to the original quantity
+                            }
+                            QtyFieldShow.value = responseQty;
+
+                            calculateTotal(selectElement); // Call your function to recalculate totals
+                        } else {
+                            console.error("Failed to fetch unit price:", response.message);
+                            unitPriceField.value = ''; // Clear the field in case of failure
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching unit price:", error);
+                        unitPriceField.value = ''; // Clear the field in case of error
                     }
-                    QtyFieldShow.value = responseQty;
-
-                    calculateTotal(selectElement); // Call your function to recalculate totals
-                } else {
-                    console.error("Failed to fetch unit price:", response.message);
-                    unitPriceField.value = ''; // Clear the field in case of failure
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching unit price:", error);
-                unitPriceField.value = ''; // Clear the field in case of error
+                });
+            } else {
+                unitPriceField.value = ''; // Clear the unit price if no SO item is selected
             }
-        });
-    } else {
-        unitPriceField.value = ''; // Clear the unit price if no SO item is selected
-    }
-}
-
+        }
     </script>
 
 
