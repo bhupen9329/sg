@@ -533,7 +533,9 @@ function cloneRow(button) {
     const newRestQty = originalQty - originalQuantity;
     const newRestQtySO = originalQtySO - originalQuantity;
 
-    clonedRow.querySelectorAll('input').forEach(input => {
+    
+
+    clonedRow.querySelectorAll('input').forEach(input => {   
         if (input.name === 'po_rest_qty_show') {
             input.value = newRestQty.toFixed(3); // Set the new calculated value
         } else if (input.name === 'so_rest_qty_show[]') {
