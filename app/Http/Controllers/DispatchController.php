@@ -522,6 +522,10 @@ class DispatchController extends Controller
 
     public function updateDispatch(Request $request)
 {
+
+    
+
+
     $old_dispatch = Dispatch::where('dispatch_number', $request->dispatch_number)->get();
 
     // Restore previous quantities
