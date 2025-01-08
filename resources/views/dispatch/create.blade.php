@@ -431,14 +431,16 @@
     <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
 
     <td><input type="number" name="dispatch_so_total[]" value="0" id="dispatch_so_total" class="form-control" readonly required /></td>
-    <td>
-    <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
-        <i class="fas fa-minus-circle"></i>
-    </button>
-</td>
+
 <td>
     <button type="button" class="btn btn-success" onclick="cloneRow(this)">
         <i class="fas fa-copy"></i>
+    </button>
+</td>
+
+    <td>
+    <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
+        <i class="fas fa-minus-circle"></i>
     </button>
 </td>
 
@@ -611,8 +613,6 @@
                 }
 
                 const rowPoItemNumber = row.querySelector('input[name="po_item_number[]"]').value;
-                console.log(rowPoItemNumber);
-
                 // Only process rows with the same po_item_number
                 if (rowPoItemNumber !== currentPoItemNumber) {
                     return;
@@ -761,34 +761,94 @@
 
 
 
+        // function deleteRow(button) {
+        //     // Find the row that was clicked
+        //     const row = button.closest('tr');
+
+        //     // Get the item number from the clicked row (for po_item_no)
+        //     const itemNumber = row.querySelector('[name="po_item_number[]"]').value;
+
+        //     if (!itemNumber) {
+        //         alert("Item number not found. Cannot delete row.");
+        //         return;
+        //     }
+
+        
+        //     row.remove();
+        // }
+
         function deleteRow(button) {
-            // Find the row that was clicked
-            const row = button.closest('tr');
+    // Find the row that was clicked
+    const row = button.closest('tr');
 
-            // Get the item number from the clicked row (for po_item_no)
-            const itemNumber = row.querySelector('[name="po_item_number[]"]').value;
+    // Get the value of 'po_item_number[]' from the current row
+    const currentPoItemInput = row.querySelector('[name="po_item_number[]"]');
+    const currentPoItemValue = currentPoItemInput ? currentPoItemInput.value : null;
 
-            if (!itemNumber) {
-                alert("Item number not found. Cannot delete row.");
-                return;
+    if (!currentPoItemValue) {
+        alert("PO Item not found. Cannot delete row.");
+        return;
+    }
+
+    // Get the value of 'so_item_no[]' from the current row
+    const currentSoItemSelect = row.querySelector('[name="so_item_no[]"]');
+    const currentSoItemValue = currentSoItemSelect ? currentSoItemSelect.value : null;
+
+    if (!currentSoItemValue) {
+        alert("SO Item not selected. Cannot proceed.");
+        return;
+    }
+
+    // Get the quantity of the row to be deleted from the 'quantity[]' input
+    const currentQuantityInput = row.querySelector('[name="quantity[]"]');
+    const currentQuantity = parseFloat(currentQuantityInput.value) || 0;
+
+    // Handle SO Item rest quantity update
+    let nextRow = row.nextElementSibling;
+
+    while (nextRow) {
+        const nextSoItemSelect = nextRow.querySelector('[name="so_item_no[]"]');
+        const nextSoItemValue = nextSoItemSelect ? nextSoItemSelect.value : null;
+
+        if (nextSoItemValue === currentSoItemValue) {
+            // Found a matching SO Item row, update its 'so_rest_qty_show[]'
+            const nextSoRestQtyInput = nextRow.querySelector('[name="so_rest_qty_show[]"]');
+            if (nextSoRestQtyInput) {
+                const nextSoRestQty = parseFloat(nextSoRestQtyInput.value) || 0;
+                nextSoRestQtyInput.value = nextSoRestQty + currentQuantity;
             }
-
-            // Function to delete a row by item number from the poTable
-            function deleteRowFromPoTable(itemNumber) {
-                const table = document.getElementById('poTable');
-                const rows = table.querySelectorAll('tbody tr');
-
-                for (const row of rows) {
-                    const cellItemNumber = row.querySelector('[name="po_item_no"]')?.value;
-                    if (cellItemNumber === itemNumber) {
-                        row.remove(); // Remove the matching row from poTable
-                        break; // Exit after finding and removing the row
-                    }
-                }
-            }
-            deleteRowFromPoTable(itemNumber);
-            row.remove();
+            break;
         }
+
+        nextRow = nextRow.nextElementSibling;
+    }
+
+    // Handle PO Item rest quantity update
+    nextRow = row.nextElementSibling;
+
+    while (nextRow) {
+        const nextPoItemInput = nextRow.querySelector('[name="po_item_number[]"]');
+        const nextPoItemValue = nextPoItemInput ? nextPoItemInput.value : null;
+
+        if (nextPoItemValue === currentPoItemValue) {
+            // Found a matching PO Item row, update its 'po_rest_qty_show'
+            const nextPoRestQtyInput = nextRow.querySelector('[name="po_rest_qty_show"]');
+            if (nextPoRestQtyInput) {
+                const nextPoRestQty = parseFloat(nextPoRestQtyInput.value) || 0;
+                nextPoRestQtyInput.value = nextPoRestQty + currentQuantity;
+            }
+            break;
+        }
+
+        nextRow = nextRow.nextElementSibling;
+    }
+
+    // Remove the current row
+    row.remove();
+    calculateTotal(button);
+}
+
+
 
 
         // function populateDispatchDetails() {
@@ -1261,12 +1321,6 @@
                         console.error("No items found in the response or response structure is incorrect.");
                     }
                 },
-
-
-
-
-
-
             });
         }
     </script>
@@ -1306,7 +1360,6 @@
             // console.log(buyerItemId, currentItemId, currentItemSubCategory);
 
             let isDuplicate = false;
-
             // Check for duplicates
             for (let i = 1; i < lastItemId; i++) {
                 const selectbuyer_name_idItemElement = document.getElementById(`buyer_name_id${i}`);
@@ -1459,57 +1512,78 @@
 
 
         function fetchUnitPrice(selectElement) {
-            const soItemNo = selectElement.value; // Get the selected SO item number
-            const row = selectElement.closest('tr'); // Find the current table row
-            const unitPriceField = row.querySelector(
-            'input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
-            const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
-            const QtyFieldValue = parseFloat(row.querySelector('input[name="quantity_po[]"]')
-            .value); // Get the current quantity value as a number
-            const QtyFieldShow = row.querySelector('input[name="so_rest_qty_show[]"]');
+    const soItemNo = selectElement.value; // Get the selected SO item number
+    const row = selectElement.closest('tr'); // Find the current table row
+    const unitPriceField = row.querySelector('input[name="dispatch_so_unit_price_actual[]"]'); // Unit price field in the same row
+    const QtyField = row.querySelector('input[name="quantity[]"]'); // Quantity field in the same row
+    const QtyFieldValue = parseFloat(row.querySelector('input[name="quantity_po[]"]').value); // Get the current quantity value as a number
+    const QtyFieldShow = row.querySelector('input[name="so_rest_qty_show[]"]'); // SO Rest Qty field
 
-            if (soItemNo) {
-                $.ajax({
-                    url: '/get-so-unit-price', // Replace with your actual route URL
-                    method: 'POST',
-                    data: {
-                        so_item_no: soItemNo,
-                        _token: '{{ csrf_token() }}' // Include CSRF token for security
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            const responseQty = parseFloat(response.qty); // Parse response.qty as a number
+    if (soItemNo) {
+        $.ajax({
+            url: '/get-so-unit-price', // Replace with your actual route URL
+            method: 'POST',
+            data: {
+                so_item_no: soItemNo,
+                _token: '{{ csrf_token() }}' // Include CSRF token for security
+            },
+            success: function(response) {
+                if (response.success) {
+                    const responseQty = parseFloat(response.qty); // Parse response.qty as a number
+                    unitPriceField.value = response.unit_price; // Set the unit price
 
-
-                            unitPriceField.value = response.unit_price; // Set the unit price
-
-                            // Compare quantities properly
-                            if (responseQty <= QtyFieldValue) {
-                                // QtyField.value = responseQty; // Set the quantity field to the returned quantity
-                                QtyField.setAttribute('max',
-                                responseQty); // Set the max attribute to the returned quantity
-                            } else {
-                                // QtyField.value = QtyFieldValue; // Restore the original quantity if it's less than the returned value
-                                QtyField.setAttribute('max',
-                                QtyFieldValue); // Set the max to the original quantity
-                            }
-                            QtyFieldShow.value = responseQty;
-
-                            calculateTotal(selectElement); // Call your function to recalculate totals
-                        } else {
-                            console.error("Failed to fetch unit price:", response.message);
-                            unitPriceField.value = ''; // Clear the field in case of failure
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error fetching unit price:", error);
-                        unitPriceField.value = ''; // Clear the field in case of error
+                    // Compare quantities properly and set max attribute
+                    if (responseQty <= QtyFieldValue) {
+                        QtyField.setAttribute('max', responseQty); // Set the max attribute to the returned quantity
+                    } else {
+                        QtyField.setAttribute('max', QtyFieldValue); // Set the max to the original quantity
                     }
-                });
-            } else {
-                unitPriceField.value = ''; // Clear the unit price if no SO item is selected
+
+                    QtyFieldShow.value = responseQty;
+
+                    // Update so_rest_qty_show for previous rows
+                    let remainingQty = responseQty; // Start with the total response_qty
+
+                    // Loop through all previous rows (above the current row)
+                    Array.from(document.querySelector("#myTable tbody").rows).forEach((prevRow) => {
+                        if (prevRow === row) return; // Skip the current row
+                        
+                        const prevSoItemNo = prevRow.querySelector('select[name="so_item_no[]"]').value; // Get SO item number from the previous row
+                        const prevSoRestQtyInput = prevRow.querySelector('input[name="so_rest_qty_show[]"]');
+                        const prevTotalDispatchQty = parseFloat(prevRow.querySelector('input[name="quantity[]"]').value) || 0;
+
+                        // Only process rows with the same SO item number
+                        if (prevSoItemNo === soItemNo) {
+                            // Calculate remaining SO quantity for previous rows
+                            const remainingSoQty = Math.max(responseQty - prevTotalDispatchQty, 0);
+
+                            // Update the so_rest_qty_show for the current row
+                            if (prevSoRestQtyInput) {
+                                QtyFieldShow.value = remainingSoQty.toFixed(3); // Set the remaining quantity with 3 decimal places
+                            }
+
+                            // Update the remainingQty after processing this row
+                            remainingQty -= prevTotalDispatchQty;
+                        }
+                    });
+
+                    // Call your function to recalculate totals after the update
+                    calculateTotal(selectElement);
+                } else {
+                    console.error("Failed to fetch unit price:", response.message);
+                    unitPriceField.value = ''; // Clear the field in case of failure
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching unit price:", error);
+                unitPriceField.value = ''; // Clear the field in case of error
             }
-        }
+        });
+    } else {
+        unitPriceField.value = ''; // Clear the unit price if no SO item is selected
+    }
+}
+
     </script>
 
 

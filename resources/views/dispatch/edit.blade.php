@@ -100,7 +100,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form class="row g-3" method="post" action="{{ route('dispatch.update') }}">
+                            <form class="row g-3"  id="dispatchForm" method="post">
                                 @csrf
                                 <div class="row mb-3">
                                     <div class="col-md-6"> <!-- Change this to col-md-6 for equal width -->
@@ -272,10 +272,82 @@
     </main><!-- End #main -->
 
     <script>
+        // function deleteRow(button) {
+        //     var row = button.parentNode.parentNode;
+        //     row.parentNode.removeChild(row);
+        // }
+
         function deleteRow(button) {
-            var row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
+    // Find the row that was clicked
+    const row = button.closest('tr');
+
+    // Get the value of 'po_item_number[]' from the current row
+    const currentPoItemInput = row.querySelector('[name="po_item_number[]"]');
+    const currentPoItemValue = currentPoItemInput ? currentPoItemInput.value : null;
+
+    if (!currentPoItemValue) {
+        alert("PO Item not found. Cannot delete row.");
+        return;
+    }
+
+    // Get the value of 'so_item_no[]' from the current row
+    const currentSoItemSelect = row.querySelector('[name="so_item_no[]"]');
+    const currentSoItemValue = currentSoItemSelect ? currentSoItemSelect.value : null;
+
+    if (!currentSoItemValue) {
+        alert("SO Item not selected. Cannot proceed.");
+        return;
+    }
+
+    // Get the quantity of the row to be deleted from the 'quantity[]' input
+    const currentQuantityInput = row.querySelector('[name="quantity[]"]');
+    const currentQuantity = parseFloat(currentQuantityInput.value) || 0;
+
+    // Handle SO Item rest quantity update
+    let nextRow = row.nextElementSibling;
+
+    while (nextRow) {
+        const nextSoItemSelect = nextRow.querySelector('[name="so_item_no[]"]');
+        const nextSoItemValue = nextSoItemSelect ? nextSoItemSelect.value : null;
+
+        if (nextSoItemValue === currentSoItemValue) {
+            // Found a matching SO Item row, update its 'so_rest_qty_show[]'
+            const nextSoRestQtyInput = nextRow.querySelector('[name="so_rest_qty_show[]"]');
+            if (nextSoRestQtyInput) {
+                const nextSoRestQty = parseFloat(nextSoRestQtyInput.value) || 0;
+                nextSoRestQtyInput.value = nextSoRestQty + currentQuantity;
+            }
+            break;
         }
+
+        nextRow = nextRow.nextElementSibling;
+    }
+
+    // Handle PO Item rest quantity update
+    nextRow = row.nextElementSibling;
+
+    while (nextRow) {
+        const nextPoItemInput = nextRow.querySelector('[name="po_item_number[]"]');
+        const nextPoItemValue = nextPoItemInput ? nextPoItemInput.value : null;
+
+        if (nextPoItemValue === currentPoItemValue) {
+            // Found a matching PO Item row, update its 'po_rest_qty_show'
+            const nextPoRestQtyInput = nextRow.querySelector('[name="po_rest_qty_show"]');
+            if (nextPoRestQtyInput) {
+                const nextPoRestQty = parseFloat(nextPoRestQtyInput.value) || 0;
+                nextPoRestQtyInput.value = nextPoRestQty + currentQuantity;
+            }
+            break;
+        }
+
+        nextRow = nextRow.nextElementSibling;
+    }
+
+    // Remove the current row
+    row.remove();
+    calculateTotal(button);
+}
+
 
         function fetchrow() {
             var table = document.getElementById("myTable");
@@ -558,8 +630,6 @@
                 }
 
                 const rowPoItemNumber = row.querySelector('input[name="po_item_number[]"]').value;
-                console.log(rowPoItemNumber);
-
                 // Only process rows with the same po_item_number
                 if (rowPoItemNumber !== currentPoItemNumber) {
                     return;
@@ -579,9 +649,6 @@
                 remainingPoQty -= parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
                 remainingSoQty -= parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
             });
-
-
-
 
             // Recalculate the total values for PO and SO based on the quantity
             const sounitPrice = parseFloat(row.querySelector('input[name="dispatch_so_unit_price[]"]').value) || 0;
@@ -646,12 +713,11 @@
 
                             // Compare quantities properly
                             if (responseQty <= QtyFieldValue) {
-                                QtyField.value = responseQty; // Set the quantity field to the returned quantity
+                               // Set the quantity field to the returned quantity
                                 QtyField.setAttribute('max',
                                     responseQty); // Set the max attribute to the returned quantity
                             } else {
-                                QtyField.value =
-                                    QtyFieldValue; // Restore the original quantity if it's less than the returned value
+                                 // Restore the original quantity if it's less than the returned value
                                 QtyField.setAttribute('max',
                                     QtyFieldValue); // Set the max to the original quantity
                             }
@@ -716,5 +782,50 @@
             row.parentNode.insertBefore(clonedRow, row.nextSibling);
         }
     </script>
+
+<script>
+    $(document).ready(function() {
+        $('#dispatchForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent page refresh
+
+            let formData = $(this).serialize(); // Serialize form data
+
+            $.ajax({
+                url: "{{ route('dispatch.update') }}", // Backend route
+                type: "POST",
+                data: formData,
+                success: function(response) {
+                    window.location.href = response.redirect;
+                },
+                error: function(xhr) {
+                    // Determine error message
+                    let error = xhr.responseJSON?.error  || 'Something went wrong!';
+                    if (xhr.status === 400) {
+                        Swal.fire({
+                            title: 'Validation Error!',
+                            text: error,
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    } else if (xhr.status === 500) {
+                        Swal.fire({
+                            title: 'Server Error!',
+                            text: 'An internal server error occurred. Please try again later.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: error,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
 
 @endsection
