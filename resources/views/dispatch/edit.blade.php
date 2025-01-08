@@ -149,29 +149,22 @@
                                     <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table">
                                         <thead>
                                             <tr>
-                                                <th class="table_heading_long">Base Item<span
-                                                        class="required-classes">*</span></th>
-                                                <th style="width: 115px;" class="table_heading_long">PO Item No.</th>
-                                                <th style="width: 150px;" class="table_heading_long">Conv Item</th>
-                                                <th style="width: 115px;" class="table_heading_long">Conv Price</th>
-                                                <th style="width: 115px;" class="table_heading_long">PO Price</th>
-                                                <th style="width: 115px;" class="table_heading_long">Gross PO Price</th>
-                                                <th style="width: 115px;" class="table_heading_long">Loading + Insurance
-                                                </th>
-                                                <th style="width: 115px;" class="table_heading_normal">PORest Qty<span
-                                                        class="required-classes">*</span></th>
-                                                <th style="width: 115px;" class="table_heading_normal">Qty<span
-                                                        class="required-classes">*</span></th>
-                                                <th style="width: 115px;" class="table_heading_long">Payable Total<span
-                                                        class="required-classes">*</span></th>
-                                                <th style="width: 250px;" class="table_heading_long">SO Item No.<span
-                                                        class="required-classes">*</span></th>
-                                                <th style="width: 115px;" class="table_heading_long">SORest Qty</th>
-                                                <th style="width: 115px;" class="table_heading_long">SO Price</th>
-                                                <th style="width: 115px;" class="table_heading_long">SO Gross Price</th>
-                                                <th style="width: 115px;" class="table_heading_long">Receivable Total<span
-                                                        class="required-classes">*</span></th>
-                                                <th class="table_heading_action">Action</th>
+                                                <th class="table_heading_long" style="width: 150px; min-width: 150px;">Base Item<span class="required-classes">*</span></th>
+                                                <th class="table_heading_long" style="width: 150px; min-width: 150px;">PO Item No.</th>
+                                                <th class="table_heading_long" style="width: 150px; min-width: 150px;">Conv Item</th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Conv Price</th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">PO Price</th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Gross PO Price</th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Loading + Insurance</th>
+                                                <th class="table_heading_normal" style="width: 115px; min-width: 115px;">PORest Qty<span class="required-classes">*</span></th>
+                                                <th class="table_heading_normal" style="width: 115px; min-width: 115px;">Qty<span class="required-classes">*</span></th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Payable Total<span class="required-classes">*</span></th>
+                                                <th class="table_heading_long" style="width: 212px; min-width: 212px;">SO Item No.<span class="required-classes">*</span></th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">SORest Qty</th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">SO Price</th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">SO Gross Price</th>
+                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Receivable Total<span class="required-classes">*</span></th>
+                                                <th class="table_heading_action" style="width: 115px; min-width: 115px;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
