@@ -102,27 +102,13 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form id="dispatchForm" class="row g-3" method="post" action="{{ route('dispatch.store') }}">
+                            <form id="dispatchForm" class="row g-3" method="post" action="{{ route('dispatch_main.redirect') }}">
                                 @csrf
                                 <div class="row mb-3">
 
                                     <?php
                                     $currentDate = date('Y-m-d');
                                     ?>
-
-                                    <div class="col-md-6 mt-2"> <!-- Change this to col-md-6 for equal width -->
-                                        <label for="to_company_id" class="form-label">Dispatch Date<span
-                                                class="required-classes">*</span></label>
-                                        <input type="date" class="form-control" name="date" id="raised_date_input"
-                                            value="{{ $currentDate }}" required>
-                                    </div>
-
-                                    <div class="col-md-6 mt-2"> <!-- Change this to col-md-6 for equal width -->
-                                        <label for="to_company_id" class="form-label">Vehicle Number</label>
-                                        <input type="text" class="form-control" name="vehicle_number">
-                                    </div>
-
-
 
                                     <div class="col-md-6 mt-4">
                                         <label for="get_miller_id" class="form-label">From</label><span
@@ -149,61 +135,6 @@
                                     </div>
                                 </div>
 
-                                <div class="row mt-5">
-                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">Dispatch Details</h4>
-                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
-                                </div>
-
-                                <div class="table-responsive" style="overflow-x: auto;">
-                                    <table id="myTable" class="col-md-4 col-sm-4 col-xl-12 table"
-                                        style="min-width: 1200px;">
-                                        <thead>
-                                            <tr>
-                                                <th class="table_heading_long" style="width: 150px; min-width: 150px;">Base Item<span class="required-classes">*</span></th>
-                                                <th class="table_heading_long" style="width: 150px; min-width: 150px;">PO Item No.</th>
-                                                <th class="table_heading_long" style="width: 150px; min-width: 150px;">Conv Item</th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Conv Price</th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">PO Price</th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Gross PO Price</th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Loading + Insurance</th>
-                                                <th class="table_heading_normal" style="width: 115px; min-width: 115px;">PORest Qty<span class="required-classes">*</span></th>
-                                                <th class="table_heading_normal" style="width: 115px; min-width: 115px;">Qty<span class="required-classes">*</span></th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Payable Total<span class="required-classes">*</span></th>
-                                                <th class="table_heading_long" style="width: 212px; min-width: 212px;">SO Item No.<span class="required-classes">*</span></th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">SORest Qty</th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">SO Price</th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">SO Gross Price</th>
-                                                <th class="table_heading_long" style="width: 115px; min-width: 115px;">Receivable Total<span class="required-classes">*</span></th>
-                                                <th class="table_heading_action" style="width: 115px; min-width: 115px;">Action</th>
-                                            </tr>
-                                        </thead>
-                                        
-                                        <tbody>
-                                            <!-- Rows will be dynamically added here -->
-                                        </tbody>
-
-                                        <tfoot>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th>Total</th>
-                                            <th></th>
-                                            <th></th>
-                                            <th>
-                                            <td style="text-align:left  ; font-weight: bold;" id="totalQty">0</td>
-                                            </th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tfoot>
-                                    </table>
-                                </div>
-
                                 {{-- ............................................................. Purchase Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Selected Details</h4>
@@ -221,6 +152,7 @@
                                             <th>Rest Quantity (Q)</th>
                                             <th>PO Unit Price</th>
                                             <th>PO Price</th>
+                                            <th>Enter Dispatch Qty</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -245,6 +177,7 @@
                                             <th>Rest Quantity (Q)</th>
                                             <th>SO Unit Price</th>
                                             <th>SO Price</th>
+                                            <th>Enter Dispatch Qty</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -256,13 +189,9 @@
                                 <input type="hidden" id="so_item_no" name="">
                                 <input type="hidden" id="po_item_no" name="">
 
-                                <div class="col-md-4">
-                                    <label for="remarks" class="form-label">Remarks</label>
-                                    <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter remarks here..."></textarea>
-                                </div>
 
                                 <div class="text-end mt-5">
-                                    <button type="submit" onclick="check_" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
                                     <a class="btn btn-secondary" href="{{ route('dispatch.index') }}">Back</a>
                                 </div>
 
@@ -349,6 +278,7 @@
                                         <th>Quantity (Q)</th>
                                         <th>Rest Quantity (Q)</th>
                                         <th>SO Unit Price</th>
+                                        <th>Enter Qty</th>
                                         <th>Remarks</th>
                                     </tr>
                                 </thead>
@@ -370,77 +300,6 @@
 
 
     <script>
-        var lastItemId = 1;
-
-        function addRow(itemName = '', po_number = '', po_item_number = '', itemId = '', quantity = '', unitPrice = '',
-            subItems = [], freight = '', insurance =
-            '', qty =
-            '', ) {
-
-            var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
-            var newRow = table.insertRow(table.rows.length);
-            let subItemOptions = '<option readonly>Select Item</option>';
-            subItems.forEach(subItem => {
-                subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
-            });
-
-            const unit_price = (parseFloat(unitPrice));
-
-            newRow.innerHTML = `
-    <td>${itemName}</td>
-    <input type="hidden" name="cat_id[]" class="form-control" value="${itemId}" required>
-       
-          <td><input type="text" name="po_item_number[]" class="form-control" value="${po_item_number}" readonly required></td>
-    <td>
-        <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select>
-    </td>
-            <td>
-            <input type="number"  name="conv_rate_show[]" id="conv_price" oninput="calculateTotal(this)" class="form-control"  value="0" readonly/>
-              
-         <td>
-            <input type="number"  oninput="calculateTotal(this)" class="form-control"  value="${unitPrice}" readonly />
-    </td>
-     <td><input type="number" name="dispatch_unit_price[]" class="form-control"  value="${unit_price}"  readonly required /></td>
-    </td>
-        <td>
-            <input type="number" name="dispatch_fregiht_insuance[]" oninput="calculateTotal(this)" class="form-control"  value="0" required />
-    </td>
-     <td><input type="number" name="po_rest_qty_show"  oninput="calculateTotal(this)" step="0.001" min="0.001" class="form-control" value="${qty}" readonly /></td>
-         <td><input type="number" name="quantity[]" oninput="calculateTotal(this)" step="0.001" min="0.001" class="form-control" value="0" required /></td>
-     <td><input type="number" name="dispatch_total[]" value="${unit_price}" class="form-control" readonly required /></td>
-
-   <input type="hidden" name="conv_rate[]" id="conv_rate" value="0" class="form-control" oninput="calculateTotal(this)" required />
-    <input type="hidden" name="dispatch_unit_price_actual[]" class="form-control"  value="${unitPrice}"  readonly required />
-     <input type="hidden" name="quantity_po[]" oninput="calculateTotal(this)" step="0.001" min="1" class="form-control" value="${qty}" required />
-          <td>
-<select name="so_item_no[]" onchange="fetchUnitPrice(this)"  required  class="form-select">
-    <option value="" disabled selected>Select SO Item</option>
-</select>
-    </td>
-     <td><input type="number" name="so_rest_qty_show[]"  id="so_rest_qty_show"  class="form-control" value="0" readonly/></td>
-      <td><input type="number" name="dispatch_so_unit_price_actual[]" id="so_unit_price"  class="form-control" readonly required /></td>
-        <td><input type="number" name="dispatch_so_unit_price[]" id="so_unit_price"  class="form-control" readonly required /></td>
-    <input type="hidden" name="dispatch_so_unit_price_actual[]" id="so_unit_price_actual"  class="form-control"  readonly required />
-
-    <td><input type="number" name="dispatch_so_total[]" value="0" id="dispatch_so_total" class="form-control" readonly required /></td>
-
-<td>
-    <button type="button" class="btn btn-success" onclick="cloneRow(this)">
-        <i class="fas fa-copy"></i>
-    </button>
-</td>
-
-    <td>
-    <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
-        <i class="fas fa-minus-circle"></i>
-    </button>
-</td>
-
-`;
-            lastItemId++;
-        }
-
-
 
         // function cloneRow(button) {
         //     const row = button.closest('tr'); // Find the current row
@@ -504,50 +363,7 @@
         //     row.parentNode.insertBefore(clonedRow, row.nextSibling);
         // }
 
-        function cloneRow(button) {
-            const row = button.closest('tr'); // Find the current row
-            const clonedRow = row.cloneNode(true); // Clone the row
-
-            // Retain the values for input fields
-            clonedRow.querySelectorAll('input').forEach(input => {
-                input.value = input.value; // Retain the value in input fields
-            });
-
-            // Retain the selected option for each select dropdown
-            clonedRow.querySelectorAll('select').forEach(select => {
-                const originalSelect = row.querySelector(
-                    `select[name="${select.name}"]`); // Find the original select
-                select.value = originalSelect.value; // Set the selected value of the cloned select
-            });
-
-
-            const originalQty = parseFloat(row.querySelector('input[name="po_rest_qty_show"]').value) || 0;
-            const originalQtySO = parseFloat(row.querySelector('input[name="so_rest_qty_show[]"]').value) || 0;
-            const originalQuantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
-
-
-            const newRestQty = originalQty - originalQuantity;
-            const newRestQtySO = originalQtySO - originalQuantity;
-
-
-
-            clonedRow.querySelectorAll('input').forEach(input => {
-                if (input.name === 'po_rest_qty_show') {
-                    input.value = newRestQty.toFixed(3); // Set the new calculated value
-                } else if (input.name === 'so_rest_qty_show[]') {
-                    input.value = newRestQtySO.toFixed(3); // Set the new calculated value
-                } else if (input.name === 'quantity[]') {
-                    input.value = '0'; // Reset quantity to 0 for the new row
-                } else {
-                    input.value = input.value; // Retain other input values
-                }
-            });
-
-            // Insert the cloned row below the current row
-            row.parentNode.insertBefore(clonedRow, row.nextSibling);
-        }
-
-
+     
 
         function formatDate(dateString) {
             if (!dateString) return ''; // Return empty string if no date is provided
@@ -694,9 +510,13 @@
         <td>${RestQty}</td>
         <td>${UnitPrice}</td>
         <td>${Price}</td>
-        <td>${editOption}</td>
+    
+         <td>
+            <input type="number" name="dispatch_po_qty[]" class="form-control" value="0" max="${RestQty}" step="0.001">
+        </td>
+            <td>${editOption}</td>
     `;
-            lastItemId++;
+       
         }
 
 
@@ -746,9 +566,11 @@
         <td>${RestQty}</td>
         <td>${UnitPrice}</td>
         <td>${Price}</td>
+            <td>
+            <input type="number" name="dispatch_so_qty[]" class="form-control" value="0" max="${RestQty}" step="0.001">
+        </td>
         <td>${editOption}</td>
     `;
-            lastItemId++;
         }
 
 
@@ -981,9 +803,6 @@
                         const insurance = response.insurance;
                         const qty = response.po_dispatch_rest_qty;
                         // Populate the row with additional details
-                        addRow(details.name, po_item.document_number, po_item.po_item_no, details.id,
-                            quantity, unitPrice, subitems, freight,
-                            insurance, qty);
 
                         PORow(po_item.date, po_item.document_number, po_item.name, po_item.po_item_no,
                             po_item.qty, po_item.po_dispatch_rest_qty, po_item.unit_price, po_item
@@ -1092,8 +911,6 @@
                         <td>${po.remark ?? 'N/A'}</td>
                     </tr>`;
                         tableBody.append(row);
-
-
                     });
 
                     // Show the modal after populating the table
@@ -1104,8 +921,6 @@
                     alert('An error occurred while fetching purchase orders. Please try again.');
                 }
             });
-
-            companySelect.value = "";
         }
 
         function fetchSalesOrders(selectElement) {
@@ -1162,8 +977,6 @@
                     alert('An error occurred while fetching sales orders. Please try again.');
                 }
             });
-
-            selectElement.value = "";
         }
 
 
@@ -1576,52 +1389,6 @@
 
     </script>
 
-
-    <script>
-        $(document).ready(function() {
-            $('#dispatchForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent page refresh
-
-                let formData = $(this).serialize(); // Serialize form data
-
-                $.ajax({
-                    url: "{{ route('dispatch.store') }}", // Backend route
-                    type: "POST",
-                    data: formData,
-                    success: function(response) {
-                        window.location.href = response.redirect;
-                    },
-                    error: function(xhr) {
-                        // Determine error message
-                        let error = xhr.responseJSON?.message || 'Something went wrong!';
-
-                        if (xhr.status === 400) {
-                            Swal.fire({
-                                title: 'Validation Error!',
-                                text: error,
-                                icon: 'warning',
-                                confirmButtonText: 'OK'
-                            });
-                        } else if (xhr.status === 500) {
-                            Swal.fire({
-                                title: 'Server Error!',
-                                text: 'An internal server error occurred. Please try again later.',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: error,
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    }
-                });
-            });
-        });
-    </script>
     <script>
         $(document).ready(function() {
             // Initialize select2 for all custom-select elements

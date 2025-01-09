@@ -76,6 +76,19 @@ class DispatchController extends Controller
         return view('dispatch.create', compact('purchase_orders', 'sales_orders', 'companies_po', 'companies_so'));
     }
 
+    public function create_so()
+    {
+        $purchase_orders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
+            ->get();
+        $sales_orders = SalesOrder::all();
+
+        $companies_po = Company::where('type', '!=', 'buyer')->get();
+        $companies_so = Company::where('type', '!=', 'supplier')->get();
+
+
+        return view('dispatch_so.create', compact('purchase_orders', 'sales_orders', 'companies_po', 'companies_so'));
+    }
+
     public function getPurchaseOrders(Request $request)
     {
         $purchaseOrders = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
@@ -418,7 +431,7 @@ class DispatchController extends Controller
     {
         // Fetch dispatch data with related joins
 
-       
+
         $dispatch_data = Dispatch::leftJoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
             ->leftJoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
             ->leftJoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
@@ -462,7 +475,7 @@ class DispatchController extends Controller
             )
             ->where('dispatches.dispatch_number', $dispatch_number)
             ->first();
-     
+
 
         $dispatch_po_company = $dispatch_company->po_company;
         $dispatch_so_company = $dispatch_company->so_company;
@@ -528,58 +541,57 @@ class DispatchController extends Controller
         $rowIdentifiers = [];
         $soDispatchQuantities = [];
         $poDispatchQuantities = [];
-    
+
         foreach ($request->quantity as $index => $quantity) {
             $rowKey = $request->po_item_number[$index] . '-' .
-                      $request->sub_cat_id[$index] . '-' .
-                      $request->so_item_no[$index];
-    
+                $request->sub_cat_id[$index] . '-' .
+                $request->so_item_no[$index];
+
             // Check for duplicate rows
             if (in_array($rowKey, $rowIdentifiers)) {
                 return response()->json([
                     'error' => 'Duplicate rows detected for PO Item, Subcategory, or SO Item.'
                 ], 400);  // 400 is for Bad Request
             }
-    
+
             $rowIdentifiers[] = $rowKey;
-    
+
             // Fetch SO and PO items
             $so_item = SoItem::where('so_item_no', $request->so_item_no[$index])->first();
             $po_item = PoItem::where('po_item_no', $request->po_item_number[$index])->first();
-    
+
             if (!$so_item || !$po_item) {
                 return response()->json([
                     'error' => 'Please select at least one PO Item or SO Item.'
                 ], 400);
             }
-    
+
             // Initialize cumulative dispatched quantities
             $soDispatchQuantities[$request->so_item_no[$index]] = $soDispatchQuantities[$request->so_item_no[$index]] ?? 0;
             $poDispatchQuantities[$request->po_item_number[$index]] = $poDispatchQuantities[$request->po_item_number[$index]] ?? 0;
-    
+
             // Update cumulative dispatched quantities
             $soDispatchQuantities[$request->so_item_no[$index]] += $quantity;
             $poDispatchQuantities[$request->po_item_number[$index]] += $quantity;
-    
+
             $dispatchedSOQty = round(floatval($soDispatchQuantities[$request->so_item_no[$index]]), 3);
             $dispatchedPOQty = round(floatval($poDispatchQuantities[$request->po_item_number[$index]]), 3);
-    
+
             // Validation: Compare (so_dispatch_rest_qty + $quantity) with dispatched quantities
             $soAllowedQty = round(floatval($so_item->so_dispatch_rest_qty + $quantity), 3);
             $poAllowedQty = round(floatval($po_item->po_dispatch_rest_qty + $quantity), 3);
-    
+
             if ($dispatchedSOQty > $soAllowedQty) {
                 return response()->json([
                     'error' => 'Dispatched quantity for SO Item ' . $so_item->so_item_no . ' exceeds the allowed quantity (' . number_format($soAllowedQty, 3) . ').'
                 ], 400);
             }
-    
+
             if ($dispatchedPOQty > $poAllowedQty) {
                 return response()->json([
                     'error' => 'Dispatched quantity for PO Item ' . $po_item->po_item_no . ' exceeds the allowed quantity (' . number_format($poAllowedQty, 3) . ').'
                 ], 400);
             }
-            
         }
 
         $old_dispatch = Dispatch::where('dispatch_number', $request->dispatch_number)->get();
@@ -639,7 +651,7 @@ class DispatchController extends Controller
         }
 
         return response()->json(['success' => true, 'redirect' => route('dispatch.index')]);
-   
+
         // return redirect()->route('dispatch.index')->with('update', 'Dispatch updated successfully.');
     }
 
@@ -726,5 +738,41 @@ class DispatchController extends Controller
                 'message' => 'SO item not found',
             ]);
         }
+    }
+
+
+
+    public function main_dispatch_redirect(Request $request)
+    {
+
+        // dd( $request);
+
+        $po_items = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
+            ->join('categories', 'categories.id', '=', 'po_items.item_category')
+            ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price', 'po_items.po_dispatch_rest_qty', 'po_items.po_id', 'po_items.id as po_item_id')
+            ->whereIn('po_item_no', $request->po_item_no)->get();
+
+          $dispatch_so_qty = $request->dispatch_so_qty;
+          $dispatch_po_qty = $request->dispatch_po_qty;
+
+        $so_items = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
+            ->join('categories', 'categories.id', '=', 'so_items.item_category')
+            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price', 'so_items.so_id as so_id',  'so_items.id as so_item_id')
+            ->whereIn('so_item_no', $request->so_item_no)->get();
+
+            foreach ($so_items as $key => $so_item) {
+                $so_item->dispatch_so_qty = $dispatch_so_qty[$key] ?? 0; // Assign dispatch quantity to each SO item
+            }
+
+            foreach ($po_items as $key => $po_item) {
+                $po_item->dispatch_po_qty = $dispatch_po_qty[$key] ?? 0; // Assign dispatch quantity to each SO item
+            }
+
+            // dd( $so_items);
+
+        $dispatch_po_company = Company::where('id', $request->po_company_id)->first();
+        $dispatch_so_company = Company::where('id', $request->so_company_id)->first();
+
+        return view('dispatch_so.main_create', compact('po_items', 'so_items', 'dispatch_po_company', 'dispatch_so_company'));
     }
 }

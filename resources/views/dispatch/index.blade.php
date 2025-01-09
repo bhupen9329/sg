@@ -111,13 +111,19 @@
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end">
                                     <div class="btn-group">
                                         @can('Dispatch-create')
-                                            <a href="{{ route('dispatch.create') }}" class="btn btn-primary mb-4 mr-3">Add
-                                                Dispatch</a>
+                                            <button type="button" class="btn btn-primary dropdown-toggle mb-4 mr-3" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Add Dispatch
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{{ route('dispatch.create') }}">Dispatch from PO</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('dispatch.create_so') }}">Dispatch from SO</a></li>
+                                            </ul>
                                         @endcan
                                     </div>
-
-
                                 </div>
+                                
+
+                            
                             </div>
                             <div style="overflow-x: auto">
                                 <table class="table " id="Category_table">
