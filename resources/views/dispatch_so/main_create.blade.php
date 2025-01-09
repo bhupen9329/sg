@@ -377,7 +377,7 @@
                                                     </td>
                                     
                                                 <td>
-                                                    <input type="number" name="qty[]"  id="qty_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" value="{{ $so_item->dispatch_po_qty }}" class="form-control po_quantity" value="0" onchange="changeOtherPO(this)" disabled/>
+                                                    <input type="number" name="qty[]"  id="qty_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" value="{{ $so_item->dispatch_po_qty }}" class="form-control po_quantity po_quantity_{{ $po_item->po_item_id }}" value="0" onchange="changeOtherPO(this)" disabled/>
                                                 </td>
                                     
                                                 <td colspan="4"></td>
@@ -569,43 +569,80 @@
             if (qtyInput) {
                 totalQuantity += parseFloat(qtyInput.value) || 0;
             }
-           
-        }
-        else{
+        } else {
             const row = checkbox.closest('tr');
             const qtyInput = row.querySelector('.po_quantity');
-            totalQuantity -= parseFloat(qtyInput.value) || 0;
+            if (qtyInput) {
+                totalQuantity -= parseFloat(qtyInput.value) || 0;
+            }
         }
     });
 
- 
+    const allCheckboxesPO = document.querySelectorAll('.custom-checkbox');
+
+    let totalQuantityParticularPO = 0;
+    allCheckboxesPO.forEach(checkbox => {
+        if (checkbox.checked) {
+            // Find the corresponding quantity input field in the same row as the checkbox
+            const row = checkbox.closest('tr');
+            const qtyInput = row.querySelector('.po_quantity_' + poItemId);
+            if (qtyInput) {
+                totalQuantityParticularPO += parseFloat(qtyInput.value) || 0;
+            }
+        } else {
+            const row = checkbox.closest('tr');
+            const qtyInput = row.querySelector('.po_quantity_' + poItemId);
+            if (qtyInput) {
+                totalQuantity -= parseFloat(qtyInput.value) || 0;
+            }
+        }
+    });
+
 
     // Calculate the PO quantity based on SO quantity and PO Rest quantity
     let poCalculateQuantity = 0;
+
     if (soQuantity > poRestQty) {
-        if(totalQuantity != 0){
+        if (totalQuantity != 0) {
             poCalculateQuantity = soQuantity - (poRestQty + totalQuantity);
-        }else{
+        } else {
             poCalculateQuantity = poRestQty;
         }
     } else {
         poCalculateQuantity = (soQuantity - totalQuantity);
     }
 
+
     // Limit the value to 3 digits for PO quantity
     poCalculateQuantity = Math.abs(poCalculateQuantity);
 
-    // Set the calculated quantity to the input
-    qtyInput.value = poCalculateQuantity;
+    
+    if(soQuantity > totalQuantityParticularPO){
+        if (qtyInput) {
+        qtyInput.value = (poCalculateQuantity - totalQuantityParticularPO);
+    }
+    }
+    else{
+        if (qtyInput) {
+        qtyInput.value =  (poRestQty - totalQuantityParticularPO);
+    }
+    }
+
+
+
+    // Ensure qtyInput exists before setting the value
+  
 
     // Enable or disable the inputs based on the checkbox status
     if (checkbox.checked) {
-        qtyInput.disabled = false;
-        grossPriceInput.disabled = false;
+        if (qtyInput) qtyInput.disabled = false;
+        if (grossPriceInput) grossPriceInput.disabled = false;
     } else {
-        qtyInput.disabled = true;
-        grossPriceInput.disabled = true;
-        qtyInput.value = 0;  // Reset quantity when unchecked
+        if (qtyInput) {
+            qtyInput.disabled = true;
+            qtyInput.value = 0;  // Reset quantity when unchecked
+        }
+        if (grossPriceInput) grossPriceInput.disabled = true;
     }
 }
 
