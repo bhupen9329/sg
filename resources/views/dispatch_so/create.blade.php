@@ -159,6 +159,20 @@
                                     <tbody>
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
+
+                                     
+                                    <tfoot>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Total Dispatch Qty PO</th>
+                                        <th></th>
+                                        <th><input type="number" id="total_po_dispatch_qty" class="form-control" value="0" readonly></th>
+                                        <th></th>
+                                    </tfoot>
                                 </table>
                                 {{-- ............................................................. Sales Details................................................................  --}}
                                 <div class="row mt-5">
@@ -184,14 +198,27 @@
                                     <tbody>
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
+                                    
+                                    <tfoot>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Total Dispatch Qty SO</th>
+                                        <th></th>
+                                        <th><input type="number" id="total_so_dispatch_qty" class="form-control" value="0" readonly></th>
+                                        <th></th>
+                                    </tfoot>
                                 </table>
                                 <input type="hidden" id="po_item_id">
                                 <input type="hidden" id="so_item_no" name="">
                                 <input type="hidden" id="po_item_no" name="">
 
 
-                                <div class="text-end mt-5">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                <div class="text-end mt-5" id="submit_button">
+                                    <button type="submit"   class="btn btn-primary">Submit</button>
                                     <a class="btn btn-secondary" href="{{ route('dispatch.index') }}">Back</a>
                                 </div>
 
@@ -239,6 +266,7 @@
                                 <tbody>
                                     <!-- Rows will be populated here by JavaScript -->
                                 </tbody>
+                    
                             </table>
                         </div>
                     </div>
@@ -512,7 +540,7 @@
         <td>${Price}</td>
     
          <td>
-            <input type="number" name="dispatch_po_qty[]" class="form-control" value="0" max="${RestQty}" step="0.001">
+            <input type="number" name="dispatch_po_qty[]" oninput="calculateTotalDispatch(this)" class="form-control" value="0" max="${RestQty}" step="0.001">
         </td>
             <td>${editOption}</td>
     `;
@@ -567,7 +595,7 @@
         <td>${UnitPrice}</td>
         <td>${Price}</td>
             <td>
-            <input type="number" name="dispatch_so_qty[]" class="form-control" value="0" max="${RestQty}" step="0.001">
+            <input type="number" name="dispatch_so_qty[]" oninput="calculateTotalDispatch(this)" class="form-control" value="0" max="${RestQty}" step="0.001">
         </td>
         <td>${editOption}</td>
     `;
@@ -659,6 +687,34 @@
     row.remove();
     calculateTotal(button);
 }
+
+function calculateTotalDispatch(input) {
+    // Update total for PO table
+    const poInputs = document.querySelectorAll("#poTable tbody input[name='dispatch_po_qty[]']");
+    let totalPoDispatch = 0;
+
+    poInputs.forEach(input => {
+        totalPoDispatch += parseFloat(input.value) || 0; // Add value or 0 if empty
+    });
+    document.getElementById("total_po_dispatch_qty").value = totalPoDispatch;
+
+    // Update total for SO table
+    const soInputs = document.querySelectorAll("#soTable tbody input[name='dispatch_so_qty[]']");
+    let totalSoDispatch = 0;
+
+    soInputs.forEach(input => {
+        totalSoDispatch += parseFloat(input.value) || 0; // Add value or 0 if empty
+    });
+    document.getElementById("total_so_dispatch_qty").value = totalSoDispatch;
+
+    const submitButton = document.getElementById("submit_button");
+    if (totalPoDispatch !== totalSoDispatch) {
+        submitButton.style.display = "none"; 
+    } else {
+        submitButton.style.display = "block"; 
+    }
+}
+
 
 
 
