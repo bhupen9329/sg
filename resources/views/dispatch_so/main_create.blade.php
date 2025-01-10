@@ -1,13 +1,16 @@
 @extends('layouts.main')
 @section('title', 'Create - Dispatch')
 @section('content')
-<style>
-    .custom-checkbox {
-        width: 15px; /* Adjust width */
-        height: 15px; /* Adjust height */
-        transform: scale(1.5); /* Adjust scale for finer control */
-    }
-</style>
+    <style>
+        .custom-checkbox {
+            width: 15px;
+            /* Adjust width */
+            height: 15px;
+            /* Adjust height */
+            transform: scale(1.5);
+            /* Adjust scale for finer control */
+        }
+    </style>
     <main id="main" class="main">
         @if ($message = Session::get('Credit_note_status'))
             <div class="tt active">
@@ -106,7 +109,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form id="dispatchForm" class="row g-3" method="post" action="{{ route('dispatch.store') }}">
+                            <form id="dispatchForm" class="row g-3" method="post"
+                                action="{{ route('dispatch.store_so') }}">
                                 @csrf
                                 <div class="row mb-3">
 
@@ -133,8 +137,9 @@
                                             class="required-classes">*</span>
                                         <select class="form-select Select-Company custom-select" id="get_miller_id"
                                             name="po_company_id">
-                                            <option value="{{ $dispatch_po_company->id }}" selected>{{ $dispatch_po_company->company_name }}</option>
-                                            
+                                            <option value="{{ $dispatch_po_company->id }}" selected>
+                                                {{ $dispatch_po_company->company_name }}</option>
+
                                         </select>
                                     </div>
 
@@ -143,8 +148,9 @@
                                             class="required-classes">*</span>
                                         <select class="form-select Select-Company custom-select" id="to_company_id"
                                             name="so_company_id">
-                                            <option value="{{ $dispatch_so_company->id }}" selected>{{ $dispatch_so_company->company_name }}</option>
-                                           
+                                            <option value="{{ $dispatch_so_company->id }}" selected>
+                                                {{ $dispatch_so_company->company_name }}</option>
+
                                         </select>
                                     </div>
                                 </div>
@@ -169,19 +175,19 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                       @foreach($po_items as $po_item)
-                                       <tr>
-                                        <td>{{date('d-M-Y', strtotime($po_item->date))}} </td>
-                                        <td>{{ $po_item->document_number }}</td>
-                                        <td>{{ $po_item->name }}</td>
-                                        <td>{{ $po_item->po_item_no }}</td>
-                                        <td>{{ $po_item->qty }}</td>
-                                        <td>{{ $po_item->po_dispatch_rest_qty }}</td>
-                                        <td>{{ $po_item->dispatch_po_qty }}</td>
+                                        @foreach ($po_items as $po_item)
+                                            <tr>
+                                                <td>{{ date('d-M-Y', strtotime($po_item->date)) }} </td>
+                                                <td>{{ $po_item->document_number }}</td>
+                                                <td>{{ $po_item->name }}</td>
+                                                <td>{{ $po_item->po_item_no }}</td>
+                                                <td>{{ $po_item->qty }}</td>
+                                                <td>{{ $po_item->po_dispatch_rest_qty }}</td>
+                                                <td>{{ $po_item->dispatch_po_qty }}</td>
 
-                                        <td>{{ $po_item->unit_price }}</td>
-                                       </tr>
-                                       @endforeach
+                                                <td>{{ $po_item->unit_price }}</td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
 
@@ -209,23 +215,23 @@
                                     <tbody>
                                         <!-- Rows will be dynamically added here -->
 
-                                        @foreach($so_items as $so_item)
-                                        <tr>
-                                         <td>{{date('d-M-Y', strtotime($so_item->date))}} </td>
-                                         <td>{{ $so_item->so_number }}</td>
-                                         <td>{{ $so_item->name }}</td>
-                                         <td>{{ $so_item->so_item_no }}</td>
-                                         <td>{{ $so_item->qty }}</td>
-                                         <td>{{ $so_item->so_dispatch_rest_qty }}</td>
-                                        <td>{{ $so_item->dispatch_so_qty }}</td>
-                                         <td>{{ $so_item->unit_price }}</td>
-                                        </tr>
+                                        @foreach ($so_items as $so_item)
+                                            <tr>
+                                                <td>{{ date('d-M-Y', strtotime($so_item->date)) }} </td>
+                                                <td>{{ $so_item->so_number }}</td>
+                                                <td>{{ $so_item->name }}</td>
+                                                <td>{{ $so_item->so_item_no }}</td>
+                                                <td>{{ $so_item->qty }}</td>
+                                                <td>{{ $so_item->so_dispatch_rest_qty }}</td>
+                                                <td>{{ $so_item->dispatch_so_qty }}</td>
+                                                <td>{{ $so_item->unit_price }}</td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
 
 
-                                
+
                                 {{-- ............................................................. Dispatch Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">Dispatch Details</h4>
@@ -252,74 +258,101 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($so_items as $so_item)
                                         @php
-                                         $conv_item = DB::table('subcategories')->where('category_id', $so_item->item_category)->get();
+                                            $total_count = 1;
                                         @endphp
+                                        @foreach ($so_items as $so_item)
+                                            @php
+                                                $conv_item = DB::table('subcategories')
+                                                    ->where('category_id', $so_item->item_category)
+                                                    ->get();
+                                            @endphp
                                             <!-- SO Item Row -->
                                             <tr class="bg-primary text-white">
                                                 <!-- Base Item Name as Input -->
                                                 <td>
-                                                    <input type="text" name="base_item_name[]" value="{{ $so_item->name }}" class="form-control" readonly />
+                                                    <input type="text" name="base_item_name[]"
+                                                        value="{{ $so_item->name }}" class="form-control" readonly />
                                                 </td>
-                                                
+
                                                 <!-- SO Item No. as Input -->
                                                 <td>
-                                                    <input type="text" name="so_item_no[]" value="{{ $so_item->so_item_no }}" class="form-control" readonly />
+                                                    <input type="text" name="so_item_no[]"
+                                                        value="{{ $so_item->so_item_no }}" class="form-control"
+                                                        readonly />
+                                                    <input type="hidden" name="so_item_id[]"
+                                                        value="{{ $so_item->so_item_id }}">
                                                 </td>
-                                                
+
                                                 <!-- Conversion Rate Select -->
                                                 <td>
-                                                    <select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">
+                                                    <select name="sub_cat_id[]" onchange="get_conv_price(this)"
+                                                        class="form-select">
                                                         <option value="">Select</option>
-                                                        @foreach($conv_item as $data)
-                                                        <option value="{{ $data->id }}">{{ $data->sub_category }}</option>
+                                                        @foreach ($conv_item as $data)
+                                                            <option value="{{ $data->id }}">{{ $data->sub_category }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </td>
-                                                
+
                                                 <!-- Conversion Rate Input -->
                                                 <td>
-                                                    <input type="number" name="conv_rate[]" class="form-control" value="0" oninput="calculateTotal(this)" readonly />
-                                                </td>
-                                                
-                                                <!-- Loading Insurance Input -->
-                                                <td>
-                                                    <input type="number" name="dispatch_freight_insuance[]" class="form-control" value="0" oninput="calculateTotal(this)" />
-                                                </td>
-                                                
-                                                <!-- Unit Price Input -->
-                                                <td>
-                                                    <input type="text" name="so_unit_price[]" value="{{ $so_item->unit_price }}" class="form-control" readonly />
-                                                </td>
-                                                
-                                                <!-- Gross SO Price Input -->
-                                                <td>
-                                                    <input type="number" name="gross_so_price[]" class="form-control" value="{{ $so_item->unit_price }}" oninput="calculateTotal(this)" readonly/>
-                                                </td>
-                                                
-                                                <!-- Quantity Input -->
-                                                <td>
-                                                    <input type="number" name="so_quantity[]" value="{{ $so_item->qty }}" class="form-control" readonly />
-                                                </td>
-                                                
-                                                <!-- SO Dispatch Rest Qty Input -->
-                                                <td>
-                                                    <input type="number" name="so_dispatch_rest_qty[]" value="{{ $so_item->so_dispatch_rest_qty }}" class="form-control" readonly />
+                                                    <input type="number" name="conv_rate[]" class="form-control"
+                                                        value="0" oninput="calculateTotal(this)" readonly />
                                                 </td>
 
-                                                    <!-- SO Dispatch Qty Input -->
-                                                    <td>
-                                                        <input type="number" name="dispatch_so_qty[]" value="{{ $so_item->dispatch_so_qty }}" class="form-control" readonly />
-                                                    </td>
-                                                
+                                                <!-- Loading Insurance Input -->
+                                                <td>
+                                                    <input type="number" name="dispatch_freight_insuance[]"
+                                                        class="form-control" value="0"
+                                                        oninput="calculateTotal(this)" />
+                                                </td>
+
+                                                <!-- Unit Price Input -->
+                                                <td>
+                                                    <input type="text" name="so_unit_price[]"
+                                                        value="{{ $so_item->unit_price }}" class="form-control"
+                                                        readonly />
+                                                </td>
+
+                                                <!-- Gross SO Price Input -->
+                                                <td>
+                                                    <input type="number" name="gross_so_price[]" class="form-control"
+                                                        value="{{ $so_item->unit_price }}" oninput="calculateTotal(this)"
+                                                        readonly />
+                                                </td>
+
+                                                <!-- Quantity Input -->
+                                                <td>
+                                                    <input type="number" name="so_quantity[]"
+                                                        value="{{ $so_item->qty }}" class="form-control" readonly />
+                                                </td>
+
+                                                <!-- SO Dispatch Rest Qty Input -->
+                                                <td>
+                                                    <input type="number" name="so_dispatch_rest_qty[]"
+                                                        value="{{ $so_item->so_dispatch_rest_qty }}" class="form-control"
+                                                        readonly />
+                                                </td>
+
+                                                <!-- SO Dispatch Qty Input -->
+                                                <td>
+                                                    <input type="number" name="dispatch_so_qty[]"
+                                                        value="{{ $so_item->dispatch_so_qty }}" class="form-control"
+                                                        readonly />
+                                                </td>
+
                                                 <!-- Final Gross SO Price Input -->
                                                 <td>
-                                                    <input type="number" name="quantity[]" id="so_quantity_{{ $so_item->so_item_id }}" value="{{ $so_item->dispatch_so_qty }}" class="form-control" value="0" oninput="calculateTotal(this)" />
+                                                    <input type="number" name="quantity[]"
+                                                        id="so_quantity_{{ $so_item->so_item_id }}"
+                                                        value="{{ $so_item->dispatch_so_qty }}" class="form-control"
+                                                        value="0" step="0.001" oninput="calculateTotal(this)" />
                                                 </td>
                                             </tr>
-                                            
-                                
+
+
                                             <!-- PO Items Header -->
                                             <tr>
                                                 <th colspan="11" class="text-center bg-light">PO Items</th>
@@ -336,84 +369,121 @@
                                                 <th>Enter Qty</th>
                                                 <th colspan="4"></th>
                                             </tr>
-                                            
+
                                             <!-- Related PO Items for this SO Item -->
-                                            @foreach($po_items as $po_item)
-                                            <tr>
-                                                <!-- Action Column with Checkbox -->
-                                                <td>
-                                                    <input type="checkbox" name="po_item_select[]" value="{{ $po_item->po_item_id }}" 
-                                                        onchange="toggleCheckbox('{{  $po_item->po_item_id }}', '{{ $so_item->so_item_id }}')" 
-                                                        id="item_checkbox_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}" />
-                                                </td>
-                                    
-                                                <td>
-                                                    <input type="text" name="base_item_name[]" value="{{ $po_item->name }}" class="form-control" readonly />
-                                                </td>
-                                    
-                                                <td>
-                                                    <input type="text" name="po_item_no[]" value="{{ $po_item->po_item_no }}" class="form-control" readonly />
-                                                </td>
-                                    
-                                                <td>
-                                                    <input type="number" name="po_qty[]" id="po_qty_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" value="{{ $po_item->qty }}" class="form-control" readonly/>
-                                                </td>
-                                    
-                                                <td>
-                                                    <input type="number" name="po_rest_qty[]" class="form-control" value="{{ $po_item->po_dispatch_rest_qty }}" oninput="calculateTotal(this)" readonly/>
-                                                </td>
-                                    
-                                                <td>
-                                                    <input type="number" name="po_unit_price[]" value="{{ $po_item->unit_price }}"  id="po_unit_price_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" class="form-control" readonly />
-                                                </td>
-                                    
-                                                <td>
-                                                    <input type="number" name="gross_po_price[]" class="form-control"  id="gross_po_price_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" value="{{ $po_item->unit_price }}" oninput="calculateTotal(this)" readonly disabled/>
-                                                </td>
-
-                                                     <!-- SO Dispatch Qty Input -->
-                                                     <td>
-                                                        <input type="number" name="dispatch_po_qty[]"  id="po_rest_qty_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" value="{{ $po_item->dispatch_po_qty }}" class="form-control dispatch_po_quantity" readonly />
+                                            @foreach ($po_items as $po_item)
+                                                <tr>
+                                                    <!-- Action Column with Checkbox -->
+                                                    <td>
+                                                        @if ($po_item->item_category == $so_item->item_category)
+                                                            <input type="checkbox" name="po_item_select[]"
+                                                                value="{{ $po_item->po_item_id }}"
+                                                                onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}')"
+                                                                id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                                class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}" />
+                                                        @else
+                                                            <input type="checkbox" name="po_item_select[]"
+                                                                value="{{ $po_item->po_item_id }}"
+                                                                onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}')"
+                                                                id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                                class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}"
+                                                                disabled />
+                                                        @endif
                                                     </td>
-                                    
-                                                <td>
-                                                    <input type="number" name="qty[]"  id="qty_{{  $po_item->po_item_id }}_{{ $so_item->so_item_id }}" value="{{ $so_item->dispatch_po_qty }}" class="form-control po_quantity po_quantity_{{ $po_item->po_item_id }}" value="0" onchange="changeOtherPO(this)" disabled/>
-                                                </td>
-                                    
-                                                <td colspan="4"></td>
-                                            </tr>
-                                            @endforeach
-                                            
-                                            <!-- Separator Row -->
-                                    
-                                            <tr class="group">
-                                                <td colspan="11" style="text-align: center; border-top: 2px solid #8B0000;"></td>
-                                            </tr>
-                                            <tr>
-                                                <th colspan="11" class="text-center bg-light">SO Items</th>
-                                            </tr>
 
-                                            <tr>
-                                                <th>Base Item</th>
-                                                <th>SO Item No.</th>
-                                                <th>Conv Item</th>
-                                                <th>Conv Price</th>
-                                                <th>Loading + Insurance</th>
-                                                <th>SO Unit Price</th>
-                                                <th>Gross SO Price</th>
-                                                <th>SO Qty</th>
-                                                <th>SORest Qty</th>
-                                                <th>Dispatch Qty</th>
-                                                <th>Enter Qty</th>
+                                                    <td>
+                                                        <input type="text" name="base_item_name[]"
+                                                            value="{{ $po_item->name }}" class="form-control" readonly />
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="text" name="po_item_no[]"
+                                                            value="{{ $po_item->po_item_no }}"
+                                                            id="po_item_number_{{ $so_item->so_item_id }}"
+                                                            class="form-control" readonly disabled />
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="number" name="po_qty[]"
+                                                            id="po_qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            value="{{ $po_item->qty }}" class="form-control" readonly />
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="number" name="po_rest_qty[]" class="form-control"
+                                                            value="{{ $po_item->po_dispatch_rest_qty }}"
+                                                            oninput="calculateTotal(this)" readonly />
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="number" name="po_unit_price[]"
+                                                            value="{{ $po_item->unit_price }}"
+                                                            id="po_unit_price_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            class="form-control" readonly />
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="number" name="gross_po_price[]"
+                                                            class="form-control"
+                                                            id="gross_po_price_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            value="{{ $po_item->unit_price }}"
+                                                            oninput="calculateTotal(this)" readonly disabled />
+                                                    </td>
+
+                                                    <!-- SO Dispatch Qty Input -->
+                                                    <td>
+                                                        <input type="number" name="dispatch_po_qty[]"
+                                                            id="po_rest_qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            value="{{ $po_item->dispatch_po_qty }}"
+                                                            class="form-control dispatch_po_quantity" readonly />
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="number" name="qty[]"
+                                                            id="qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            value="{{ $so_item->dispatch_po_qty }}"
+                                                            class="form-control po_quantity po_quantity_{{ $po_item->po_item_id }}"
+                                                            value="0" step="0.001" onchange="changeOtherPO(this)"
+                                                            disabled />
+                                                    </td>
+
+                                                    <td colspan="4"></td>
+                                                </tr>
+                                            @endforeach
+
+                                            <!-- Separator Row -->
+
+                                            <tr class="group">
+                                                <td colspan="11"
+                                                    style="text-align: center; border-top: 2px solid #8B0000;"></td>
                                             </tr>
+                                            @if ($total_count != $total_no)
+                                                <tr>
+                                                    <th colspan="11" class="text-center bg-light">SO Items</th>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Base Item</th>
+                                                    <th>SO Item No.</th>
+                                                    <th>Conv Item</th>
+                                                    <th>Conv Price</th>
+                                                    <th>Loading + Insurance</th>
+                                                    <th>SO Unit Price</th>
+                                                    <th>Gross SO Price</th>
+                                                    <th>SO Qty</th>
+                                                    <th>SORest Qty</th>
+                                                    <th>Dispatch Qty</th>
+                                                    <th>Enter Qty</th>
+                                                </tr>
+                                            @endif
+                                            @php
+                                                $total_count++;
+                                            @endphp
                                         @endforeach
                                     </tbody>
                                 </table>
-                                
-                                
-                                <input type="hidden" id="po_item_id">
-                                <input type="hidden" id="so_item_no" name="">
-                                <input type="hidden" id="po_item_no" name="">
+
+
 
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
@@ -436,7 +506,7 @@
 
     <script>
         // ............................................................................. fetch conv price.................................................................. 
-     function get_conv_price(selectElement) {
+        function get_conv_price(selectElement) {
             let item_id = selectElement.value;
 
             $.ajax({
@@ -479,45 +549,62 @@
         function calculateTotal(element) {
             const row = element.closest('tr');
 
+            // Fetch values from SO row
             const quantityInput = row.querySelector('input[name="quantity[]"]');
-            const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
-
+            const quantity = parseFloat(quantityInput.value) || 0;
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
-            const so_rest_quantity = parseFloat(row.querySelector('input[name="so_dispatch_rest_qty[]"]').value) || 0;
-            const sounitPrice = parseFloat(row.querySelector('input[name="so_unit_price[]"]').value) || 0;
-            const freight_insurance = parseFloat(row.querySelector('input[name="dispatch_freight_insuance[]"]').value) || 0;
-            const gross_so_price = parseFloat(row.querySelector('input[name="gross_so_price[]"]').value) || 0;
+            const freightInsurance = parseFloat(row.querySelector('input[name="dispatch_freight_insuance[]"]').value) || 0;
+            const soRestQuantity = parseFloat(row.querySelector('input[name="so_dispatch_rest_qty[]"]').value) || 0;
+            const soUnitPrice = parseFloat(row.querySelector('input[name="so_unit_price[]"]').value) || 0;
 
-            const totalSoAmountGross = (sounitPrice + freight_insurance + convRate);
+            // Update SO Gross Price
+            const totalSoAmountGross = soUnitPrice + freightInsurance + convRate;
             row.querySelector('input[name="gross_so_price[]"]').value = totalSoAmountGross.toFixed(2);
 
-            if (quantity > so_rest_quantity) {
+            // Ensure quantity doesn't exceed SO rest quantity
+            if (quantity > soRestQuantity) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Quantity Exceeded',
                     text: 'The entered quantity exceeds the available SO quantity.',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    // Reset the quantity to 0 after SweetAlert
-                    quantityInput.value = 0;
+                    quantityInput.value = 0; // Reset to 0
                 });
-                return; // Exit the function if the condition is met
+                return;
             }
-           
+
+            // Update related PO rows
+            updateRelatedPO(row, convRate, freightInsurance);
+        }
+
+        function updateRelatedPO(soRow, convRate, freightInsurance) {
+            const soItemId = soRow.querySelector('input[name="so_item_id[]"]').value; // SO Item ID
+
+            // Find all related PO rows
+            const relatedPORows = document.querySelectorAll('.custom-checkbox_' + soItemId);
+            relatedPORows.forEach((checkbox) => {
+                const poRow = checkbox.closest('tr');
+                // Update PO fields
+                const poUnitPrice = parseFloat(poRow.querySelector('input[name="po_unit_price[]"]').value) || 0;
+
+
+                const totalPoAmountGross = poUnitPrice + freightInsurance + convRate;
+                poRow.querySelector('input[name="gross_po_price[]"]').value = totalPoAmountGross.toFixed(2);
+
+            });
         }
 
         // ........................................................................................................................................................................ 
 
 
-                // .............................................................................Pochange.................................................................. 
+        // .............................................................................Pochange.................................................................. 
 
-                function changeOtherPO(element) {
+        function changeOtherPO(element) {
             const row = element.closest('tr');
 
             const quantityInput = row.querySelector('input[name="quantity[]"]');
             const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
-
-
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
             const so_rest_quantity = parseFloat(row.querySelector('input[name="so_dispatch_rest_qty[]"]').value) || 0;
             const sounitPrice = parseFloat(row.querySelector('input[name="so_unit_price[]"]').value) || 0;
@@ -539,7 +626,7 @@
                 });
                 return; // Exit the function if the condition is met
             }
-           
+
         }
 
         // ........................................................................................................................................................................ 
@@ -548,107 +635,107 @@
 
 
         function toggleCheckbox(poItemId, soItemId) {
-    // Get the checkbox, quantity input, and gross price input elements
-    const checkbox = document.getElementById('item_checkbox_' + poItemId + '_' + soItemId);
-    const qtyInput = document.getElementById('qty_' + poItemId + '_' + soItemId);
-    const grossPriceInput = document.getElementById('gross_po_price_' + poItemId + '_' + soItemId);
+            // Get the checkbox, quantity input, and gross price input elements
+            const checkbox = document.getElementById('item_checkbox_' + poItemId + '_' + soItemId);
+            const qtyInput = document.getElementById('qty_' + poItemId + '_' + soItemId);
+            const grossPriceInput = document.getElementById('gross_po_price_' + poItemId + '_' + soItemId);
 
-    // Get SO quantity, PO Rest quantity, and other related values
-    const poRestQty = parseFloat(document.getElementById('po_rest_qty_' + poItemId + '_' + soItemId).value) || 0;
-    const soQuantity = parseFloat(document.getElementById('so_quantity_' + soItemId).value) || 0;
+            const PoItemNumber = document.getElementById('po_item_number_' + soItemId);
 
-    const allCheckboxes = document.querySelectorAll('.custom-checkbox_' + soItemId);
-  
-    let totalQuantity = 0;
 
-    allCheckboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            // Find the corresponding quantity input field in the same row as the checkbox
-            const row = checkbox.closest('tr');
-            const qtyInput = row.querySelector('.po_quantity');
-            if (qtyInput) {
-                totalQuantity += parseFloat(qtyInput.value) || 0;
+            // Get SO quantity, PO Rest quantity, and other related values
+            const poRestQty = parseFloat(document.getElementById('po_rest_qty_' + poItemId + '_' + soItemId).value) || 0;
+            const soQuantity = parseFloat(document.getElementById('so_quantity_' + soItemId).value) || 0;
+
+            const allCheckboxes = document.querySelectorAll('.custom-checkbox_' + soItemId);
+
+            let totalQuantity = 0;
+
+            allCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    // Find the corresponding quantity input field in the same row as the checkbox
+                    const row = checkbox.closest('tr');
+                    const qtyInput = row.querySelector('.po_quantity');
+                    if (qtyInput) {
+                        totalQuantity += parseFloat(qtyInput.value) || 0;
+                    }
+                } else {
+                    const row = checkbox.closest('tr');
+                    const qtyInput = row.querySelector('.po_quantity');
+                    if (qtyInput) {
+                        totalQuantity -= parseFloat(qtyInput.value) || 0;
+                    }
+                }
+            });
+
+
+            const allCheckboxesPO = document.querySelectorAll('.custom-checkbox');
+            let totalQuantityParticularPO = 0;
+            allCheckboxesPO.forEach(checkbox => {
+                if (checkbox.checked) {
+                    // Find the corresponding quantity input field in the same row as the checkbox
+                    const row = checkbox.closest('tr');
+                    const qtyInput = row.querySelector('.po_quantity_' + poItemId);
+                    if (qtyInput) {
+                        totalQuantityParticularPO += parseFloat(qtyInput.value) || 0;
+                    }
+                } else {
+                    const row = checkbox.closest('tr');
+                    const qtyInput = row.querySelector('.po_quantity_' + poItemId);
+                    if (qtyInput) {
+                        totalQuantity -= parseFloat(qtyInput.value) || 0;
+                    }
+                }
+            });
+
+            // Calculate the PO quantity based on SO quantity and PO Rest quantity
+            let poCalculateQuantity = 0;
+            if (soQuantity > poRestQty) {
+                if (totalQuantity != 0) {
+                    poCalculateQuantity = soQuantity - (totalQuantity);
+                    if (poCalculateQuantity > poRestQty) {
+                        poCalculateQuantity = (poRestQty - totalQuantityParticularPO);
+                    }
+                } else {
+                    poCalculateQuantity = poRestQty - (totalQuantityParticularPO);
+                }
+            } else {
+                poCalculateQuantity = (soQuantity - totalQuantity);
             }
-        } else {
-            const row = checkbox.closest('tr');
-            const qtyInput = row.querySelector('.po_quantity');
+
+
+            //     poCalculateQuantity = Math.abs(poCalculateQuantity);
+            // if (soQuantity > totalQuantityParticularPO) {
+            //     if (qtyInput) {
+            //         qtyInput.value = Math.max((poCalculateQuantity - totalQuantityParticularPO), 0);
+            //     }
+            // } else {
+            //     if (qtyInput) {
+            //         qtyInput.value = Math.max((poRestQty - totalQuantityParticularPO), 0);
+
+            //     }
+            // }
             if (qtyInput) {
-                totalQuantity -= parseFloat(qtyInput.value) || 0;
+                qtyInput.value = Math.max((poCalculateQuantity), 0).toFixed(3);
+            }
+
+            // Enable or disable the inputs based on the checkbox status
+            if (checkbox.checked) {
+                if (qtyInput) qtyInput.disabled = false;
+                if (grossPriceInput) grossPriceInput.disabled = false;
+
+                PoItemNumber.disabled = false;
+            } else {
+                if (qtyInput) {
+                    qtyInput.disabled = true;
+                    qtyInput.value = 0; // Reset quantity when unchecked
+                }
+                if (grossPriceInput) grossPriceInput.disabled = true;
+                PoItemNumber.disabled = true;
             }
         }
-    });
-
-    const allCheckboxesPO = document.querySelectorAll('.custom-checkbox');
-
-    let totalQuantityParticularPO = 0;
-    allCheckboxesPO.forEach(checkbox => {
-        if (checkbox.checked) {
-            // Find the corresponding quantity input field in the same row as the checkbox
-            const row = checkbox.closest('tr');
-            const qtyInput = row.querySelector('.po_quantity_' + poItemId);
-            if (qtyInput) {
-                totalQuantityParticularPO += parseFloat(qtyInput.value) || 0;
-            }
-        } else {
-            const row = checkbox.closest('tr');
-            const qtyInput = row.querySelector('.po_quantity_' + poItemId);
-            if (qtyInput) {
-                totalQuantity -= parseFloat(qtyInput.value) || 0;
-            }
-        }
-    });
-
-
-    // Calculate the PO quantity based on SO quantity and PO Rest quantity
-    let poCalculateQuantity = 0;
-
-    if (soQuantity > poRestQty) {
-        if (totalQuantity != 0) {
-            poCalculateQuantity = soQuantity - (poRestQty + totalQuantity);
-        } else {
-            poCalculateQuantity = poRestQty;
-        }
-    } else {
-        poCalculateQuantity = (soQuantity - totalQuantity);
-    }
-
-
-    // Limit the value to 3 digits for PO quantity
-    poCalculateQuantity = Math.abs(poCalculateQuantity);
-
-    
-    if(soQuantity > totalQuantityParticularPO){
-        if (qtyInput) {
-        qtyInput.value = (poCalculateQuantity - totalQuantityParticularPO);
-    }
-    }
-    else{
-        if (qtyInput) {
-        qtyInput.value =  (poRestQty - totalQuantityParticularPO);
-    }
-    }
-
-
-
-    // Ensure qtyInput exists before setting the value
-  
-
-    // Enable or disable the inputs based on the checkbox status
-    if (checkbox.checked) {
-        if (qtyInput) qtyInput.disabled = false;
-        if (grossPriceInput) grossPriceInput.disabled = false;
-    } else {
-        if (qtyInput) {
-            qtyInput.disabled = true;
-            qtyInput.value = 0;  // Reset quantity when unchecked
-        }
-        if (grossPriceInput) grossPriceInput.disabled = true;
-    }
-}
 
 
         // ........................................................................................................................................................................ 
-
-
     </script>
 @endsection
