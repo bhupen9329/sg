@@ -176,6 +176,7 @@ class DispatchController extends Controller
     public function storeDispatch(Request $request)
     {
 
+
         // $month = date('m');
         // $year = date('Y');
 
@@ -775,38 +776,67 @@ class DispatchController extends Controller
         $dispatch_po_company = Company::where('id', $request->po_company_id)->first();
         $dispatch_so_company = Company::where('id', $request->so_company_id)->first();
 
-        return view('dispatch_so.main_create', compact('po_items', 'so_items','total_no', 'dispatch_po_company', 'dispatch_so_company'));
+        return view('dispatch_so.main_create', compact('po_items', 'so_items', 'total_no', 'dispatch_po_company', 'dispatch_so_company'));
     }
 
 
     public function storeDispatchSO(Request $request)
     {
-        dd($request);
-        $so_items = SoItem::whereIn('id', $request->so_item_id)->sum('so_dispatch_rest_qty');
-        $po_items = SoItem::whereIn('id', $request->po_item_id)->sum('so_dispatch_rest_qty');
+
+        // dd( $request);
+        // ......................................................................................so_check....................................................................... 
+        $total_dispatch_so = 0;
+
+        foreach ($request->quantity as $quantity) {
+            $total_dispatch_so += $quantity;
+        }
+
+        $so_items_qty_total = SoItem::whereIn('id', $request->so_item_id)->sum('so_dispatch_rest_qty');
+
+        if ($so_items_qty_total < $total_dispatch_so) {
+            return response()->json([
+                'message' => 'Dispatched quantity for SO Item Exceed (' . number_format($so_items_qty_total, 3) . ').'
+            ], 400);
+        }
+
+        // Validate PO dispatch quantity
+     
+
+        //  ............................................................................................................................................................................ 
 
 
-        // $month = date('m');
-        // $year = date('Y');
+        // ......................................................................................po_check....................................................................... 
 
-        // if ($month >= 4) {
-        //     $financial_year = $year;
-        // } else {
-        //     $financial_year = $year - 1;
-        // }
-        // $last_sail_number = Dispatch::whereYear('created_at', '=', $financial_year)
-        //     ->latest('id')
-        //     ->first();
+        $total_dispatch_po = 0;
 
-        // if ($last_sail_number) {
-        //     $max_serial_number = $last_sail_number->dispatch_number;
-        //     $last_serial_number = substr($max_serial_number, -4); // Get the last 4 digits
-        //     $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
-        // } else {
-        //     $next_serial_number = '0001';
-        // }
+        foreach ($request->qty as $quantity) {
+            $total_dispatch_po += reset($quantity); // Get the first value from the associative array
+        }
+        
 
-        // $doc_number = 'DIS' . $financial_year . $next_serial_number;
+        $po_items_qty_total = PoItem::whereIn('po_item_no', $request->po_item_no)->sum('po_dispatch_rest_qty');
+
+        if ($po_items_qty_total < $total_dispatch_po) {
+            return response()->json([
+                'message' => 'Dispatched quantity for PO Item Exceed(' . number_format($po_items_qty_total, 3) . ').'
+            ], 400);
+        }
+
+        //  ............................................................................................................................................................................ 
+
+
+        // ......................................................................................so_po_qty_check....................................................................... 
+
+        if($total_dispatch_po !=  $total_dispatch_so){
+            return response()->json([
+                'message' => 'Total Dispatched quantity for PO Item and SO Item Not equal.'
+            ], 400);
+        }
+        //  ............................................................................................................................................................................ 
+
+
+
+        // ......................................................................................Taxonomy....................................................................... 
 
         $year = date('Y');
         $month = date('m');
@@ -841,54 +871,84 @@ class DispatchController extends Controller
         $doc_number = 'DIS' . $financial_year . $next_serial_number;
 
 
+   
+
+        //  ............................................................................................................................................................................ 
+
+     
+        //   ...........................................................................Save Data.................................................................. 
+
+    
+        foreach ($request->qty as $index => $qty) {
 
 
+            
+            $so_item_id = array_key_first($qty);
+            
+            $dispatch_qty = $qty[$so_item_id];
+        if( $dispatch_qty == 0){
+            continue;
+        }
+
+            $so_item_index = array_search($so_item_id, $request->so_item_id);
 
 
-        //   .............................................................................................................................................   
-
-        // Save dispatch data as in your original function
-        foreach ($request->quantity as $index => $quantity) {
-            $so_item = SoItem::where('so_item_no', $request->so_item_no[$index])
+    
+            $so_item = SoItem::where('so_items.id', $so_item_id)
                 ->join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
                 ->select('sales_orders.*', 'so_items.*', 'so_items.id as so_item_id')
                 ->first();
-            $po_item = PoItem::where('po_item_no', $request->po_item_number[$index])
+
+
+            $po_item = PoItem::where('po_item_no', $request->po_item_no[$index])
                 ->join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
                 ->select('purchase_orders.*', 'po_items.*', 'po_items.id as po_item_id')
                 ->first();
+
+
             $dispatch = new Dispatch();
             $dispatch->date = $request->date;
             $dispatch->dispatch_number = $doc_number;
-            $dispatch->po_company_id =  $po_item->supplier_id;
-            $dispatch->so_company_id =  $so_item->company_id;
+            $dispatch->po_company_id =  $request->po_company_id;
+            $dispatch->so_company_id =  $request->so_company_id;
             $dispatch->po_id = $po_item->po_id;
             $dispatch->so_id = $so_item->so_id;
             $dispatch->po_item_id = $po_item->po_item_id;
             $dispatch->so_item_id = $so_item->so_item_id;
-            $dispatch->category_id = $request->cat_id[$index];
-            $dispatch->subcategory_id = $request->sub_cat_id[$index];
-            $dispatch->dispatched_quantity = $request->quantity[$index];
-            $dispatch->conv_rate = $request->conv_rate[$index];
-            $dispatch->dispatch_unit_price = $request->dispatch_unit_price_actual[$index];
 
-            $dispatch->dispatch_other = $request->dispatch_fregiht_insuance[$index];
-            $dispatch->dispatch_so_other = $request->dispatch_fregiht_insuance[$index];
+            $dispatch->category_id = $so_item->item_category;
 
-            $dispatch->dispatch_total = $request->dispatch_total[$index];
+            $dispatch->subcategory_id = $request->sub_cat_id[$so_item_index] ?? 'Select Item';
+
+            $dispatch->dispatched_quantity = $dispatch_qty;
+
+            $dispatch->conv_rate = $request->conv_rate[$so_item_index];
+            
+            $dispatch->dispatch_unit_price = $so_item->unit_price;
+
+            $dispatch->dispatch_other = $request->dispatch_freight_insuance[$so_item_index];
+
+            $dispatch->dispatch_so_other = $request->dispatch_freight_insuance[$so_item_index];
+
+            $dispatch_total_po =  (($request->conv_rate[$so_item_index] + $request->dispatch_freight_insuance[$so_item_index] + $so_item->unit_price) * $dispatch_qty);
+
+            $dispatch->dispatch_total = $dispatch_total_po;
+
             $dispatch->vehicle_number = $request->vehicle_number;
 
             $dispatch->dispatch_so_unit_price = $so_item->unit_price;
 
-            $dispatch->dispatch_so_total = $request->dispatch_so_total[$index];
+            $dispatch_total_so =  (($request->conv_rate[$so_item_index] + $request->dispatch_freight_insuance[$so_item_index] + $po_item->unit_price) * $dispatch_qty);
+
+            $dispatch->dispatch_so_total = $dispatch_total_so;
+
             $dispatch->receiver_person = $request->receiver_person;
 
             $dispatch->remarks = $request->remarks;
             $dispatch->save();
 
-
-            $actual_so_dispatch_qty = number_format($so_item->so_dispatch_rest_qty - $dispatch->dispatched_quantity, 3);
-            $actual_po_dispatch_qty = number_format($po_item->po_dispatch_rest_qty - $dispatch->dispatched_quantity, 3);
+            $actual_so_dispatch_qty = number_format($so_item->so_dispatch_rest_qty - $dispatch_qty, 3);
+            $actual_po_dispatch_qty = number_format($po_item->po_dispatch_rest_qty - $dispatch_qty, 3);
 
 
             $so_item->update(['so_dispatch_rest_qty' => $actual_so_dispatch_qty]);
@@ -905,6 +965,11 @@ class DispatchController extends Controller
                 $po_item->update(['po_dispatch_item_status' => 'Partial Pending']);
             }
         }
+
+        // dd(1);
+
+        // return response()->json(['success' => true, 'redirect' => route('dispatch.index')]);
+
 
         return response()->json(['success' => true, 'redirect' => route('dispatch.index')]);
 
