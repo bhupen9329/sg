@@ -155,6 +155,43 @@
                                     </div>
                                 </div>
 
+                                  {{-- ............................................................. Sales Details................................................................  --}}
+                                  <div class="row mt-5">
+                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Selected Details</h4>
+                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
+                                </div>
+
+                                <table id="soTable" class="col-md-4 col-sm-4 col-xl-12 table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date (DD/MM/YY)</th>
+                                            <th>SO Number</th>
+                                            <th>Item Name</th>
+                                            <th>SO Item No.</th>
+                                            <th>Quantity (Q)</th>
+                                            <th>Rest Quantity (Q)</th>
+                                            <th>Dispatch Quantity (Q)</th>
+                                            <th>SO Unit Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Rows will be dynamically added here -->
+
+                                        @foreach ($so_items as $so_item)
+                                            <tr>
+                                                <td>{{ date('d-M-Y', strtotime($so_item->date)) }} </td>
+                                                <td>{{ $so_item->so_number }}</td>
+                                                <td>{{ $so_item->name }}</td>
+                                                <td>{{ $so_item->so_item_no }}</td>
+                                                <td>{{ $so_item->qty }}</td>
+                                                <td>{{ $so_item->so_dispatch_rest_qty }}</td>
+                                                <td>{{ $so_item->dispatch_so_qty }}</td>
+                                                <td>{{ $so_item->unit_price }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+
                                 {{-- ............................................................. Purchase Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Selected Details</h4>
@@ -193,42 +230,7 @@
 
 
 
-                                {{-- ............................................................. Sales Details................................................................  --}}
-                                <div class="row mt-5">
-                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Selected Details</h4>
-                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
-                                </div>
-
-                                <table id="soTable" class="col-md-4 col-sm-4 col-xl-12 table">
-                                    <thead>
-                                        <tr>
-                                            <th>Date (DD/MM/YY)</th>
-                                            <th>SO Number</th>
-                                            <th>Item Name</th>
-                                            <th>SO Item No.</th>
-                                            <th>Quantity (Q)</th>
-                                            <th>Rest Quantity (Q)</th>
-                                            <th>Dispatch Quantity (Q)</th>
-                                            <th>SO Unit Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Rows will be dynamically added here -->
-
-                                        @foreach ($so_items as $so_item)
-                                            <tr>
-                                                <td>{{ date('d-M-Y', strtotime($so_item->date)) }} </td>
-                                                <td>{{ $so_item->so_number }}</td>
-                                                <td>{{ $so_item->name }}</td>
-                                                <td>{{ $so_item->so_item_no }}</td>
-                                                <td>{{ $so_item->qty }}</td>
-                                                <td>{{ $so_item->so_dispatch_rest_qty }}</td>
-                                                <td>{{ $so_item->dispatch_so_qty }}</td>
-                                                <td>{{ $so_item->unit_price }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                              
 
 
 
@@ -399,7 +401,7 @@
                                                     <td>
                                                         <input type="text" name="po_item_no[]"
                                                             value="{{ $po_item->po_item_no }}"
-                                                            id="po_item_number_{{ $so_item->so_item_id }}"
+                                                            id="po_item_number_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}"
                                                             class="form-control" readonly disabled />
                                                     </td>
 
@@ -439,7 +441,7 @@
                                                     </td>
 
                                                     <td>
-                                                        <input type="number" name="qty[]"
+                                                        <input type="number" name="qty[][{{$so_item->so_item_id}}]"
                                                             id="qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
                                                             value="{{ $so_item->dispatch_po_qty }}"
                                                             class="form-control po_quantity po_quantity_{{ $po_item->po_item_id }}"
@@ -640,7 +642,7 @@
             const qtyInput = document.getElementById('qty_' + poItemId + '_' + soItemId);
             const grossPriceInput = document.getElementById('gross_po_price_' + poItemId + '_' + soItemId);
 
-            const PoItemNumber = document.getElementById('po_item_number_' + soItemId);
+            const PoItemNumber = document.getElementById('po_item_number_' + soItemId + '_' + poItemId);
 
 
             // Get SO quantity, PO Rest quantity, and other related values
@@ -690,7 +692,7 @@
 
             // Calculate the PO quantity based on SO quantity and PO Rest quantity
             let poCalculateQuantity = 0;
-            if (soQuantity > poRestQty) {
+            if (soQuantity >= poRestQty) {
                 if (totalQuantity != 0) {
                     poCalculateQuantity = soQuantity - (totalQuantity);
                     if (poCalculateQuantity > poRestQty) {
@@ -716,9 +718,10 @@
             //     }
             // }
             if (qtyInput) {
-                qtyInput.value = Math.max((poCalculateQuantity), 0).toFixed(3);
+                const calculatedValue = Math.max(poCalculateQuantity, 0).toFixed(3);
+                qtyInput.value = calculatedValue;
+                qtyInput.max = calculatedValue; // Set the max attribute to the same value
             }
-
             // Enable or disable the inputs based on the checkbox status
             if (checkbox.checked) {
                 if (qtyInput) qtyInput.disabled = false;
@@ -738,4 +741,51 @@
 
         // ........................................................................................................................................................................ 
     </script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#dispatchForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent page refresh
+
+            let formData = $(this).serialize(); // Serialize form data
+
+            $.ajax({
+                url: "{{ route('dispatch.store_so') }}", // Backend route
+                type: "POST",
+                data: formData,
+                success: function(response) {
+                    window.location.href = response.redirect;
+                },
+                error: function(xhr) {
+                    // Determine error message
+                    let error = xhr.responseJSON?.message || 'Something went wrong!';
+
+                    if (xhr.status === 400) {
+                        Swal.fire({
+                            title: 'Validation Error!',
+                            text: error,
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    } else if (xhr.status === 500) {
+                        Swal.fire({
+                            title: 'Server Error!',
+                            text: 'An internal server error occurred. Please try again later.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: error,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
 @endsection

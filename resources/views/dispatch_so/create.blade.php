@@ -135,6 +135,45 @@
                                     </div>
                                 </div>
 
+                                           {{-- ............................................................. Sales Details................................................................  --}}
+                                           <div class="row mt-5">
+                                            <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Selected Details</h4>
+                                            {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
+                                        </div>
+        
+                                        <table id="soTable" class="col-md-4 col-sm-4 col-xl-12 table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date (DD/MM/YY)</th>
+                                                    <th>SO Number</th>
+                                                    <th>Item Name</th>
+                                                    <th>SO Item No.</th>
+                                                    <th>Quantity (Q)</th>
+                                                    <th>Rest Quantity (Q)</th>
+                                                    <th>SO Unit Price</th>
+                                                    <th>SO Price</th>
+                                                    <th>Enter Dispatch Qty</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Rows will be dynamically added here -->
+                                            </tbody>
+                                            
+                                            <tfoot>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th>Total Dispatch Qty SO</th>
+                                                <th></th>
+                                                <th><input type="number" id="total_so_dispatch_qty" class="form-control" value="0" readonly></th>
+                                                <th></th>
+                                            </tfoot>
+                                        </table>
+
                                 {{-- ............................................................. Purchase Details................................................................  --}}
                                 <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">PO Selected Details</h4>
@@ -174,44 +213,7 @@
                                         <th></th>
                                     </tfoot>
                                 </table>
-                                {{-- ............................................................. Sales Details................................................................  --}}
-                                <div class="row mt-5">
-                                    <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Selected Details</h4>
-                                    {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
-                                </div>
-
-                                <table id="soTable" class="col-md-4 col-sm-4 col-xl-12 table">
-                                    <thead>
-                                        <tr>
-                                            <th>Date (DD/MM/YY)</th>
-                                            <th>SO Number</th>
-                                            <th>Item Name</th>
-                                            <th>SO Item No.</th>
-                                            <th>Quantity (Q)</th>
-                                            <th>Rest Quantity (Q)</th>
-                                            <th>SO Unit Price</th>
-                                            <th>SO Price</th>
-                                            <th>Enter Dispatch Qty</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Rows will be dynamically added here -->
-                                    </tbody>
-                                    
-                                    <tfoot>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th>Total Dispatch Qty SO</th>
-                                        <th></th>
-                                        <th><input type="number" id="total_so_dispatch_qty" class="form-control" value="0" readonly></th>
-                                        <th></th>
-                                    </tfoot>
-                                </table>
+                     
                                 <input type="hidden" id="po_item_id">
                                 <input type="hidden" id="so_item_no" name="">
                                 <input type="hidden" id="po_item_no" name="">
@@ -306,7 +308,6 @@
                                         <th>Quantity (Q)</th>
                                         <th>Rest Quantity (Q)</th>
                                         <th>SO Unit Price</th>
-                                        <th>Enter Qty</th>
                                         <th>Remarks</th>
                                     </tr>
                                 </thead>
@@ -714,10 +715,6 @@ function calculateTotalDispatch(input) {
         submitButton.style.display = "block"; 
     }
 }
-
-
-
-
 
         // function populateDispatchDetails() {
         //     const selectedPOs = document.querySelectorAll('.po-checkbox:checked');
@@ -1466,5 +1463,7 @@ function calculateTotalDispatch(input) {
             $('#raised_date_input').focus();
         });
     </script>
+
+    
 
 @endsection
