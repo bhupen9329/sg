@@ -152,8 +152,11 @@
                                                     <th>Rest Quantity (Q)</th>
                                                     <th>SO Unit Price</th>
                                                     <th>SO Price</th>
+                                                    <th>Select Conv Item</th>
                                                     <th>Enter Dispatch Qty</th>
-                                                    <th>Action</th>
+                                                    <th>Duplicate</th>
+                                                    <th>Edit</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -161,6 +164,7 @@
                                             </tbody>
                                             
                                             <tfoot>
+                                                <th></th>
                                                 <th></th>
                                                 <th></th>
                                                 <th></th>
@@ -565,11 +569,15 @@
         }
 
         function SORow(Date = '', soNumber = '', ItemName = '', soItemNumber = '', Quantity = '', RestQty = '', UnitPrice =
-            '', Price = '', SoId = '') {
-            console.log(SoId);
+            '', Price = '', SoId = '',  subItems = []) {
             var table = document.getElementById("soTable").getElementsByTagName('tbody')[0];
             var newRow = table.insertRow(table.rows.length);
             const formattedDate = formatDate(Date);
+
+            let subItemOptions = '<option readonly>Select Item</option>';
+            subItems.forEach(subItem => {
+                subItemOptions += `<option value="${subItem.id}">${subItem.sub_category}</option>`;
+            });
 
             // Assuming `editRoute` is passed to JavaScript as a global variable from Blade
             const editRoute = "{{ route('sales.edit', ':id') }}"; // Update route name if needed
@@ -583,6 +591,12 @@
            </a>` :
                 '';
 
+                const cloneOption = 
+                `<button type="button" class="btn btn-success" onclick="cloneRow(this)">
+        <i class="fas fa-copy"></i>
+    </button>`;
+
+
             newRow.innerHTML = `
         <td>${formattedDate}</td>
         <td>${soNumber}</td>
@@ -595,9 +609,11 @@
         <td>${RestQty}</td>
         <td>${UnitPrice}</td>
         <td>${Price}</td>
+        <td><select name="sub_cat_id[]" onchange="get_conv_price(this)" class="form-select">${subItemOptions}</select></td>
             <td>
             <input type="number" name="dispatch_so_qty[]" oninput="calculateTotalDispatch(this)" class="form-control" value="0" max="${RestQty}" step="0.001">
         </td>
+        <td>${cloneOption}</td>
         <td>${editOption}</td>
     `;
         }
@@ -619,6 +635,27 @@
         
         //     row.remove();
         // }
+
+        
+        function cloneRow(button) {
+            const row = button.closest('tr'); // Find the current row
+            const clonedRow = row.cloneNode(true); // Clone the row
+
+            // Retain the values for input fields
+            clonedRow.querySelectorAll('input').forEach(input => {
+                input.value = input.value; // Retain the value in input fields
+            });
+
+            // Retain the selected option for each select dropdown
+            clonedRow.querySelectorAll('select').forEach(select => {
+                const originalSelect = row.querySelector(
+                    `select[name="${select.name}"]`); // Find the original select
+                select.value = originalSelect.value; // Set the selected value of the cloned select
+            });
+
+            // Insert the cloned row below the current row
+            row.parentNode.insertBefore(clonedRow, row.nextSibling);
+        }
 
         function deleteRow(button) {
     // Find the row that was clicked
@@ -796,6 +833,7 @@ function calculateTotalDispatch(input) {
                             so_item.unit_price,
                             so_item.so_price,
                             so_item.so_id,
+                            response.subitem,
                             response.freight_insurance.freight_rate,
                             response.freight_insurance.insurance_rate,
                         );

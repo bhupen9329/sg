@@ -162,16 +162,16 @@ class DispatchController extends Controller
         // dd($request);
         $so_items = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price', 'so_items.so_id as so_id')
+            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price', 'so_items.so_id as so_id', 'categories.id as category_id')
             ->where('so_item_no', $request->so_item_no)->first();
+
+        $sub_items = SubCategory::where('category_id', $so_items->category_id)->get();
 
         $freight_insurance = FreightRate::latest()->first();
 
 
-        return response()->json(['so_items' => $so_items, 'freight_insurance' => $freight_insurance]);
+        return response()->json(['so_items' => $so_items, 'freight_insurance' => $freight_insurance, 'subitem' => $sub_items]);
     }
-
-
 
     public function storeDispatch(Request $request)
     {
@@ -746,26 +746,64 @@ class DispatchController extends Controller
     public function main_dispatch_redirect(Request $request)
     {
 
-        // dd( $request);
-
+        // dd($request);
         $po_items = PoItem::join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
             ->join('categories', 'categories.id', '=', 'po_items.item_category')
             ->select('purchase_orders.*', 'categories.*', 'po_items.*', 'po_items.price as po_price', 'po_items.po_dispatch_rest_qty', 'po_items.po_id', 'po_items.id as po_item_id')
             ->whereIn('po_item_no', $request->po_item_no)->get();
 
+
+
         $dispatch_so_qty = $request->dispatch_so_qty;
         $dispatch_po_qty = $request->dispatch_po_qty;
 
-        $so_items = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
-            ->join('categories', 'categories.id', '=', 'so_items.item_category')
-            ->select('sales_orders.*', 'categories.*', 'so_items.*', 'so_items.price as so_price', 'so_items.so_id as so_id',  'so_items.id as so_item_id')
-            ->whereIn('so_item_no', $request->so_item_no)->get();
+        $sub_cat_id = $request->sub_cat_id;
 
-        $total_no =   $so_items->count();
-        // dd($total_no );
-        foreach ($so_items as $key => $so_item) {
-            $so_item->dispatch_so_qty = $dispatch_so_qty[$key] ?? 0; // Assign dispatch quantity to each SO item
+
+
+        $so_items = [];
+        foreach ($request->so_item_no as $key => $data) {
+            $so_item = SoItem::join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
+                ->join('categories', 'categories.id', '=', 'so_items.item_category')
+                ->select(
+                    'sales_orders.*',
+                    'categories.*',
+                    'so_items.*',
+                    'so_items.price as so_price',
+                    'so_items.so_id as so_id',
+                    'so_items.id as so_item_id'
+                )
+                ->where('so_item_no', $data)
+                ->first();
+
+            if ($so_item) {
+                // Fetch the corresponding subcategory
+                $sub_category = SubCategory::find($request->sub_cat_id[$key] ?? null);
+                if ($sub_category) {
+                    // Fetch the latest conversion rate
+                    $conv_rate = ConvRate::where('subcategory_id', $sub_category->id)->latest()->first();
+
+                    // Attach additional properties to the SO item
+                    $so_item->sub_cat_id = $sub_category->id;
+                    $so_item->sub_cat_name = $sub_category->sub_category;
+                    $so_item->conv_rate = $conv_rate->item_price ?? 0;
+                } else {
+                    // Default values if no subcategory found
+                    $so_item->sub_cat_id = null;
+                    $so_item->sub_cat_name = null;
+                    $so_item->conv_rate = 0;
+                }
+
+                // Assign dispatch quantity to each SO item
+                $so_item->dispatch_so_qty = $request->dispatch_so_qty[$key] ?? 0;
+
+                // Add the item to the result array
+                $so_items[] = $so_item;
+            }
         }
+
+        // Calculate the total number of SO items
+        $total_no = count($so_items);
 
         foreach ($po_items as $key => $po_item) {
             $po_item->dispatch_po_qty = $dispatch_po_qty[$key] ?? 0; // Assign dispatch quantity to each SO item
@@ -783,7 +821,7 @@ class DispatchController extends Controller
     public function storeDispatchSO(Request $request)
     {
 
-        // dd( $request);
+    //    dd($request);
         // ......................................................................................so_check....................................................................... 
         $total_dispatch_so = 0;
 
@@ -800,7 +838,7 @@ class DispatchController extends Controller
         }
 
         // Validate PO dispatch quantity
-     
+
 
         //  ............................................................................................................................................................................ 
 
@@ -812,7 +850,7 @@ class DispatchController extends Controller
         foreach ($request->qty as $quantity) {
             $total_dispatch_po += reset($quantity); // Get the first value from the associative array
         }
-        
+
 
         $po_items_qty_total = PoItem::whereIn('po_item_no', $request->po_item_no)->sum('po_dispatch_rest_qty');
 
@@ -827,7 +865,7 @@ class DispatchController extends Controller
 
         // ......................................................................................so_po_qty_check....................................................................... 
 
-        if($total_dispatch_po !=  $total_dispatch_so){
+        if ($total_dispatch_po !=  $total_dispatch_so) {
             return response()->json([
                 'message' => 'Total Dispatched quantity for PO Item and SO Item Not equal.'
             ], 400);
@@ -871,29 +909,25 @@ class DispatchController extends Controller
         $doc_number = 'DIS' . $financial_year . $next_serial_number;
 
 
-   
+
 
         //  ............................................................................................................................................................................ 
 
-     
+
         //   ...........................................................................Save Data.................................................................. 
 
-    
+
         foreach ($request->qty as $index => $qty) {
 
-
-            
             $so_item_id = array_key_first($qty);
-            
+
             $dispatch_qty = $qty[$so_item_id];
-        if( $dispatch_qty == 0){
-            continue;
-        }
+            if ($dispatch_qty == 0) {
+                continue;
+            }
 
             $so_item_index = array_search($so_item_id, $request->so_item_id);
 
-
-    
             $so_item = SoItem::where('so_items.id', $so_item_id)
                 ->join('sales_orders', 'so_items.so_id', '=', 'sales_orders.id')
                 ->select('sales_orders.*', 'so_items.*', 'so_items.id as so_item_id')
@@ -904,6 +938,8 @@ class DispatchController extends Controller
                 ->join('purchase_orders', 'po_items.po_id', '=', 'purchase_orders.id')
                 ->select('purchase_orders.*', 'po_items.*', 'po_items.id as po_item_id')
                 ->first();
+
+                // dd( $po_item);
 
 
             $dispatch = new Dispatch();
@@ -918,19 +954,19 @@ class DispatchController extends Controller
 
             $dispatch->category_id = $so_item->item_category;
 
-            $dispatch->subcategory_id = $request->sub_cat_id[$so_item_index] ?? 'Select Item';
+            $dispatch->subcategory_id = $request->sub_cat_id_po[$index] ?? 'Select Item';
 
             $dispatch->dispatched_quantity = $dispatch_qty;
 
-            $dispatch->conv_rate = $request->conv_rate[$so_item_index];
-            
-            $dispatch->dispatch_unit_price = $so_item->unit_price;
+            $dispatch->conv_rate = $request->conv_rate_po[$index];
 
-            $dispatch->dispatch_other = $request->dispatch_freight_insuance[$so_item_index];
+            $dispatch->dispatch_unit_price = $po_item->unit_price;
 
-            $dispatch->dispatch_so_other = $request->dispatch_freight_insuance[$so_item_index];
+            $dispatch->dispatch_other = $request->dispatch_freight_insuance_po[$index];
 
-            $dispatch_total_po =  (($request->conv_rate[$so_item_index] + $request->dispatch_freight_insuance[$so_item_index] + $so_item->unit_price) * $dispatch_qty);
+            $dispatch->dispatch_so_other = $request->dispatch_freight_insuance_po[$index];
+
+            $dispatch_total_po =  (($request->conv_rate_po[$index] + $request->dispatch_freight_insuance_po[$index] + $po_item->unit_price) * $dispatch_qty);
 
             $dispatch->dispatch_total = $dispatch_total_po;
 
@@ -938,7 +974,7 @@ class DispatchController extends Controller
 
             $dispatch->dispatch_so_unit_price = $so_item->unit_price;
 
-            $dispatch_total_so =  (($request->conv_rate[$so_item_index] + $request->dispatch_freight_insuance[$so_item_index] + $po_item->unit_price) * $dispatch_qty);
+            $dispatch_total_so =  (($request->conv_rate_po[$index] + $request->dispatch_freight_insuance_po[$index] + $so_item->unit_price) * $dispatch_qty);
 
             $dispatch->dispatch_so_total = $dispatch_total_so;
 

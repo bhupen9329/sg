@@ -109,8 +109,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form id="dispatchForm" class="row g-3" method="post"
-                                action="{{ route('dispatch.store_so') }}">
+                            <form id="dispatchForm" class="row g-3" method="post" action="">
                                 @csrf
                                 <div class="row mb-3">
 
@@ -155,8 +154,8 @@
                                     </div>
                                 </div>
 
-                                  {{-- ............................................................. Sales Details................................................................  --}}
-                                  <div class="row mt-5">
+                                {{-- ............................................................. Sales Details................................................................  --}}
+                                <div class="row mt-5">
                                     <h4 class="col-md-12 col-sm-12 mb-15 text-blue h4 col-xl-11">SO Selected Details</h4>
                                     {{-- <button type="button" id="addRowBtn" class="btn btn-success col-md-12 col-sm-12 col-xl-1 mb-1" onclick="addRow()">Add Row</button> --}}
                                 </div>
@@ -230,7 +229,7 @@
 
 
 
-                              
+
 
 
 
@@ -243,9 +242,10 @@
                                 <table id="poTable" class="table">
                                     <thead>
                                         <tr>
-                                            <th colspan="11" class="text-center bg-light">SO Items</th>
+                                            <th colspan="12" class="text-center bg-light">SO Items</th>
                                         </tr>
                                         <tr>
+                                            <th>S.No</th>
                                             <th>Base Item</th>
                                             <th>SO Item No.</th>
                                             <th>Conv Item</th>
@@ -262,6 +262,7 @@
                                     <tbody>
                                         @php
                                             $total_count = 1;
+                                            $index = 1;
                                         @endphp
                                         @foreach ($so_items as $so_item)
                                             @php
@@ -272,6 +273,12 @@
                                             <!-- SO Item Row -->
                                             <tr class="bg-primary text-white">
                                                 <!-- Base Item Name as Input -->
+
+                                                <td>
+                                                    <input type="number" name="index[]" value="{{ $index }}"
+                                                        class="form-control" readonly />
+                                                </td>
+
                                                 <td>
                                                     <input type="text" name="base_item_name[]"
                                                         value="{{ $so_item->name }}" class="form-control" readonly />
@@ -290,17 +297,25 @@
                                                 <td>
                                                     <select name="sub_cat_id[]" onchange="get_conv_price(this)"
                                                         class="form-select">
-                                                        <option value="">Select</option>
+                                                        <option value="">
+                                                            Select Conv Item</option>
                                                         @foreach ($conv_item as $data)
-                                                            <option value="{{ $data->id }}">{{ $data->sub_category }}
-                                                            </option>
+                                                            @if ($so_item->sub_cat_id == $data->id)
+                                                                <option value="{{ $data->id }}" selected>
+                                                                    {{ $data->sub_category }}</option>
+                                                            @else
+                                                                <option value="{{ $data->id }}">
+                                                                    {{ $data->sub_category }}</option>
+                                                            @endif
                                                         @endforeach
                                                     </select>
                                                 </td>
 
+
                                                 <!-- Conversion Rate Input -->
                                                 <td>
-                                                    <input type="number" name="conv_rate[]" class="form-control"
+                                                    <input type="number" name="conv_rate[]"
+                                                        value="{{ $so_item->conv_rate }}" class="form-control"
                                                         value="0" oninput="calculateTotal(this)" readonly />
                                                 </td>
 
@@ -348,7 +363,7 @@
                                                 <!-- Final Gross SO Price Input -->
                                                 <td>
                                                     <input type="number" name="quantity[]"
-                                                        id="so_quantity_{{ $so_item->so_item_id }}"
+                                                        id="so_quantity_{{ $so_item->so_item_id }}_{{ $index }}"
                                                         value="{{ $so_item->dispatch_so_qty }}" class="form-control"
                                                         value="0" step="0.001" oninput="calculateTotal(this)" />
                                                 </td>
@@ -357,12 +372,14 @@
 
                                             <!-- PO Items Header -->
                                             <tr>
-                                                <th colspan="11" class="text-center bg-light">PO Items</th>
+                                                <th colspan="12" class="text-center bg-light">PO Items</th>
                                             </tr>
                                             <tr>
                                                 <th>Action</th>
                                                 <th>Base Item</th>
                                                 <th>PO Item No.</th>
+                                                <th>Conv Price</th>
+                                                <th>Loading + Insurance</th>
                                                 <th>PO Qty</th>
                                                 <th>PORest Qty</th>
                                                 <th>PO Unit Price</th>
@@ -380,15 +397,15 @@
                                                         @if ($po_item->item_category == $so_item->item_category)
                                                             <input type="checkbox" name="po_item_select[]"
                                                                 value="{{ $po_item->po_item_id }}"
-                                                                onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}')"
-                                                                id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
-                                                                class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}" />
+                                                                onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}', '{{ $index }}')"
+                                                                id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                                class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}_{{ $index }}" />
                                                         @else
                                                             <input type="checkbox" name="po_item_select[]"
                                                                 value="{{ $po_item->po_item_id }}"
-                                                                onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}')"
-                                                                id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
-                                                                class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}"
+                                                                onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}','{{ $index }}')"
+                                                                id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                                class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}_{{ $index }}"
                                                                 disabled />
                                                         @endif
                                                     </td>
@@ -401,13 +418,38 @@
                                                     <td>
                                                         <input type="text" name="po_item_no[]"
                                                             value="{{ $po_item->po_item_no }}"
-                                                            id="po_item_number_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}"
+                                                            id="po_item_number_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}_{{ $index }}"
                                                             class="form-control" readonly disabled />
+                                                    </td>
+
+                                                    <!-- Conversion Rate Select -->
+
+
+                                                    <input type="hidden" name="sub_cat_id_po[]"
+                                                        value="{{ $so_item->sub_cat_id }}"
+                                                        id="sub_cat_id_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}_{{ $index }}"
+                                                        class="form-control sub_cat_id_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                        oninput="calculateTotal(this)" disabled readonly/>
+                                                    <!-- Conversion Rate Input -->
+                                                    <td>
+                                                        <input type="number" name="conv_rate_po[]"
+                                                            value="{{ $so_item->conv_rate }}"
+                                                            class="form-control conv_rate_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                            id="conv_rate_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}_{{ $index }}"
+                                                            value="0" oninput="calculateTotal(this)" disabled readonly/>
+                                                    </td>
+
+                                                    <!-- Loading Insurance Input -->
+                                                    <td>
+                                                        <input type="number" name="dispatch_freight_insuance_po[]"
+                                                            class="form-control dispatch_freight_insuance_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                            id="dispatch_freight_insuance_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}_{{ $index }}"
+                                                            value="0" oninput="calculateTotal(this)" disabled readonly/>
                                                     </td>
 
                                                     <td>
                                                         <input type="number" name="po_qty[]"
-                                                            id="po_qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            id="po_qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
                                                             value="{{ $po_item->qty }}" class="form-control" readonly />
                                                     </td>
 
@@ -420,14 +462,14 @@
                                                     <td>
                                                         <input type="number" name="po_unit_price[]"
                                                             value="{{ $po_item->unit_price }}"
-                                                            id="po_unit_price_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            id="po_unit_price_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
                                                             class="form-control" readonly />
                                                     </td>
 
                                                     <td>
                                                         <input type="number" name="gross_po_price[]"
                                                             class="form-control"
-                                                            id="gross_po_price_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            id="gross_po_price_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
                                                             value="{{ $po_item->unit_price }}"
                                                             oninput="calculateTotal(this)" readonly disabled />
                                                     </td>
@@ -435,14 +477,14 @@
                                                     <!-- SO Dispatch Qty Input -->
                                                     <td>
                                                         <input type="number" name="dispatch_po_qty[]"
-                                                            id="po_rest_qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                            id="po_rest_qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
                                                             value="{{ $po_item->dispatch_po_qty }}"
                                                             class="form-control dispatch_po_quantity" readonly />
                                                     </td>
 
                                                     <td>
-                                                        <input type="number" name="qty[][{{$so_item->so_item_id}}]"
-                                                            id="qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}"
+                                                        <input type="number" name="qty[][{{ $so_item->so_item_id }}]"
+                                                            id="qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
                                                             value="{{ $so_item->dispatch_po_qty }}"
                                                             class="form-control po_quantity po_quantity_{{ $po_item->po_item_id }}"
                                                             value="0" step="0.001" onchange="changeOtherPO(this)"
@@ -456,15 +498,16 @@
                                             <!-- Separator Row -->
 
                                             <tr class="group">
-                                                <td colspan="11"
+                                                <td colspan="12"
                                                     style="text-align: center; border-top: 2px solid #8B0000;"></td>
                                             </tr>
                                             @if ($total_count != $total_no)
                                                 <tr>
-                                                    <th colspan="11" class="text-center bg-light">SO Items</th>
+                                                    <th colspan="12" class="text-center bg-light">SO Items</th>
                                                 </tr>
 
                                                 <tr>
+                                                    <th>S.No</th>
                                                     <th>Base Item</th>
                                                     <th>SO Item No.</th>
                                                     <th>Conv Item</th>
@@ -480,6 +523,7 @@
                                             @endif
                                             @php
                                                 $total_count++;
+                                                $index++;
                                             @endphp
                                         @endforeach
                                     </tbody>
@@ -508,6 +552,15 @@
 
     <script>
         // ............................................................................. fetch conv price.................................................................. 
+
+
+        $(document).ready(function() {
+            // On page load, trigger get_conv_price for each select element with the desired name
+            $('select[name="sub_cat_id[]"]').each(function() {
+                get_conv_price(this);
+            });
+        });
+
         function get_conv_price(selectElement) {
             let item_id = selectElement.value;
 
@@ -555,9 +608,56 @@
             const quantityInput = row.querySelector('input[name="quantity[]"]');
             const quantity = parseFloat(quantityInput.value) || 0;
             const convRate = parseFloat(row.querySelector('input[name="conv_rate[]"]').value) || 0;
+            const convItem = parseFloat(row.querySelector('select[name="sub_cat_id[]"]').value) || 0;
             const freightInsurance = parseFloat(row.querySelector('input[name="dispatch_freight_insuance[]"]').value) || 0;
             const soRestQuantity = parseFloat(row.querySelector('input[name="so_dispatch_rest_qty[]"]').value) || 0;
             const soUnitPrice = parseFloat(row.querySelector('input[name="so_unit_price[]"]').value) || 0;
+
+            const soItemId = parseFloat(row.querySelector('input[name="so_item_id[]"]').value) || 0;
+            const index = parseFloat(row.querySelector('input[name="index[]"]').value) || 0;
+
+            const poRows = document.querySelectorAll(
+                `.custom-checkbox_${soItemId}_${index}` // Adjust index if needed
+            );
+
+
+            poRows.forEach((poRow) => {
+                const poConvRateInputs = document.querySelectorAll(
+                    `.conv_rate_${soItemId}_${index}`
+                );
+
+                poConvRateInputs.forEach((input) => {
+                    input.value = convRate.toFixed(2); // Set the value for each input
+                });
+            });
+
+
+            poRows.forEach((poRow) => {
+                const poLoadingRateInputs = document.querySelectorAll(
+                    `.dispatch_freight_insuance_${soItemId}_${index}`
+                );
+
+                poLoadingRateInputs.forEach((input) => {
+                    input.value = freightInsurance.toFixed(2); // Set the value for each input
+                });
+            });
+
+
+            poRows.forEach((poRow) => {
+                const poLoadingRateInputs = document.querySelectorAll(
+                    `.sub_cat_id_${soItemId}_${index}`
+                );
+
+                poLoadingRateInputs.forEach((input) => {
+                    input.value = convItem.toFixed(2); // Set the value for each input
+                });
+            });
+
+
+
+
+            // $('#conv_rate_' + soItemId + '_' + index).val(convRate);
+
 
             // Update SO Gross Price
             const totalSoAmountGross = soUnitPrice + freightInsurance + convRate;
@@ -582,9 +682,10 @@
 
         function updateRelatedPO(soRow, convRate, freightInsurance) {
             const soItemId = soRow.querySelector('input[name="so_item_id[]"]').value; // SO Item ID
+            const index = soRow.querySelector('input[name="index[]"]').value; // SO Item ID
 
             // Find all related PO rows
-            const relatedPORows = document.querySelectorAll('.custom-checkbox_' + soItemId);
+            const relatedPORows = document.querySelectorAll('.custom-checkbox_' + soItemId + '_' + index);
             relatedPORows.forEach((checkbox) => {
                 const poRow = checkbox.closest('tr');
                 // Update PO fields
@@ -636,20 +737,30 @@
         // ..................................................................................toggleCheckbox........................................................................
 
 
-        function toggleCheckbox(poItemId, soItemId) {
+        function toggleCheckbox(poItemId, soItemId, index) {
             // Get the checkbox, quantity input, and gross price input elements
-            const checkbox = document.getElementById('item_checkbox_' + poItemId + '_' + soItemId);
-            const qtyInput = document.getElementById('qty_' + poItemId + '_' + soItemId);
-            const grossPriceInput = document.getElementById('gross_po_price_' + poItemId + '_' + soItemId);
+            const checkbox = document.getElementById('item_checkbox_' + poItemId + '_' + soItemId + '_' + index);
+            const qtyInput = document.getElementById('qty_' + poItemId + '_' + soItemId + '_' + index);
+            const grossPriceInput = document.getElementById('gross_po_price_' + poItemId + '_' + soItemId + '_' + index);
+            const PoItemNumber = document.getElementById('po_item_number_' + soItemId + '_' + poItemId + '_' + index);
 
-            const PoItemNumber = document.getElementById('po_item_number_' + soItemId + '_' + poItemId);
+
+            // ...............................................................................................pocharges............................................................ 
+            const convItemPO = document.getElementById('sub_cat_id_' + soItemId + '_' + poItemId + '_' + index);
+            const ConvRatePO = document.getElementById('conv_rate_' + soItemId + '_' + poItemId + '_' + index);
+            const freightInsurancePO = document.getElementById('dispatch_freight_insuance_' + soItemId + '_' + poItemId +
+                '_' + index);
+
+            // ........................................................................................................................................................................ 
+
 
 
             // Get SO quantity, PO Rest quantity, and other related values
-            const poRestQty = parseFloat(document.getElementById('po_rest_qty_' + poItemId + '_' + soItemId).value) || 0;
-            const soQuantity = parseFloat(document.getElementById('so_quantity_' + soItemId).value) || 0;
+            const poRestQty = parseFloat(document.getElementById('po_rest_qty_' + poItemId + '_' + soItemId + '_' + index)
+                .value) || 0;
+            const soQuantity = parseFloat(document.getElementById('so_quantity_' + soItemId + '_' + index).value) || 0;
 
-            const allCheckboxes = document.querySelectorAll('.custom-checkbox_' + soItemId);
+            const allCheckboxes = document.querySelectorAll('.custom-checkbox_' + soItemId + '_' + index);
 
             let totalQuantity = 0;
 
@@ -725,6 +836,9 @@
             // Enable or disable the inputs based on the checkbox status
             if (checkbox.checked) {
                 if (qtyInput) qtyInput.disabled = false;
+                convItemPO.disabled = false;
+                freightInsurancePO.disabled = false;
+                ConvRatePO.disabled = false;
                 if (grossPriceInput) grossPriceInput.disabled = false;
 
                 PoItemNumber.disabled = false;
@@ -732,10 +846,14 @@
                 if (qtyInput) {
                     qtyInput.disabled = true;
                     qtyInput.value = 0; // Reset quantity when unchecked
+                    convItemPO.disabled = true;
+                    freightInsurancePO.disabled = true;
+                    ConvRatePO.disabled = true;
                 }
                 if (grossPriceInput) grossPriceInput.disabled = true;
                 PoItemNumber.disabled = true;
             }
+
         }
 
 
@@ -743,49 +861,49 @@
     </script>
 
 
-<script>
-    $(document).ready(function() {
-        $('#dispatchForm').on('submit', function(e) {
-            e.preventDefault(); // Prevent page refresh
+    <script>
+        $(document).ready(function() {
+            $('#dispatchForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent page refresh
 
-            let formData = $(this).serialize(); // Serialize form data
+                let formData = $(this).serialize(); // Serialize form data
 
-            $.ajax({
-                url: "{{ route('dispatch.store_so') }}", // Backend route
-                type: "POST",
-                data: formData,
-                success: function(response) {
-                    window.location.href = response.redirect;
-                },
-                error: function(xhr) {
-                    // Determine error message
-                    let error = xhr.responseJSON?.message || 'Something went wrong!';
+                $.ajax({
+                    url: "{{ route('dispatch.store_so') }}", // Backend route
+                    type: "POST",
+                    data: formData,
+                    success: function(response) {
+                        window.location.href = response.redirect;
+                    },
+                    error: function(xhr) {
+                        // Determine error message
+                        let error = xhr.responseJSON?.message || 'Something went wrong!';
 
-                    if (xhr.status === 400) {
-                        Swal.fire({
-                            title: 'Validation Error!',
-                            text: error,
-                            icon: 'warning',
-                            confirmButtonText: 'OK'
-                        });
-                    } else if (xhr.status === 500) {
-                        Swal.fire({
-                            title: 'Server Error!',
-                            text: 'An internal server error occurred. Please try again later.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: error,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
+                        if (xhr.status === 400) {
+                            Swal.fire({
+                                title: 'Validation Error!',
+                                text: error,
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        } else if (xhr.status === 500) {
+                            Swal.fire({
+                                title: 'Server Error!',
+                                text: 'An internal server error occurred. Please try again later.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: error,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
                     }
-                }
+                });
             });
         });
-    });
-</script>
+    </script>
 @endsection
