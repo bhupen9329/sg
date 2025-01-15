@@ -94,11 +94,11 @@
 
 
         <div class="dashboard-header pagetitle">
-            <h1>New Dispatch</h1>
+            <h1>Edit Dispatch</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Open Dispatch Positions</li>
+                    <li class="breadcrumb-item">Edit Dispatch</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -121,24 +121,25 @@
                                         <label for="to_company_id" class="form-label">Dispatch Date<span
                                                 class="required-classes">*</span></label>
                                         <input type="date" class="form-control" name="date" id="raised_date_input"
-                                            value="{{ $currentDate }}" required>
+                                            value="{{ $dispatch_date }}" required>
                                     </div>
 
                                     <div class="col-md-6 mt-2"> <!-- Change this to col-md-6 for equal width -->
                                         <label for="to_company_id" class="form-label">Vehicle Number</label>
-                                        <input type="text" class="form-control" name="vehicle_number">
+                                        <input type="text" class="form-control" value="{{ $dispatch_vehicle }}"
+                                            name="vehicle_number">
+                                        <input type="hidden" class="form-control" value="{{ $dispatch_number }}"
+                                            name="dispatch_number">
+
                                     </div>
-
-
 
                                     <div class="col-md-6 mt-4">
                                         <label for="get_miller_id" class="form-label">From</label><span
                                             class="required-classes">*</span>
                                         <select class="form-select Select-Company custom-select" id="get_miller_id"
                                             name="po_company_id">
-                                            <option value="{{ $dispatch_po_company->id }}" selected>
-                                                {{ $dispatch_po_company->company_name }}</option>
-
+                                            <option value="{{ $dispatch_po_company_id }}" selected>
+                                                {{ $dispatch_po_company }}</option>
                                         </select>
                                     </div>
 
@@ -147,8 +148,8 @@
                                             class="required-classes">*</span>
                                         <select class="form-select Select-Company custom-select" id="to_company_id"
                                             name="so_company_id">
-                                            <option value="{{ $dispatch_so_company->id }}" selected>
-                                                {{ $dispatch_so_company->company_name }}</option>
+                                            <option value="{{ $dispatch_so_company_id }}" selected>
+                                                {{ $dispatch_so_company }}</option>
 
                                         </select>
                                     </div>
@@ -182,11 +183,12 @@
                                                 <td>{{ date('d-M-Y', strtotime($so_item->date)) }} </td>
                                                 <td>{{ $so_item->so_number }}</td>
                                                 <td>{{ $so_item->name }}</td>
-                                                <td>{{ $so_item->sub_cat_name }}</td>
+                                                <td>{{ $so_item->sub_category_name }}</td>
                                                 <td>{{ $so_item->so_item_no }}</td>
                                                 <td>{{ $so_item->qty }}</td>
-                                                <td>{{ $so_item->so_dispatch_rest_qty }}</td>
-                                                <td>{{ $so_item->dispatch_so_qty }}</td>
+                                                <td>{{ $so_item->so_dispatch_rest_qty + $so_item->total_dispatched_qty }}
+                                                </td>
+                                                <td>{{ $so_item->total_dispatched_qty }}</td>
                                                 <td>{{ $so_item->unit_price }}</td>
                                             </tr>
                                         @endforeach
@@ -220,8 +222,9 @@
                                                 <td>{{ $po_item->name }}</td>
                                                 <td>{{ $po_item->po_item_no }}</td>
                                                 <td>{{ $po_item->qty }}</td>
-                                                <td>{{ $po_item->po_dispatch_rest_qty }}</td>
-                                                <td>{{ $po_item->dispatch_po_qty }}</td>
+                                                <td>{{ $po_item->po_dispatch_rest_qty + $po_item->total_dispatched_qty }}
+                                                </td>
+                                                <td>{{ $po_item->total_dispatched_qty }}</td>
 
                                                 <td>{{ $po_item->unit_price }}</td>
                                             </tr>
@@ -271,6 +274,7 @@
                                                 $conv_item = DB::table('subcategories')
                                                     ->where('category_id', $so_item->item_category)
                                                     ->get();
+
                                             @endphp
                                             <!-- SO Item Row -->
                                             <tr class="bg-primary text-white">
@@ -302,7 +306,7 @@
                                                         <option value="">
                                                             Select Conv Item</option>
                                                         @foreach ($conv_item as $data)
-                                                            @if ($so_item->sub_cat_id == $data->id)
+                                                            @if ($so_item->subcategory_id == $data->id)
                                                                 <option value="{{ $data->id }}" selected>
                                                                     {{ $data->sub_category }}</option>
                                                             @else
@@ -324,8 +328,8 @@
                                                 <!-- Loading Insurance Input -->
                                                 <td>
                                                     <input type="number" name="dispatch_freight_insuance[]"
-                                                        class="form-control" value="0"
-                                                        oninput="calculateTotal(this)" />
+                                                        value="{{ $so_item->dispatch_other }}" class="form-control"
+                                                        value="0" oninput="calculateTotal(this)" />
                                                 </td>
 
                                                 <!-- Unit Price Input -->
@@ -351,14 +355,14 @@
                                                 <!-- SO Dispatch Rest Qty Input -->
                                                 <td>
                                                     <input type="number" name="so_dispatch_rest_qty[]"
-                                                        value="{{ $so_item->so_dispatch_rest_qty }}" class="form-control"
-                                                        readonly />
+                                                        value="{{ $so_item->so_dispatch_rest_qty + $so_item->total_dispatched_qty }}"
+                                                        class="form-control" readonly />
                                                 </td>
 
                                                 <!-- SO Dispatch Qty Input -->
                                                 <td>
                                                     <input type="number" name="dispatch_so_qty[]"
-                                                        value="{{ $so_item->dispatch_so_qty }}" class="form-control"
+                                                        value="{{ $so_item->total_dispatched_qty }}" class="form-control"
                                                         readonly />
                                                 </td>
 
@@ -366,8 +370,8 @@
                                                 <td>
                                                     <input type="number" name="quantity[]"
                                                         id="so_quantity_{{ $so_item->so_item_id }}_{{ $index }}"
-                                                        value="{{ $so_item->dispatch_so_qty }}" class="form-control"
-                                                        value="0" step="0.001" oninput="calculateTotal(this)" />
+                                                        value="{{ $so_item->total_dispatched_qty }}" class="form-control"
+                                                        step="0.001" oninput="calculateTotal(this)" />
                                                 </td>
                                             </tr>
 
@@ -394,14 +398,33 @@
                                             <!-- Related PO Items for this SO Item -->
                                             @foreach ($po_items as $po_item)
                                                 <tr>
+
+                                                    <?php
+                                                    
+                                                    $dispatch_data = DB::table('dispatches')
+                                                        ->where('so_item_id', $so_item->so_item_id)
+                                                        ->where('po_item_id', $po_item->po_item_id)
+                                                        ->where('subcategory_id', $so_item->subcategory_id)
+                                                        ->where('dispatch_number', $so_item->dispatch_number)
+                                                        ->first();
+                                                    ?>
                                                     <!-- Action Column with Checkbox -->
                                                     <td>
                                                         @if ($po_item->item_category == $so_item->item_category)
-                                                            <input type="checkbox" name="po_item_select[]"
-                                                                value="{{ $po_item->po_item_id }}"
-                                                                onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}', '{{ $index }}')"
-                                                                id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
-                                                                class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}_{{ $index }}" />
+                                                            @if ($dispatch_data)
+                                                                <input type="checkbox" name="po_item_select[]"
+                                                                    value="{{ $po_item->po_item_id }}"
+                                                                    onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}', '{{ $index }}')"
+                                                                    id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                                    class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                                    checked />
+                                                            @else
+                                                                <input type="checkbox" name="po_item_select[]"
+                                                                    value="{{ $po_item->po_item_id }}"
+                                                                    onchange="toggleCheckbox('{{ $po_item->po_item_id }}', '{{ $so_item->so_item_id }}', '{{ $index }}')"
+                                                                    id="item_checkbox_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
+                                                                    class="form-check-input custom-checkbox custom-checkbox_{{ $so_item->so_item_id }}_{{ $index }}" />
+                                                            @endif
                                                         @else
                                                             <input type="checkbox" name="po_item_select[]"
                                                                 value="{{ $po_item->po_item_id }}"
@@ -431,14 +454,15 @@
                                                         value="{{ $so_item->sub_cat_id }}"
                                                         id="sub_cat_id_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}_{{ $index }}"
                                                         class="form-control sub_cat_id_{{ $so_item->so_item_id }}_{{ $index }}"
-                                                        oninput="calculateTotal(this)" disabled readonly/>
+                                                        oninput="calculateTotal(this)" disabled readonly />
                                                     <!-- Conversion Rate Input -->
                                                     <td>
                                                         <input type="number" name="conv_rate_po[]"
                                                             value="{{ $so_item->conv_rate }}"
                                                             class="form-control conv_rate_{{ $so_item->so_item_id }}_{{ $index }}"
                                                             id="conv_rate_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}_{{ $index }}"
-                                                            value="0" oninput="calculateTotal(this)" disabled readonly/>
+                                                            value="0" oninput="calculateTotal(this)" disabled
+                                                            readonly />
                                                     </td>
 
                                                     <!-- Loading Insurance Input -->
@@ -446,7 +470,8 @@
                                                         <input type="number" name="dispatch_freight_insuance_po[]"
                                                             class="form-control dispatch_freight_insuance_{{ $so_item->so_item_id }}_{{ $index }}"
                                                             id="dispatch_freight_insuance_{{ $so_item->so_item_id }}_{{ $po_item->po_item_id }}_{{ $index }}"
-                                                            value="0" oninput="calculateTotal(this)" disabled readonly/>
+                                                            value="0" oninput="calculateTotal(this)" disabled
+                                                            readonly />
                                                     </td>
 
                                                     <td>
@@ -480,14 +505,14 @@
                                                     <td>
                                                         <input type="number" name="dispatch_po_qty[]"
                                                             id="po_rest_qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
-                                                            value="{{ $po_item->dispatch_po_qty }}"
+                                                            value="{{ $po_item->total_dispatched_qty }}"
                                                             class="form-control dispatch_po_quantity" readonly />
                                                     </td>
 
                                                     <td>
                                                         <input type="number" name="qty[][{{ $so_item->so_item_id }}]"
                                                             id="qty_{{ $po_item->po_item_id }}_{{ $so_item->so_item_id }}_{{ $index }}"
-                                                            value="{{ $so_item->dispatch_po_qty }}"
+                                                            value="{{ $dispatch_data->dispatched_quantity ?? 0 }}"
                                                             class="form-control po_quantity po_quantity_{{ $po_item->po_item_id }}"
                                                             value="0" step="0.001" onchange="changeOtherPO(this)"
                                                             disabled />
@@ -531,15 +556,13 @@
                                     </tbody>
                                 </table>
 
-
-
                                 <div class="col-md-4">
                                     <label for="remarks" class="form-label">Remarks</label>
                                     <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter remarks here..."></textarea>
                                 </div>
 
                                 <div class="text-end mt-5">
-                                    <button type="submit" onclick="check_" class="btn btn-primary">Submit</button>
+                                    <button type="submit" onclick="check_" class="btn btn-primary">Update</button>
                                     <a class="btn btn-secondary" href="{{ route('dispatch.index') }}">Back</a>
                                 </div>
 
@@ -737,6 +760,50 @@
         // ........................................................................................................................................................................ 
 
         // ..................................................................................toggleCheckbox........................................................................
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all checkboxes with the 'checked' attribute
+            const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"].custom-checkbox:checked');
+
+            // Loop through each checked checkbox and call the toggleCheckbox function
+            checkedCheckboxes.forEach((checkbox) => {
+                const [poItemId, soItemId, index] = checkbox.id.split('_').slice(2);
+                toggleCheckboxPageLoad(poItemId, soItemId, index);
+            });
+        });
+
+        function toggleCheckboxPageLoad(poItemId, soItemId, index) {
+            // Get the checkbox, quantity input, and other related elements
+            const checkbox = document.getElementById('item_checkbox_' + poItemId + '_' + soItemId + '_' + index);
+            const qtyInput = document.getElementById('qty_' + poItemId + '_' + soItemId + '_' + index);
+            const grossPriceInput = document.getElementById('gross_po_price_' + poItemId + '_' + soItemId + '_' + index);
+            const PoItemNumber = document.getElementById('po_item_number_' + soItemId + '_' + poItemId + '_' + index);
+
+            const convItemPO = document.getElementById('sub_cat_id_' + soItemId + '_' + poItemId + '_' + index);
+            const ConvRatePO = document.getElementById('conv_rate_' + soItemId + '_' + poItemId + '_' + index);
+            const freightInsurancePO = document.getElementById('dispatch_freight_insuance_' + soItemId + '_' + poItemId +
+                '_' + index);
+
+            // Enable or disable the inputs based on the checkbox status
+            if (checkbox.checked) {
+                if (qtyInput) qtyInput.disabled = false;
+                convItemPO.disabled = false;
+                freightInsurancePO.disabled = false;
+                ConvRatePO.disabled = false;
+                if (grossPriceInput) grossPriceInput.disabled = false;
+                PoItemNumber.disabled = false;
+            } else {
+                if (qtyInput) {
+                    qtyInput.disabled = true;
+                    if (!isPageLoad) qtyInput.value = 0; // Reset only if not page load
+                }
+                convItemPO.disabled = true;
+                freightInsurancePO.disabled = true;
+                ConvRatePO.disabled = true;
+                if (grossPriceInput) grossPriceInput.disabled = true;
+                PoItemNumber.disabled = true;
+            }
+        }
+
 
 
         function toggleCheckbox(poItemId, soItemId, index) {
@@ -785,6 +852,8 @@
 
 
             const allCheckboxesPO = document.querySelectorAll('.custom-checkbox');
+
+
             let totalQuantityParticularPO = 0;
             allCheckboxesPO.forEach(checkbox => {
                 if (checkbox.checked) {
@@ -871,7 +940,7 @@
                 let formData = $(this).serialize(); // Serialize form data
 
                 $.ajax({
-                    url: "{{ route('dispatch.store_so') }}", // Backend route
+                    url: "{{ route('dispatch.update_so') }}", // Backend route
                     type: "POST",
                     data: formData,
                     success: function(response) {

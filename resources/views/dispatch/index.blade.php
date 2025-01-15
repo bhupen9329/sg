@@ -145,6 +145,7 @@
                                             <th>SO Item No</th>
                                             <th style="width: 84.8125px;">SO Item Unit Price</th>
                                             <th>SO Gross Price</th>
+                                            <th>Dispatch Type</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -200,6 +201,8 @@
                                                         {{ number_format($gross_so, 2) }}
                                                     </a>
                                                 </td>
+
+                                                <td>{{ $data->dispatch_type ?? 'DispatchPO'}}</td>
                                     
                                                 <td>
                                                     <div class="filter">
@@ -381,7 +384,7 @@
                                 $(data).before(
                                     '<tr class="group"><td colspan="10" style="text-align: end;font-weight: bold;">Total Qty:</td><td colspan="6" style="text-align: left;font-weight: bold;">' +
                                     totalQuantity.toFixed(3) + '</td></tr>' +
-                                    '<tr class="group"><td colspan="16" style="text-align: center; border-top: 2px solid #8B0000;"></td></tr>'
+                                    '<tr class="group"><td colspan="17" style="text-align: center; border-top: 2px solid #8B0000;"></td></tr>'
                                 );
                             }
 
