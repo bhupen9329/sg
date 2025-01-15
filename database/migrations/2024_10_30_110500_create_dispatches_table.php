@@ -36,6 +36,7 @@ return new class extends Migration
             $table->decimal('dispatch_so_total', 10, 2)->nullable();
             $table->string('vehicle_number')->nullable();
             $table->string('receiver_person')->nullable();
+            $table->string('dispatch_type')->nullable();
             $table->string('remarks')->nullable();
             $table->timestamps();
 

@@ -655,6 +655,8 @@
 
             // Insert the cloned row below the current row
             row.parentNode.insertBefore(clonedRow, row.nextSibling);
+
+            calculateTotal(button);
         }
 
         function deleteRow(button) {

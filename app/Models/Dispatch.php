@@ -33,8 +33,8 @@ class Dispatch extends Model
         'vehicle_number',
         'receiver_person',
         'vehicle_number',
+        'dispatch_type',
         'remarks',
-
     ];
     public $timestamps = true; // Add this line
 }
