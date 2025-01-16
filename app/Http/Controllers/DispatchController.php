@@ -915,7 +915,7 @@ class DispatchController extends Controller
     
         // If errors exist, return with error message
         if (!empty($errors)) {
-            return back()->with('msg', 'Conv item is duplicate for one so item');
+            return response()->json(['message' => 'Conv item is duplicate for one so item.'], 400);
         }
 
         // $total_dispatch_so = 0;
@@ -990,7 +990,15 @@ class DispatchController extends Controller
         $dispatch_po_company = Company::where('id', $request->po_company_id)->first();
         $dispatch_so_company = Company::where('id', $request->so_company_id)->first();
 
-        return view('dispatch_so.main_create', compact('po_items', 'so_items', 'total_no', 'dispatch_po_company', 'dispatch_so_company'));
+        session([
+            'po_items' => $po_items,
+            'so_items' => $so_items,
+            'total_no' => $total_no,
+            'dispatch_po_company' => $dispatch_po_company,
+            'dispatch_so_company' => $dispatch_so_company
+        ]);
+    
+        return response()->json(['redirect' => route('dispatch_so.main_create')]);
     }
 
 
@@ -1354,5 +1362,17 @@ class DispatchController extends Controller
 
 
         return response()->json(['success' => true, 'redirect' => route('dispatch.index')]);
+    }
+
+    public function DispatchSOmain()
+    {
+        // Retrieve the data from session
+        $po_items = session('po_items', []);
+        $so_items = session('so_items', []);
+        $total_no = session('total_no', 0);
+        $dispatch_po_company = session('dispatch_po_company');
+        $dispatch_so_company = session('dispatch_so_company');
+    
+        return view('dispatch_so.main_create', compact('po_items', 'so_items', 'total_no', 'dispatch_po_company', 'dispatch_so_company'));
     }
 }

@@ -102,7 +102,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Dispatch Details</h5>
-                            <form id="dispatchForm" class="row g-3" method="post" action="{{ route('dispatch_main.redirect') }}">
+                            <form id="dispatchForm" class="row g-3" method="post" action="">
                                 @csrf
                                 <div class="row mb-3">
 
@@ -1503,6 +1503,38 @@ function calculateTotalDispatch(input) {
             $('#raised_date_input').focus();
         });
     </script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#dispatchForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent page refresh
+
+            let formData = $(this).serialize(); // Serialize form data
+
+            $.ajax({
+                url: "{{ route('dispatch_main.redirect') }}", // Backend route
+                type: "POST",
+                data: formData,
+                success: function(response) {
+                    window.location.href = response.redirect;
+                },
+                error: function(xhr) {
+                    // Handle error
+                    let error = xhr.responseJSON?.message || 'Something went wrong!';
+                    Swal.fire({
+                        title: 'Error!',
+                        text: error,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
 
     
 
