@@ -433,6 +433,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/dispatch_so_main_create', [DispatchController::class, 'DispatchSOmain'])->name('dispatch_so.main_create');
 
+    Route::post('/dispatch-update_so', [DispatchController::class, 'updateDispatchSO'])->name('dispatch.update_so');
+
 
 
     Route::post('/dispatch-create-main', [DispatchController::class, 'main_dispatch_redirect'])->name('dispatch_main.redirect');
