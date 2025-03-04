@@ -93,13 +93,13 @@
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
                                     <div class="btn-group">
-                                        @can('Sub-Category-create')
+                                        {{-- @can('Sub-Category-create') --}}
                                             @can('Conversion-index')
                                                 <a class="btn btn-primary mb-4 mr-3 "href="{{ route('subcategory.create') }}">Add
                                                     New
                                                     Conv Item</a>
                                             @endcan
-                                        @endcan
+                                        {{-- @endcan --}}
 
                                     </div>
                                 </div>
