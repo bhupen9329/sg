@@ -35,7 +35,10 @@ class ReportController extends Controller
     {
         $companys = Company::whereIn('type', ['supplier', 'both'])->get();
         $Categorys = Category::all();
-        $user = User::all();
+        // $user = User::all();
+        $user = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['Admin', 'Sales Person']);
+        })->get();
     
         // Handle $id if provided
         $selectedCategory = $id ? Category::find($id) : null;
@@ -148,7 +151,10 @@ class ReportController extends Controller
     {
         $companys = Company::whereIn('type', ['buyer', 'both'])->get();
         $Categorys = Category::all();
-        $user = User::all();
+        // $user = User::all();
+        $user = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['Admin', 'Sales Person']);
+        })->get();
 
         $selectedCategory = $id ? Category::find($id) : null;
         $selectedCompany = null;

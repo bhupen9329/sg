@@ -104,7 +104,10 @@ class SalesController extends Controller
         $category = Category::all();
         $custom_due_date = CompanySetting::first();
         $gstsetting = GstSetting::all();
-        $user = User::all();
+        $user = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['Admin', 'Sales Person']);
+        })->get();
+// dd( $user)        ;
         $data = [
             'company' => $company,
             'category' => $category,
@@ -465,7 +468,10 @@ class SalesController extends Controller
         $sales_order = SalesOrder::where('sales_orders.id', $id)
             ->select('sales_orders.*', 'sales_orders.id as so_id')
             ->first();
-        $user = User::all();
+        // $user = User::all();
+        $user = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['Admin', 'Sales Person']);
+        })->get();
 
 
         if ($sales_order->due_date != null) {

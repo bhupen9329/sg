@@ -108,7 +108,10 @@ class PurchaseController extends Controller
         $company = Company::where('id', $id)->first();
         $custom_due_date = CompanySetting::first();
         $category = Category::all();
-        $user = User::all();
+        // $user = User::all();
+        $user = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['Admin', 'Sales Person']);
+        })->get();
         $data = [
             'company' => $company,
             'category' => $category,
@@ -542,7 +545,10 @@ class PurchaseController extends Controller
         $po_number = $po_data->document_number;
 
         $category_2 = Category::all();
-        $user = User::all();
+        // $user = User::all();
+        $user = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['Admin', 'Sales Person']);
+        })->get();
 
         if ($po_data->due_date != null) {
             $due_date = Carbon::parse($po_data->due_date);
