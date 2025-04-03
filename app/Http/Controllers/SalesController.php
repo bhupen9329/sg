@@ -43,9 +43,9 @@ class SalesController extends Controller
 
     function __construct()
     {
-        $this->middleware('permission:Sales-index', ['only' => ['index','show']]);
+        $this->middleware('permission:Sales-index', ['only' => ['index', 'show']]);
         $this->middleware('permission:Sales-create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:Sales-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:Sales-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:Sales-delete', ['only' => ['delete']]);
     }
 
@@ -120,11 +120,47 @@ class SalesController extends Controller
 
     public function store(Request $request, ValuationController $valuationcontroller)
     {
+        // $year = date('Y');
+        // $month = date('m');
+
+
+        // if ($month >= 4) { // If the current month is April (4) or later, it's the new financial year
+        //     $financial_year_start = $year;
+        //     $financial_year_end = $year + 1;
+        // } else { // Otherwise, we're still in the previous financial year
+        //     $financial_year_start = $year - 1;
+        //     $financial_year_end = $year;
+        // }
+
+        // $max_serial_number = SalesOrder::all()->whereBetween('created_at', [
+        //     "$financial_year_start-04-01 00:00:00", // Start of the financial year
+        //     "$financial_year_end-03-31 23:59:59",  // End of the financial year
+        // ])->max('so_number');
+        // $last_serial_number = substr($max_serial_number, -4);
+        // $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+        // $so_number = 'SO' .  $financial_year_start . $next_serial_number;
+
+
         $year = date('Y');
-        $max_serial_number = SalesOrder::all()->max('so_number');
-        $last_serial_number = substr($max_serial_number, -4);
-        $next_serial_number = str_pad((int) $last_serial_number + 1, 4, '0', STR_PAD_LEFT);
-        $so_number = 'SO' . $year . $next_serial_number;
+        $month = date('m');
+ 
+        if ($month >= 4) {
+            $financial_year_start = $year;
+            $financial_year_end = $year + 1;
+        } else {
+            $financial_year_start = $year - 1;
+            $financial_year_end = $year;
+        }
+        $financial_year = $financial_year_start;
+
+        $max_serial_number = SalesOrder::whereBetween('created_at', [
+            "$financial_year_start-04-01 00:00:00",
+            "$financial_year_end-03-31 23:59:59",
+        ])->max('so_number');
+
+        $last_serial_number = $max_serial_number ? substr($max_serial_number, -4) : '0000';
+        $next_serial_number = str_pad((int)$last_serial_number + 1, 4, '0', STR_PAD_LEFT);
+        $so_number = 'SO' . $financial_year . $next_serial_number;
 
         $salesOrder = new SalesOrder();
         $salesOrder->company_id = $request->company_id;
@@ -792,8 +828,9 @@ class SalesController extends Controller
         ]);
     }
 
-    
-    public function so_pre_closed_save(Request $request){
+
+    public function so_pre_closed_save(Request $request)
+    {
         SoItem::where('id', $request->so_item_id)->update(['so_dispatch_item_status' => $request->status, 'so_item_status_date' => $request->date,  'so_item_status_remarks' => $request->remarks,]);
         return redirect()->route('sales.index')->with('success', 'Sales Order Status Updated Successfully');
     }
@@ -802,37 +839,37 @@ class SalesController extends Controller
     public function get_dispatch_qty(Request $request)
     {
         $received_qty_records = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
-        ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
-        ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
-        ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
-        ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
-        ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
-        ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
-        ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
-        ->select(
-            'dispatches.*',
-            'so_items.so_dispatch_rest_qty',
-            'po_items.po_dispatch_rest_qty',
-            'po_company.company_name as po_company',
-            'so_company.company_name as so_company',
-            'sales_orders.so_number',
-            'purchase_orders.id as po_id',
-            'sales_orders.id as so_id',
-            'purchase_orders.document_number as po_number',
-            'sales_orders.date as so_date',
-            'purchase_orders.date as po_date',
-            'categories.name as category_name',
-            'subcategories.sub_category as sub_category_name',
-            'po_items.po_item_no',
-            'so_items.so_item_no',
-            'po_items.unit_price as po_unit_price',
-            'so_items.unit_price as so_unit_price',
-            'po_items.qty as po_qty',
-            'so_items.qty as so_qty',
-            'dispatches.id as dispatch_id',
-            'dispatches.date as dispatch_date',
-        )
-        ->where('dispatches.so_item_id', $request->get_so_item_id)->get();
+            ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
+            ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
+            ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
+            ->leftjoin('sales_orders', 'dispatches.so_id', '=', 'sales_orders.id')
+            ->leftjoin('purchase_orders', 'dispatches.po_id', '=', 'purchase_orders.id')
+            ->leftjoin('categories', 'dispatches.category_id', '=', 'categories.id')
+            ->leftjoin('subcategories', 'dispatches.subcategory_id', '=', 'subcategories.id')
+            ->select(
+                'dispatches.*',
+                'so_items.so_dispatch_rest_qty',
+                'po_items.po_dispatch_rest_qty',
+                'po_company.company_name as po_company',
+                'so_company.company_name as so_company',
+                'sales_orders.so_number',
+                'purchase_orders.id as po_id',
+                'sales_orders.id as so_id',
+                'purchase_orders.document_number as po_number',
+                'sales_orders.date as so_date',
+                'purchase_orders.date as po_date',
+                'categories.name as category_name',
+                'subcategories.sub_category as sub_category_name',
+                'po_items.po_item_no',
+                'so_items.so_item_no',
+                'po_items.unit_price as po_unit_price',
+                'so_items.unit_price as so_unit_price',
+                'po_items.qty as po_qty',
+                'so_items.qty as so_qty',
+                'dispatches.id as dispatch_id',
+                'dispatches.date as dispatch_date',
+            )
+            ->where('dispatches.so_item_id', $request->get_so_item_id)->get();
 
         return response()->json([
             'received_qty_records' => $received_qty_records,
