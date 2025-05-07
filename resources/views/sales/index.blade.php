@@ -544,7 +544,38 @@
                 ],
                 // Add to buttons the pageLength option
                 buttons: [
-                    'pageLength', 'csv', 'print'
+                    'pageLength',
+                    {
+                        extend: 'csv',
+                        text: 'CSV',
+                        title: 'Saraswati Globals (Sales Orders Details)',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'PRINT',
+                        title: 'Saraswati Globals (Sales Orders Details)',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ],
+                        },
+                        customize: function(win) {
+                            $(win.document.body).find('table')
+                                .addClass('table')
+                                .css({
+                                    'margin': '10px',
+                                    'padding': '10px'
+                                });
+
+                            $(win.document.body).find('h1')
+                                .css({
+                                    'text-align': 'center',
+                                    'font-size': '20px',
+                                    'margin-top': '20px'
+                                });
+                        }
+                    }
                 ]
             });
         });

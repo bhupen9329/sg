@@ -364,7 +364,38 @@
                     [10, 20, 50, 100, 150, -1],
                     ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
                 ],
-                buttons: ['pageLength', 'csv', 'print'],
+                buttons: ['pageLength',
+                    {
+                        extend: 'csv',
+                        text: 'CSV',
+                        title: 'Saraswati Globals (Index-Dispatch)',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'PRINT',
+                        title: 'Saraswati Globals (Index-Dispatch)',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                        },
+                        customize: function(win) {
+                            $(win.document.body).find('table')
+                                .addClass('table')
+                                .css({
+                                    'margin': '10px',
+                                    'padding': '10px'
+                                });
+
+                            $(win.document.body).find('h1')
+                                .css({
+                                    'text-align': 'center',
+                                    'font-size': '20px',
+                                    'margin-top': '20px'
+                                });
+                        }
+                    }],
                 drawCallback: function(settings) {
                     var api = this.api();
                     var lastDispatchNumber = null;

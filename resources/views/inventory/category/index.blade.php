@@ -157,9 +157,7 @@
                         title: 'Saraswati Globals (Category Details)',
 
                         exportOptions: {
-                            columns: [0, 1, 2,
-                                3,
-                            ], // Include all columns except the last one with dropdown
+                            columns: [0, 1] // Include all columns except the last one with dropdown
                         }
                     },
                     {
@@ -167,9 +165,7 @@
                         text: 'PRINT',
                         title: 'Saraswati Globals (Category Details)',
                         exportOptions: {
-                            columns: [0, 1, 2,
-                                3,
-                            ] // Include all columns except the last one with dropdown
+                            columns: [0, 1] // Include all columns except the last one with dropdown
                         },
                         customize: function(win) {
                             $(win.document.body).find('table')

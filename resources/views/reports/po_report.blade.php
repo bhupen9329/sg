@@ -322,7 +322,7 @@
                         title: 'Saraswati Globals (PO Report)',
 
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7],
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                         }
                     },
                     {
@@ -330,7 +330,7 @@
                         text: 'PRINT',
                         title: 'Saraswati Globals (PO Report)',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7],
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                         },
                         customize: function(win) {
                             $(win.document.body).find('table')
