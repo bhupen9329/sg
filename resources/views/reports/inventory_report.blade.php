@@ -179,7 +179,7 @@
                             <div class="row ">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="pd-20">
-                                        <h4 class="text-blue h4">Stockss</h4>
+                                        <h4 class="text-blue h4">Stocks</h4>
                                     </div><br>
                                 </div>
                                 <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
@@ -233,18 +233,18 @@
                     {
                         extend: 'csv',
                         text: 'CSV',
-                        title: 'Saraswati Globals (Outward  Report)',
+                        title: 'Saraswati Globals (Stock Report)',
 
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+                            columns: [0, 1, 2, 3],
                         }
                     },
                     {
                         extend: 'print',
                         text: 'PRINT',
-                        title: 'Saraswati Globals (Outward   Report)',
+                        title: 'Saraswati Globals (Stock Report)',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, ],
+                            columns: [0, 1, 2, 3],
                         },
                         customize: function(win) {
                             $(win.document.body).find('table')

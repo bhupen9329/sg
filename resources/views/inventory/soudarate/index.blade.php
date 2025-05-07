@@ -250,7 +250,7 @@
                         title: 'Saraswati Globals (Sub Category Details)',
                         exportOptions: {
                             columns: [0, 1,
-                                2, ] // Include all columns except the last one with dropdown
+                                2, 3, 4, 5 ] // Include all columns except the last one with dropdown
                         },
                         customize: function(win) {
                             $(win.document.body).find('table')
