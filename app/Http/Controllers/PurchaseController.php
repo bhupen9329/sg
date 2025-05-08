@@ -52,7 +52,7 @@ class PurchaseController extends Controller
         // Retrieve all roles assigned to the user
         $roles = $user->getRoleNames();
 
-        if ($roles->contains('Admin')) {
+        if ($roles->contains('Admin') || $roles->contains('Accountant')) {
             $po_data = PurchaseOrder::join('companies', 'companies.id', '=', 'purchase_orders.supplier_id')
                 ->join('po_items', 'po_items.po_id', '=', 'purchase_orders.id')
                 ->join('categories', 'categories.id', '=', 'po_items.item_category')

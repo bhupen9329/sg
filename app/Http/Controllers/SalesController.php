@@ -74,7 +74,7 @@ class SalesController extends Controller
             )
             ->orderBy('sales_orders.date', 'asc');
 
-        if ($roles->contains('Admin')) {
+        if ($roles->contains('Admin') || $roles->contains('Accountant')) {
             $sales_order = $sales_order_query->get();
         } else {
             $sales_order = $sales_order_query->where('sales_orders.so_user_id', $user->id)->get();
