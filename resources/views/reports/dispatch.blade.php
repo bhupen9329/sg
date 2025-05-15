@@ -396,62 +396,145 @@
 
         });
 
-        $(document).ready(function() {
-            var table = $('#Category_table').DataTable({
-                dom: 'Bfrtip',
-                lengthMenu: [
-                    [10, 20, 50, 100, 150, -1],
-                    ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
-                ],
-                buttons: [
-                    'pageLength',
-                    {
-                        extend: 'csv',
-                        text: 'CSV',
-                        title: 'Saraswati Globals (Dispatch  Report)',
+        $(document).ready(function () {
+    var table = $('#Category_table').DataTable({
+        dom: 'Bfrtip',
+        lengthMenu: [
+            [10, 20, 50, 100, 150, -1],
+            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+        ],
+        buttons: [
+            'pageLength',
 
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: 'PRINT',
-                        title: 'Saraswati Globals (Dispatch   Report)',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-                        },
-                        customize: function(win) {
-                            $(win.document.body).find('table')
-                                .addClass('table')
-                                .css({
-                                    'margin': '10px',
-                                    'padding': '10px'
-                                });
+            // CSV Export with footer totals manually added
+            {
+                extend: 'csvHtml5',
+                text: 'CSV',
+                title: 'Saraswati Globals (Dispatch Report)',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+                },
+                customize: function (csv) {
+                    var footer = [
+                        '', '', '', 'Grand Total:',
+                        '', '',
+                        $('#totalDispatchTotal').text(),
+                        '', '', 
+                        $('#totalDispatchedQty').text(),
+                        '', '',
+                        $('#totalDispatchSoTotal').text()
+                    ];
+                    var footerRow = '\n"' + footer.join('","') + '"';
+                    return csv + footerRow;
+                }
+            },
 
-                            $(win.document.body).find('h1')
-                                .css({
-                                    'text-align': 'center',
-                                    'font-size': '20px',
-                                    'margin-top': '20px'
-                                });
-                        }
-                    }
-                ]
-            });
+        
 
-            $('.dt-buttons button').addClass('custom-button');
+            // Print with visible footer
+            {
+                extend: 'print',
+                text: 'PRINT',
+                title: 'Saraswati Globals (Dispatch Report)',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    footer: true
+                },
+                customize: function (win) {
+                    // Style table
+                    $(win.document.body).find('table')
+                        .addClass('table')
+                        .css({ 'margin': '10px', 'padding': '10px' });
+
+                    // Style title
+                    $(win.document.body).find('h1')
+                        .css({ 'text-align': 'center', 'font-size': '20px', 'margin-top': '20px' });
+
+                    // Append the original footer
+                    var tfoot = $('#Category_table').find('tfoot').clone();
+                    $(win.document.body).find('table').append(tfoot);
+                }
+            }
+        ]
+    });
+
+    // Style DataTable buttons
+    $('.dt-buttons button').addClass('custom-button');
+    $('.custom-button, .paginate_button').css({
+        'padding': '5px 10px',
+        'font-size': '10px'
+    });
+});
 
 
-            $('.custom-button, .paginate_button').css({
-                'padding': '5px 10px',
-                'font-size': '10px'
-            });
-        });
+        // $(document).ready(function() {
+        //     var table = $('#Category_table').DataTable({
+        //         dom: 'Bfrtip',
+        //         lengthMenu: [
+        //             [10, 20, 50, 100, 150, -1],
+        //             ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+        //         ],
+        //         buttons: [
+        //             'pageLength',
+        //             {
+        //                 extend: 'csv',
+        //                 text: 'CSV',
+        //                 title: 'Saraswati Globals (Dispatch  Report)',
+
+        //                 exportOptions: {
+        //                     columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        //                 }
+        //             },
+        //             {
+        //                 extend: 'print',
+        //                 text: 'PRINT',
+        //                 title: 'Saraswati Globals (Dispatch   Report)',
+        //                 exportOptions: {
+        //                     columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        //                 },
+        //                 customize: function(win) {
+        //                     $(win.document.body).find('table')
+        //                         .addClass('table')
+        //                         .css({
+        //                             'margin': '10px',
+        //                             'padding': '10px'
+        //                         });
+
+        //                     $(win.document.body).find('h1')
+        //                         .css({
+        //                             'text-align': 'center',
+        //                             'font-size': '20px',
+        //                             'margin-top': '20px'
+        //                         });
+        //                 }
+        //             }
+        //         ]
+        //     });
+
+        //     $('.dt-buttons button').addClass('custom-button');
+
+
+        //     $('.custom-button, .paginate_button').css({
+        //         'padding': '5px 10px',
+        //         'font-size': '10px'
+        //     });
+        // });
     </script>
 
 
 <script>
+
+    $(document).ready(function () {
+        filterButton(
+      $('#filterTodate').val(),
+                $('#filterFromdate').val(),
+                $('#filterItem_name').val(),
+                $('#filterCompany').val(),
+                $('#filterDispatch').val(),
+        );
+    });
+
+
     function filterButton(filterTodate, filterFromdate, filterItem_name, filterCompany, filterDispatch) {
         $.ajax({
             type: 'POST',

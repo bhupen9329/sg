@@ -306,61 +306,73 @@
             });
         });
 
-        $(document).ready(function() {
-            // Initialize DataTable
-            var table = $('#Category_table').DataTable({
-                dom: 'Bfrtip',
-                lengthMenu: [
-                    [10, 20, 50, 100, 150, -1],
-                    ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
-                ],
-                buttons: [
-                    'pageLength',
-                    {
-                        extend: 'csv',
-                        text: 'CSV',
-                        title: 'Saraswati Globals (PO Report)',
+  $(document).ready(function () {
+    var table = $('#Category_table').DataTable({
+        dom: 'Bfrtip',
+        lengthMenu: [
+            [10, 20, 50, 100, 150, -1],
+            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+        ],
+        buttons: [
+            'pageLength',
+            {
+                extend: 'csvHtml5',
+                text: 'CSV',
+                title: 'Saraswati Globals (PO Report)',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                },
+                customize: function (csv) {
+                    var footer = [
+                        '', '', '', 'Grand Total:',
+                        '', '',
+                        $('#totalPoUnitPrice').text(),
+                        $('#totalPoQty').text(),
+                        $('#totalDispatchedQty').text(),
+                        $('#totalBalancedQty').text(),
+                        '', ''
+                    ];
+                    var footerRow = '\n"' + footer.join('","') + '"';
+                    return csv + footerRow;
+                }
+            },
+            {
+                extend: 'print',
+                text: 'PRINT',
+                title: 'Saraswati Globals (PO Report)',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                },
+                customize: function (win) {
+                    $(win.document.body).find('table')
+                        .addClass('table')
+                        .css({
+                            'margin': '10px',
+                            'padding': '10px'
+                        });
 
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: 'PRINT',
-                        title: 'Saraswati Globals (PO Report)',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                        },
-                        customize: function(win) {
-                            $(win.document.body).find('table')
-                                .addClass('table')
-                                .css({
-                                    'margin': '10px',
-                                    'padding': '10px'
-                                });
+                    $(win.document.body).find('h1')
+                        .css({
+                            'text-align': 'center',
+                            'font-size': '20px',
+                            'margin-top': '20px'
+                        });
 
-                            $(win.document.body).find('h1')
-                                .css({
-                                    'text-align': 'center',
-                                    'font-size': '20px',
-                                    'margin-top': '20px'
-                                });
-                        }
-                    }
-                ]
-            });
+                    var tfoot = $('#Category_table').find('tfoot').clone();
+                    $(win.document.body).find('table').append(tfoot);
+                }
+            }
+        ]
+    });
 
-            // Modify button styles
-            $('.dt-buttons button').addClass('custom-button');
+    $('.dt-buttons button').addClass('custom-button');
 
-            // Add additional CSS styles
+    $('.custom-button, .paginate_button').css({
+        'padding': '5px 10px',
+        'font-size': '10px'
+    });
+});
 
-            $('.custom-button, .paginate_button').css({
-                'padding': '5px 10px', // Adjust padding as needed
-                'font-size': '10px' // Adjust font size as needed
-            });
-        });
     </script>
 
 
