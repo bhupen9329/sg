@@ -277,41 +277,58 @@
                     [10, 20, 50, 100, 150, -1],
                     ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
                 ],
-                buttons: [
-                    'pageLength',
-                    {
-                        extend: 'csv',
-                        text: 'CSV',
-                        title: 'Saraswati Globals (SO Report)',
+            buttons: [
+    'pageLength',
+    {
+        extend: 'csvHtml5',
+        text: 'CSV',
+        title: 'Saraswati Globals (SO Report)',
+        exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        },
+        customize: function (csv) {
+            var footer = [
+                '', '', '', 'Grand Total:',
+                '',
+                '',
+                $('#totalSOUnitPrice').text(),
+                $('#totalSOQty').text(),
+                $('#totalDispatchedQty').text(),
+                $('#totalRestQty').text(),
+                '', ''
+            ];
+            var footerRow = '\n"' + footer.join('","') + '"';
+            return csv + footerRow;
+        }
+    },
+    {
+        extend: 'print',
+        text: 'PRINT',
+        title: 'Saraswati Globals (SO Report)',
+        exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        },
+        customize: function (win) {
+            $(win.document.body).find('table')
+                .addClass('table')
+                .css({
+                    'margin': '10px',
+                    'padding': '10px'
+                });
 
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: 'PRINT',
-                        title: 'Saraswati Globals (SO Report)',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                        },
-                        customize: function(win) {
-                            $(win.document.body).find('table')
-                                .addClass('table')
-                                .css({
-                                    'margin': '10px',
-                                    'padding': '10px'
-                                });
+            $(win.document.body).find('h1')
+                .css({
+                    'text-align': 'center',
+                    'font-size': '20px',
+                    'margin-top': '20px'
+                });
 
-                            $(win.document.body).find('h1')
-                                .css({
-                                    'text-align': 'center',
-                                    'font-size': '20px',
-                                    'margin-top': '20px'
-                                });
-                        }
-                    }
-                ]
+            var tfoot = $('#Category_table').find('tfoot').clone();
+            $(win.document.body).find('table').append(tfoot);
+        }
+    }
+]
+
             });
 
             $('.dt-buttons button').addClass('custom-button');
@@ -329,7 +346,6 @@
 <script>
 
 $(document).ready(function () {
-        // Call filterButton on page load with default or initial filter values
         filterButton(
                $('#filterTodate').val(),
                 $('#filterFromdate').val(),
