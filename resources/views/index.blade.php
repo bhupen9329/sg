@@ -494,7 +494,7 @@
 
                                     <!-- Table with stripped rows -->
                                     <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
+                                        <table class="table" id="table_1">
                                             <thead>
                                                 <tr>
                                                     <th>Due SO Date</th>
@@ -553,7 +553,7 @@
 
                                     <!-- Table with stripped rows -->
                                     <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
+                                        <table class="table"  id="table_2">
                                             <thead>
                                                 <tr>
                                                     <th>Due PO Date</th>
@@ -613,7 +613,7 @@
 
                                     <!-- Table with stripped rows -->
                                     <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
+                                        <table class="table" id="table_3">
                                             <thead>
                                                 <tr>
                                                     <th>Base Item</th>
@@ -626,7 +626,10 @@
                                                     <tr>
                                                         <td>{{ $total['category_name'] }}</td>
                                                         <td>
-                                                            <a href="#"
+                                                          @if ($total['so_total_quantity'] == null)
+                                                              N/A
+                                                          @else
+                                                                <a href="#"
                                                                 style="text-decoration: underline; color: blue;"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details_so"
@@ -634,9 +637,13 @@
                                                                 onclick="openModalWithCategorySO({{ $total['category_id'] }})">
                                                                 {{ number_format((float) $total['so_total_quantity'], 3) }}
                                                             </a>
+                                                          @endif
                                                         </td>
                                                         <td>
-                                                            <a href="#"
+                                                            @if ( $total['po_total_quantity'] == null)
+                                                              N/A  
+                                                            @else
+                                                                 <a href="#"
                                                                 style="text-decoration: underline; color: blue;"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details"
@@ -644,6 +651,8 @@
                                                                 onclick="openModalWithCategory({{ $total['category_id'] }})">
                                                                 {{ number_format((float) $total['po_total_quantity'], 3) }}
                                                             </a>
+                                                            @endif
+                                                           
                                                         </td>
 
                                                     </tr>
@@ -673,7 +682,7 @@
 
                                     <!-- Table with stripped rows -->
                                     <div class="dashboard_dataTables_wrapper_low">
-                                        <table class="table datatable">
+                                        <table class="table" id="table_4">
                                             <thead>
                                                 <tr>
                                                     <th>Party Name</th>
@@ -682,11 +691,22 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                {{-- @dd($mergedTotalsPartyWise) --}}
                                                 @foreach ($mergedTotalsPartyWise as $total)
+                                                  @if ($total['so_total_quantity'] == null && $total['po_total_quantity'] == null)
+                                                    @continue
+                                                @endif
                                                     <tr>
                                                         <td>{{ $total['company_name'] }}</td>
                                                         <td>
-                                                            <a href="#"
+                                                            
+                                                            @if ($total['so_total_quantity'] == null)
+                                                            N/A
+                                                               
+                                                    
+                                                            @else
+
+                                                                 <a href="#"
                                                                 style="text-decoration: underline; color: blue;"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details_so_party_wise"
@@ -694,10 +714,14 @@
                                                                 onclick="openModalWithCategorySOPartyWise({{ $total['party_id'] }})">
                                                                 {{-- {{ $total['so_total_quantity'] }} --}}
                                                                 {{ number_format((float) $total['so_total_quantity'], 3) }}
-                                                            </a>
+                                                                        </a>
+                                                            @endif
                                                         </td>
                                                         <td>
-                                                            <a href="#"
+                                                            @if ( $total['po_total_quantity'] == null)
+                                                                 N/A
+                                                            @else
+                                                                 <a href="#"
                                                                 style="text-decoration: underline; color: blue;"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#Modalfor_quantity_details_po_party_wise"
@@ -706,6 +730,7 @@
                                                                 {{-- {{ $total['po_total_quantity'] }} --}}
                                                                 {{ number_format((float) $total['po_total_quantity'], 3) }}
                                                             </a>
+                                                            @endif
                                                         </td>
 
                                                     </tr>
@@ -731,6 +756,14 @@
         </section>
         @endcan
 
+<script>
+    $(document).ready(function() {
+        $('#table_1').DataTable();
+        $('#table_2').DataTable();
+        $('#table_3').DataTable();
+        $('#table_4').DataTable();
+    });
+</script>
 
         <script>
             function get_category_id(id) {

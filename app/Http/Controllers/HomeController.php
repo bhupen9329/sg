@@ -26,7 +26,7 @@ use App\Http\Controllers\ValuationController;
 
 class HomeController extends Controller
 {
- 
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -57,14 +57,17 @@ class HomeController extends Controller
         $user_count = User::count();
         $role_count = Role::count();
 
-        $sales_order = SoItem::sum('so_dispatch_rest_qty');
-        $purchase_order = PoItem::sum('po_dispatch_rest_qty');
+        $sales_order = SoItem::
+            whereNotIn('so_dispatch_item_status', ['Pre Closed', 'Cancelled'])->sum('so_dispatch_rest_qty');
+
+        // $purchase_order = PoItem::sum('po_dispatch_rest_qty');
+        $purchase_order = PoItem::whereNotIn('po_dispatch_item_status', ['Pre Closed', 'Cancelled'])->sum('po_dispatch_rest_qty');
 
         $company_count = Company::all()->count();
         $my_notes = MyNote::latest()->first();
         $base_price = Category::get();
         $CompanySetting_data = CompanySetting::first();
-        $threshold_value = (int)$CompanySetting_data->threshold_value;
+        $threshold_value = (int) $CompanySetting_data->threshold_value;
 
         $categories = Category::all();
         $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
@@ -74,7 +77,7 @@ class HomeController extends Controller
         $avg_transaction = [];
 
 
-        $latestEntriesByDate = []; 
+        $latestEntriesByDate = [];
 
         $lifoData = '';
         $fifoData = '';
@@ -119,10 +122,12 @@ class HomeController extends Controller
 
         $total_sales_order_quantity = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
             ->whereDate('sales_orders.due_date', '<=', $todaysDate) // Due date ko filter karte hain
+            ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->sum('so_items.so_dispatch_rest_qty'); // Sirf total quantity ka sum nikalte hain
 
         $total_purchase_order_quantity = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
             ->whereDate('purchase_orders.due_date', '<=', $todaysDate) // Due date ko filter karte hain
+            ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->sum('po_items.po_dispatch_rest_qty'); // Sirf total quantity ka sum nikalte hain
 
         // dd( $total_sales_order_quantity,   $total_purchase_order_quantity);
@@ -139,9 +144,11 @@ class HomeController extends Controller
                 'po_items.item_category',
                 'categories.id as category_id',
                 'categories.name as category_name',
+                'po_items.po_dispatch_item_status',
                 DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
             )
-            ->groupBy('po_items.item_category', 'categories.name', 'categories.id')
+            ->groupBy('po_items.po_dispatch_item_status', 'po_items.item_category', 'categories.name', 'categories.id')
+            ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
         $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
@@ -150,9 +157,11 @@ class HomeController extends Controller
                 'so_items.item_category',
                 'categories.name as category_name',
                 'categories.id as category_id',
+                'so_items.so_dispatch_item_status',
                 DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
             )
-            ->groupBy('so_items.item_category', 'categories.name', 'categories.id')
+            ->groupBy('so_items.so_dispatch_item_status','so_items.item_category', 'categories.name', 'categories.id')
+            ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
         $mergedTotals = $filteredPOTotals->map(function ($po) use ($filteredSOTotals) {
@@ -235,9 +244,11 @@ class HomeController extends Controller
 
         // Add Missing SO Data if No Matching PO Exists
         $filteredSOTotalsPartyWise->each(function ($so) use ($mergedTotalsPartyWise) {
-            if (!$mergedTotalsPartyWise->contains(function ($merged) use ($so) {
-                return $merged['party_id'] === $so->party_id;
-            })) {
+            if (
+                !$mergedTotalsPartyWise->contains(function ($merged) use ($so) {
+                    return $merged['party_id'] === $so->party_id;
+                })
+            ) {
                 $mergedTotalsPartyWise->push([
                     'party_id' => $so->party_id,
                     'company_name' => $so->company_name,
@@ -314,7 +325,8 @@ class HomeController extends Controller
             ->select('categories.name', DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
-            ->get();
+            ->whereNotIn('so_items.so_item_status', ['Pre Closed', 'Cancelled'])
+            ->get('so_items.so_dispatch_rest_qty');
 
 
         return response()->json([
@@ -329,6 +341,7 @@ class HomeController extends Controller
             ->select('categories.name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
             ->where('po_items.po_dispatch_rest_qty', '!=', 0)
+            ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
 
@@ -354,7 +367,7 @@ class HomeController extends Controller
                 DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
             )
             ->whereDate('sales_orders.due_date', '<=', $todaysDate) // Due date ko filter karte hain
-            ->groupBy('sales_orders.id', 'sales_orders.so_number', 'sales_orders.due_date', 'users.name',  'companies.company_name')
+            ->groupBy('sales_orders.id', 'sales_orders.so_number', 'sales_orders.due_date', 'users.name', 'companies.company_name')
             ->get();
 
         return response()->json([
