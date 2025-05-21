@@ -783,6 +783,7 @@ class SalesController extends Controller
             ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
             ->where('so_items.item_category', $request->get_category_id)
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
+             ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
         return response()->json([
@@ -804,6 +805,7 @@ class SalesController extends Controller
             )
             ->groupBy('so_items.item_category', 'categories.name')
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
+             ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
 
@@ -826,6 +828,7 @@ class SalesController extends Controller
             )
             ->groupBy('po_items.item_category', 'categories.name')
             ->where('po_items.po_dispatch_rest_qty', '!=', 0)
+             ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
 

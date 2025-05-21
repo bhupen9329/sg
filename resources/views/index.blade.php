@@ -51,7 +51,6 @@
                                         data-bs-toggle="modal" data-bs-target="#Modalfor_quantity_details_item_wise"
                                         class="rest-quantity-link" onclick="get_received_so_qty_for_report_item_wise()">
                                         <h6>
-
                                             {{ number_format($sales_order, 3) }}
                                         </h6>
                                     </a>
@@ -623,6 +622,9 @@
                                             </thead>
                                             <tbody>
                                                 @foreach ($mergedTotals as $total)
+                                                    @if ($total['so_total_quantity'] == null && $total['po_total_quantity'] == null)
+                                                    @continue
+                                                @endif
                                                     <tr>
                                                         <td>{{ $total['category_name'] }}</td>
                                                         <td>
