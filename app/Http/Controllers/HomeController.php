@@ -325,7 +325,7 @@ class HomeController extends Controller
             ->select('categories.name', DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
-            ->whereNotIn('so_items.so_item_status', ['Pre Closed', 'Cancelled'])
+            ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get('so_items.so_dispatch_rest_qty');
 
 
