@@ -688,6 +688,7 @@ class PurchaseController extends Controller
             ->join('categories', 'po_items.item_category', '=', 'categories.id')
             ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
             ->where('po_items.item_category', $request->get_category_id)
+            ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
         return response()->json([
