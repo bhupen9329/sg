@@ -418,8 +418,6 @@
                                     '<tr class="group"><td colspan="17" style="text-align: center; border-top: 2px solid #8B0000;"></td></tr>'
                                 );
                             }
-
-
                             // Reset the totalQuantity for the new dispatch number
                             totalQuantity = quantity;
                             lastDispatchNumber = dispatchNumber;
@@ -431,8 +429,8 @@
                     // After looping through all rows, display the last total quantity if necessary
                     if (lastDispatchNumber !== null) {
                         $(api.row(':last').node()).after(
-                            '<tr class="group"><td colspan="16" style="text-align: center; border-top: 2px solid #8B0000;">Total Quantity: ' +
-                            totalQuantity.toFixed(3) + '</td></tr>'
+                                 '<tr class="group"><td colspan="10" style="text-align: end;font-weight: bold;">Total Qty:</td><td colspan="6" style="text-align: left;font-weight: bold;">' +
+                                    totalQuantity.toFixed(3) + '</td></tr>'
                         );
                     }
                 }
