@@ -695,6 +695,7 @@
                                             <tbody>
                                                 {{-- @dd($mergedTotalsPartyWise) --}}
                                                 @foreach ($mergedTotalsPartyWise as $total)
+                                                {{-- @dump($total); --}}
                                                   @if ($total['so_total_quantity'] == null && $total['po_total_quantity'] == null)
                                                     @continue
                                                 @endif
