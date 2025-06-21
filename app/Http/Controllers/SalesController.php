@@ -513,6 +513,7 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request);
 
         $sales_order = SalesOrder::where('id', $id)->first();
 
@@ -527,12 +528,14 @@ class SalesController extends Controller
         ];
 
         SalesOrder::where('id', $id)->update($data);
-        $so_item = SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->whereColumn('qty', '=', 'so_dispatch_rest_qty')->get();
+        $so_item = SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->whereColumn('qty', '=', 'so_dispatch_rest_qty')->where('so_dispatch_item_status', '=', 'Open')->get();
         foreach ($so_item as $so_items) {
             InventoryTransaction::where('so_item_id', $so_items->id)->delete();
         }
 
-        SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->whereColumn('qty', '=', 'so_dispatch_rest_qty')->delete();
+      $d =  SoItem::where('so_id', $id)->whereColumn('qty', '=', 'so_rest_qty')->whereColumn('qty', '=', 'so_dispatch_rest_qty')->where('so_dispatch_item_status', '=', 'Open')->delete();
+
+        // dd($d);
 
         if ($id) {
             if (isset($request->unit_price_) >  0) {
@@ -546,7 +549,7 @@ class SalesController extends Controller
                     $soItem->unit_price = $request->unit_price_[$i];
                     $soItem->price = $request->price[$i];
                     $soItem->so_dispatch_rest_qty = $request->qty[$i];
-                    $so_item_available = SoItem::where('so_id', $id)->latest()->first();
+                    $so_item_available = SoItem::where('so_id', $id)->latest('id')->first();
 
                     if ($so_item_available) {
                         // Extract the last two digits from `so_item_no` to get the current serial number

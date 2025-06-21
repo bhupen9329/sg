@@ -89,7 +89,8 @@
                                     </label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" name="date"
-                                            value="{{ $sales_order->date }}" id="raised_date_input"  onchange="setDueDate()" required>
+                                            value="{{ $sales_order->date }}" id="raised_date_input" onchange="setDueDate()"
+                                            required>
                                     </div>
                                 </div>
 
@@ -123,12 +124,12 @@
                                     <div class="col-sm-4 mt-1">
                                         <select name="user_id" class="form-select" required>
                                             @foreach ($user as $user_data)
-                                            @if($user_data->id == $sales_order->so_user_id)
-                                            <option value="{{ $user_data->id }}" selected>{{ $user_data->name }}</option>
-                                            @else
-                                            <option value="{{ $user_data->id }}">{{ $user_data->name }}</option>
-
-                                            @endif
+                                                @if ($user_data->id == $sales_order->so_user_id)
+                                                    <option value="{{ $user_data->id }}" selected>{{ $user_data->name }}
+                                                    </option>
+                                                @else
+                                                    <option value="{{ $user_data->id }}">{{ $user_data->name }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
 
@@ -210,8 +211,8 @@
                                                                         }
                                                                     </style>
 
-                                                                    <th class="smaller-font" style="width: 25%;">Item Category <span
-                                                                            class="required-classes">*</span>
+                                                                    <th class="smaller-font" style="width: 25%;">Item
+                                                                        Category <span class="required-classes">*</span>
                                                                     </th>
                                                                     <th class="smaller-font">Quantity(Q) <span
                                                                             class="required-classes">*</span></th>
@@ -227,7 +228,7 @@
                                                             </tbody>
                                                             <tfoot>
                                                                 <tr>
-                                                      
+
                                                                     <th>Total</th>
                                                                     <th>
                                                                         <input type="text"
@@ -251,8 +252,8 @@
                                                                             value="{{ $sales_order->total_price }}"
                                                                             required readonly>
                                                                     </th>
-                                                          
-                                                            
+
+
                                                                     <th></th>
                                                                 </tr>
                                                             </tfoot>
@@ -273,10 +274,13 @@
                                                                 var cell4 = newRow.insertCell(3);
                                                                 var cell5 = newRow.insertCell(4);
                                                                 var cell6 = newRow.insertCell(5);
+                                                                @php
+                                                                    $isEditable = $so_item->qty == $so_item->so_rest_qty && $so_item->qty == $so_item->so_dispatch_rest_qty && $so_item->so_dispatch_item_status !== 'Pre Closed' && $so_item->so_dispatch_item_status !== 'Cancelled';
+                                                                @endphp
 
-                                                                @if(($so_item->qty == $so_item->so_rest_qty) && ($so_item->qty == $so_item->so_dispatch_rest_qty))
+                                                                @if ($isEditable)
 
-                                                                cell1.innerHTML = `
+                                                                    cell1.innerHTML = `
                                                             <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"   class="form-control item-select-${lastItemId}" required>
                                                                 <option value="{{ $so_item->item_category }}" selected>{{ $so_item->name }}</option>
                                                                 @foreach ($category_2 as $category)
@@ -285,40 +289,43 @@
                                                                     @endif
                                                                 @endforeach
                                                             </select>`;
-                                                                $('.item-select-' + lastItemId).select2();
+                                                                    $('.item-select-' + lastItemId).select2();
 
-                                                                cell2.innerHTML =
-                                                                    `
+                                                                    cell2.innerHTML =
+                                                                        `
                                                             <input type="number" name="qty[]" step="0.001" value="{{ $so_item->qty }}" min="0.001" id="qty_${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')"  placeholder="Qty" min="1"  required>`;
 
 
-                                                                cell3.innerHTML =
-                                                                    `
+                                                                    cell3.innerHTML =
+                                                                        `
                                                             <input type="number" name="unit_price_[]"  value="{{ $so_item->unit_price }}" step="0.01" min="0.01" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')"  placeholder="Amount"    required  >`;
 
-                                                                cell4.innerHTML =
-                                                                    `
+                                                                    cell4.innerHTML =
+                                                                        `
                                                             <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $so_item->price }}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
 
-                                                            if (lastItemId != 1) {
-                                                                cell5.innerHTML = `
+                                                                    if (lastItemId != 1) {
+                                                                        cell5.innerHTML =
+                                                                            `
                                                                     <button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
                                                                     <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
-                                                            } else {
-                                                                cell5.innerHTML = '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
-                                                            }
+                                                                    } else {
+                                                                        cell5.innerHTML =
+                                                                            '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
+                                                                    }
 
 
-                                                                // Focus the search box when the dropdown is opened
-                                                                $('.item-select-' + lastItemId).on('select2:open', function() {
-                                                                    document.querySelector('.select2-search__field').focus();
-                                                                });
+                                                                    // Focus the search box when the dropdown is opened
+                                                                    $('.item-select-' + lastItemId).on('select2:open', function() {
+                                                                        document.querySelector('.select2-search__field').focus();
+                                                                    });
 
-                                                                // Focus the search box when the subcategory dropdown is opened
-                                                                $('#subcategory_' + lastItemId).on('select2:open', function() {
-                                                                    document.querySelector('.select2-search__field').focus();
-                                                                });
-                                                                @else
+                                                                    // Focus the search box when the subcategory dropdown is opened
+                                                                    $('#subcategory_' + lastItemId).on('select2:open', function() {
+                                                                        document.querySelector('.select2-search__field').focus();
+                                                                    });
+                                                            
+                                                            @else
                                                                 cell1.innerHTML = `
                                                             <select name="item_category[]" id="item_id${lastItemId}" onchange="get_subcategory(this);" style="width:300px!important"  class="form-control item-select-${lastItemId}" disabled required>
                                                                 <option value="{{ $so_item->item_category }}" selected>{{ $so_item->name }}</option>
@@ -330,7 +337,7 @@
                                                             </select>`;
                                                                 $('.item-select-' + lastItemId).select2();
 
-                                        
+
 
                                                                 cell2.innerHTML =
                                                                     `
@@ -345,7 +352,7 @@
                                                                     `
                                                             <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $so_item->price }}"  class="form-control smaller-font"  placeholder="Price"  disabled  >`;
                                                                 cell5.innerHTML =
-                                                    'N/A';
+                                                                    'N/A';
 
 
                                                                 // Focus the search box when the dropdown is opened
@@ -357,17 +364,17 @@
                                                                 $('#subcategory_' + lastItemId).on('select2:open', function() {
                                                                     document.querySelector('.select2-search__field').focus();
                                                                 });
-                                                                @endif
-                                                        
+                                                            @endif
+
                                                             lastItemId++;
-                                                            @endforeach
+                                                        @endforeach
                                                         }
                                                     </script>
 
                                                     <script>
                                                         var lastItemId = 1; // Initial Item ID
                                                         function addRow(event) {
-                                                            event.preventDefault(); 
+                                                            event.preventDefault();
                                                             var table = document.getElementById("myTable");
                                                             var newRow = table.insertRow(table.rows.length);
                                                             // console.log(table);
@@ -392,7 +399,7 @@
                                                             </select>`;
                                                             $('.item-select-' + lastItemId).select2();
 
-                                                  
+
 
                                                             cell2.innerHTML =
                                                                 `
@@ -407,11 +414,12 @@
                                                                 `
                                                             <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
 
-                                                        
-                                                                cell5.innerHTML = `
+
+                                                            cell5.innerHTML =
+                                                                `
                                                                     <button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
                                                                     <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
-                                                            
+
 
                                                             // Focus the search box when the dropdown is opened
                                                             $('.item-select-' + lastItemId).on('select2:open', function() {
@@ -506,9 +514,10 @@
                                         <br><br>
                                         <div class="row">
                                             <div class="col-sm-4">
-                                                <label for="inputEmail3" class="col-sm-4 col-form-label"><strong>Remarks</strong></label>
-                                                <textarea class="form-control" name="terms_condition"  value="{{ $sales_order->terms_condition }}" placeholder="Enter Remarks" id="floatingTextarea"
-                                                    style="height: 100px;">{{ $sales_order->terms_condition }}</textarea>
+                                                <label for="inputEmail3"
+                                                    class="col-sm-4 col-form-label"><strong>Remarks</strong></label>
+                                                <textarea class="form-control" name="terms_condition" value="{{ $sales_order->terms_condition }}"
+                                                    placeholder="Enter Remarks" id="floatingTextarea" style="height: 100px;">{{ $sales_order->terms_condition }}</textarea>
                                             </div>
 
 
@@ -626,9 +635,7 @@
             $('#addRowBtn').show();
 
         });
-
-
-        </script>
+    </script>
 
     <script>
         function check_same_data(lastItemId) {
@@ -724,24 +731,24 @@
         });
     </script>
 
-<script>
-    $(document).ready(function() {
-        // Focus the date input when the page is loaded
-        $('#raised_date_input').focus();
-    });
-</script>
+    <script>
+        $(document).ready(function() {
+            // Focus the date input when the page is loaded
+            $('#raised_date_input').focus();
+        });
+    </script>
 
-<script>
-    function setDueDate() {
-        const raisedDateInput = document.getElementById('raised_date_input');
-        const dueDateInput = document.getElementById('due_date_input');
-        
-        const raisedDate = new Date(raisedDateInput.value);
-        if (!isNaN(raisedDate.getTime())) {
-            raisedDate.setDate(raisedDate.getDate() + 10); // +10 days
-            dueDateInput.value = raisedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    <script>
+        function setDueDate() {
+            const raisedDateInput = document.getElementById('raised_date_input');
+            const dueDateInput = document.getElementById('due_date_input');
+
+            const raisedDate = new Date(raisedDateInput.value);
+            if (!isNaN(raisedDate.getTime())) {
+                raisedDate.setDate(raisedDate.getDate() + 10); // +10 days
+                dueDateInput.value = raisedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+            }
         }
-    }
     </script>
 
 
