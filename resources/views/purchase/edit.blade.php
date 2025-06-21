@@ -60,7 +60,7 @@
                                             Raised</strong><span class="required-classes">*</span></label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" value="{{ $po_data->date }}"
-                                            name="date" id="raised_date_input"  onchange="setDueDate()" required>
+                                            name="date" id="raised_date_input" onchange="setDueDate()" required>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -81,19 +81,19 @@
                                     </div>
                                 </div>
 
-                                
+
                                 <div class="row mb-3">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label"><strong>
                                             Purchase Person</strong><span class="required-classes">*</span></label>
                                     <div class="col-sm-4 mt-1">
                                         <select name="user_id" class="form-select" required>
                                             @foreach ($user as $user_data)
-                                            @if($user_data->id == $po_data->po_user_id)
-                                            <option value="{{ $user_data->id }}" selected>{{ $user_data->name }}</option>
-                                            @else
-                                            <option value="{{ $user_data->id }}">{{ $user_data->name }}</option>
-
-                                            @endif
+                                                @if ($user_data->id == $po_data->po_user_id)
+                                                    <option value="{{ $user_data->id }}" selected>{{ $user_data->name }}
+                                                    </option>
+                                                @else
+                                                    <option value="{{ $user_data->id }}">{{ $user_data->name }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
 
@@ -134,8 +134,8 @@
                                                                         }
                                                                     </style>
 
-                                                                    <th class="smaller-font" style="width: 25%;">Item Category <span
-                                                                            class="required-classes">*</span>
+                                                                    <th class="smaller-font" style="width: 25%;">Item
+                                                                        Category <span class="required-classes">*</span>
                                                                     </th>
                                                                     <th class="smaller-font">Quantity(Q) <span
                                                                             class="required-classes">*</span></th>
@@ -151,28 +151,31 @@
                                                             </tbody>
                                                             <tfoot>
                                                                 <tr>
-                                                              
+
                                                                     <th>Total</th>
                                                                     <th>
                                                                         <input type="text"
                                                                             class="form-control smaller-font"
-                                                                            name="total_quantity" value="{{$po_data->total_quantity}}"
+                                                                            name="total_quantity"
+                                                                            value="{{ $po_data->total_quantity }}"
                                                                             id="overall_total_quantity" required readonly>
                                                                     </th>
                                                                     <th>
                                                                         <input type="text"
-                                                                            class="form-control smaller-font" value="{{$po_data->total_amount}}"
+                                                                            class="form-control smaller-font"
+                                                                            value="{{ $po_data->total_amount }}"
                                                                             name="total_amount" id="overall_total_amount"
                                                                             required readonly>
                                                                     </th>
                                                                     <th>
                                                                         <input type="text"
-                                                                            class="form-control smaller-font" value="{{$po_data->total_price}}"
+                                                                            class="form-control smaller-font"
+                                                                            value="{{ $po_data->total_price }}"
                                                                             name="total_price" id="overall_total_price"
                                                                             required readonly>
                                                                     </th>
                                                                     <th></th>
-                                                             
+
 
                                                                 </tr>
                                                             </tfoot>
@@ -187,7 +190,7 @@
                                                             @foreach ($po_items as $po_item)
                                                                 var newRow = table.insertRow(table.rows.length);
                                                                 // console.log(table);
-                                                  
+
                                                                 var cell1 = newRow.insertCell(0);
                                                                 var cell2 = newRow.insertCell(1);
                                                                 var cell3 = newRow.insertCell(2);
@@ -195,11 +198,15 @@
                                                                 var cell5 = newRow.insertCell(4);
                                                                 var cell6 = newRow.insertCell(5);
                                                                 var cell7 = newRow.insertCell(6);
-                                                  
 
-                                                                @if(($po_item->qty == $po_item->po_rest_qty) && ($po_item->qty == $po_item->po_dispatch_rest_qty))
 
-                                                                cell1.innerHTML = `
+                                                                @php
+                                                                    $isEditable = $po_item->qty == $po_item->po_rest_qty && $po_item->qty == $po_item->po_dispatch_rest_qty && $po_item->po_dispatch_item_status !== 'Pre Closed' && $po_item->po_dispatch_item_status !== 'Cancelled';
+                                                                @endphp
+
+                                                                @if ($isEditable)
+
+                                                                    cell1.innerHTML = `
     <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"  class="form-control smaller-font item-select-${lastItemId}" required>
         <option value="{{ $po_item->item_category }}" selected>{{ $po_item->name }}</option>
         @foreach ($category_2 as $category)
@@ -208,42 +215,44 @@
                 @endif
         @endforeach
     </select>`;
-                                                                $('.item-select-' + lastItemId).select2();
+                                                                    $('.item-select-' + lastItemId).select2();
 
-                                                               
 
-                                                                cell2.innerHTML =
-                                                                    `
+
+                                                                    cell2.innerHTML =
+                                                                        `
     <input type="number" name="qty[]" id="qty_${lastItemId}" step="any" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" value="{{ $po_item->qty }}"  placeholder="Qty" min="1"  required>`;
 
 
-                                                                cell3.innerHTML =
-                                                                    `
+                                                                    cell3.innerHTML =
+                                                                        `
     <input type="number" name="unit_price_[]" value="{{ $po_item->unit_price }}" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" placeholder="Amount"    required  >`;
 
-                                                                cell4.innerHTML =
-                                                                    `
+                                                                    cell4.innerHTML =
+                                                                        `
     <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $po_item->price }}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
-    if (lastItemId != 1) {
-                                                                cell5.innerHTML = `
+                                                                    if (lastItemId != 1) {
+                                                                        cell5.innerHTML =
+                                                                            `
                                                                     <button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
                                                                     <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
-                                                            } else {
-                                                                cell5.innerHTML = '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
-                                                            }
+                                                                    } else {
+                                                                        cell5.innerHTML =
+                                                                            '<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>';
+                                                                    }
 
 
-                                                                // Focus the search box when the dropdown is opened
-                                                                $('.item-select-' + lastItemId).on('select2:open', function() {
-                                                                    document.querySelector('.select2-search__field').focus();
-                                                                });
+                                                                    // Focus the search box when the dropdown is opened
+                                                                    $('.item-select-' + lastItemId).on('select2:open', function() {
+                                                                        document.querySelector('.select2-search__field').focus();
+                                                                    });
 
-                                                                // Focus the search box when the subcategory dropdown is opened
-                                                                $('#subcategory_' + lastItemId).on('select2:open', function() {
-                                                                    document.querySelector('.select2-search__field').focus();
-                                                                });
+                                                                    // Focus the search box when the subcategory dropdown is opened
+                                                                    $('#subcategory_' + lastItemId).on('select2:open', function() {
+                                                                        document.querySelector('.select2-search__field').focus();
+                                                                    });
                                                                 @else
-                                                                cell1.innerHTML = `
+                                                                    cell1.innerHTML = `
     <select name="item_category[]" id="item_id${lastItemId}"  onchange="check_same_data('${lastItemId}')"  style="width:300px!important" class="form-control smaller-font item-select-${lastItemId}" disabled required>
         <option value="{{ $po_item->item_category }}" selected>{{ $po_item->name }}</option>
         @foreach ($category_2 as $category)
@@ -252,32 +261,31 @@
                 @endif
         @endforeach
     </select>`;
-                                                                $('.item-select-' + lastItemId).select2();
+                                                                    $('.item-select-' + lastItemId).select2();
 
-                                                                cell2.innerHTML =
-                                                                    `
+                                                                    cell2.innerHTML =
+                                                                        `
     <input type="number" name="qty[]" id="qty_${lastItemId}" step="any" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" value="{{ $po_item->qty }}" disabled placeholder="Qty" min="1"  required>`;
 
 
-                                                                cell3.innerHTML =
-                                                                    `
+                                                                    cell3.innerHTML =
+                                                                        `
     <input type="number" name="unit_price_[]" value="{{ $po_item->unit_price }}" id="unit_price${lastItemId}" class="form-control smaller-font" oninput="calculatePrice('${lastItemId}')" placeholder="Amount" disabled   required  >`;
 
-                                                                cell4.innerHTML =
-                                                                    `
+                                                                    cell4.innerHTML =
+                                                                        `
     <input type="text" name="price[]" id="price_${lastItemId}" value="{{ $po_item->price }}"  class="form-control smaller-font" disabled  placeholder="Price" readonly>`;
-                                                                cell5.innerHTML =
-                                                                    `
+                                                                    cell5.innerHTML =
+                                                                        `
     N/A`;
 
 
-                                                                // Focus the search box when the dropdown is opened
-                                                                $('.item-select-' + lastItemId).on('select2:open', function() {
-                                                                    document.querySelector('.select2-search__field').focus();
-                                                                });
+                                                                    // Focus the search box when the dropdown is opened
+                                                                    $('.item-select-' + lastItemId).on('select2:open', function() {
+                                                                        document.querySelector('.select2-search__field').focus();
+                                                                    });
 
-                                                                // Focus the search box when the subcategory dropdown is opened
-                                                    
+                                                                    // Focus the search box when the subcategory dropdown is opened
                                                                 @endif
 
 
@@ -324,7 +332,7 @@
                                                                 `
                                                             <input type="text" name="price[]" id="price_${lastItemId}"  class="form-control smaller-font"  placeholder="Price" readonly>`;
                                                             cell5.innerHTML =
-                                                           `<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
+                                                                `<button onclick="addRow(event)" class="btn btn-success"><i class="fas fa-plus-circle"></i></button>
                                                                     <button class="btn btn-danger" onclick="deleteRow(this)"><i class="fas fa-minus-circle"></i></button>`;
 
 
@@ -433,9 +441,10 @@
 
                                         <div class="row">
                                             <div class="col-sm-4">
-                                                <label for="inputEmail3" class="col-sm-4 col-form-label"><strong>Remarks</strong></label>
-                                                <textarea class="form-control" name="remark" value={{ $po_data->remark }} placeholder="Remarks" id="floatingTextarea"
-                                                    style="height: 100px;">{{ $po_data->remark }}</textarea>
+                                                <label for="inputEmail3"
+                                                    class="col-sm-4 col-form-label"><strong>Remarks</strong></label>
+                                                <textarea class="form-control" name="remark" value={{ $po_data->remark }} placeholder="Remarks"
+                                                    id="floatingTextarea" style="height: 100px;">{{ $po_data->remark }}</textarea>
                                             </div>
 
 
@@ -593,7 +602,6 @@
         //     console.log(lastItemId);
 
         // }
- 
     </script>
 
     <script>
@@ -681,29 +689,29 @@
             $(`#grandTotal`).val(grand_total);
         }
 
-        
+
         document.addEventListener("DOMContentLoaded", function() {
             fetchrow();
         });
     </script>
 
-<script>
-    $(document).ready(function() {
-        // Focus the date input when the page is loaded
-        $('#raised_date_input').focus();
-    });
-</script>
+    <script>
+        $(document).ready(function() {
+            // Focus the date input when the page is loaded
+            $('#raised_date_input').focus();
+        });
+    </script>
 
-<script>
-    function setDueDate() {
-        const raisedDateInput = document.getElementById('raised_date_input');
-        const dueDateInput = document.getElementById('due_date_input');
-        
-        const raisedDate = new Date(raisedDateInput.value);
-        if (!isNaN(raisedDate.getTime())) {
-            raisedDate.setDate(raisedDate.getDate() + 10); // +10 days
-            dueDateInput.value = raisedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    <script>
+        function setDueDate() {
+            const raisedDateInput = document.getElementById('raised_date_input');
+            const dueDateInput = document.getElementById('due_date_input');
+
+            const raisedDate = new Date(raisedDateInput.value);
+            if (!isNaN(raisedDate.getTime())) {
+                raisedDate.setDate(raisedDate.getDate() + 10); // +10 days
+                dueDateInput.value = raisedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+            }
         }
-    }
     </script>
 @endsection

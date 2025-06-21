@@ -36,8 +36,6 @@ use Illuminate\Support\Facades\Auth;
 class PurchaseController extends Controller
 {
 
-
-
     function __construct()
     {
         $this->middleware('permission:Purchase-index', ['only' => ['index']]);
@@ -592,7 +590,9 @@ class PurchaseController extends Controller
         PurchaseOrder::where('id', $id)->update($data);
 
         $po_item = PoItem::where('po_id', $id)
-            ->whereColumn('qty', '=', 'po_rest_qty')->whereColumn('qty', '=', 'po_dispatch_rest_qty')->get();
+            ->whereColumn('qty', '=', 'po_rest_qty')->whereColumn('qty', '=', 'po_dispatch_rest_qty')->where('po_dispatch_item_status', '=', 'Open')->get();
+
+            
 
         foreach ($po_item as $po_items) {
             InventoryTransaction::where('po_item_id', $po_items->id)->delete();
@@ -601,6 +601,7 @@ class PurchaseController extends Controller
         PoItem::where('po_id', $id)
             ->whereColumn('qty', '=', 'po_rest_qty')
             ->whereColumn('qty', '=', 'po_dispatch_rest_qty')
+            ->where('po_dispatch_item_status', '=', 'Open')
             ->delete();
 
 
@@ -619,7 +620,7 @@ class PurchaseController extends Controller
                     $poItem->price = $request->price[$i];
                     $poItem->po_dispatch_rest_qty = $request->qty[$i];
 
-                    $po_item_available = PoItem::where('po_id', $id)->latest()->first();
+                    $po_item_available = PoItem::where('po_id', $id)->latest('id')->first();
 
                     if ($po_item_available) {
                         $lastSerialNumber = (int)substr($po_item_available->po_item_no, -2);
