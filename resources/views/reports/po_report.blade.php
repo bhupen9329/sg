@@ -1,79 +1,79 @@
 @extends('layouts.main')
 @section('title', 'Purchase Order Reports - Saraswati Globals')
 @section('content')
-    <main id="main" class="main">
-        @if ($message = Session::get('success'))
-            <div class="tt active">
-                <div class="tt-content">
-                    <i class="fas fa-solid fa-check check"></i>
-                    <div class="message">
-                        <span class="text text-1">Success</span>
-                        <span class="text text-2"> {{ $message }}</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-xmark close"></i>
-                <div class="pg active"></div>
+<main id="main" class="main">
+    @if ($message = Session::get('success'))
+    <div class="tt active">
+        <div class="tt-content">
+            <i class="fas fa-solid fa-check check"></i>
+            <div class="message">
+                <span class="text text-1">Success</span>
+                <span class="text text-2"> {{ $message }}</span>
             </div>
-        @endif
-        @if ($message = Session::get('update'))
-            <div class="tt active">
-                <div class="tt-content">
-                    <i class="fas fa-solid fa-check check"></i>
-                    <div class="message">
-                        <span class="text text-1">Update</span>
-                        <span class="text text-2"> {{ $message }}</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-xmark close"></i>
-                <div class="pg active"></div>
+        </div>
+        <i class="fa-solid fa-xmark close"></i>
+        <div class="pg active"></div>
+    </div>
+    @endif
+    @if ($message = Session::get('update'))
+    <div class="tt active">
+        <div class="tt-content">
+            <i class="fas fa-solid fa-check check"></i>
+            <div class="message">
+                <span class="text text-1">Update</span>
+                <span class="text text-2"> {{ $message }}</span>
             </div>
-        @endif
-        @if ($message = Session::get('approve'))
-            <div class="tt active">
-                <div class="tt-content">
-                    <i class="fas fa-solid fa-check check"></i>
-                    <div class="message">
-                        <span class="text text-1">Approve</span>
-                        <span class="text text-2"> {{ $message }}</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-xmark close"></i>
-                <div class="pg active"></div>
+        </div>
+        <i class="fa-solid fa-xmark close"></i>
+        <div class="pg active"></div>
+    </div>
+    @endif
+    @if ($message = Session::get('approve'))
+    <div class="tt active">
+        <div class="tt-content">
+            <i class="fas fa-solid fa-check check"></i>
+            <div class="message">
+                <span class="text text-1">Approve</span>
+                <span class="text text-2"> {{ $message }}</span>
             </div>
-        @endif
+        </div>
+        <i class="fa-solid fa-xmark close"></i>
+        <div class="pg active"></div>
+    </div>
+    @endif
 
-        @if ($message = Session::get('delete'))
-            <div class="tt active">
-                <div class="tt-content">
-                    <i class="fas fa-solid fa-exclamation exclamation update"></i>
-                    <div class="message">
-                        <span class="text text-1">Delete</span>
-                        <span class="text text-2"> {{ $message }}</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-xmark close"></i>
-                <div class="pg active"></div>
+    @if ($message = Session::get('delete'))
+    <div class="tt active">
+        <div class="tt-content">
+            <i class="fas fa-solid fa-exclamation exclamation update"></i>
+            <div class="message">
+                <span class="text text-1">Delete</span>
+                <span class="text text-2"> {{ $message }}</span>
             </div>
-        @endif
-        <div class="dashboard-header pagetitle">
-            <h1>Purchase Order Report</h1>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item">Purchase Order Report</li>
-                </ol>
-            </nav>
-        </div><!-- End Page Title -->
+        </div>
+        <i class="fa-solid fa-xmark close"></i>
+        <div class="pg active"></div>
+    </div>
+    @endif
+    <div class="dashboard-header pagetitle">
+        <h1>Purchase Order Report</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
+                <li class="breadcrumb-item">Purchase Order Report</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
 
 
-        <div class="dashboard-header pagetitle">
-            <h1>Purchase Order Report</h1>
-            <div class="row" style="align-items: flex-end;">
-                <div class="col-md-12 col-sm-12 d-flex justify-content-end">
+    <div class="dashboard-header pagetitle">
+        <h1>Purchase Order Report</h1>
+        <div class="row" style="align-items: flex-end;">
+            <div class="col-md-12 col-sm-12 d-flex justify-content-end">
 
 
-                    <button class="m-1 btn btn-primary" type="button"
-                        onclick="filterButton(
+                <button class="m-1 btn btn-primary" type="button"
+                    onclick="filterButton(
                 $('#filterTodate').val(),
                 $('#filterFromdate').val(),
                 $('#filterCompany').val(),  
@@ -82,34 +82,34 @@
                 $('#filteruser').val(),
 
             )">
-                        Apply
-                    </button>
-                    <button class="m-1 btn btn-primary" type="button" id="resetButton">Reset</button>
-                </div>
+                    Apply
+                </button>
+                <button class="m-1 btn btn-primary" type="button" id="resetButton">Reset</button>
             </div>
+        </div>
 
-            <div class="page-header">
-                <div class="row">
-                    <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterTodate"><strong>From Date</strong></label>
-                        <?php
-                        $currentDate = new DateTime();
-                        $currentYear = $currentDate->format('Y');
-                        $financialYearStart = new DateTime(($currentDate->format('m') >= 4 ? $currentYear : $currentYear - 1) . '-04-01');
-                        ?>
-                        <input type="date" class="form-control" name="to_date" id="filterTodate"
-                            value="<?php echo $financialYearStart->format('Y-m-d'); ?>" required>
-                    </div>
-                    <div class="col-md-2 col-sm-12" style="margin-top: 7px">
-                        <label for="filterFromdate"><strong>To Date</strong></label>
-                        <?php
-                        $financialYearEnd = new DateTime(($currentDate->format('m') >= 4 ? $currentYear + 1 : $currentYear) . '-03-31');
-                        ?>
-                        <input type="date" class="form-control" name="from_date" id="filterFromdate"
-                            value="<?php echo $financialYearEnd->format('Y-m-d'); ?>" required>
-                    </div>
-                    
-                    {{-- <div class="col-md-2 col-sm-12">
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-2 col-sm-12" style="margin-top: 7px">
+                    <label for="filterTodate"><strong>From Date</strong></label>
+                    <?php
+                    $currentDate = new DateTime();
+                    $currentYear = $currentDate->format('Y');
+                    $financialYearStart = new DateTime(($currentDate->format('m') >= 4 ? $currentYear : $currentYear - 1) . '-04-01');
+                    ?>
+                    <input type="date" class="form-control" name="to_date" id="filterTodate"
+                        value="<?php echo $financialYearStart->format('Y-m-d'); ?>" required>
+                </div>
+                <div class="col-md-2 col-sm-12" style="margin-top: 7px">
+                    <label for="filterFromdate"><strong>To Date</strong></label>
+                    <?php
+                    $financialYearEnd = new DateTime(($currentDate->format('m') >= 4 ? $currentYear + 1 : $currentYear) . '-03-31');
+                    ?>
+                    <input type="date" class="form-control" name="from_date" id="filterFromdate"
+                        value="<?php echo $financialYearEnd->format('Y-m-d'); ?>" required>
+                </div>
+
+                {{-- <div class="col-md-2 col-sm-12">
                         <label for="filterCompany" class="mb-2"><strong>Company</strong></label>
                         <select class="custom-select form-control company-select" name="company_id" id="filterCompany"
                             required>
@@ -117,95 +117,96 @@
                             <option value="all" selected>All</option>
                             @foreach ($companys as $company)
                                 <option value="{{ $company->id }}">{{ $company->company_name }}</option>
-                            @endforeach
-                        </select>
-                    </div> --}}
+                @endforeach
+                </select>
+            </div> --}}
 
-                    <div class="col-md-2 col-sm-12">
-                        <label for="filterCompany" class="mb-2"><strong>Company</strong></label>
-                        <select class="custom-select form-control company-select" name="company_id" id="filterCompany" required>
-                            <option value="" disabled {{ is_null($selectedCompany) ? 'selected' : '' }}>Select Company</option>
-                            <option value="all" {{ is_null($selectedCompany) ? 'selected' : '' }}>All</option>
-                            @foreach ($companys as $company)
-                            <option value="{{ $company->id }}" 
-                                {{ isset($selectedCompany) && $selectedCompany->id == $company->id ? 'selected' : '' }}>
-                                {{ $company->company_name }}
-                            </option>
-                            
-                            @endforeach
-                        </select>
-                    </div>
+            <div class="col-md-2 col-sm-12">
+                <label for="filterCompany" class="mb-2"><strong>Company</strong></label>
+                <select class="custom-select form-control company-select" name="company_id" id="filterCompany" required>
+                    <option value="" disabled {{ is_null($selectedCompany) ? 'selected' : '' }}>Select Company</option>
+                    <option value="all" {{ is_null($selectedCompany) ? 'selected' : '' }}>All</option>
+                    @foreach ($companys as $company)
+                    <option value="{{ $company->id }}"
+                        {{ isset($selectedCompany) && $selectedCompany->id == $company->id ? 'selected' : '' }}>
+                        {{ $company->company_name }}
+                    </option>
 
-                    <div class="col-md-2 col-sm-12">
-                        <label for="filterCategory" class="mb-2"><strong>Category</strong></label>
-                        <select class="custom-select form-control item_select" name="category" id="filterCategory" required>
-                            <option value="" disabled>Select Category</option>
-                            <option value="all" {{ is_null($selectedCategory) ? 'selected' : '' }}>All</option>
-                            @foreach ($Categorys as $category)
-                                <option value="{{ $category->id }}" 
-                                    {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    
-
-                    <div class="col-md-2 col-sm-12">
-                        <label for="filterCategory" class="mb-2"><strong>Dispatch Status</strong></label>
-                        <select class="custom-select form-control item_select   " name="category" id="filterstatus"
-                            required>
-                            <option value="all">All</option>
-                            <option value="Open">Open</option>
-                            <option value="Partial Pending">Partial Pending</option>
-                            <option value="Not Close" selected>Not Close</option>
-                            <option value="Close">Close</option>
-                            <option value="Pre Closed">Pre Closed</option>
-                            <option value="Cancelled">Cancelled</option>
-
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 col-sm-12">
-                        <label for="filterCategory" class="mb-2"><strong>Purchase Person</strong></label>
-                        <select class="custom-select form-control item_select" name="filteruser" id="filteruser" required>
-                            <option value="all">All</option>
-                            @foreach ($user as $users)
-                                <option value="{{ $users->id }}">{{ $users->name }}</option>
-                            @endforeach
-
-                        </select>
-                    </div>
-
-
-
-                </div>
-
+                    @endforeach
+                </select>
             </div>
+
+            <div class="col-md-2 col-sm-12">
+                <label for="filterCategory" class="mb-2"><strong>Category</strong></label>
+                <select class="custom-select form-control item_select" name="category" id="filterCategory" required>
+                    <option value="" disabled>Select Category</option>
+                    <option value="all" {{ is_null($selectedCategory) ? 'selected' : '' }}>All</option>
+                    @foreach ($Categorys as $category)
+                    <option value="{{ $category->id }}"
+                        {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'selected' : '' }}>
+                        {{ $category->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
+
+            <div class="col-md-2 col-sm-12">
+                <label for="filterCategory" class="mb-2"><strong>Dispatch Status</strong></label>
+                <select class="custom-select form-control item_select   " name="category" id="filterstatus"
+                    required>
+                    <option value="all">All</option>
+                    <option value="Open">Open</option>
+                    <option value="Partial Pending">Partial Pending</option>
+                    <option value="Not Close" selected>Not Close</option>
+                    <option value="Close">Close</option>
+                    <option value="Pre Closed">Pre Closed</option>
+                    <option value="Cancelled">Cancelled</option>
+
+                </select>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+                <label for="filterCategory" class="mb-2"><strong>Purchase Person</strong></label>
+                <select class="custom-select form-control item_select" name="filteruser" id="filteruser" required>
+                    <option value="all">All</option>
+                    @foreach ($user as $users)
+                    <option value="{{ $users->id }}">{{ $users->name }}</option>
+                    @endforeach
+
+                </select>
+            </div>
+
+
+
         </div>
 
-        <section class="section">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row ">
-                                <div class="col-md-6 col-sm-12">
-                                    <div class="pd-20">
-                                        <h4 class="text-blue h4">Purchase Order Report</h4>
-                                    </div>
+    </div>
+    </div>
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row ">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="pd-20">
+                                    <h4 class="text-blue h4">Purchase Order Report</h4>
                                 </div>
-                                <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
-                                    {{-- <div class="btn-group">
+                            </div>
+                            <div class="col-md-6 col-sm-12 d-flex justify-content-end ">
+                                {{-- <div class="btn-group">
                                         @can('Company-create')
                                             <a class="btn btn-primary mb-4 mr-3" data-bs-toggle="modal"
                                                 data-bs-target="#SelectTypeModal">
                                                 New Inward</a>
                                         @endcan
                                     </div> --}}
-                                </div>
                             </div>
-                            <!-- Table with stripped rows -->
+                        </div>
+                        <!-- Table with stripped rows -->
+                        <div style="overflow-x: auto;">
                             <table class="table " id="Category_table">
                                 <thead>
                                     <tr>
@@ -221,6 +222,8 @@
                                         <th>Balanced PO Quantity</th>
                                         <th>PO Dispatch Status</th>
                                         <th>PO Person</th>
+                                        <th>Remarks</th>
+                                        <th>pre Close</th>
 
                                     </tr>
                                 </thead>
@@ -239,29 +242,30 @@
                                         <td style="text-align:left; font-weight: bold;" id="totalPoQty">0</td>
                                         <td style="text-align:left; font-weight: bold;" id="totalDispatchedQty">0</td>
                                         <td style="text-align:left; font-weight: bold;" id="totalBalancedQty">0</td>
-                                        <td colspan="2"></td>
+                                        <td colspan="4"></td>
                                     </tr>
                                 </tfoot>
                             </table>
-                            <!-- End Table with stripped rows -->
-
                         </div>
+                        <!-- End Table with stripped rows -->
+
                     </div>
                 </div>
             </div>
-        </section>
-    </main><!-- End #main -->
+        </div>
+    </section>
+</main><!-- End #main -->
 
 
-    <!-- Modal  -->
-    <div class="modal fade" id="Modalfor_quantity_details" tabindex="-1" aria-labelledby="modal3Label"
+<!-- Modal  -->
+<div class="modal fade" id="Modalfor_quantity_details" tabindex="-1" aria-labelledby="modal3Label"
     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal3Label">Dispatched Quantity - History</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"style="width:50px"></button>
+                    aria-label="Close" style="width:50px"></button>
             </div>
             <div class="modal-body">
                 <h6 class="text-end py-3"><strong>Total Dispatched Quantity</strong> : <span id="add_total_qty"></span></h6>
@@ -289,251 +293,265 @@
     </div>
 </div>
 
-    {{-- csv  print   --}}
-    <script>
-        // $(document).ready(function() {
-        //     $('.item_select').select2();
-        //     $('.company-select').select2();
-        //     $('.mode-select').select2();
-        //     $('.status-select').select2();
-        // });
+{{-- csv  print   --}}
+<script>
+    // $(document).ready(function() {
+    //     $('.item_select').select2();
+    //     $('.company-select').select2();
+    //     $('.mode-select').select2();
+    //     $('.status-select').select2();
+    // });
 
-        $(document).ready(function() {
-            $('.custom-select').select2();
-            // Focus the search box when the subcategory dropdown is opened
-            $('.custom-select').on('select2:open', function() {
-                document.querySelector('.select2-search__field').focus();
-            });
+    $(document).ready(function() {
+        $('.custom-select').select2();
+        // Focus the search box when the subcategory dropdown is opened
+        $('.custom-select').on('select2:open', function() {
+            document.querySelector('.select2-search__field').focus();
+        });
+    });
+
+    $(document).ready(function() {
+        var table = $('#Category_table').DataTable({
+            dom: 'Bfrtip',
+            lengthMenu: [
+                [10, 20, 50, 100, 150, -1],
+                ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
+            ],
+            buttons: [
+                'pageLength',
+                {
+                    extend: 'csvHtml5',
+                    text: 'CSV',
+                    title: 'Saraswati Globals (PO Report)',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+                    },
+                    customize: function(csv) {
+                        var footer = [
+                            '', '', '', 'Grand Total:',
+                            '', '',
+                            $('#totalPoUnitPrice').text(),
+                            $('#totalPoQty').text(),
+                            $('#totalDispatchedQty').text(),
+                            $('#totalBalancedQty').text(),
+                            '', '', '', ''
+                        ];
+                        var footerRow = '\n"' + footer.join('","') + '"';
+                        return csv + footerRow;
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: 'PRINT',
+                    title: 'Saraswati Globals (PO Report)',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+                    },
+                    customize: function(win) {
+                        $(win.document.body).find('table')
+                            .addClass('table')
+                            .css({
+                                'margin': '10px',
+                                'padding': '10px'
+                            });
+
+                        $(win.document.body).find('h1')
+                            .css({
+                                'text-align': 'center',
+                                'font-size': '20px',
+                                'margin-top': '20px'
+                            });
+
+                        var tfoot = $('#Category_table').find('tfoot').clone();
+                        $(win.document.body).find('table').append(tfoot);
+                    }
+                }
+            ]
         });
 
-  $(document).ready(function () {
-    var table = $('#Category_table').DataTable({
-        dom: 'Bfrtip',
-        lengthMenu: [
-            [10, 20, 50, 100, 150, -1],
-            ['10 rows', '20 rows', '50 rows', '100 rows', '150 rows', 'Show all']
-        ],
-        buttons: [
-            'pageLength',
-            {
-                extend: 'csvHtml5',
-                text: 'CSV',
-                title: 'Saraswati Globals (PO Report)',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-                },
-                customize: function (csv) {
-                    var footer = [
-                        '', '', '', 'Grand Total:',
-                        '', '',
-                        $('#totalPoUnitPrice').text(),
-                        $('#totalPoQty').text(),
-                        $('#totalDispatchedQty').text(),
-                        $('#totalBalancedQty').text(),
-                        '', ''
-                    ];
-                    var footerRow = '\n"' + footer.join('","') + '"';
-                    return csv + footerRow;
+        $('.dt-buttons button').addClass('custom-button');
+
+        $('.custom-button, .paginate_button').css({
+            'padding': '5px 10px',
+            'font-size': '10px'
+        });
+    });
+</script>
+
+
+<script>
+    $(document).ready(function() {
+        // Call filterButton on page load with default or initial filter values
+        filterButton(
+            $('#filterTodate').val(),
+            $('#filterFromdate').val(),
+            $('#filterCompany').val(),
+            $('#filterCategory').val(),
+            $('#filterstatus').val(),
+            $('#filteruser').val(),
+        );
+    });
+
+
+    function filterButton() {
+        const filterTodate = $('#filterTodate').val();
+        const filterFromdate = $('#filterFromdate').val();
+        const filterCompany = $('#filterCompany').val();
+        const filterCategory = $('#filterCategory').val();
+        const filterStatus = $('#filterstatus').val();
+        const filterUser = $('#filteruser').val();
+
+        $.ajax({
+            type: 'POST',
+            url: 'report-po',
+            data: {
+                filterTodate: filterTodate,
+                filterFromdate: filterFromdate,
+                filterCompany: filterCompany,
+                filterCategory: filterCategory,
+                filterStatus: filterStatus,
+                filterUser: filterUser,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (Array.isArray(response)) {
+                    var table = $('#Category_table').DataTable();
+                    table.clear().draw();
+
+                    var totalPOUnitPrice = 0;
+                    var totalPOQty = 0;
+                    var totalBalancedQty = 0;
+                    var totalDispatchedQty = 0;
+
+                    response.forEach(function(data, index) {
+                        // Parse and format quantities
+                        const quantity = parseFloat(data.quantity) || 0;
+                        const rest_quantity = parseFloat(data.rest_quantity) || 0;
+                        const dispatched_qty = (quantity - rest_quantity).toFixed(3); // Calculate dispatched qty and format
+
+                        // Update totals
+                        totalPOUnitPrice += parseFloat(data.po_unit_price) || 0;
+                        totalPOQty += quantity;
+                        totalBalancedQty += rest_quantity;
+                        totalDispatchedQty += parseFloat(dispatched_qty) || 0;
+
+                        let closeBtn = '';
+
+                        if (data.close_link && data.close_link !== '') {
+                            closeBtn = `
+        <a href="${data.close_link}"
+           class="btn btn-sm btn-warning"
+           onclick="return confirm('Are you sure you want to Pre Close this PO item?')">
+           Pre Close
+        </a>`;
+                        }
+
+                        // Add row to DataTable
+                        const rowNode = table.row.add([
+                            index + 1,
+                            data.date,
+                            data.po_document_number,
+                            data.po_item_number,
+                            data.company_name,
+                            data.category,
+                            parseFloat(data.po_unit_price).toFixed(2),
+                            quantity.toFixed(3),
+
+                            `<a href="javascript:void(0);" data-bs-toggle="modal" 
+       data-bs-target="#Modalfor_quantity_details" 
+       onclick="get_received_po_qty_for_report('${data.po_item_id}', '${dispatched_qty}')">
+       ${dispatched_qty}
+     </a>`,
+
+                            rest_quantity.toFixed(3),
+                            data.dispatch_status,
+                            data.user_name,
+                            data.po_remark,
+                            closeBtn
+
+                        ]).draw(false).node();
+
+
+                        // Conditional styling for rows
+                        if (rest_quantity !== 0) {
+                            $(rowNode).find('td:eq(9)').css({
+                                'background-color': '#ff3300',
+                                'color': 'black',
+                            });
+                        } else {
+                            $(rowNode).find('td').css({
+                                'background-color': '#15ff00',
+                                'color': 'black',
+                            });
+                        }
+                    });
+
+                    // Update totals in the footer
+                    $('#totalPoUnitPrice').text(totalPOUnitPrice.toFixed(2));
+                    $('#totalPoQty').text(totalPOQty.toFixed(3));
+                    $('#totalBalancedQty').text(totalBalancedQty.toFixed(3));
+                    $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(3));
+                } else {
+                    console.log("Invalid response format");
                 }
             },
-            {
-                extend: 'print',
-                text: 'PRINT',
-                title: 'Saraswati Globals (PO Report)',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-                },
-                customize: function (win) {
-                    $(win.document.body).find('table')
-                        .addClass('table')
-                        .css({
-                            'margin': '10px',
-                            'padding': '10px'
-                        });
-
-                    $(win.document.body).find('h1')
-                        .css({
-                            'text-align': 'center',
-                            'font-size': '20px',
-                            'margin-top': '20px'
-                        });
-
-                    var tfoot = $('#Category_table').find('tfoot').clone();
-                    $(win.document.body).find('table').append(tfoot);
-                }
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed:", error);
             }
-        ]
-    });
-
-    $('.dt-buttons button').addClass('custom-button');
-
-    $('.custom-button, .paginate_button').css({
-        'padding': '5px 10px',
-        'font-size': '10px'
-    });
-});
-
-    </script>
-
-
-    <script>
-        $(document).ready(function() {
-            // Call filterButton on page load with default or initial filter values
-            filterButton(
-                $('#filterTodate').val(),
-                $('#filterFromdate').val(),
-                $('#filterCompany').val(),
-                $('#filterCategory').val(),
-                $('#filterstatus').val(),
-                $('#filteruser').val(),
-            );
         });
+    }
 
 
-        function filterButton() {
-    const filterTodate = $('#filterTodate').val();
-    const filterFromdate = $('#filterFromdate').val();
-    const filterCompany = $('#filterCompany').val();
-    const filterCategory = $('#filterCategory').val();
-    const filterStatus = $('#filterstatus').val();
-    const filterUser = $('#filteruser').val();
 
-    $.ajax({
-        type: 'POST',
-        url: 'report-po',
-        data: {
-            filterTodate: filterTodate,
-            filterFromdate: filterFromdate,
-            filterCompany: filterCompany,
-            filterCategory: filterCategory,
-            filterStatus: filterStatus,
-            filterUser: filterUser,
-            _token: "{{ csrf_token() }}"
-        },
-        success: function(response) {
-            if (Array.isArray(response)) {
-                var table = $('#Category_table').DataTable();
-                table.clear().draw();
-
-                var totalPOUnitPrice = 0;
-                var totalPOQty = 0;
-                var totalBalancedQty = 0;
-                var totalDispatchedQty = 0;
-
-                response.forEach(function(data, index) {
-                    // Parse and format quantities
-                    const quantity = parseFloat(data.quantity) || 0;
-                    const rest_quantity = parseFloat(data.rest_quantity) || 0;
-                    const dispatched_qty = (quantity - rest_quantity).toFixed(3); // Calculate dispatched qty and format
-
-                    // Update totals
-                    totalPOUnitPrice += parseFloat(data.po_unit_price) || 0;
-                    totalPOQty += quantity;
-                    totalBalancedQty += rest_quantity;
-                    totalDispatchedQty += parseFloat(dispatched_qty) || 0;
-
-                    // Add row to DataTable
-                    const rowNode = table.row.add([
-                        index + 1,
-                        data.date,
-                        data.po_document_number,
-                        data.po_item_number,
-                        data.company_name,
-                        data.category,
-                        parseFloat(data.po_unit_price).toFixed(2), // Format PO Unit Price
-                        quantity.toFixed(3), // Format Quantity
-                            
-                `<a href="javascript:void(0);" data-bs-toggle="modal" 
-                               data-bs-target="#Modalfor_quantity_details" 
-                               onclick="get_received_po_qty_for_report('${data.po_item_id}', ' ${dispatched_qty}')">
-                               ${dispatched_qty}
-                            </a>`,
-                        rest_quantity.toFixed(3), // Format Rest Quantity
-                        data.dispatch_status,
-                        data.user_name
-                    ]).draw(false).node();
-
-                    // Conditional styling for rows
-                    if (rest_quantity !== 0) {
-                        $(rowNode).find('td:eq(9)').css({
-                            'background-color': '#ff3300',
-                            'color': 'black',
-                        });
-                    } else {
-                        $(rowNode).find('td').css({
-                            'background-color': '#15ff00',
-                            'color': 'black',
-                        });
-                    }
-                });
-
-                // Update totals in the footer
-                $('#totalPoUnitPrice').text(totalPOUnitPrice.toFixed(2));
-                $('#totalPoQty').text(totalPOQty.toFixed(3));
-                $('#totalBalancedQty').text(totalBalancedQty.toFixed(3));
-                $('#totalDispatchedQty').text(totalDispatchedQty.toFixed(3));
-            } else {
-                console.log("Invalid response format");
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX request failed:", error);
-        }
+    $('#resetButton').click(function() {
+        location.reload();
     });
-}
+</script>
 
 
 
-        $('#resetButton').click(function() {
-            location.reload();
-        });
-    </script>
+<script>
+    $(document).ready(function() {
+        $('.table.dataTable').removeClass('no-footer');
+    });
+</script>
 
+<script>
+    function get_received_po_qty_for_report(po_item_id, total_dispatched_qty) {
+        let get_po_item_id = po_item_id;
+        let totalDispatchedQty = total_dispatched_qty;
 
+        $.ajax({
+            url: "{{ url('get_dispatch_qty_po') }}",
+            method: "POST",
+            data: {
+                get_po_item_id: get_po_item_id,
+                total_dispatched: totalDispatchedQty,
+                "_token": "{{ csrf_token() }}",
+            },
+            success: function(res) {
+                let rowsData = res.received_qty_records;
+                let totalQty = res.total_dispatched;
 
-    <script>
-        $(document).ready(function() {
-            $('.table.dataTable').removeClass('no-footer');
-        });
-    </script>
+                // Update total dispatched quantity
+                $('#add_total_qty').html(parseFloat(totalQty).toFixed(3));
 
-    <script>
+                let tableBody = document.querySelector('.modal-body table tbody');
+                tableBody.innerHTML = ''; // Clear existing table rows
 
-        function get_received_po_qty_for_report(po_item_id, total_dispatched_qty) {
-let get_po_item_id = po_item_id;
-let totalDispatchedQty = total_dispatched_qty;
+                rowsData.forEach((rowData, index) => {
+                    // Parse the date string and format it
+                    let date = new Date(rowData.dispatch_date);
+                    let formattedDate = date.toLocaleDateString('en-US', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
 
-$.ajax({
-    url: "{{ url('get_dispatch_qty_po') }}",
-    method: "POST",
-    data: {
-        get_po_item_id: get_po_item_id,
-        total_dispatched: totalDispatchedQty,
-        "_token": "{{ csrf_token() }}",
-    },
-    success: function(res) {
-        let rowsData = res.received_qty_records;
-        let totalQty = res.total_dispatched;
+                    // Format the dispatched quantity to 3 decimal places
+                    let dispatchedQuantity = parseFloat(rowData.dispatched_quantity || 0).toFixed(3);
 
-        // Update total dispatched quantity
-        $('#add_total_qty').html(parseFloat(totalQty).toFixed(3));
-
-        let tableBody = document.querySelector('.modal-body table tbody');
-        tableBody.innerHTML = ''; // Clear existing table rows
-
-        rowsData.forEach((rowData, index) => {
-            // Parse the date string and format it
-            let date = new Date(rowData.dispatch_date);
-            let formattedDate = date.toLocaleDateString('en-US', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
-
-            // Format the dispatched quantity to 3 decimal places
-            let dispatchedQuantity = parseFloat(rowData.dispatched_quantity || 0).toFixed(3);
-
-            let row = `<tr>
+                    let row = `<tr>
                             <th scope="row">${index + 1}</th>
                             <td>${formattedDate ?? 'N/A'}</td>
                             <td>${rowData.dispatch_number ?? 'N/A'}</td>
@@ -545,13 +563,13 @@ $.ajax({
                             <td>${rowData.so_unit_price ?? 'N/A'}</td>
                             <td>${dispatchedQuantity}</td>
                         </tr>`;
-            tableBody.insertAdjacentHTML('beforeend', row);
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed:", error);
+            }
         });
-    },
-    error: function(xhr, status, error) {
-        console.error("AJAX request failed:", error);
     }
-});
-}
-    </script>
+</script>
 @endsection

@@ -786,6 +786,7 @@ class SalesController extends Controller
             ->join('companies', 'sales_orders.company_id', '=', 'companies.id')
             ->where('so_items.item_category', $request->get_category_id)
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
+                     ->orderBy('companies.company_name', 'asc')
              ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
@@ -807,6 +808,7 @@ class SalesController extends Controller
                 DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_quantity')
             )
             ->groupBy('so_items.item_category', 'categories.name')
+                     ->orderBy('categories.name', 'asc')
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
              ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
@@ -830,6 +832,7 @@ class SalesController extends Controller
                 DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity')
             )
             ->groupBy('po_items.item_category', 'categories.name')
+             ->orderBy('categories.name', 'asc')
             ->where('po_items.po_dispatch_rest_qty', '!=', 0)
              ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
@@ -845,6 +848,13 @@ class SalesController extends Controller
     {
         SoItem::where('id', $request->so_item_id)->update(['so_dispatch_item_status' => $request->status, 'so_item_status_date' => $request->date,  'so_item_status_remarks' => $request->remarks,]);
         return redirect()->route('sales.index')->with('success', 'Sales Order Status Updated Successfully');
+    }
+
+     public function so_pre_closed_report($id)
+    {
+        $preCloseDate = Carbon::now();
+        SoItem::where('id', $id)->update(['so_dispatch_item_status' => 'Pre Closed', 'so_item_status_date' => $preCloseDate]);
+        return redirect()->back()->with('success', 'Sales Order Status Pre Closed Successfully');
     }
 
 

@@ -101,16 +101,18 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/get_dispatch_qty_po', [PurchaseController::class, 'get_dispatch_qty_po']);
 
+    Route::get('/po_pre_close_report/{id}', [PurchaseController::class, 'po_pre_closed_report'])->name('po_pre_close_report');
 
 
-   
+
+
 
     Route::post('/get_received_qty_so', [SalesController::class, 'get_received_qty_so']);
     Route::post('/get_received_qty_party_wise', [SalesController::class, 'get_received_qty_so_party_wise']);
     Route::post('/get_received_qty_po_party_wise', [SalesController::class, 'get_received_qty_po_party_wise']);
 
 
-    
+
     // Route::post('/get_received_qty_so', [SalesController::class, 'get_received_qty_so']);
 
 
@@ -197,6 +199,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/sales/closed', [SalesController::class, 'closeSales'])->name('sales.closed');
     Route::post('/get-so-remark-for-modal', [SalesController::class, 'getSoRemarkForModal']);
     Route::post('/so_pre_close_save', [SalesController::class, 'so_pre_closed_save'])->name('so_pre_closed.save');
+    Route::get('/so_pre_close_report/{id}', [SalesController::class, 'so_pre_closed_report'])->name('so_pre_close_report');
 
     Route::post('/get_dispatch_qty', [SalesController::class, 'get_dispatch_qty']);
 
@@ -356,13 +359,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/dispatch-report-get', [ReportController::class, 'get_dispatch_report'])->name('dispatch_report_get');
 
 
-        // .........................................Aggregate Report.............................................
+    // .........................................Aggregate Report.............................................
 
     Route::get('/company-wise-report', [ReportController::class, 'company_wise_report'])->name('company_wise.report');
 
-       Route::post('/company-wise-report-get', [ReportController::class, 'get_company_wise_report'])->name('get_company_wise_report');
+    Route::post('/company-wise-report-get', [ReportController::class, 'get_company_wise_report'])->name('get_company_wise_report');
 
-               // .........................................Due Report.............................................
+    // .........................................Due Report.............................................
 
     Route::get('/due_so_report', [ReportController::class, 'due_so_report'])->name('due_so_report');
 
@@ -483,13 +486,4 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get_po_qty', [HomeController::class, 'get_po_item']);
 
     Route::post('/get-so-unit-price', [DispatchController::class, 'get_so_unit_price']);
-
-
-    
-
-
-
-
-    
-
 });

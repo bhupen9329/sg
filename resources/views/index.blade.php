@@ -1055,7 +1055,6 @@
             }
 
             function openModalWithCategorySOPartyWise(party_id) {
-                console.log(party_id);
                 // Update the 'Show More Details' link with the category_id
                 const link = document.getElementById('showMoreDetailsLinkSoPartyWise');
                 const baseUrl = "{{ route('so_report_party_wise', ':id') }}";
@@ -1067,7 +1066,6 @@
             }
 
             function openModalWithCategoryPOPartyWise(party_id) {
-                console.log(party_id);
 
                 // Update the 'Show More Details' link with the party_id
                 const link = document.getElementById('showMoreDetailsLinkPoPartyWise');

@@ -31,7 +31,7 @@ use App\Http\Controllers\ValuationController;
 use App\Models\Dispatch;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class PurchaseController extends Controller
 {
@@ -689,6 +689,7 @@ class PurchaseController extends Controller
             ->join('categories', 'po_items.item_category', '=', 'categories.id')
             ->join('companies', 'purchase_orders.supplier_id', '=', 'companies.id')
             ->where('po_items.item_category', $request->get_category_id)
+             ->orderBy('companies.company_name', 'asc')
             ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled'])
             ->get();
 
@@ -731,6 +732,7 @@ class PurchaseController extends Controller
                 'dispatches.id as dispatch_id',
                 'dispatches.date as dispatch_date',
             )
+         
             ->where('dispatches.po_item_id', $request->get_po_item_id)->get();
 
         return response()->json([
@@ -738,5 +740,12 @@ class PurchaseController extends Controller
             'total_dispatched' => $request->total_dispatched,
 
         ]);
+    }
+
+      public function po_pre_closed_report($id)
+    {
+        $date = Carbon::now();
+        PoItem::where('id', $id)->update(['po_dispatch_item_status' => 'Pre Closed', 'po_item_status_date' => $date]);
+        return redirect()->back()->with('success', 'Purchase Order Status Updated Successfully');
     }
 }

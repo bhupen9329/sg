@@ -71,6 +71,7 @@ class ReportController extends Controller
             ->join('categories', 'categories.id', '=', 'po_items.item_category')
             ->select(
                 'purchase_orders.po_user_id',
+                'purchase_orders.remark as po_remark',
                 'purchase_orders.id as po_id',
                 'purchase_orders.document_number',
                 'purchase_orders.date',
@@ -123,6 +124,13 @@ class ReportController extends Controller
 
         $data = [];
         foreach ($filteredDatas as $filteredData) {
+
+            if (!in_array($filteredData->po_dispatch_item_status, ['Close', 'Pre Closed', 'Cancelled'])) {
+                $closeLink = route('po_pre_close_report', $filteredData->po_item_id);
+            } else {
+                $closeLink = '';
+            }
+
             $tempData = [
                 'po_id' => $filteredData->po_id,
                 'po_item_id' => $filteredData->po_item_id,
@@ -138,6 +146,8 @@ class ReportController extends Controller
                 'dispatch_status' => $filteredData->po_dispatch_item_status,
                 'po_item_status_date' => $filteredData->po_item_status_date,
                 'po_item_status_remarks' => $filteredData->po_item_status_remarks,
+                'po_remark' => $filteredData->po_remark,
+                'close_link' => $closeLink,
             ];
             $data[] = $tempData;
         }
@@ -235,6 +245,7 @@ class ReportController extends Controller
             ->join('categories', 'categories.id', '=', 'so_items.item_category')
             ->select(
                 'sales_orders.so_user_id',
+                'sales_orders.terms_condition',
                 'sales_orders.date',
                 'sales_orders.so_number',
                 'so_items.so_item_no',
@@ -284,6 +295,14 @@ class ReportController extends Controller
 
         $data = [];
         foreach ($filteredDatas as $filteredData) {
+
+            if (!in_array($filteredData->so_dispatch_item_status, ['Close', 'Pre Closed', 'Cancelled'])) {
+                $closeLink = route('so_pre_close_report', $filteredData->so_item_id);
+            } else {
+                $closeLink = '';
+            }
+
+
             $tempData = [
                 'date' => date('d-M-Y', strtotime($filteredData->date)),
                 'so_number' => $filteredData->so_number,
@@ -298,6 +317,8 @@ class ReportController extends Controller
                 'user_name' => $filteredData->user_name,
                 'so_item_status_date' => $filteredData->po_item_status_date,
                 'so_item_status_remarks' => $filteredData->po_item_status_remarks,
+                'so_remark' => $filteredData->terms_condition,
+                 'closeLink' => $closeLink,
 
             ];
             $data[] = $tempData;
@@ -1636,7 +1657,7 @@ class ReportController extends Controller
                 'so_items.so_dispatch_item_status'
 
             )
-             ->whereNotIn('so_items.so_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled'])
+            ->whereNotIn('so_items.so_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled'])
             ->where('so_items.so_dispatch_rest_qty', '!=', 0);
 
         // Apply Date Filters
@@ -1721,7 +1742,7 @@ class ReportController extends Controller
                 'po_items.po_dispatch_rest_qty',
                 'po_items.po_dispatch_item_status',
                 'users.name as user_name',
-                 'po_items.po_dispatch_item_status',
+                'po_items.po_dispatch_item_status',
             )
             ->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled'])
             ->where('po_items.po_dispatch_rest_qty', '!=', 0);

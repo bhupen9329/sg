@@ -90,36 +90,36 @@ class HomeController extends Controller
         // Instantiate the ValuationController
         $valuationController = app(ValuationController::class);
 
-        foreach ($inventory_transaction as $data) {
-            // Process LIFO, FIFO, and Average calculations using the ValuationController methods
-            $lifoData = $valuationController->calculateLIFO($data->id, $data->item_id);
-            $fifoData = $valuationController->calculateFIFO($data->id, $data->item_id);
-            $avgData = $valuationController->calculateAverage($data->id, $data->item_id);
+        // foreach ($inventory_transaction as $data) {
+        //     // Process LIFO, FIFO, and Average calculations using the ValuationController methods
+        //     $lifoData = $valuationController->calculateLIFO($data->id, $data->item_id);
+        //     $fifoData = $valuationController->calculateFIFO($data->id, $data->item_id);
+        //     $avgData = $valuationController->calculateAverage($data->id, $data->item_id);
 
-            // Get the latest transaction logs for each valuation method
-            if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
-                $latestEntriesByDate[$data->item_id]['lifo'] = end($lifoData['transaction_logs']);
-            }
-            if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
-                $latestEntriesByDate[$data->item_id]['fifo'] = end($fifoData['transaction_logs']);
-            }
-            if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
-                $latestEntriesByDate[$data->item_id]['avg'] = end($avgData['transaction_logs']);
-            }
-        }
+        //     // Get the latest transaction logs for each valuation method
+        //     if (isset($lifoData['transaction_logs']) && is_array($lifoData['transaction_logs'])) {
+        //         $latestEntriesByDate[$data->item_id]['lifo'] = end($lifoData['transaction_logs']);
+        //     }
+        //     if (isset($fifoData['transaction_logs']) && is_array($fifoData['transaction_logs'])) {
+        //         $latestEntriesByDate[$data->item_id]['fifo'] = end($fifoData['transaction_logs']);
+        //     }
+        //     if (isset($avgData['transaction_logs']) && is_array($avgData['transaction_logs'])) {
+        //         $latestEntriesByDate[$data->item_id]['avg'] = end($avgData['transaction_logs']);
+        //     }
+        // }
 
-        // Collect the latest transactions for LIFO, FIFO, and Average
-        foreach ($latestEntriesByDate as $itemId => $entry) {
-            if (isset($entry['lifo'])) {
-                $lifo_transaction[] = $entry['lifo'];
-            }
-            if (isset($entry['fifo'])) {
-                $fifo_transaction[] = $entry['fifo'];
-            }
-            if (isset($entry['avg'])) {
-                $avg_transaction[] = $entry['avg'];
-            }
-        }
+        // // Collect the latest transactions for LIFO, FIFO, and Average
+        // foreach ($latestEntriesByDate as $itemId => $entry) {
+        //     if (isset($entry['lifo'])) {
+        //         $lifo_transaction[] = $entry['lifo'];
+        //     }
+        //     if (isset($entry['fifo'])) {
+        //         $fifo_transaction[] = $entry['fifo'];
+        //     }
+        //     if (isset($entry['avg'])) {
+        //         $avg_transaction[] = $entry['avg'];
+        //     }
+        // }
 
 
         $todaysDate = Carbon::today(); // Aaj ki date lete hain
@@ -357,6 +357,7 @@ class HomeController extends Controller
             ->select('categories.name',  DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
+             ->orderBy('categories.name', 'asc')
             ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled', 'Close'])
             ->get();
 
@@ -372,6 +373,7 @@ class HomeController extends Controller
             ->select('categories.name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
             ->where('po_items.po_dispatch_rest_qty', '!=', 0)
+             ->orderBy('categories.name', 'asc')
             ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled', 'Close'])
             ->get();
 
