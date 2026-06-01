@@ -13,6 +13,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanySettingController;
 use App\Http\Controllers\EmaailSettingController;
+use App\Http\Controllers\NewDispatchController;
 use App\Http\Controllers\EmailSettingController;
 use App\Http\Controllers\OutwardController;
 use App\Http\Controllers\PdfController;
@@ -458,6 +459,47 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/get_dispatch_payable_total', [DispatchController::class, 'get_dispatch_payable_total']);
     Route::post('/get_dispatch_so_unit_price', [DispatchController::class, 'get_dispatch_so_unit_price']);
+
+
+     // ........New Dispatch Controller.........................................................................................................................................
+
+    Route::get('/new-dispatch', [NewDispatchController::class, 'index'])->name('new.dispatch.index');
+    Route::get('/new-dispatch_create', [NewDispatchController::class, 'create'])->name('new.dispatch.create');
+    Route::post('/new-dispatch-store', [NewDispatchController::class, 'storeDispatch'])->name('new.dispatch.store');
+    Route::post('/new-dispatch-store-so', [NewDispatchController::class, 'storeDispatchSO'])->name('new.dispatch.store_so');
+
+    Route::get('/new-dispatch-delete/{id}', [NewDispatchController::class, 'destroyDispatch'])->name('new.dispatch.destroy');
+    Route::get('/new-dispatch-edit/{dispatch_number}', [NewDispatchController::class, 'editDispatch'])->name('new.dispatch.edit');
+    Route::post('/new-dispatch-update', [NewDispatchController::class, 'updateDispatch'])->name('new.dispatch.update');
+
+    Route::post('/new-dispatch-update', [NewDispatchController::class, 'updateDispatch'])->name('new.dispatch.update');
+
+
+    Route::get('/new-dispatch_so_main_create', [NewDispatchController::class, 'DispatchSOmain'])->name('new.dispatch_so.main_create');
+
+    Route::post('/new-dispatch-update_so', [NewDispatchController::class, 'updateDispatchSO'])->name('new.dispatch.update_so');
+
+
+
+    Route::post('/new-dispatch-create-main', [NewDispatchController::class, 'main_dispatch_redirect'])->name('new.dispatch_main.redirect');
+
+    Route::get('/new-dispatch_create_so', [NewDispatchController::class, 'create_so'])->name('new.dispatch.create_so');
+
+    Route::post('/new-get_conv_price', [NewDispatchController::class, 'get_conv_price']);
+
+    Route::post('/new-get-purchase-orders', [NewDispatchController::class, 'getPurchaseOrders']);
+    Route::post('/new-get-po-items', [NewDispatchController::class, 'getPoItems'])->name('new.getPoItems');
+    Route::post('/new-get-sales-orders', [NewDispatchController::class, 'getSalesOrders'])->name('new.getSalesOrders');
+    Route::post('/new-get-so-items', [NewDispatchController::class, 'getSoItems'])->name('new.getSoItems');
+    Route::post('/new-get-item-details', [NewDispatchController::class, 'getItemDetails'])->name('new.getItemdetails');
+    Route::post('/new-get-item-details-so', [NewDispatchController::class, 'getItemDetailsSO'])->name('new.getItemdetailsSO');
+
+    Route::post('/new-get-so-items-filtered', [NewDispatchController::class, 'getSoItemsFiltered'])->name('new.getSoItemsFiltered');
+    Route::get('/new-get-company-purchase-orders', [NewDispatchController::class, 'getCompanyPurchaseOrders']);
+
+    Route::post('/new-get_dispatch_payable_total', [NewDispatchController::class, 'get_dispatch_payable_total']);
+    Route::post('/new-get_dispatch_so_unit_price', [NewDispatchController::class, 'get_dispatch_so_unit_price']);
+
 
 
     // .................................................Rate ................................................................................................
