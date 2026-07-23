@@ -74,7 +74,19 @@ class HomeController extends Controller
         $threshold_value = (int)$CompanySetting_data->threshold_value;
 
         $categories = Category::all();
-        $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
+        $uniqueTransactions = InventoryTransaction::select('id', 'item_id')
+            ->distinct()
+            ->get()
+            ->groupBy('item_id')
+            ->map(function ($group) {
+                return $group->first(); // Latest/first record per item
+            })
+            ->values()
+            ->toArray();
+
+            // dd( $uniqueTransactions);
+
+            $inventory_transaction = InventoryTransaction::orderBy('transaction_date', 'asc')->get();
 
         $lifo_transaction = [];
         $fifo_transaction = [];
@@ -108,7 +120,7 @@ class HomeController extends Controller
         //     }
         // }
 
-        // // Collect the latest transactions for LIFO, FIFO, and Average
+        // Collect the latest transactions for LIFO, FIFO, and Average
         // foreach ($latestEntriesByDate as $itemId => $entry) {
         //     if (isset($entry['lifo'])) {
         //         $lifo_transaction[] = $entry['lifo'];
@@ -120,6 +132,9 @@ class HomeController extends Controller
         //         $avg_transaction[] = $entry['avg'];
         //     }
         // }
+
+
+
 
 
         $todaysDate = Carbon::today(); // Aaj ki date lete hain
@@ -357,7 +372,7 @@ class HomeController extends Controller
             ->select('categories.name',  DB::raw('SUM(so_items.so_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
             ->where('so_items.so_dispatch_rest_qty', '!=', 0)
-             ->orderBy('categories.name', 'asc')
+            ->orderBy('categories.name', 'asc')
             ->whereNotIn('so_items.so_dispatch_item_status', ['Pre Closed', 'Cancelled', 'Close'])
             ->get();
 
@@ -373,7 +388,7 @@ class HomeController extends Controller
             ->select('categories.name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_qty')) // Select category name and sum of quantity
             ->groupBy('categories.name') // Group by category name
             ->where('po_items.po_dispatch_rest_qty', '!=', 0)
-             ->orderBy('categories.name', 'asc')
+            ->orderBy('categories.name', 'asc')
             ->whereNotIn('po_items.po_dispatch_item_status', ['Pre Closed', 'Cancelled', 'Close'])
             ->get();
 
