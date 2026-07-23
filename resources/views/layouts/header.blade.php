@@ -275,6 +275,14 @@
                     </a>
                 </li>
             @endcan
+            @can('Dispatch-index')
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="{{ route('new.dispatch.index') }}">
+                        <i class="fa-solid fas fa fa-paper-plane"></i>
+                        <span>New Dispatch</span>
+                    </a>
+                </li>
+            @endcan
 
 
 

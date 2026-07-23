@@ -2,35 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Livewire\Warehouse;
 use App\Models\Ageing;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Dispatch;
+use App\Models\InventoryTransaction;
 use App\Models\Inward;
 use App\Models\Outward;
+use App\Models\PurchaseOrder;
 use App\Models\Quotation;
 use App\Models\Report;
-use App\Models\PurchaseOrder;
 use App\Models\SalesOrder;
 use App\Models\StockItem;
 use App\Models\SubCategory;
 use App\Models\Transaction;
-use App\Models\WareHouseModel;
-use App\Models\InventoryTransaction;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Models\WareHouseModel;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
-
-
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-
-
     public function po_report($id = null)
     {
         $companys = Company::whereIn('type', ['supplier', 'both'])->get();
@@ -46,15 +41,12 @@ class ReportController extends Controller
         $selectedCompany = null;
 
         // Check if the category exists when $id is provided
-        if ($id && !$selectedCategory) {
+        if ($id && ! $selectedCategory) {
             return redirect()->back()->with('error', 'The selected category does not exist.');
         }
 
         return view('reports.po_report', compact('companys', 'Categorys', 'user', 'selectedCategory', 'selectedCompany'));
     }
-
-
-
 
     public function get_po_report(Request $request)
     {
@@ -91,7 +83,6 @@ class ReportController extends Controller
 
         if ($filterStatus != 'all') {
 
-
             if ($filterStatus == 'Not Close') {
                 $query->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled']);
             } elseif ($filterStatus == 'Open') {
@@ -106,7 +97,6 @@ class ReportController extends Controller
                 $query->where('po_items.po_dispatch_item_status', '=', 'Cancelled');
             }
         }
-
 
         if ($filteruser != 'all') {
             $query->where('purchase_orders.po_user_id', $filteruser);
@@ -125,7 +115,7 @@ class ReportController extends Controller
         $data = [];
         foreach ($filteredDatas as $filteredData) {
 
-            if (!in_array($filteredData->po_dispatch_item_status, ['Close', 'Pre Closed', 'Cancelled'])) {
+            if (! in_array($filteredData->po_dispatch_item_status, ['Close', 'Pre Closed', 'Cancelled'])) {
                 $closeLink = route('po_pre_close_report', $filteredData->po_item_id);
             } else {
                 $closeLink = '';
@@ -155,7 +145,6 @@ class ReportController extends Controller
         return response()->json($data);
     }
 
-
     // SO Report
     public function so_report($id = null)
     {
@@ -169,12 +158,13 @@ class ReportController extends Controller
         $selectedCategory = $id ? Category::find($id) : null;
         $selectedCompany = null;
 
-        if ($id && !$selectedCategory) {
+        if ($id && ! $selectedCategory) {
             return redirect()->back()->with('error', 'The selected category does not exist.');
         }
 
         return view('reports.so_report', compact('companys', 'Categorys', 'user', 'selectedCategory', 'selectedCompany'));
     }
+
     public function so_report_party_wise($id = null)
     {
         // Get all companies of type 'buyer'
@@ -192,7 +182,7 @@ class ReportController extends Controller
             $selectedCompany = Company::where('id', $id)->where('type', 'buyer')->first();
 
             // Check if the company exists
-            if (!$selectedCompany) {
+            if (! $selectedCompany) {
                 return redirect()->back()->with('error', 'The selected company does not exist.');
             }
         }
@@ -217,16 +207,13 @@ class ReportController extends Controller
             $selectedCompany = Company::where('id', $id)->where('type', 'supplier')->first();
 
             // Check if the company exists
-            if (!$selectedCompany) {
+            if (! $selectedCompany) {
                 return redirect()->back()->with('error', 'The selected company does not exist.');
             }
         }
 
         return view('reports.po_report', compact('companys', 'Categorys', 'user', 'selectedCompany', 'selectedCategory'));
     }
-
-
-
 
     public function get_so_report(Request $request)
     {
@@ -237,7 +224,6 @@ class ReportController extends Controller
         $filterStatus = $request->filterStatus;
         $filteruser = $request->filteruser;
         // dd($filterTodate,  $filterFromdate, $filterCompany, $filterCategory, $filterStatus, $filteruser);
-
 
         $query = SalesOrder::join('companies', 'companies.id', '=', 'sales_orders.company_id')
             ->join('users', 'sales_orders.so_user_id', '=', 'users.id')
@@ -261,7 +247,6 @@ class ReportController extends Controller
             )
             ->whereBetween('sales_orders.date', [$filterTodate, $filterFromdate])
             ->orderBy('sales_orders.date', 'asc');
-
 
         if ($filterStatus != 'all') {
 
@@ -296,12 +281,11 @@ class ReportController extends Controller
         $data = [];
         foreach ($filteredDatas as $filteredData) {
 
-            if (!in_array($filteredData->so_dispatch_item_status, ['Close', 'Pre Closed', 'Cancelled'])) {
+            if (! in_array($filteredData->so_dispatch_item_status, ['Close', 'Pre Closed', 'Cancelled'])) {
                 $closeLink = route('so_pre_close_report', $filteredData->so_item_id);
             } else {
                 $closeLink = '';
             }
-
 
             $tempData = [
                 'date' => date('d-M-Y', strtotime($filteredData->date)),
@@ -318,7 +302,7 @@ class ReportController extends Controller
                 'so_item_status_date' => $filteredData->po_item_status_date,
                 'so_item_status_remarks' => $filteredData->po_item_status_remarks,
                 'so_remark' => $filteredData->terms_condition,
-                 'closeLink' => $closeLink,
+                'closeLink' => $closeLink,
 
             ];
             $data[] = $tempData;
@@ -326,7 +310,6 @@ class ReportController extends Controller
 
         return response()->json($data);
     }
-
 
     // Quotationso Report
     public function quotationso_report()
@@ -343,7 +326,6 @@ class ReportController extends Controller
         $filterFromdate = $request->filterFromdate;
         // $filterCompany = $request->filterCompany;
 
-
         $query = Quotation::join('companies', 'quotations.company_id', '=', 'companies.id')
             ->whereBetween('quotations.quotation_date', [$filterTodate, $filterFromdate])
             ->orderBy('quotations.id', 'desc')
@@ -352,7 +334,6 @@ class ReportController extends Controller
         // if ($filterCompany != 'all') {
         //     $query->where('companies.id', $filterCompany);
         // }
-
 
         $quotation_data = $query->get();
         // dd($quotation_data);
@@ -366,7 +347,7 @@ class ReportController extends Controller
             $tempData = [
                 'date' => date('m-d-Y', strtotime($quotation->quotation_date)),
                 // 'qt_number' => $quotation->document_number,
-                'qt_number' => '<a href="quotation-edit/' . $quotation->id . '  ">' . $quotation->document_number . '</a>',
+                'qt_number' => '<a href="quotation-edit/'.$quotation->id.'  ">'.$quotation->document_number.'</a>',
                 'company_name' => $quotation->company_name,
                 'total_pcs' => $quotation->total_pcs,
                 'total_weight' => $quotation->total_weight,
@@ -391,25 +372,23 @@ class ReportController extends Controller
         return response()->json($response);
     }
 
-
     // Outward Report
     public function outward_report()
     {
 
         $companys = Company::all();
         $Categorys = Category::all();
+
         return view('reports.outward_report', compact('companys', 'Categorys'));
     }
 
     public function get_outward_report(Request $request)
     {
 
-
         $filterTodate = $request->filterTodate;
         $filterFromdate = $request->filterFromdate;
         $filterCompany = $request->filterCompany;
         $filterCategory = $request->filterCategory;
-
 
         $query = Outward::join('companies as company_1', 'outwards.company_id', '=', 'company_1.id')
             ->join('outward_items', 'outward_items.outward_id', '=', 'outwards.id')
@@ -446,7 +425,6 @@ class ReportController extends Controller
             $query->where('categories.id', $filterCategory);
         }
 
-
         $filteredDatas = $query->get();
         // dd($filteredDatas);
         $data = [];
@@ -470,17 +448,14 @@ class ReportController extends Controller
         return response()->json($data);
     }
 
-
-
-
     // Stock Reports
     public function stock_report()
     {
 
-
         $Categorys = Category::all();
         $SubCategorys = SubCategory::all();
         $virtual_store = Company::where('type', 'supplier')->get();
+
         return view('reports.stock_report', compact('SubCategorys', 'Categorys', 'virtual_store'));
     }
 
@@ -493,15 +468,12 @@ class ReportController extends Controller
         $filtersubcategory = $request->filtersubcategory;
         $filterVirtualStore = $request->filterVirtualStore;
 
-
         $query = StockItem::join('categories', 'stock_items.category_id', '=', 'categories.id')
             ->join('subcategories', 'stock_items.sub_category_id', '=', 'subcategories.id')
             ->join('companies', 'stock_items.supplier_id', '=', 'companies.id')
             // ->whereBetween('stock_items.created_at', [$filterTodate, $filterFromdate])
             ->orderBy('stock_items.id', 'desc')
-            ->select('categories.*', 'companies.*', 'subcategories.*', 'stock_items.*', 'stock_items.weight as w_weight',);
-
-
+            ->select('categories.*', 'companies.*', 'subcategories.*', 'stock_items.*', 'stock_items.weight as w_weight');
 
         if ($filterCategory != 'all') {
             $query->where('categories.id', $filterCategory);
@@ -531,8 +503,6 @@ class ReportController extends Controller
 
         return response()->json($data);
     }
-
-
 
     // Inward Reports
     public function inward_report()
@@ -579,12 +549,9 @@ class ReportController extends Controller
 
             );
 
-
         if ($filterCompany != 'all') {
             $query->where('companies.id', $filterCompany);
         }
-
-
 
         if ($filterCategory != 'all') {
             $query->where('categories.id', $filterCategory);
@@ -611,8 +578,6 @@ class ReportController extends Controller
         return response()->json($data);
     }
 
-
-
     // Top Selling Report
 
     public function top_selling_report()
@@ -621,12 +586,10 @@ class ReportController extends Controller
         return view('reports.top_selling_report');
     }
 
-
     public function get_top_selling_report(Request $request)
     {
         $filterTodate = $request->filterTodate;
         $filterFromdate = $request->filterFromdate;
-
 
         $query = Outward::join('companies', 'outwards.company_id', '=', 'companies.id')
             ->join('outward_items', 'outward_items.outward_id', '=', 'outwards.id')
@@ -648,8 +611,6 @@ class ReportController extends Controller
         // ->orderBy('outward_items.weight', 'desc');
         // ->orderBy('outward_items.weight', 'asc');
 
-
-
         $quotation_data = $query->get();
         // dd($quotation_data);
         $data = [];
@@ -667,12 +628,10 @@ class ReportController extends Controller
         return response()->json($data);
     }
 
-
     public function quotation_execution_report()
     {
         return view('reports.quotation_execution_report');
     }
-
 
     public function get_quotation_execution_report(Request $request)
     {
@@ -682,7 +641,6 @@ class ReportController extends Controller
         $query = Quotation::join('companies', 'quotations.company_id', '=', 'companies.id')
             ->whereBetween('quotations.created_at', [$filterTodate, $filterFromdate])
             ->select('companies.*', 'quotations.*', 'quotations.id as q_id');
-
 
         $quotation = Quotation::whereBetween('created_at', [$filterTodate, $filterFromdate])
             ->count();
@@ -695,8 +653,6 @@ class ReportController extends Controller
         $execution_value = ($value_1 / 100);
 
         $quotation_data = $query->get();
-
-
 
         $data = [];
 
@@ -712,11 +668,10 @@ class ReportController extends Controller
             ];
             $data['quotations'][] = $tempData;
         }
+
         // dd($data);
         return response()->json($data);
     }
-
-
 
     public function stock_transaction_report()
     {
@@ -732,9 +687,9 @@ class ReportController extends Controller
             'warehouse' => $warehouse,
             'stock_transaction' => $stock_transaction,
         ];
+
         return view('reports.stocktransaction_report')->with($data);
     }
-
 
     public function get_stock_transaction_report(Request $request)
     {
@@ -819,12 +774,11 @@ class ReportController extends Controller
         return response()->json($data);
     }
 
-
-
     public function ageing_report()
     {
         $category = Category::all();
         $warehouse = WareHouseModel::all();
+
         return view('reports.ageing_report', compact('category', 'warehouse'));
     }
 
@@ -923,14 +877,12 @@ class ReportController extends Controller
             ->orderBy('transaction_date', 'desc')
             ->get();
 
-
         $issues = InventoryTransaction::where('transaction_type', 'issue')
             ->orderBy('transaction_date')
             ->get();
 
         $inventoryStack = [];
         $costOfGoodsSold = 0;
-
 
         foreach ($purchases as $purchase) {
             $inventoryStack[] = [
@@ -969,18 +921,17 @@ class ReportController extends Controller
     // public function calculateLIFO()
     // {
     //     $purchases = InventoryTransaction::where('transaction_type', 'purchase')
-    //         ->orderBy('transaction_date', 'asc') 
+    //         ->orderBy('transaction_date', 'asc')
     //         ->get();
 
     //     $issues = InventoryTransaction::where('transaction_type', 'issue')
     //         ->orderBy('transaction_date', 'asc')
     //         ->get();
 
-    //     $inventoryStack = []; 
-    //     $transactionLogs = []; 
+    //     $inventoryStack = [];
+    //     $transactionLogs = [];
     //     $totalQuantity = 0;
     //     $totalValue = 0;
-
 
     //     foreach ($purchases as $purchase) {
     //         $inventoryStack[] = [
@@ -993,7 +944,6 @@ class ReportController extends Controller
     //         $totalQuantity += $purchase->quantity;
     //         $totalValue += $purchase->quantity * $purchase->unit_price;
 
-
     //         $transactionLogs[] = [
     //             'transaction_type' => 'Purchase',
     //             'quantity' => $purchase->quantity,
@@ -1004,10 +954,8 @@ class ReportController extends Controller
     //         ];
     //     }
 
-
     //     foreach ($issues as $issue) {
-    //         $issueQty = abs($issue->quantity); 
-
+    //         $issueQty = abs($issue->quantity);
 
     //         $logEntry = [
     //             'transaction_type' => 'Issue',
@@ -1025,10 +973,8 @@ class ReportController extends Controller
     //                 $usedQty = $issueQty;
     //                 $remainingQty = $lastPurchase['quantity'] - $issueQty;
 
-
     //                 $totalQuantity -= $usedQty;
     //                 $totalValue -= $usedQty * $lastPurchase['unit_price'];
-
 
     //                 $inventoryStack[] = [
     //                     'quantity' => $remainingQty,
@@ -1044,11 +990,10 @@ class ReportController extends Controller
     //                     'remaining_value' => $remainingQty * $lastPurchase['unit_price']
     //                 ];
 
-    //                 $issueQty = 0; 
+    //                 $issueQty = 0;
     //             } else {
 
     //                 $usedQty = $lastPurchase['quantity'];
-
 
     //                 $totalQuantity -= $usedQty;
     //                 $totalValue -= $usedQty * $lastPurchase['unit_price'];
@@ -1060,10 +1005,9 @@ class ReportController extends Controller
     //                     'remaining_value' => 0
     //                 ];
 
-    //                 $issueQty -= $usedQty; 
+    //                 $issueQty -= $usedQty;
     //             }
     //         }
-
 
     //         $transactionLogs[] = [
     //             'transaction_type' => 'Issue',
@@ -1071,10 +1015,9 @@ class ReportController extends Controller
     //             'transaction_date' => $logEntry['transaction_date'],
     //             'balance_qty' => $totalQuantity,
     //             'balance_value' => $totalValue,
-    //             'details' => $logEntry['details'] 
+    //             'details' => $logEntry['details']
     //         ];
     //     }
-
 
     //     return response()->json([
     //         'transaction_logs' => $transactionLogs,
@@ -1125,11 +1068,11 @@ class ReportController extends Controller
                     'quantity' => $sellQty,
                     'transaction_date' => $transaction->transaction_date,
                     'selling_price' => $transaction->unit_price,
-                    'details' => []
+                    'details' => [],
                 ];
 
                 // LIFO logic - Sell the most recent purchase first
-                while ($sellQty > 0 && !empty($inventoryStack)) {
+                while ($sellQty > 0 && ! empty($inventoryStack)) {
                     $lastPurchase = array_pop($inventoryStack); // Get the last batch
 
                     if ($lastPurchase['quantity'] >= $sellQty) {
@@ -1205,12 +1148,6 @@ class ReportController extends Controller
         ]);
     }
 
-
-
-
-
-
-
     public function calculateFIFO()
     {
 
@@ -1231,10 +1168,8 @@ class ReportController extends Controller
                     'transaction_date' => $transaction->transaction_date,
                 ];
 
-
                 $totalQuantity += $transaction->quantity;
                 $totalValue += $transaction->quantity * $transaction->unit_price;
-
 
                 $transactionLogs[] = [
                     'transaction_type' => 'Purchase',
@@ -1242,7 +1177,7 @@ class ReportController extends Controller
                     'unit_price' => $transaction->unit_price,
                     'transaction_date' => $transaction->transaction_date,
                     'balance_qty' => $totalQuantity,
-                    'balance_value' => $totalValue
+                    'balance_value' => $totalValue,
                 ];
             } elseif ($transaction->transaction_type === 'sell') {
 
@@ -1253,19 +1188,17 @@ class ReportController extends Controller
                     'quantity' => $sellQty,
                     'transaction_date' => $transaction->transaction_date,
                     'selling_price' => $sellingPrice,
-                    'details' => []
+                    'details' => [],
                 ];
 
                 $costOfGoodsSold = 0;
 
-
-                while ($sellQty > 0 && !empty($inventoryQueue)) {
+                while ($sellQty > 0 && ! empty($inventoryQueue)) {
                     $firstPurchase = array_shift($inventoryQueue);
 
                     if ($firstPurchase['quantity'] >= $sellQty) {
 
                         $remainingQty = $firstPurchase['quantity'] - $sellQty;
-
 
                         $costOfGoodsSold += $sellQty * $firstPurchase['unit_price'];
                         $totalValue -= $sellQty * $firstPurchase['unit_price'];
@@ -1279,7 +1212,6 @@ class ReportController extends Controller
                                 'transaction_date' => $firstPurchase['transaction_date'],
                             ];
                         }
-
 
                         $logEntry['details'][] = [
                             'used_qty' => $sellQty,
@@ -1307,11 +1239,9 @@ class ReportController extends Controller
                     }
                 }
 
-
                 $totalSaleValue = $transaction->quantity * $sellingPrice;
                 $profitLoss = $totalSaleValue - $costOfGoodsSold;
                 $totalProfitLoss += $profitLoss;
-
 
                 $transactionLogs[] = [
                     'transaction_type' => 'sell',
@@ -1323,20 +1253,18 @@ class ReportController extends Controller
                     'cost_of_goods_sold' => $costOfGoodsSold,
                     'profit_loss' => $profitLoss,
                     'total_profit_loss' => $totalProfitLoss,
-                    'details' => $logEntry['details']
+                    'details' => $logEntry['details'],
                 ];
             }
         }
-
 
         return response()->json([
             'transaction_logs' => $transactionLogs,
             'final_balance_qty' => $totalQuantity,
             'final_balance_value' => $totalValue,
-            'final_profit_loss' => $totalProfitLoss
+            'final_profit_loss' => $totalProfitLoss,
         ]);
     }
-
 
     public function calculateAverageCost()
     {
@@ -1360,7 +1288,7 @@ class ReportController extends Controller
                     'transaction_date' => $transaction->transaction_date,
                     'balance_qty' => $totalQuantity,
                     'balance_value' => $totalValue,
-                    'average_cost' => $averageCost
+                    'average_cost' => $averageCost,
                 ];
             } elseif ($transaction->transaction_type === 'sell') {
                 $sellQty = abs($transaction->quantity);
@@ -1382,7 +1310,7 @@ class ReportController extends Controller
                     'balance_value' => $totalValue,
                     'cost_of_goods_sold' => $costOfGoodsSold,
                     'profit_loss' => $profitLoss,
-                    'total_profit_loss' => $totalProfitLoss
+                    'total_profit_loss' => $totalProfitLoss,
                 ];
             }
         }
@@ -1391,17 +1319,16 @@ class ReportController extends Controller
             'transaction_logs' => $transactionLogs,
             'final_balance_qty' => $totalQuantity,
             'final_balance_value' => $totalValue,
-            'final_profit_loss' => $totalProfitLoss
+            'final_profit_loss' => $totalProfitLoss,
         ]);
     }
-
 
     public function inventory_report()
     {
         $category = Category::all();
+
         return view('reports.inventory_report', compact('category'));
     }
-
 
     public function get_inventory_report(Request $request)
     {
@@ -1417,7 +1344,6 @@ class ReportController extends Controller
                 ->groupBy('po_items.item_category', 'categories.name', 'categories.id', 'po_items.po_dispatch_item_status')
                 ->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled'])
                 ->get();
-
 
             $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
                 ->join('categories', 'so_items.item_category', '=', 'categories.id')
@@ -1435,11 +1361,10 @@ class ReportController extends Controller
         } else {
             $filteredPOTotals = PurchaseOrder::join('po_items', 'purchase_orders.id', '=', 'po_items.po_id')
                 ->join('categories', 'po_items.item_category', '=', 'categories.id')
-                ->select('po_items.item_category',  'categories.id as category_id', 'po_items.po_dispatch_item_status', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
+                ->select('po_items.item_category', 'categories.id as category_id', 'po_items.po_dispatch_item_status', 'categories.name as category_name', DB::raw('SUM(po_items.po_dispatch_rest_qty) as total_quantity'))
                 ->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled'])
                 ->groupBy('po_items.item_category', 'categories.name', 'categories.id', 'po_items.po_dispatch_item_status')
                 ->get();
-
 
             $filteredSOTotals = SalesOrder::join('so_items', 'sales_orders.id', '=', 'so_items.so_id')
                 ->join('categories', 'so_items.item_category', '=', 'categories.id')
@@ -1455,9 +1380,6 @@ class ReportController extends Controller
                 ->get();
         }
 
-
-
-
         $data = [
             'filteredPOTotal' => $filteredPOTotals,
             'filteredSOTotal' => $filteredSOTotals,
@@ -1468,9 +1390,10 @@ class ReportController extends Controller
 
     public function dispatch_report()
     {
-        $company =  Company::all();
+        $company = Company::all();
         $category = Category::all();
         $dispatch = Dispatch::distinct('dispatch_number')->get();
+
         return view('reports.dispatch', compact('company', 'category', 'dispatch'));
     }
 
@@ -1482,7 +1405,7 @@ class ReportController extends Controller
         $filterCompany = $request->filterCompany;
         $filterDispatch = $request->filterDispatch;
 
-        $query =  Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
+        $query = Dispatch::leftjoin('so_items', 'dispatches.so_item_id', '=', 'so_items.id')
             ->leftjoin('po_items', 'dispatches.po_item_id', '=', 'po_items.id')
             ->leftjoin('companies as po_company', 'dispatches.po_company_id', '=', 'po_company.id')
             ->leftjoin('companies as so_company', 'dispatches.so_company_id', '=', 'so_company.id')
@@ -1553,24 +1476,23 @@ class ReportController extends Controller
             $data[] = $tempData;
             // dd( $data);
         }
+
         return response()->json($data);
     }
 
-
-
     public function company_wise_report()
     {
-        $company =  Company::all();
+        $company = Company::all();
         $category = Category::all();
 
         return view('reports.company_wise_report', compact('company', 'category'));
     }
+
     public function get_company_wise_report(Request $request)
     {
         $filterTodate = $request->filterTodate;
         $filterFromdate = $request->filterFromdate;
         $filterCompany = $request->filterCompany;
-
 
         $query = Company::leftJoin('sales_orders', 'companies.id', '=', 'sales_orders.company_id')
             ->leftJoin('purchase_orders', 'companies.id', '=', 'purchase_orders.supplier_id')
@@ -1603,7 +1525,6 @@ class ReportController extends Controller
 
         $filteredData = $query->get();
 
-
         $data = [];
         foreach ($filteredData as $item) {
             $tempData = [
@@ -1621,7 +1542,7 @@ class ReportController extends Controller
 
     public function due_so_report()
     {
-        $companys =  Company::all();
+        $companys = Company::all();
         $Categorys = Category::all();
 
         return view('reports.due_so_report', compact('companys', 'Categorys'));
@@ -1670,7 +1591,6 @@ class ReportController extends Controller
             $query->where('so_items.item_category', $filterItem_name);
         }
 
-
         if ($filterDue_date != 'all' && $filterDue_date == 'due_future') {
             $query->whereDate('sales_orders.due_date', '>=', $todaysDate);
         }
@@ -1708,13 +1628,12 @@ class ReportController extends Controller
         return response()->json($data);
     }
 
-
     public function due_po_report()
     {
-        $companys =  Company::all();
+        $companys = Company::all();
         $Categorys = Category::all();
 
-        return view('reports.due_po_report',  compact('companys', 'Categorys'));
+        return view('reports.due_po_report', compact('companys', 'Categorys'));
     }
 
     public function get_due_po_report(Request $request)
@@ -1746,7 +1665,6 @@ class ReportController extends Controller
             )
             ->whereNotIn('po_items.po_dispatch_item_status', ['Close', 'Pre Closed', 'Cancelled'])
             ->where('po_items.po_dispatch_rest_qty', '!=', 0);
-
 
         if ($filterCompany && $filterCompany != 'all') {
             $query->where('companies.id', $filterCompany);
